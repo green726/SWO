@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "yLICSLaW/chYxeheio+rXY35N5S8cX9JHLirKsym9PDcHzwYD+7GljGKL2OE3GkrHlFk4uhU8qf9CmQyuOYHYw==",
+  "success": true,
+  "projectFilePath": "/home/green726/coding/greenlang/greenlang.csproj",
+  "expectedPackageFiles": [
+    "/home/green726/.nuget/packages/microsoft.aspnetcore.app.ref/6.0.2/microsoft.aspnetcore.app.ref.6.0.2.nupkg.sha512"
+  ],
+  "logs": []
+}
