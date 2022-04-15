@@ -1,4 +1,6 @@
 
+using System.Text;
+
 public static class Lexer
 {
     public enum tokenType
@@ -26,26 +28,46 @@ public static class Lexer
         }
 
     }
-
     private static List<Token> tokenList;
-    private static char[] operators = { '+', '-', '*', '/' };
+    private static string[] operators = { "+", "-", "*", "/" };
 
     public static List<Token> lex(string input)
     {
         tokenList = new List<Token>();
+        char lastChar = new char();
+        StringBuilder stringBuilder = new StringBuilder();
+
 
         foreach (char ch in input)
         {
-            if (ch == ' ')
+            bool isFinalChar = input.IndexOf(ch) == input.Length - 1;
+            if (ch == ' ' || isFinalChar)
             {
-                continue;
+                if (lastChar != ' ' || isFinalChar)
+                {
+                    if (int.TryParse(stringBuilder.ToString(), out int result))
+                    {
+                        tokenList.Add(new Token(tokenType.number, stringBuilder.ToString()));
+                    }
+                    else if (operators.Contains(stringBuilder.ToString()))
+                    {
+                        tokenList.Add(new Token(tokenType._operator, stringBuilder.ToString()));
+                    }
+                    stringBuilder = new StringBuilder();
+                    lastChar = ch;
+                    continue;
+                }
+                else
+                {
+                    lastChar = ch;
+                    continue;
+                }
             }
 
-            else if (Char.IsDigit(ch))
-                tokenList.Add(new Token(tokenType.number, ch));
-            else if (operators.Contains(ch))
-                tokenList.Add(new Token(tokenType._operator, ch));
+            stringBuilder.Append(ch.ToString());
+            lastChar = ch;
         }
+
 
         return tokenList;
     }
