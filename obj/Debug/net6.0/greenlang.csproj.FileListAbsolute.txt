@@ -1,0 +1,15 @@
+/home/green726/coding/greenlang/obj/Debug/net6.0/greenlang.csproj.AssemblyReference.cache
+/home/green726/coding/greenlang/obj/Debug/net6.0/greenlang.GeneratedMSBuildEditorConfig.editorconfig
+/home/green726/coding/greenlang/obj/Debug/net6.0/greenlang.AssemblyInfoInputs.cache
+/home/green726/coding/greenlang/obj/Debug/net6.0/greenlang.AssemblyInfo.cs
+/home/green726/coding/greenlang/obj/Debug/net6.0/greenlang.csproj.CoreCompileInputs.cache
+/home/green726/coding/greenlang/bin/Debug/net6.0/greenlang
+/home/green726/coding/greenlang/bin/Debug/net6.0/greenlang.deps.json
+/home/green726/coding/greenlang/bin/Debug/net6.0/greenlang.runtimeconfig.json
+/home/green726/coding/greenlang/bin/Debug/net6.0/greenlang.dll
+/home/green726/coding/greenlang/bin/Debug/net6.0/ref/greenlang.dll
+/home/green726/coding/greenlang/bin/Debug/net6.0/greenlang.pdb
+/home/green726/coding/greenlang/obj/Debug/net6.0/greenlang.dll
+/home/green726/coding/greenlang/obj/Debug/net6.0/ref/greenlang.dll
+/home/green726/coding/greenlang/obj/Debug/net6.0/greenlang.pdb
+/home/green726/coding/greenlang/obj/Debug/net6.0/greenlang.genruntimeconfig.cache
