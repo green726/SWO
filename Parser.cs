@@ -2,15 +2,31 @@
 public static class Parser
 {
 
-
-
-
-    public static void Parse()
+    public class AST
     {
+        public List<ASTNode> nodes;
+
+
 
     }
 
-    public abstract class Expression
+    public abstract class ASTNode
+    {
+        public List<ASTNode> children;
+        public ASTNode parent;
+
+        public ASTNode getParent()
+        {
+            return parent;
+        }
+
+        public void addChild(ASTNode child)
+        {
+            children.Add(child);
+        }
+    }
+
+    public abstract class Expression : ASTNode
     {
         public ExprType NodeType;
 
@@ -22,22 +38,17 @@ public static class Parser
             Divide,
             Declare
         }
-    }
-    /*
-        //numerical expression
-        public class NumExpr : Expression
-        {
-            public NumExpr(string value)
-            {
-                this.value = int.Parse(value);
-                this.exprType = ExprType.declare;
-            }
 
-        }
-    */
+    }
+
+
+
     public class BinaryExpression : Expression
     {
-        public BinaryExpression(Lexer.Token token, Lexer.Token previousToken, Lexer.Token nextToken)
+        public ASTNode leftHand;
+        public ASTNode rightHand;
+
+        public BinaryExpression(Util.Token token, Util.Token previousToken, Util.Token nextToken, ASTNode parent)
         {
             switch (token.value)
             {
@@ -56,8 +67,14 @@ public static class Parser
                 default:
                     throw new ArgumentException("op " + token.value + " is not a valid operator");
             }
+
+            this.parent = parent;
         }
     }
 
 
+    public static void Parse()
+    {
+
+    }
 }

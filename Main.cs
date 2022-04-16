@@ -10,10 +10,10 @@ public class greenlang
 
         fileContents = System.IO.File.ReadAllText(@$"{fileToRead}");
 
-        List<Lexer.Token> lexedContent = Lexer.lex(fileContents);
+        List<Util.Token> lexedContent = Lexer.lex(fileContents);
 
 
-        foreach (Lexer.Token token in lexedContent)
+        foreach (Util.Token token in lexedContent)
         {
             Console.WriteLine(token.type + " " + token.value);
         }
