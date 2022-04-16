@@ -6,7 +6,8 @@ public static class Lexer
     public enum tokenType
     {
         _operator,
-        number
+        number,
+        blankLine
     }
 
 
@@ -62,6 +63,12 @@ public static class Lexer
                     lastChar = ch;
                     continue;
                 }
+            }
+            else if (ch == '\n')
+            {
+                tokenList.Add(new Token(tokenType.blankLine, ch.ToString()));
+                lastChar = ch;
+                continue;
             }
 
             stringBuilder.Append(ch.ToString());
