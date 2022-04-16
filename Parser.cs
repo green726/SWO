@@ -42,6 +42,16 @@ public static class Parser
     }
 
 
+    public class NumberExpression : Expression
+    {
+
+        public double value;
+
+        public NumberExpression(Util.Token token)
+        {
+            this.value = Double.Parse(token.value);
+        }
+    }
 
     public class BinaryExpression : Expression
     {
@@ -67,14 +77,26 @@ public static class Parser
                 default:
                     throw new ArgumentException("op " + token.value + " is not a valid operator");
             }
-
             this.parent = parent;
+
+            this.leftHand = checkToken(previousToken, Util.tokenType.number);
+            this.rightHand = checkToken(nextToken, Util.tokenType.number);
+
         }
     }
 
+    public static Util.Token checkToken(Util.Token token, Util.tokenType expectedType)
+    {
+        if (token.type != expectedType)
+        {
+            throw new ArgumentException($"expected type {expectedType} but got {token.type} at {token.line}:{token.column}");
+        }
+        return token;
+    }
 
-    public static void Parse()
+    public static void parseProgram()
     {
 
     }
+
 }
