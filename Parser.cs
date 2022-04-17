@@ -1,14 +1,14 @@
-
+// to decide where everything goes in the final AST: assign every node type a "importance/level" value and then loop through all the ASTNodes and assign all the nodes from the highest level to the topAST primaryChildren?
 public static class Parser
 {
+    public static List<ASTNode> nodes = new List<ASTNode>();
+    public static List<Util.Token> tokenList;
 
-    public class AST
+    public static class topAST
     {
-        public List<ASTNode> nodes;
-
-
-
+        public static List<ASTNode> primaryChildren = new List<ASTNode>();
     }
+
 
     public abstract class ASTNode
     {
@@ -29,7 +29,6 @@ public static class Parser
     public abstract class Expression : ASTNode
     {
         public ExprType NodeType;
-
         public enum ExprType
         {
             Add,
@@ -38,13 +37,13 @@ public static class Parser
             Divide,
             Declare
         }
-
     }
 
 
     public class NumberExpression : Expression
     {
 
+        public ASTNode parent;
         public double value;
 
         public NumberExpression(Util.Token token)
@@ -58,7 +57,7 @@ public static class Parser
         public ASTNode leftHand;
         public ASTNode rightHand;
 
-        public BinaryExpression(Util.Token token, Util.Token previousToken, Util.Token nextToken, ASTNode parent)
+        public BinaryExpression(Util.Token token, ASTNode previousNode, Util.Token nextToken, ASTNode parent)
         {
             switch (token.value)
             {
@@ -79,8 +78,8 @@ public static class Parser
             }
             this.parent = parent;
 
-            this.leftHand = checkToken(previousToken, Util.tokenType.number);
-            this.rightHand = checkToken(nextToken, Util.tokenType.number);
+            this.leftHand = previousNode;
+            this.rightHand = new NumberExpression(checkToken(nextToken, Util.tokenType.number));
 
         }
     }
@@ -94,9 +93,33 @@ public static class Parser
         return token;
     }
 
-    public static void parseProgram()
+    public static bool parseToken(Util.Token token, int tokenIndex, ASTNode parent = null)
     {
+        if (tokenIndex == tokenList.Count - 1)
+        {
+            return true;
+        }
 
+        switch (token.type)
+        {
+            case Util.tokenType.number:
+                nodes.Append(new NumberExpression(token));
+                break;
+            case Util.tokenType._operator:
+                BinaryExpression binExpr = new BinaryExpression(token, nodes.Last(), tokenList[tokenIndex + 1], parent);
+                nodes.Append(binExpr);
+                return parseToken(tokenList[tokenIndex + 1], tokenIndex + 1, binExpr);
+
+        }
+        return parseToken(tokenList[tokenIndex + 1], tokenIndex + 1);
+
+    }
+
+    public static void beginParse(List<Util.Token> _tokenList)
+    {
+        tokenList = _tokenList;
+        parseToken(tokenList[0], 0);
+        Console.WriteLine(nodes[0]);
     }
 
 }
