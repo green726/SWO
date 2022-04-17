@@ -12,7 +12,7 @@ public static class Lexer
         char lastChar = new char();
         StringBuilder stringBuilder = new StringBuilder();
 
-
+        
         foreach (char ch in input)
         {
             bool isFinalChar = input.IndexOf(ch) == input.Length - 1;

@@ -12,10 +12,10 @@ public class greenlang
 
         List<Util.Token> lexedContent = Lexer.lex(fileContents);
 
-
         foreach (Util.Token token in lexedContent)
         {
             Console.WriteLine(token.type + " " + token.value);
         }
+        Parser.beginParse(lexedContent);
     }
 }

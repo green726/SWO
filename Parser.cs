@@ -12,8 +12,8 @@ public static class Parser
 
     public abstract class ASTNode
     {
-        public List<ASTNode> children;
-        public ASTNode parent;
+        public List<ASTNode>? children;
+        public ASTNode? parent;
 
         public ASTNode getParent()
         {
@@ -43,7 +43,6 @@ public static class Parser
     public class NumberExpression : Expression
     {
 
-        public ASTNode parent;
         public double value;
 
         public NumberExpression(Util.Token token)
@@ -57,7 +56,7 @@ public static class Parser
         public ASTNode leftHand;
         public ASTNode rightHand;
 
-        public BinaryExpression(Util.Token token, ASTNode previousNode, Util.Token nextToken, ASTNode parent)
+        public BinaryExpression(Util.Token token, ASTNode previousNode, Util.Token nextToken, ASTNode? parent)
         {
             switch (token.value)
             {
@@ -93,7 +92,7 @@ public static class Parser
         return token;
     }
 
-    public static bool parseToken(Util.Token token, int tokenIndex, ASTNode parent = null)
+    public static bool parseToken(Util.Token token, int tokenIndex, ASTNode? parent = null)
     {
         if (tokenIndex == tokenList.Count - 1)
         {
@@ -119,7 +118,7 @@ public static class Parser
     {
         tokenList = _tokenList;
         parseToken(tokenList[0], 0);
-        Console.WriteLine(nodes[0]);
+        Console.WriteLine(nodes[1]);
     }
 
 }
