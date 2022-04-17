@@ -6,7 +6,8 @@ public class greenlang
 
     static void Main(string[] args)
     {
-        string fileToRead = args[0];
+        string fileToRead = args.Length != 0 ? args[0] : "/home/green726/coding/greenlang/test.hiss";
+
 
         fileContents = System.IO.File.ReadAllText(@$"{fileToRead}");
 

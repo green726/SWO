@@ -1,4 +1,6 @@
 // to decide where everything goes in the final AST: assign every node type a "importance/level" value and then loop through all the ASTNodes and assign all the nodes from the highest level to the topAST primaryChildren?
+using System.Text;
+
 public static class Parser
 {
     public static List<ASTNode> nodes = new List<ASTNode>();
@@ -92,8 +94,29 @@ public static class Parser
         return token;
     }
 
+    public static string printAST()
+    {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        foreach (ASTNode node in nodes)
+        {
+            if (node.GetType() == typeof(NumberExpression))
+            {
+                stringBuilder.Append(node.value);
+
+            }
+            else if (node.GetType() == typeof(BinaryExpression))
+            {
+                stringBuilder.Append(node.NodeType);
+            }
+        }
+
+        return nodes.ToString();
+    }
+
     public static bool parseToken(Util.Token token, int tokenIndex, ASTNode? parent = null)
     {
+        Console.WriteLine($"parse loop {tokenIndex}: {printAST()}");
         if (tokenIndex == tokenList.Count - 1)
         {
             return true;
@@ -102,11 +125,11 @@ public static class Parser
         switch (token.type)
         {
             case Util.tokenType.number:
-                nodes.Append(new NumberExpression(token));
+                nodes.Add(new NumberExpression(token));
                 break;
             case Util.tokenType._operator:
                 BinaryExpression binExpr = new BinaryExpression(token, nodes.Last(), tokenList[tokenIndex + 1], parent);
-                nodes.Append(binExpr);
+                nodes.Add(binExpr);
                 return parseToken(tokenList[tokenIndex + 1], tokenIndex + 1, binExpr);
 
         }
