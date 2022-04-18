@@ -140,7 +140,7 @@ public static class Parser
         {
             if (node.nodeType != expectedNodeType && expectedNodeType == expectedTypes.Last())
             {
-                throw new ArgumentException($"expected type {expectedTypes.ToString()} but got {node.nodeType}");
+                throw new ArgumentException($"expected type {string.Join(", ", expectedTypes)} but got {node.nodeType}");
             }
             else if (node.nodeType == expectedNodeType)
             {
@@ -160,7 +160,7 @@ public static class Parser
         {
             if (token.type != expectedTokenType && expectedTokenType == expectedTypes.Last())
             {
-                throw new ArgumentException($"expected type {expectedTypes.ToString()} but got {token.type} at {token.line}:{token.column}");
+                throw new ArgumentException($"expected type {string.Join(", ", expectedTypes)} but got {token.type} at {token.line}:{token.column}");
             }
             else if (token.type == expectedTokenType)
             {
