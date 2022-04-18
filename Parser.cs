@@ -67,7 +67,7 @@ public static class Parser
     public class BinaryExpression : ASTNode
     {
         public ASTNode leftHand;
-        public ASTNode rightHand;
+        public ASTNode? rightHand;
         public OperatorType operatorType;
 
         public enum OperatorType
@@ -78,7 +78,7 @@ public static class Parser
             Divide
         }
 
-        public BinaryExpression(Util.Token token, ASTNode previousNode, Util.Token nextToken, ASTNode? parent)
+        public BinaryExpression(Util.Token token, ASTNode? previousNode, Util.Token nextToken, ASTNode? parent)
         {
             this.nodeType = NodeType.BinaryExpression;
             switch (token.value)
@@ -130,8 +130,12 @@ public static class Parser
         }
     }
 
-    public static void checkNode(ASTNode node, ASTNode.NodeType[] expectedTypes)
+    public static void checkNode(ASTNode? node, ASTNode.NodeType[] expectedTypes)
     {
+        if (node == null)
+        {
+            throw new ArgumentException($"expected a node at (line and column goes here) but got null");
+        }
         foreach (ASTNode.NodeType expectedNodeType in expectedTypes)
         {
             if (node.nodeType != expectedNodeType && expectedNodeType == expectedTypes.Last())
@@ -145,8 +149,13 @@ public static class Parser
         }
     }
 
-    public static void checkToken(Util.Token token, Util.TokenType[] expectedTypes)
+    public static void checkToken(Util.Token? token, Util.TokenType[] expectedTypes)
     {
+        if (token == null)
+        {
+            throw new ArgumentException($"expected a token at {token.line}:{token.column} but got null");
+        }
+
         foreach (Util.TokenType expectedTokenType in expectedTypes)
         {
             if (token.type != expectedTokenType && expectedTokenType == expectedTypes.Last())
@@ -175,6 +184,9 @@ public static class Parser
 
     public static bool parseToken(Util.Token token, int tokenIndex, ASTNode? parent = null, Util.TokenType[]? expectedTypes = null)
     {
+
+        ASTNode? previousNode = nodes.Count > 0 ? nodes.Last() : null;
+
         Console.WriteLine($"parse loop {tokenIndex}: {printAST()}");
         if (token.type == Util.TokenType.EOF)
         {
@@ -192,7 +204,7 @@ public static class Parser
                 new NumberExpression(token, parent);
                 break;
             case Util.TokenType._operator:
-                BinaryExpression binExpr = new BinaryExpression(token, nodes.Last(), tokenList[tokenIndex + 1], parent);
+                BinaryExpression binExpr = new BinaryExpression(token, previousNode, tokenList[tokenIndex + 1], parent);
                 return parseToken(tokenList[tokenIndex + 1], tokenIndex + 1, binExpr, binaryExpectedTokens);
 
         }
