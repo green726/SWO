@@ -6,7 +6,7 @@ public static class Parser
     public static List<ASTNode> nodes = new List<ASTNode>();
     public static List<Util.Token> tokenList;
 
-    public static Util.TokenType[] binaryExpectedTokens = { Util.TokenType.number };
+    public static Util.TokenType[] binaryExpectedTokens = { Util.TokenType.Number };
     public static ASTNode.NodeType[] binaryExpectedNodes = { ASTNode.NodeType.NumberExpression, ASTNode.NodeType.BinaryExpression };
 
     public static class topAST
@@ -99,6 +99,8 @@ public static class Parser
                     throw new ArgumentException("op " + token.value + " is not a valid operator");
             }
 
+            this.parent = parent;
+
             checkNode(previousNode, binaryExpectedNodes);
 
             this.leftHand = previousNode;
@@ -107,13 +109,16 @@ public static class Parser
             {
                 this.leftHand.addParent(this);
             }
+            else
+            {
+                this.parent = previousNode;
+            }
+
 
             // this.rightHand = new NumberExpression(checkToken(nextToken, Util.tokenType.number), this);
 
-            this.parent = parent;
 
-
-            if (parent != null)
+            if (this.parent != null)
             {
                 this.parent.addChild(this);
             }
@@ -126,7 +131,13 @@ public static class Parser
         public override void addChild(ASTNode child)
         {
             this.children.Add(child);
-            this.rightHand = child;
+            if (child.nodeType == ASTNode.NodeType.BinaryExpression)
+            {
+            }
+            else
+            {
+                this.rightHand = child;
+            }
         }
     }
 
@@ -200,10 +211,10 @@ public static class Parser
 
         switch (token.type)
         {
-            case Util.TokenType.number:
+            case Util.TokenType.Number:
                 new NumberExpression(token, parent);
                 break;
-            case Util.TokenType._operator:
+            case Util.TokenType.Operator:
                 BinaryExpression binExpr = new BinaryExpression(token, previousNode, tokenList[tokenIndex + 1], parent);
                 return parseToken(tokenList[tokenIndex + 1], tokenIndex + 1, binExpr, binaryExpectedTokens);
 

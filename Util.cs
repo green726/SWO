@@ -2,9 +2,9 @@ public static class Util
 {
     public enum TokenType
     {
-        _operator,
-        number,
-        blankLine,
+        Operator,
+        Number,
+        BlankLine,
         EOF
     }
 

@@ -22,11 +22,11 @@ public static class Lexer
                 {
                     if (int.TryParse(stringBuilder.ToString(), out int result))
                     {
-                        tokenList.Add(new Util.Token(Util.TokenType.number, stringBuilder.ToString(), 0, 0));
+                        tokenList.Add(new Util.Token(Util.TokenType.Number, stringBuilder.ToString(), 0, 0));
                     }
                     else if (operators.Contains(stringBuilder.ToString()))
                     {
-                        tokenList.Add(new Util.Token(Util.TokenType._operator, stringBuilder.ToString(), 0, 0));
+                        tokenList.Add(new Util.Token(Util.TokenType.Operator, stringBuilder.ToString(), 0, 0));
                     }
                     stringBuilder = new StringBuilder();
                     lastChar = ch;
@@ -40,7 +40,7 @@ public static class Lexer
             }
             else if (ch == '\n')
             {
-                tokenList.Add(new Util.Token(Util.TokenType.blankLine, ch.ToString(), 0, 0));
+                tokenList.Add(new Util.Token(Util.TokenType.BlankLine, ch.ToString(), 0, 0));
                 lastChar = ch;
                 continue;
             }
