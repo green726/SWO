@@ -30,10 +30,10 @@ public static class Parser
 
         public virtual void addParent(ASTNode parent)
         {
+            this.parent = parent;
             if (this.parent != null)
             {
                 nodes.Remove(this);
-
             }
         }
 
@@ -103,7 +103,7 @@ public static class Parser
 
             this.leftHand = previousNode;
 
-            if (this.leftHand.parent == null)
+            if (this.leftHand.parent == null && this.leftHand.nodeType == ASTNode.NodeType.NumberExpression)
             {
                 this.leftHand.addParent(this);
             }
@@ -167,6 +167,7 @@ public static class Parser
         foreach (ASTNode node in nodes)
         {
             stringBuilder.Append(node.nodeType);
+            stringBuilder.Append("\n");
         }
 
         return stringBuilder.ToString();
@@ -188,7 +189,7 @@ public static class Parser
         switch (token.type)
         {
             case Util.TokenType.number:
-                nodes.Add(new NumberExpression(token, parent));
+                new NumberExpression(token, parent);
                 break;
             case Util.TokenType._operator:
                 BinaryExpression binExpr = new BinaryExpression(token, nodes.Last(), tokenList[tokenIndex + 1], parent);
@@ -203,7 +204,9 @@ public static class Parser
     {
         tokenList = _tokenList;
         parseToken(tokenList[0], 0);
-        Console.WriteLine(nodes[1]);
+
+        Console.WriteLine("node types below");
+        Console.WriteLine(printAST());
     }
 
 }
