@@ -74,6 +74,12 @@ public static class IRGen
         foreach (Parser.ASTNode node in nodes)
         {
             evaluateNode(node);
+
+            foreach (Parser.ASTNode child in node.children)
+            {
+                evaluateNode(child);
+            }
+            // LLVM.DumpValue(valueStack.Peek());
         }
 
         while (valueStack.Count > 0)

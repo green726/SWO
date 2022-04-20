@@ -43,6 +43,17 @@ public static class Parser
         }
     }
 
+    public class PrototypeAST : ASTNode
+    {
+
+    }
+
+    public class FunctionAST : ASTNode
+    {
+
+    }
+
+
     public class NumberExpression : ASTNode
     {
         public double value;
@@ -63,6 +74,7 @@ public static class Parser
         }
 
     }
+
 
     public class BinaryExpression : ASTNode
     {
@@ -109,7 +121,7 @@ public static class Parser
             {
                 this.leftHand.addParent(this);
             }
-            else if (previousNode.nodeType != NodeType.BinaryExpression && parent == null)
+            else if (parent == null)
             {
                 this.parent = previousNode;
             }
@@ -118,7 +130,7 @@ public static class Parser
             // this.rightHand = new NumberExpression(checkToken(nextToken, Util.tokenType.number), this);
 
 
-            if (this.parent != null && this.parent.nodeType != ASTNode.NodeType.BinaryExpression)
+            if (this.parent != null)
             {
                 this.parent.addChild(this);
             }
