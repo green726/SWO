@@ -109,7 +109,7 @@ public static class Parser
             {
                 this.leftHand.addParent(this);
             }
-            else
+            else if (previousNode.nodeType != NodeType.BinaryExpression && parent == null)
             {
                 this.parent = previousNode;
             }
@@ -118,7 +118,7 @@ public static class Parser
             // this.rightHand = new NumberExpression(checkToken(nextToken, Util.tokenType.number), this);
 
 
-            if (this.parent != null)
+            if (this.parent != null && this.parent.nodeType != ASTNode.NodeType.BinaryExpression)
             {
                 this.parent.addChild(this);
             }
@@ -223,13 +223,15 @@ public static class Parser
 
     }
 
-    public static void beginParse(List<Util.Token> _tokenList)
+    public static List<ASTNode> beginParse(List<Util.Token> _tokenList)
     {
         tokenList = _tokenList;
         parseToken(tokenList[0], 0);
 
         Console.WriteLine("node types below");
         Console.WriteLine(printAST());
+
+        return nodes;
     }
 
 }
