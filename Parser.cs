@@ -192,6 +192,11 @@ public static class Parser
         {
             throw new ArgumentException($"expected a node at (line and column goes here) but got null");
         }
+        else if (node.nodeType == ASTNode.NodeType.Function)
+        {
+            FunctionAST func = (FunctionAST)node;
+            node = func.body.Last();
+        }
         foreach (ASTNode.NodeType expectedNodeType in expectedTypes)
         {
             if (node.nodeType != expectedNodeType && expectedNodeType == expectedTypes.Last())
