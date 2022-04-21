@@ -4,8 +4,14 @@ public static class Util
     {
         Operator,
         Number,
-        BlankLine,
-        EOF
+        Keyword,
+        ParenDelimiterOpen,
+        ParenDelimiterClose,
+        BrackDelimiterOpen,
+        BrackDelimiterClose,
+        Text,
+        EOL, //end of line,
+        EOF //end of file
     }
 
 

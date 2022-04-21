@@ -25,7 +25,9 @@ public static class Parser
         public enum NodeType
         {
             NumberExpression,
-            BinaryExpression
+            BinaryExpression,
+            Prototype,
+            Function
         }
 
         public virtual void addParent(ASTNode parent)
@@ -45,11 +47,38 @@ public static class Parser
 
     public class PrototypeAST : ASTNode
     {
+        string? name;
+        List<string>? arguments;
 
+        public PrototypeAST(string? name = null, List<string>? arguments = null)
+        {
+            this.nodeType = NodeType.Prototype;
+            this.name = name;
+            this.arguments = arguments;
+
+        }
     }
 
     public class FunctionAST : ASTNode
     {
+        public PrototypeAST prototype;
+        public List<ASTNode> body;
+
+
+        public FunctionAST(PrototypeAST prototype, List<ASTNode>? body = null)
+        {
+            this.nodeType = NodeType.Function;
+            this.prototype = prototype;
+            this.body = body != null ? body : new List<ASTNode>();
+        }
+
+        public FunctionAST(PrototypeAST prototype, ASTNode body)
+        {
+            this.nodeType = NodeType.Function;
+            this.prototype = prototype;
+            this.body = new List<ASTNode>();
+            this.body.Add(body);
+        }
 
     }
 
@@ -92,6 +121,7 @@ public static class Parser
 
         public BinaryExpression(Util.Token token, ASTNode? previousNode, Util.Token nextToken, ASTNode? parent)
         {
+            //TODO: implement operator precedence parsing
             this.nodeType = NodeType.BinaryExpression;
             switch (token.value)
             {
@@ -136,7 +166,10 @@ public static class Parser
             }
             else
             {
-                nodes.Add(this);
+                //TODO: add the creation of an anonymous function for the binary expression here
+                PrototypeAST proto = new PrototypeAST();
+                FunctionAST func = new FunctionAST(proto, this);
+                nodes.Add(func);
             }
         }
 
