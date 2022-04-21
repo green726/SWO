@@ -47,15 +47,14 @@ public static class Parser
 
     public class PrototypeAST : ASTNode
     {
-        string? name;
-        List<string>? arguments;
+        public string name;
+        public List<string> arguments;
 
-        public PrototypeAST(string? name = null, List<string>? arguments = null)
+        public PrototypeAST(string name = "", List<string> arguments = null)
         {
             this.nodeType = NodeType.Prototype;
             this.name = name;
-            this.arguments = arguments;
-
+            this.arguments = arguments != null ? arguments : new List<string>();
         }
     }
 
@@ -65,11 +64,11 @@ public static class Parser
         public List<ASTNode> body;
 
 
-        public FunctionAST(PrototypeAST prototype, List<ASTNode>? body = null)
+        public FunctionAST(PrototypeAST prototype, List<ASTNode>? body = default(List<ASTNode>))
         {
             this.nodeType = NodeType.Function;
             this.prototype = prototype;
-            this.body = body != null ? body : new List<ASTNode>();
+            this.body = body;
         }
 
         public FunctionAST(PrototypeAST prototype, ASTNode body)
@@ -238,8 +237,22 @@ public static class Parser
 
         foreach (ASTNode node in nodes)
         {
-            stringBuilder.Append(node.nodeType);
-            stringBuilder.Append("\n");
+            switch (node.nodeType)
+            {
+                case ASTNode.NodeType.BinaryExpression:
+                    BinaryExpression bin = (BinaryExpression)node;
+                    stringBuilder.Append($"{bin.nodeType} op: {bin.operatorType} lhs type: {bin.leftHand.nodeType} rhs type: {bin.rightHand.nodeType}");
+                    break;
+                case ASTNode.NodeType.Function:
+                    FunctionAST func = (FunctionAST)node;
+                    stringBuilder.Append($"{func.nodeType} name: {func.prototype.name} args: {string.Join(", ", func.prototype.arguments)} body {string.Join(", ", func.body)}");
+                    break;
+                default:
+                    stringBuilder.Append(node.nodeType);
+                    stringBuilder.Append("\n");
+                    break;
+            }
+
         }
 
         return stringBuilder.ToString();
@@ -280,7 +293,7 @@ public static class Parser
         tokenList = _tokenList;
         parseToken(tokenList[0], 0);
 
-        Console.WriteLine("node types below");
+        Console.WriteLine("debugs below");
         Console.WriteLine(printAST());
 
         return nodes;
