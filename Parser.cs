@@ -142,11 +142,17 @@ public static class Parser
             }
 
             this.parent = parent;
-
-            checkNode(previousNode, binaryExpectedNodes);
-
-            this.leftHand = previousNode;
-
+            if (previousNode.nodeType == NodeType.Function)
+            {
+                FunctionAST prevFunc = (FunctionAST)previousNode;
+                checkNode(prevFunc.body.Last(), binaryExpectedNodes);
+                this.leftHand = previousNode;
+            }
+            else
+            {
+                checkNode(previousNode, binaryExpectedNodes);
+                this.leftHand = previousNode;
+            }
             if (this.leftHand.parent == null && this.leftHand.nodeType == ASTNode.NodeType.NumberExpression)
             {
                 this.leftHand.addParent(this);
@@ -192,11 +198,7 @@ public static class Parser
         {
             throw new ArgumentException($"expected a node at (line and column goes here) but got null");
         }
-        else if (node.nodeType == ASTNode.NodeType.Function)
-        {
-            FunctionAST func = (FunctionAST)node;
-            node = func.body.Last();
-        }
+
         foreach (ASTNode.NodeType expectedNodeType in expectedTypes)
         {
             if (node.nodeType != expectedNodeType && expectedNodeType == expectedTypes.Last())
