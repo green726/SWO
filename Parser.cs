@@ -1,5 +1,6 @@
 // to decide where everything goes in the final AST: assign every node type a "importance/level" value and then loop through all the ASTNodes and assign all the nodes from the highest level to the topAST primaryChildren?
 using System.Text;
+using static System.Text.Json.JsonSerializer;
 
 public static class Parser
 {
@@ -19,6 +20,9 @@ public static class Parser
     {
         public List<ASTNode> children = new List<ASTNode>();
         public ASTNode? parent;
+
+        public int line = 0;
+        public int column = 0;
 
         public NodeType nodeType;
 
@@ -48,13 +52,52 @@ public static class Parser
     public class PrototypeAST : ASTNode
     {
         public string name;
-        public List<string> arguments;
+        public Dictionary<Util.ClassType, string> arguments;
 
-        public PrototypeAST(string name = "", List<string> arguments = null)
+        public PrototypeAST(int line, int column, string name = "", List<Util.Token> arguments = null)
         {
             this.nodeType = NodeType.Prototype;
             this.name = name;
-            this.arguments = arguments != null ? arguments : new List<string>();
+
+            bool typePredicted = true;
+            Util.ClassType prevType = Util.ClassType.Double;
+            if (arguments != null)
+            {
+                foreach (Util.Token item in arguments)
+                {
+                    if (typePredicted)
+                    {
+
+                        checkToken(item, expectedType: Util.TokenType.Keyword);
+                        switch (item.value)
+                        {
+                            case "double":
+                                prevType = Util.ClassType.Double;
+                                break;
+                            case "int":
+                                prevType = Util.ClassType.Int;
+                                break;
+                            case "string":
+                                prevType = Util.ClassType.String;
+                                break;
+                            default:
+                                throw new ArgumentException($"expected type declaration but got something else at {item.line}:{item.column}");
+                        }
+                    }
+                    else
+                    {
+                        this.arguments.Add(prevType, item.value);
+                    }
+
+                    //swap typePredicted
+                    typePredicted = !typePredicted;
+                }
+
+            }
+            else
+            {
+                this.arguments = new Dictionary<Util.ClassType, string>();
+            }
         }
     }
 
@@ -120,6 +163,9 @@ public static class Parser
 
         public BinaryExpression(Util.Token token, ASTNode? previousNode, Util.Token nextToken, ASTNode? parent)
         {
+            this.line = token.line;
+            this.column = token.column;
+
             //TODO: implement operator precedence parsing
             this.nodeType = NodeType.BinaryExpression;
             switch (token.value)
@@ -172,7 +218,7 @@ public static class Parser
             else
             {
                 //TODO: add the creation of an anonymous function for the binary expression here
-                PrototypeAST proto = new PrototypeAST();
+                PrototypeAST proto = new PrototypeAST(this.line, this.column);
                 FunctionAST func = new FunctionAST(proto, this);
                 nodes.Add(func);
             }
@@ -211,22 +257,33 @@ public static class Parser
         }
     }
 
-    public static void checkToken(Util.Token? token, Util.TokenType[] expectedTypes)
+    public static void checkToken(Util.Token? token, Util.TokenType[]? expectedTypes = null, Util.TokenType? expectedType = null)
     {
         if (token == null)
         {
             throw new ArgumentException($"expected a token at {token.line}:{token.column} but got null");
         }
 
-        foreach (Util.TokenType expectedTokenType in expectedTypes)
+        if (expectedTypes != null)
         {
-            if (token.type != expectedTokenType && expectedTokenType == expectedTypes.Last())
+            foreach (Util.TokenType expectedTokenType in expectedTypes)
             {
-                throw new ArgumentException($"expected type {string.Join(", ", expectedTypes)} but got {token.type} at {token.line}:{token.column}");
+                if (token.type != expectedTokenType && expectedTokenType == expectedTypes.Last())
+                {
+                    throw new ArgumentException($"expected token of type {string.Join(", ", expectedTypes)} but got {token.type} at {token.line}:{token.column}");
+                }
+                else if (token.type == expectedTokenType)
+                {
+                    break;
+                }
             }
-            else if (token.type == expectedTokenType)
+
+        }
+        else
+        {
+            if (token.type != expectedType)
             {
-                break;
+                throw new ArgumentException($"expected token of type {expectedType} but got {token.type} at {token.line}:{token.column}");
             }
         }
     }
@@ -245,7 +302,7 @@ public static class Parser
                     break;
                 case ASTNode.NodeType.Function:
                     FunctionAST func = (FunctionAST)node;
-                    stringBuilder.Append($"{func.nodeType} name: {func.prototype.name} args: {string.Join(", ", func.prototype.arguments)} body {string.Join(", ", func.body)}");
+                    stringBuilder.Append($"{func.nodeType} name: {func.prototype.name} args: {Serialize(func.prototype.arguments.ToList())} body: {string.Join(", ", func.body)}");
                     break;
                 default:
                     stringBuilder.Append(node.nodeType);

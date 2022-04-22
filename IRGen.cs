@@ -9,6 +9,8 @@ public static class IRGen
 
     private static readonly Stack<LLVMValueRef> valueStack = new Stack<LLVMValueRef>();
 
+    private static Dictionary<string, LLVMValueRef> namedValues = new Dictionary<string, LLVMValueRef>();
+
     public static void generateNumberExpression(Parser.NumberExpression numberExpression)
     {
 
@@ -51,6 +53,40 @@ public static class IRGen
         }
 
         valueStack.Push(ir);
+
+    }
+
+    public static void generatePrototype(Parser.PrototypeAST prototype)
+    {
+
+        //begin argument generation
+        int argumentCount = prototype.arguments.Count();
+        var arguments = new LLVMValueRef[argumentCount];
+
+        //check if function is already defined
+        var function = LLVM.GetNamedFunction(module, prototype.name);
+
+        if (function.Pointer != IntPtr.Zero)
+        {
+            // If func already has a body, reject this.
+            if (LLVM.CountBasicBlocks(function) != 0)
+            {
+                throw new Exception($"redefinition of function named {prototype.name}");
+            }
+
+            // if func originally took a different number of args, reject.
+            if (LLVM.CountParams(function) != argumentCount)
+            {
+                throw new Exception($"redefinition of function with different number of args (redfined to: {argumentCount})");
+            }
+        }
+
+
+
+    }
+
+    public static void generateFunction(Parser.FunctionAST func)
+    {
 
     }
 

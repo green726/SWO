@@ -1,10 +1,10 @@
 functions:
     functions are declared like this:
     ```
-    ILH foo(arg1, arg2){
+    ilh foo(int arg1, double arg2){
         
     }
     ```
-    (note): "ILH" stands for I love HISS
+    (note): "ilh" stands for I love HISS
 
 
