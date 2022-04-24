@@ -61,8 +61,7 @@ public static class IRGen
 
         //begin argument generation
         int argumentCount = prototype.arguments.Count();
-        var arguments = new LLVMValueRef[argumentCount];
-
+        List<LLVMTypeRef> arguments = new List<LLVMTypeRef>();
         //check if function is already defined
         var function = LLVM.GetNamedFunction(module, prototype.name);
 
@@ -81,12 +80,74 @@ public static class IRGen
             }
         }
 
+        else
+        {
 
+            foreach (KeyValuePair<Util.ClassType, string> arg in prototype.arguments)
+            {
+                switch (arg.Key)
+                {
+                    case Util.ClassType.Double:
+                        arguments.Add(LLVM.DoubleType());
+                        break;
 
+                    case Util.ClassType.Int:
+                        arguments.Add(LLVM.IntType(64));
+                        break;
+
+                        // case Util.ClassType.String:
+                        //     arguments.Add(LLVM.);
+                        //     break;
+                }
+
+            }
+
+            function = LLVM.AddFunction(module, prototype.name, LLVM.FunctionType(LLVM.DoubleType(), arguments.ToArray(), false));
+            LLVM.SetLinkage(function, LLVMLinkage.LLVMExternalLinkage);
+
+        }
+
+        int argLoopIndex = 0;
+        foreach (KeyValuePair<Util.ClassType, string> arg in prototype.arguments)
+        {
+            string argumentName = arg.Value;
+
+            LLVMValueRef param = LLVM.GetParam(function, (uint)argLoopIndex);
+            LLVM.SetValueName(param, argumentName);
+
+            namedValues[argumentName] = param;
+            argLoopIndex++;
+        }
+
+        valueStack.Push(function);
     }
 
-    public static void generateFunction(Parser.FunctionAST func)
+    public static void generateFunction(Parser.FunctionAST funcNode)
     {
+        //TODO: change this in the future once more variables are added
+        namedValues.Clear();
+
+        generatePrototype(funcNode.prototype);
+
+        LLVMValueRef function = valueStack.Pop();
+
+        LLVM.PositionBuilderAtEnd(builder, LLVM.AppendBasicBlock(function, "body"));
+
+        try
+        {
+            evaluateNode(funcNode.body.First());
+        }
+        catch (Exception)
+        {
+            LLVM.DeleteFunction(function);
+            throw;
+        }
+
+        LLVM.BuildRet(builder, valueStack.Pop());
+
+        LLVM.VerifyFunction(function, LLVMVerifierFailureAction.LLVMPrintMessageAction);
+
+        valueStack.Push(function);
 
     }
 
@@ -94,6 +155,9 @@ public static class IRGen
     {
         switch (node.nodeType)
         {
+            case Parser.ASTNode.NodeType.Function:
+                generateFunction((Parser.FunctionAST)node);
+                break;
             case Parser.ASTNode.NodeType.BinaryExpression:
                 generateBinaryExpression((Parser.BinaryExpression)node);
                 break;
