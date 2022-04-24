@@ -54,6 +54,14 @@ public static class IRGen
 
         valueStack.Push(ir);
 
+        foreach (Parser.ASTNode child in binaryExpression.children)
+        {
+            Console.WriteLine(child.nodeType);
+            evaluateNode(child);
+
+        }
+
+        LLVM.DumpValue(valueStack.Peek());
     }
 
     public static void generatePrototype(Parser.PrototypeAST prototype)
@@ -175,17 +183,17 @@ public static class IRGen
         {
             evaluateNode(node);
 
-            foreach (Parser.ASTNode child in node.children)
-            {
-                evaluateNode(child);
-            }
+            // foreach (Parser.ASTNode child in node.children)
+            // {
+            //     evaluateNode(child);
+            // }
             // LLVM.DumpValue(valueStack.Peek());
         }
 
-        while (valueStack.Count > 0)
-        {
-            Console.WriteLine(valueStack.Pop().PrintValueToString());
-        }
+        // while (valueStack.Count > 0)
+        // {
+        //     Console.WriteLine(valueStack.Pop().PrintValueToString());
+        // }
 
         LLVM.DumpModule(module);
     }
