@@ -288,32 +288,26 @@ public static class Parser
         }
     }
 
-    public static string printBinary(BinaryExpression bin)
+    public static void printBinary(BinaryExpression bin)
     {
-        return $"{bin.nodeType} op: {bin.operatorType} lhs type: {bin.leftHand.nodeType} rhs type: {bin.rightHand.nodeType}";
+        Console.WriteLine($"{bin.nodeType} op: {bin.operatorType} lhs type: {bin.leftHand.nodeType} rhs type: {bin.rightHand.nodeType} binop children below:");
+        printAST(bin.children);
     }
 
-    public static string printFunc(FunctionAST func)
+    public static void printFunc(FunctionAST func)
     {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.Append($"{func.nodeType} name: {func.prototype.name} args: {Serialize(func.prototype.arguments.ToList())} body");
+        Console.WriteLine($"{func.nodeType} name: {func.prototype.name} args: {Serialize(func.prototype.arguments.ToList())} body start: ");
 
-        foreach (ASTNode node in func.body)
-        {
-            List<ASTNode> nodesPrint = new List<ASTNode>();
-            nodesPrint.Append(node);
-            printAST(nodesPrint);
-        }
+        printAST(func.body);
 
-        return stringBuilder.ToString();
+        Console.WriteLine("function body end");
+
     }
 
-    public static string printAST(List<ASTNode>? nodesPrint = null)
+    public static void printAST(List<ASTNode> nodesPrint)
     {
         StringBuilder stringBuilder = new StringBuilder();
-
-        stringBuilder.Append("BEGIN OF PARSE DEBUG ");
-        nodesPrint = nodesPrint == null ? nodes : nodesPrint;
 
         foreach (ASTNode node in nodesPrint)
         {
@@ -321,11 +315,11 @@ public static class Parser
             {
                 case ASTNode.NodeType.BinaryExpression:
                     BinaryExpression bin = (BinaryExpression)node;
-                    stringBuilder.Append(printBinary(bin));
+                    printBinary(bin);
                     break;
                 case ASTNode.NodeType.Function:
                     FunctionAST func = (FunctionAST)node;
-                    stringBuilder.Append(printFunc(func));
+                    printFunc(func);
                     break;
                 default:
                     stringBuilder.Append(node.nodeType);
@@ -335,8 +329,7 @@ public static class Parser
 
         }
 
-        stringBuilder.Append(" END OF PARSE DEBUGS");
-        return stringBuilder.ToString();
+        Console.WriteLine(stringBuilder);
     }
 
     public static bool parseToken(Util.Token token, int tokenIndex, ASTNode? parent = null, Util.TokenType[]? expectedTypes = null)
@@ -374,7 +367,9 @@ public static class Parser
         tokenList = _tokenList;
         parseToken(tokenList[0], 0);
 
-        Console.WriteLine(printAST());
+        Console.WriteLine("BEGIN OF PARSER DEBUG");
+        printAST(nodes);
+        Console.WriteLine("END OF PARSER DEBUG");
 
         return nodes;
     }
