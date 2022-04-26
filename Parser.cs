@@ -201,7 +201,7 @@ public static class Parser
             {
                 this.leftHand.addParent(this);
             }
-            else if (parent == null)
+            else if (parent == null && this.leftHand.nodeType == NodeType.BinaryExpression)
             {
                 this.parent = this.leftHand;
             }
