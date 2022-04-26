@@ -1,4 +1,3 @@
-// to decide where everything goes in the final AST: assign every node type a "importance/level" value and then loop through all the ASTNodes and assign all the nodes from the highest level to the topAST primaryChildren?
 using System.Text;
 using static System.Text.Json.JsonSerializer;
 
