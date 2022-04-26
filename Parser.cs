@@ -203,7 +203,7 @@ public static class Parser
             }
             else if (parent == null)
             {
-                this.parent = previousNode;
+                this.parent = this.leftHand;
             }
 
 
