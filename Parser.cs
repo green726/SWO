@@ -14,7 +14,6 @@ public static class Parser
         public static List<ASTNode> primaryChildren = new List<ASTNode>();
     }
 
-
     public abstract class ASTNode
     {
         public List<ASTNode> children = new List<ASTNode>();

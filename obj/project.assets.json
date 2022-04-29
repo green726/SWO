@@ -2,32 +2,8 @@
   "version": 3,
   "targets": {
     "net6.0": {
-      "LibLLVM/5.0.1": {
-        "type": "package",
-        "dependencies": {
-          "Microsoft.NETCore.Platforms": "1.0.1"
-        },
-        "build": {
-          "build/net461/_._": {}
-        },
-        "runtimeTargets": {
-          "runtimes/linux-x64/native/libLLVM.so": {
-            "assetType": "native",
-            "rid": "linux-x64"
-          },
-          "runtimes/osx/native/libLLVM.dylib": {
-            "assetType": "native",
-            "rid": "osx"
-          },
-          "runtimes/win-x64/native/libLLVM.dll": {
-            "assetType": "native",
-            "rid": "win-x64"
-          },
-          "runtimes/win-x86/native/libLLVM.dll": {
-            "assetType": "native",
-            "rid": "win-x86"
-          }
-        }
+      "libLLVM/14.0.0": {
+        "type": "package"
       },
       "LLVMSharp/5.0.0": {
         "type": "package",
@@ -1233,21 +1209,17 @@
     }
   },
   "libraries": {
-    "LibLLVM/5.0.1": {
-      "sha512": "pWsPGfwesb/+bn9r+XBz7QF04+aDz9pyQAUIv6geUjDEnMEoMEgX+FnaaNqpTU2t0xdi3YFZoGB70/yraeD21g==",
+    "libLLVM/14.0.0": {
+      "sha512": "aEJxx/U1s5lIMJj0XA5zIjYWW0CiPym+DyqjkQnLGrHauYbRibfqyYz38H8z5vDXHjSnvCBLIIUQAaY6+w0aXA==",
       "type": "package",
-      "path": "libllvm/5.0.1",
+      "path": "libllvm/14.0.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "License.txt",
-        "build/net461/libLLVM.targets",
-        "libllvm.5.0.1.nupkg.sha512",
+        "LICENSE.TXT",
+        "libllvm.14.0.0.nupkg.sha512",
         "libllvm.nuspec",
-        "runtimes/linux-x64/native/libLLVM.so",
-        "runtimes/osx/native/libLLVM.dylib",
-        "runtimes/win-x64/native/libLLVM.dll",
-        "runtimes/win-x86/native/libLLVM.dll"
+        "runtime.json"
       ]
     },
     "LLVMSharp/5.0.0": {
@@ -4534,7 +4506,8 @@
   },
   "projectFileDependencyGroups": {
     "net6.0": [
-      "LLVMSharp >= 5.0.0"
+      "LLVMSharp >= 5.0.0",
+      "libLLVM >= 14.0.0"
     ]
   },
   "packageFolders": {
@@ -4577,6 +4550,10 @@
           "LLVMSharp": {
             "target": "Package",
             "version": "[5.0.0, )"
+          },
+          "libLLVM": {
+            "target": "Package",
+            "version": "[14.0.0, )"
           }
         },
         "imports": [
@@ -4603,17 +4580,5 @@
         "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/6.0.102/RuntimeIdentifierGraph.json"
       }
     }
-  },
-  "logs": [
-    {
-      "code": "NU1701",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "Package 'LibLLVM 5.0.1' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8' instead of the project target framework 'net6.0'. This package may not be fully compatible with your project.",
-      "libraryId": "LibLLVM",
-      "targetGraphs": [
-        "net6.0"
-      ]
-    }
-  ]
+  }
 }

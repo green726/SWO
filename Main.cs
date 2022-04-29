@@ -1,5 +1,4 @@
-﻿
-public class greenlang
+﻿public class greenlang
 
 {
     private static string fileContents;
@@ -22,5 +21,6 @@ public class greenlang
         ModuleGen.GenerateModule(nodes);
 
 
+        EXE.compileEXE();
     }
 }

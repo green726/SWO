@@ -41,6 +41,10 @@
             "LLVMSharp": {
               "target": "Package",
               "version": "[5.0.0, )"
+            },
+            "libLLVM": {
+              "target": "Package",
+              "version": "[14.0.0, )"
             }
           },
           "imports": [
