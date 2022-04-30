@@ -8,43 +8,18 @@
     ".NETCoreApp,Version=v6.0": {
       "greenlang/1.0.0": {
         "dependencies": {
-          "LLVMSharp": "5.0.0"
+          "LLVMSharp": "5.0.0",
+          "libLLVM": "12.0.0"
         },
         "runtime": {
           "greenlang.dll": {}
         }
       },
-      "LibLLVM/5.0.1": {
-        "dependencies": {
-          "Microsoft.NETCore.Platforms": "1.1.0"
-        },
-        "runtimeTargets": {
-          "runtimes/linux-x64/native/libLLVM.so": {
-            "rid": "linux-x64",
-            "assetType": "native",
-            "fileVersion": "0.0.0.0"
-          },
-          "runtimes/osx/native/libLLVM.dylib": {
-            "rid": "osx",
-            "assetType": "native",
-            "fileVersion": "0.0.0.0"
-          },
-          "runtimes/win-x64/native/libLLVM.dll": {
-            "rid": "win-x64",
-            "assetType": "native",
-            "fileVersion": "0.0.0.0"
-          },
-          "runtimes/win-x86/native/libLLVM.dll": {
-            "rid": "win-x86",
-            "assetType": "native",
-            "fileVersion": "0.0.0.0"
-          }
-        }
-      },
+      "libLLVM/12.0.0": {},
       "LLVMSharp/5.0.0": {
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "LibLLVM": "5.0.1"
+          "libLLVM": "12.0.0"
         },
         "runtime": {
           "lib/netstandard1.1/LLVMSharp.dll": {
@@ -727,12 +702,12 @@
       "serviceable": false,
       "sha512": ""
     },
-    "LibLLVM/5.0.1": {
+    "libLLVM/12.0.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-pWsPGfwesb/+bn9r+XBz7QF04+aDz9pyQAUIv6geUjDEnMEoMEgX+FnaaNqpTU2t0xdi3YFZoGB70/yraeD21g==",
-      "path": "libllvm/5.0.1",
-      "hashPath": "libllvm.5.0.1.nupkg.sha512"
+      "sha512": "sha512-TqbM24TqdI7me0WVGBrnofdkVsRIPb1wtA6M2swDqgyrbGJ9990LYtg6C7/EGYQndi92z+b+tZV1uA/af7RRyQ==",
+      "path": "libllvm/12.0.0",
+      "hashPath": "libllvm.12.0.0.nupkg.sha512"
     },
     "LLVMSharp/5.0.0": {
       "type": "package",

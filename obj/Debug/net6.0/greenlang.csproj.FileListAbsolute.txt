@@ -14,8 +14,4 @@
 /home/green726/coding/greenlang/obj/Debug/net6.0/greenlang.pdb
 /home/green726/coding/greenlang/obj/Debug/net6.0/greenlang.genruntimeconfig.cache
 /home/green726/coding/greenlang/bin/Debug/net6.0/LLVMSharp.dll
-/home/green726/coding/greenlang/bin/Debug/net6.0/runtimes/linux-x64/native/libLLVM.so
-/home/green726/coding/greenlang/bin/Debug/net6.0/runtimes/osx/native/libLLVM.dylib
-/home/green726/coding/greenlang/bin/Debug/net6.0/runtimes/win-x64/native/libLLVM.dll
-/home/green726/coding/greenlang/bin/Debug/net6.0/runtimes/win-x86/native/libLLVM.dll
 /home/green726/coding/greenlang/obj/Debug/net6.0/greenlang.csproj.CopyComplete

@@ -2,7 +2,7 @@
   "version": 3,
   "targets": {
     "net6.0": {
-      "libLLVM/14.0.0": {
+      "libLLVM/12.0.0": {
         "type": "package"
       },
       "LLVMSharp/5.0.0": {
@@ -1209,15 +1209,15 @@
     }
   },
   "libraries": {
-    "libLLVM/14.0.0": {
-      "sha512": "aEJxx/U1s5lIMJj0XA5zIjYWW0CiPym+DyqjkQnLGrHauYbRibfqyYz38H8z5vDXHjSnvCBLIIUQAaY6+w0aXA==",
+    "libLLVM/12.0.0": {
+      "sha512": "TqbM24TqdI7me0WVGBrnofdkVsRIPb1wtA6M2swDqgyrbGJ9990LYtg6C7/EGYQndi92z+b+tZV1uA/af7RRyQ==",
       "type": "package",
-      "path": "libllvm/14.0.0",
+      "path": "libllvm/12.0.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "LICENSE.TXT",
-        "libllvm.14.0.0.nupkg.sha512",
+        "libllvm.12.0.0.nupkg.sha512",
         "libllvm.nuspec",
         "runtime.json"
       ]
@@ -4507,7 +4507,7 @@
   "projectFileDependencyGroups": {
     "net6.0": [
       "LLVMSharp >= 5.0.0",
-      "libLLVM >= 14.0.0"
+      "libLLVM >= 12.0.0"
     ]
   },
   "packageFolders": {
@@ -4553,7 +4553,7 @@
           },
           "libLLVM": {
             "target": "Package",
-            "version": "[14.0.0, )"
+            "version": "[12.0.0, )"
           }
         },
         "imports": [
