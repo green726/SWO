@@ -235,6 +235,10 @@ public static class Parser
         }
     }
 
+    public static void parseKeyword(Util.Token token, ASTNode? parent) {
+
+    }
+
     public static void checkNode(ASTNode? node, ASTNode.NodeType[] expectedTypes)
     {
         if (node == null)
@@ -354,6 +358,14 @@ public static class Parser
             case Util.TokenType.Operator:
                 BinaryExpression binExpr = new BinaryExpression(token, previousNode, tokenList[tokenIndex + 1], parent);
                 return parseToken(tokenList[tokenIndex + 1], tokenIndex + 1, binExpr, binaryExpectedTokens);
+            case Util.TokenType.Keyword:
+                ASTNode keyword = parseKeyword(token, parent);
+                return parseToken(tokenList[tokenIndex + 1], tokenIndex + 1, keyword, bi);
+                break;
+            case Util.TokenType.ParenDelimiterOpen:
+                break;
+            case Util.TokenType.ParenDelimiterClose:
+                break;
 
         }
         return parseToken(tokenList[tokenIndex + 1], tokenIndex + 1);

@@ -46,22 +46,27 @@ public static class Lexer
                 case '\n':
                     tokenList.Add(new Util.Token(Util.TokenType.EOL, ch.ToString(), 0, 0));
                     lastChar = ch;
+                    stringBuilder = new StringBuilder();
                     continue;
                 case '(':
                     lexDelimiter(Util.TokenType.ParenDelimiterOpen, stringBuilder, ch, 0, 0);
                     lastChar = ch;
+                    stringBuilder = new StringBuilder();
                     continue;
                 case ')':
                     lexDelimiter(Util.TokenType.ParenDelimiterClose, stringBuilder, ch, 0, 0);
                     lastChar = ch;
+                    stringBuilder = new StringBuilder();
                     continue;
                 case '{':
                     lexDelimiter(Util.TokenType.BrackDelimiterOpen, stringBuilder, ch, 0, 0);
                     lastChar = ch;
+                    stringBuilder = new StringBuilder();
                     continue;
                 case '}':
                     lexDelimiter(Util.TokenType.BrackDelimiterClose, stringBuilder, ch, 0, 0);
                     lastChar = ch;
+                    stringBuilder = new StringBuilder();
                     continue;
             }
 
@@ -78,11 +83,13 @@ public static class Lexer
 
     public static void lexDelimiter(Util.TokenType type, StringBuilder builder, char ch, int column, int line)
     {
-        if (builder.ToString() != "")
+        if (builder.ToString() == "")
         {
             throw new ArgumentException($"Illegal delimeter usage at {line}:{column}");
         }
+        tokenList.Add(new Util.Token(Util.TokenType.Keyword, builder.ToString(), 0, 0));
         tokenList.Add(new Util.Token(type, ch.ToString(), 0, 0));
     }
+
 
 }

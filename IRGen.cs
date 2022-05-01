@@ -3,7 +3,7 @@ using LLVMSharp;
 public static class IRGen
 {
 
-    private static LLVMModuleRef module;
+    public static LLVMModuleRef module;
 
     private static LLVMBuilderRef builder;
 
