@@ -1,5 +1,6 @@
 using System.Text;
 using static System.Text.Json.JsonSerializer;
+using System.Linq;
 
 public static class Parser
 {
@@ -29,7 +30,8 @@ public static class Parser
             NumberExpression,
             BinaryExpression,
             Prototype,
-            Function
+            Function,
+            FunctionCall
         }
 
         public virtual void addParent(ASTNode parent)
@@ -122,266 +124,329 @@ public static class Parser
 
     }
 
-
-    public class NumberExpression : ASTNode
+    public class FunctionCall : ASTNode
     {
-        public double value;
+        public string? functionName;
+        public bool builtIn = false;
 
-        public NumberExpression(Util.Token token, ASTNode? parent)
+        public FunctionCall(Util.Token token, bool? builtInExpected = false)
         {
-            this.value = Double.Parse(token.value);
-            this.parent = parent;
+            this.nodeType = NodeType.FunctionCall;
 
-            if (parent != null)
+            if (Util.builtinFuncs.Contains(token.value))
             {
-                this.parent.addChild(this);
+                this.builtIn = true;
             }
-            else
+            if (builtInExpected == true && this.builtIn == false)
             {
-                nodes.Add(this);
+                throw new ArgumentException("builtin function expected but name does not exist");
             }
+
         }
 
-    }
 
-
-    public class BinaryExpression : ASTNode
-    {
-        public ASTNode leftHand;
-        public ASTNode? rightHand;
-        public OperatorType operatorType;
-
-        public enum OperatorType
+        public class NumberExpression : ASTNode
         {
-            Add,
-            Subtract,
-            Multiply,
-            Divide
-        }
+            public double value;
 
-        public BinaryExpression(Util.Token token, ASTNode? previousNode, Util.Token nextToken, ASTNode? parent)
-        {
-            this.line = token.line;
-            this.column = token.column;
-
-            //TODO: implement operator precedence parsing
-            this.nodeType = NodeType.BinaryExpression;
-            switch (token.value)
+            public NumberExpression(Util.Token token, ASTNode? parent)
             {
-                case "+":
-                    this.operatorType = OperatorType.Add;
-                    break;
-                case "-":
-                    this.operatorType = OperatorType.Subtract;
-                    break;
-                case "*":
-                    this.operatorType = OperatorType.Multiply;
-                    break;
-                case "/":
-                    this.operatorType = OperatorType.Divide;
-                    break;
-                default:
-                    throw new ArgumentException("op " + token.value + " is not a valid operator");
-            }
+                this.value = Double.Parse(token.value);
+                this.parent = parent;
 
-            this.parent = parent;
-            if (previousNode.nodeType == NodeType.Function)
-            {
-                FunctionAST prevFunc = (FunctionAST)previousNode;
-                checkNode(prevFunc.body.Last(), binaryExpectedNodes);
-                this.leftHand = prevFunc.body.Last();
-            }
-            else
-            {
-                checkNode(previousNode, binaryExpectedNodes);
-                this.leftHand = previousNode;
-            }
-            if (this.leftHand.parent == null && this.leftHand.nodeType == ASTNode.NodeType.NumberExpression)
-            {
-                this.leftHand.addParent(this);
-            }
-            else if (parent == null && this.leftHand.nodeType == NodeType.BinaryExpression)
-            {
-                this.parent = this.leftHand;
-            }
-
-
-            // this.rightHand = new NumberExpression(checkToken(nextToken, Util.tokenType.number), this);
-
-
-            if (this.parent != null)
-            {
-                this.parent.addChild(this);
-            }
-            else
-            {
-                //TODO: add the creation of an anonymous function for the binary expression here
-                PrototypeAST proto = new PrototypeAST(this.line, this.column);
-                FunctionAST func = new FunctionAST(proto, this);
-                nodes.Add(func);
-            }
-        }
-
-        public override void addChild(ASTNode child)
-        {
-            this.children.Add(child);
-            if (child.nodeType == ASTNode.NodeType.BinaryExpression)
-            {
-            }
-            else
-            {
-                this.rightHand = child;
-            }
-        }
-    }
-
-    public static void parseKeyword(Util.Token token, ASTNode? parent) {
-
-    }
-
-    public static void checkNode(ASTNode? node, ASTNode.NodeType[] expectedTypes)
-    {
-        if (node == null)
-        {
-            throw new ArgumentException($"expected a node at (line and column goes here) but got null");
-        }
-
-        foreach (ASTNode.NodeType expectedNodeType in expectedTypes)
-        {
-            if (node.nodeType != expectedNodeType && expectedNodeType == expectedTypes.Last())
-            {
-                throw new ArgumentException($"expected type {string.Join(", ", expectedTypes)} but got {node.nodeType}");
-            }
-            else if (node.nodeType == expectedNodeType)
-            {
-                break;
-            }
-        }
-    }
-
-    public static void checkToken(Util.Token? token, Util.TokenType[]? expectedTypes = null, Util.TokenType? expectedType = null)
-    {
-        if (token == null)
-        {
-            throw new ArgumentException($"expected a token at {token.line}:{token.column} but got null");
-        }
-
-        if (expectedTypes != null)
-        {
-            foreach (Util.TokenType expectedTokenType in expectedTypes)
-            {
-                if (token.type != expectedTokenType && expectedTokenType == expectedTypes.Last())
+                if (parent != null)
                 {
-                    throw new ArgumentException($"expected token of type {string.Join(", ", expectedTypes)} but got {token.type} at {token.line}:{token.column}");
+                    this.parent.addChild(this);
                 }
-                else if (token.type == expectedTokenType)
+                else
                 {
-                    break;
+                    nodes.Add(this);
                 }
             }
 
         }
-        else
+
+
+        public class BinaryExpression : ASTNode
         {
-            if (token.type != expectedType)
+            public ASTNode leftHand;
+            public ASTNode? rightHand;
+            public OperatorType operatorType;
+
+            public enum OperatorType
             {
-                throw new ArgumentException($"expected token of type {expectedType} but got {token.type} at {token.line}:{token.column}");
-            }
-        }
-    }
-
-    public static void printBinary(BinaryExpression bin)
-    {
-        Console.WriteLine($"{bin.nodeType} op: {bin.operatorType} lhs type: {bin.leftHand.nodeType} rhs type: {bin.rightHand.nodeType} binop children below:");
-        printAST(bin.children);
-    }
-
-    public static void printFunc(FunctionAST func)
-    {
-        StringBuilder stringBuilder = new StringBuilder();
-        Console.WriteLine($"{func.nodeType} name: {func.prototype.name} args: {Serialize(func.prototype.arguments.ToList())} body start: ");
-
-        printAST(func.body);
-
-        Console.WriteLine("function body end");
-
-    }
-
-    public static void printAST(List<ASTNode> nodesPrint)
-    {
-        StringBuilder stringBuilder = new StringBuilder();
-
-        foreach (ASTNode node in nodesPrint)
-        {
-            switch (node.nodeType)
-            {
-                case ASTNode.NodeType.BinaryExpression:
-                    BinaryExpression bin = (BinaryExpression)node;
-                    printBinary(bin);
-                    break;
-                case ASTNode.NodeType.Function:
-                    FunctionAST func = (FunctionAST)node;
-                    printFunc(func);
-                    break;
-                default:
-                    stringBuilder.Append(node.nodeType);
-                    stringBuilder.Append("\n");
-                    break;
+                Add,
+                Subtract,
+                Multiply,
+                Divide
             }
 
+            public BinaryExpression(Util.Token token, ASTNode? previousNode, Util.Token nextToken, ASTNode? parent)
+            {
+                this.line = token.line;
+                this.column = token.column;
+
+                //TODO: implement operator precedence parsing
+                this.nodeType = NodeType.BinaryExpression;
+                switch (token.value)
+                {
+                    case "+":
+                        this.operatorType = OperatorType.Add;
+                        break;
+                    case "-":
+                        this.operatorType = OperatorType.Subtract;
+                        break;
+                    case "*":
+                        this.operatorType = OperatorType.Multiply;
+                        break;
+                    case "/":
+                        this.operatorType = OperatorType.Divide;
+                        break;
+                    default:
+                        throw new ArgumentException("op " + token.value + " is not a valid operator");
+                }
+
+                this.parent = parent;
+                if (previousNode.nodeType == NodeType.Function)
+                {
+                    FunctionAST prevFunc = (FunctionAST)previousNode;
+                    checkNode(prevFunc.body.Last(), binaryExpectedNodes);
+                    this.leftHand = prevFunc.body.Last();
+                }
+                else
+                {
+                    checkNode(previousNode, binaryExpectedNodes);
+                    this.leftHand = previousNode;
+                }
+                if (this.leftHand.parent == null && this.leftHand.nodeType == ASTNode.NodeType.NumberExpression)
+                {
+                    this.leftHand.addParent(this);
+                }
+                else if (parent == null && this.leftHand.nodeType == NodeType.BinaryExpression)
+                {
+                    this.parent = this.leftHand;
+                }
+
+
+                // this.rightHand = new NumberExpression(checkToken(nextToken, Util.tokenType.number), this);
+
+
+                if (this.parent != null)
+                {
+                    this.parent.addChild(this);
+                }
+                else
+                {
+                    //TODO: add the creation of an anonymous function for the binary expression here
+                    PrototypeAST proto = new PrototypeAST(this.line, this.column);
+                    FunctionAST func = new FunctionAST(proto, this);
+                    nodes.Add(func);
+                }
+            }
+
+            public override void addChild(ASTNode child)
+            {
+                this.children.Add(child);
+                if (child.nodeType == ASTNode.NodeType.BinaryExpression)
+                {
+                }
+                else
+                {
+                    this.rightHand = child;
+                }
+            }
         }
 
-        Console.WriteLine(stringBuilder);
-    }
-
-    public static bool parseToken(Util.Token token, int tokenIndex, ASTNode? parent = null, Util.TokenType[]? expectedTypes = null)
-    {
-
-        ASTNode? previousNode = nodes.Count > 0 ? nodes.Last() : null;
-
-        // Console.WriteLine($"parse loop {tokenIndex}: {printAST()}");
-        if (token.type == Util.TokenType.EOF)
+        public static ASTNode parseKeyword(Util.Token token, ASTNode? parent)
         {
-            return true;
+            return new NumberExpression(token, parent);
         }
 
-        if (expectedTypes != null)
+        public static void checkNode(ASTNode? node, ASTNode.NodeType[] expectedTypes)
         {
-            checkToken(token, expectedTypes);
+            if (node == null)
+            {
+                throw new ArgumentException($"expected a node at (line and column goes here) but got null");
+            }
+
+            foreach (ASTNode.NodeType expectedNodeType in expectedTypes)
+            {
+                if (node.nodeType != expectedNodeType && expectedNodeType == expectedTypes.Last())
+                {
+                    throw new ArgumentException($"expected type {string.Join(", ", expectedTypes)} but got {node.nodeType}");
+                }
+                else if (node.nodeType == expectedNodeType)
+                {
+                    break;
+                }
+            }
         }
 
-        switch (token.type)
+        public static void checkToken(Util.Token? token, Util.TokenType[]? expectedTypes = null, Util.TokenType? expectedType = null)
         {
-            case Util.TokenType.Number:
-                new NumberExpression(token, parent);
-                break;
-            case Util.TokenType.Operator:
-                BinaryExpression binExpr = new BinaryExpression(token, previousNode, tokenList[tokenIndex + 1], parent);
-                return parseToken(tokenList[tokenIndex + 1], tokenIndex + 1, binExpr, binaryExpectedTokens);
-            case Util.TokenType.Keyword:
-                ASTNode keyword = parseKeyword(token, parent);
-                return parseToken(tokenList[tokenIndex + 1], tokenIndex + 1, keyword, bi);
-                break;
-            case Util.TokenType.ParenDelimiterOpen:
-                break;
-            case Util.TokenType.ParenDelimiterClose:
-                break;
+            if (token == null)
+            {
+                throw new ArgumentException($"expected a token at {token.line}:{token.column} but got null");
+            }
+
+            if (expectedTypes != null)
+            {
+                foreach (Util.TokenType expectedTokenType in expectedTypes)
+                {
+                    if (token.type != expectedTokenType && expectedTokenType == expectedTypes.Last())
+                    {
+                        throw new ArgumentException($"expected token of type {string.Join(", ", expectedTypes)} but got {token.type} at {token.line}:{token.column}");
+                    }
+                    else if (token.type == expectedTokenType)
+                    {
+                        break;
+                    }
+                }
+
+            }
+            else
+            {
+                if (token.type != expectedType)
+                {
+                    throw new ArgumentException($"expected token of type {expectedType} but got {token.type} at {token.line}:{token.column}");
+                }
+            }
+        }
+
+        public static void printBinary(BinaryExpression bin)
+        {
+            Console.WriteLine($"{bin.nodeType} op: {bin.operatorType} lhs type: {bin.leftHand.nodeType} rhs type: {bin.rightHand.nodeType} binop children below:");
+            printAST(bin.children);
+        }
+
+        public static void printFunc(FunctionAST func)
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            Console.WriteLine($"{func.nodeType} name: {func.prototype.name} args: {Serialize(func.prototype.arguments.ToList())} body start: ");
+
+            printAST(func.body);
+
+            Console.WriteLine("function body end");
 
         }
-        return parseToken(tokenList[tokenIndex + 1], tokenIndex + 1);
+
+        public static void printAST(List<ASTNode> nodesPrint)
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+
+            foreach (ASTNode node in nodesPrint)
+            {
+                switch (node.nodeType)
+                {
+                    case ASTNode.NodeType.BinaryExpression:
+                        BinaryExpression bin = (BinaryExpression)node;
+                        printBinary(bin);
+                        break;
+                    case ASTNode.NodeType.Function:
+                        FunctionAST func = (FunctionAST)node;
+                        printFunc(func);
+                        break;
+                    default:
+                        stringBuilder.Append(node.nodeType);
+                        stringBuilder.Append("\n");
+                        break;
+                }
+
+            }
+
+            Console.WriteLine(stringBuilder);
+        }
+
+        public static List<dynamic> parseDelimeter(Util.Token token, int tokenIndex, ASTNode? parent = null)
+        {
+            List<dynamic> ret = new List<dynamic>();
+
+            switch (token.type)
+            {
+                case Util.TokenType.ParenDelimiterOpen:
+                    ret = parseUntil(token, Util.TokenType.ParenDelimiterClose, parent);
+                    break;
+
+                case Util.TokenType.ParenDelimiterClose:
+                    throw new ArgumentException("illegal paren delimeter close");
+
+                case Util.TokenType.BrackDelimiterOpen:
+                    ret = parseUntil(token, Util.TokenType.BrackDelimiterClose, parent);
+                    break;
+
+                case Util.TokenType.BrackDelimiterClose:
+                    throw new ArgumentException("illegal brack delimeter close");
+
+                case Util.TokenType.SquareDelimiterOpen:
+                    ret = parseUntil(token, Util.TokenType.SquareDelimiterClose, parent);
+                    break;
+
+                case Util.TokenType.SquareDelimiterClose:
+                    throw new ArgumentException("illegal square delimeter close");
+            }
+
+            return ret;
+        }
+
+        public static List<dynamic> parseUntil(Util.Token startToken, Util.TokenType stopType, ASTNode? parent = null)
+        {
+
+
+            List<dynamic> ret = new List<dynamic>();
+            return ret;
+        }
+
+        public static bool parseToken(Util.Token token, int tokenIndex, ASTNode? parent = null, Util.TokenType[]? expectedTypes = null)
+        {
+
+            ASTNode? previousNode = nodes.Count > 0 ? nodes.Last() : null;
+
+            // Console.WriteLine($"parse loop {tokenIndex}: {printAST()}");
+            if (token.type == Util.TokenType.EOF)
+            {
+                return true;
+            }
+
+            if (expectedTypes != null)
+            {
+                checkToken(token, expectedTypes);
+            }
+
+            switch (token.type)
+            {
+                case Util.TokenType.Number:
+                    new NumberExpression(token, parent);
+                    break;
+
+                case Util.TokenType.Operator:
+                    BinaryExpression binExpr = new BinaryExpression(token, previousNode, tokenList[tokenIndex + 1], parent);
+                    return parseToken(tokenList[tokenIndex + 1], tokenIndex + 1, binExpr, binaryExpectedTokens);
+
+                case Util.TokenType.Keyword:
+                    ASTNode keyword = parseKeyword(token, parent);
+                    return parseToken(tokenList[tokenIndex + 1], tokenIndex + 1, keyword);
+
+            }
+
+            if (Util.delimeters.Contains(token.value))
+            {
+                List<dynamic> delimRet = parseDelimeter(token, tokenIndex, parent);
+                return parseToken(delimRet[0], delimRet[1], delimRet[2]);
+            }
+            return parseToken(tokenList[tokenIndex + 1], tokenIndex + 1);
+
+        }
+
+        public static List<ASTNode> beginParse(List<Util.Token> _tokenList)
+        {
+            tokenList = _tokenList;
+            parseToken(tokenList[0], 0);
+
+            Console.WriteLine("BEGIN OF PARSER DEBUG");
+            printAST(nodes);
+            Console.WriteLine("END OF PARSER DEBUG");
+
+            return nodes;
+        }
 
     }
-
-    public static List<ASTNode> beginParse(List<Util.Token> _tokenList)
-    {
-        tokenList = _tokenList;
-        parseToken(tokenList[0], 0);
-
-        Console.WriteLine("BEGIN OF PARSER DEBUG");
-        printAST(nodes);
-        Console.WriteLine("END OF PARSER DEBUG");
-
-        return nodes;
-    }
-
-}

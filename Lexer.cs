@@ -68,6 +68,16 @@ public static class Lexer
                     lastChar = ch;
                     stringBuilder = new StringBuilder();
                     continue;
+                case '[':
+                    lexDelimiter(Util.TokenType.SquareDelimiterOpen, stringBuilder, ch, 0, 0);
+                    lastChar = ch;
+                    stringBuilder = new StringBuilder();
+                    continue;
+                case ']':
+                    lexDelimiter(Util.TokenType.SquareDelimiterClose, stringBuilder, ch, 0, 0);
+                    lastChar = ch;
+                    stringBuilder = new StringBuilder();
+                    continue;
             }
 
             if (ch != ' ')

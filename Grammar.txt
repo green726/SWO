@@ -1,10 +1,17 @@
 functions:
     functions are declared like this:
     ```
-    ilh foo(int arg1, double arg2){
-        
-    }
+    {foo arg1type arg1, arg2type arg2} [
+
+    ] 
     ```
-    (note): "ilh" stands for I love HISS
+    functions are called like this:
+    ```
+    foo[arg1, arg2]
+    ```
+    HISS built-int methods/function are called like this:
+    ```
+    foo(arg1, arg2)
+    ```
 
 
