@@ -8,6 +8,7 @@ public static class Parser
     public static List<Util.Token> tokenList;
 
     public static Util.TokenType[] binaryExpectedTokens = { Util.TokenType.Number };
+    public static Util.TokenType[] delimiterExpectedTokens = { Util.TokenType.Keyword };
     public static ASTNode.NodeType[] binaryExpectedNodes = { ASTNode.NodeType.NumberExpression, ASTNode.NodeType.BinaryExpression };
 
     public static class topAST
@@ -398,11 +399,9 @@ public static class Parser
 
         StringBuilder currentWord;
         List<string> previousWords = new List<string>();
-
         while (currentToken.type != stopType)
         {
             currentWord = new StringBuilder();
-
 
             currentToken = tokenList[currentTokenIndex + 1];
             currentTokenIndex++;
@@ -438,9 +437,9 @@ public static class Parser
                 BinaryExpression binExpr = new BinaryExpression(token, previousNode, tokenList[tokenIndex + 1], parent);
                 return parseToken(tokenList[tokenIndex + 1], tokenIndex + 1, binExpr, binaryExpectedTokens);
 
-            case Util.TokenType.Keyword:
-                ASTNode keyword = parseKeyword(token, parent);
-                return parseToken(tokenList[tokenIndex + 1], tokenIndex + 1, keyword);
+                // case Util.TokenType.Keyword:
+                //     ASTNode keyword = parseKeyword(token, parent);
+                //     return parseToken(tokenList[tokenIndex + 1], tokenIndex + 1, keyword);
 
         }
 

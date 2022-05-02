@@ -1,7 +1,7 @@
 public static class Util
 {
     public static string[] delimeters = { "(", ")", "{", "}", "[", "]" };
-    public static string[] builtinFuncs = {"print"};
+    public static string[] builtinFuncs = { "print" };
 
 
     public enum TokenType
@@ -18,6 +18,20 @@ public static class Util
         Text,
         EOL, //end of line,
         EOF //end of file
+    }
+
+    public static List<TokenType> allTokenTypesExcept(List<TokenType> exceptedTypes)
+    {
+        List<TokenType> ret = new List<TokenType>();
+        foreach (TokenType type in Enum.GetValues(typeof(TokenType)))
+        {
+            if (exceptedTypes.Contains(type)) {
+                continue;
+            }
+            ret.Add(type);
+        }
+
+        return ret;
     }
 
     public enum ClassType
