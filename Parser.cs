@@ -32,7 +32,8 @@ public static class Parser
             BinaryExpression,
             Prototype,
             Function,
-            FunctionCall
+            FunctionCall,
+            BuiltinCall
         }
 
         public virtual void addParent(ASTNode parent)
@@ -101,6 +102,7 @@ public static class Parser
             }
         }
     }
+
 
     public class FunctionAST : ASTNode
     {
@@ -261,10 +263,7 @@ public static class Parser
         }
     }
 
-    public static ASTNode parseKeyword(Util.Token token, ASTNode? parent)
-    {
-        return new NumberExpression(token, parent);
-    }
+
 
     public static void checkNode(ASTNode? node, ASTNode.NodeType[] expectedTypes)
     {
@@ -361,57 +360,39 @@ public static class Parser
         Console.WriteLine(stringBuilder);
     }
 
-    public static List<dynamic> parseDelimeter(Util.Token token, int tokenIndex, ASTNode? parent = null)
-    {
-        List<dynamic> ret = new List<dynamic>();
+    // public static List<dynamic> parseDelimeter(Util.Token token, int tokenIndex, ASTNode? parent = null)
+    // {
+    //     List<dynamic> ret = new List<dynamic>();
+    //     ret.Add(token);
+    //     switch (token.type)
+    //     {
+    //         case Util.TokenType.ParenDelimiterOpen:
+    //             ret.Add(ASTNode.NodeType.BuiltinCall);
+    //             ret = parseUntil(token, tokenIndex, Util.TokenType.ParenDelimiterClose, parent);
+    //             break;
+    //
+    //         case Util.TokenType.ParenDelimiterClose:
+    //             throw new ArgumentException("illegal paren delimeter close");
+    //
+    //         case Util.TokenType.BrackDelimiterOpen:
+    //             ret = parseUntil(token, tokenIndex, Util.TokenType.BrackDelimiterClose, parent);
+    //             break;
+    //
+    //         case Util.TokenType.BrackDelimiterClose:
+    //             throw new ArgumentException("illegal brack delimeter close");
+    //
+    //         case Util.TokenType.SquareDelimiterOpen:
+    //             ret = parseUntil(token, tokenIndex, Util.TokenType.SquareDelimiterClose, parent);
+    //             break;
+    //
+    //         case Util.TokenType.SquareDelimiterClose:
+    //             throw new ArgumentException("illegal square delimeter close");
+    //     }
+    //
+    //     return ret;
+    // }
 
-        switch (token.type)
-        {
-            case Util.TokenType.ParenDelimiterOpen:
-                ret = parseUntil(token, tokenIndex, Util.TokenType.ParenDelimiterClose, parent);
-                break;
-
-            case Util.TokenType.ParenDelimiterClose:
-                throw new ArgumentException("illegal paren delimeter close");
-
-            case Util.TokenType.BrackDelimiterOpen:
-                ret = parseUntil(token, tokenIndex, Util.TokenType.BrackDelimiterClose, parent);
-                break;
-
-            case Util.TokenType.BrackDelimiterClose:
-                throw new ArgumentException("illegal brack delimeter close");
-
-            case Util.TokenType.SquareDelimiterOpen:
-                ret = parseUntil(token, tokenIndex, Util.TokenType.SquareDelimiterClose, parent);
-                break;
-
-            case Util.TokenType.SquareDelimiterClose:
-                throw new ArgumentException("illegal square delimeter close");
-        }
-
-        return ret;
-    }
-
-    public static List<dynamic> parseUntil(Util.Token startToken, int startTokenIndex, Util.TokenType stopType, ASTNode? parent = null)
-    {
-        int currentTokenIndex = startTokenIndex;
-        Util.Token currentToken = startToken;
-
-        StringBuilder currentWord;
-        List<string> previousWords = new List<string>();
-        while (currentToken.type != stopType)
-        {
-            currentWord = new StringBuilder();
-
-            currentToken = tokenList[currentTokenIndex + 1];
-            currentTokenIndex++;
-        }
-
-        List<dynamic> ret = new List<dynamic>();
-        return ret;
-    }
-
-    public static bool parseToken(Util.Token token, int tokenIndex, ASTNode? parent = null, Util.TokenType[]? expectedTypes = null)
+    public static bool parseTokenRecursive(Util.Token token, int tokenIndex, ASTNode? parent = null, Util.TokenType[]? expectedTypes = null)
     {
 
         ASTNode? previousNode = nodes.Count > 0 ? nodes.Last() : null;
@@ -435,27 +416,28 @@ public static class Parser
 
             case Util.TokenType.Operator:
                 BinaryExpression binExpr = new BinaryExpression(token, previousNode, tokenList[tokenIndex + 1], parent);
-                return parseToken(tokenList[tokenIndex + 1], tokenIndex + 1, binExpr, binaryExpectedTokens);
+                return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, binExpr, binaryExpectedTokens);
 
-                // case Util.TokenType.Keyword:
-                //     ASTNode keyword = parseKeyword(token, parent);
-                //     return parseToken(tokenList[tokenIndex + 1], tokenIndex + 1, keyword);
-
+            case Util.TokenType.Keyword:
+                List<dynamic> keywordRet = parseKeyword(token, tokenIndex, parent);
+                //0 is the keyword ASTNode, 1 is the next token, and 2 is the next token index
+                return parseTokenRecursive(keywordRet[1], keywordRet[2], keywordRet[0]);
         }
 
         if (Util.delimeters.Contains(token.value))
         {
             List<dynamic> delimRet = parseDelimeter(token, tokenIndex, parent);
-            return parseToken(delimRet[0], delimRet[1], delimRet[2]);
+            return parseTokenRecursive(delimRet[0], delimRet[1], delimRet[2]);
         }
-        return parseToken(tokenList[tokenIndex + 1], tokenIndex + 1);
+        return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1);
 
     }
+
 
     public static List<ASTNode> beginParse(List<Util.Token> _tokenList)
     {
         tokenList = _tokenList;
-        parseToken(tokenList[0], 0);
+        parseTokenRecursive(tokenList[0], 0);
 
         Console.WriteLine("BEGIN OF PARSER DEBUG");
         printAST(nodes);

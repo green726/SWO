@@ -1,5 +1,5 @@
-﻿public class greenlang
-
+﻿
+public class greenlang
 {
     private static string fileContents;
 
@@ -17,7 +17,6 @@
             Console.WriteLine(token.type + " " + token.value);
         }
         List<Parser.ASTNode> nodes = Parser.beginParse(lexedContent);
-
         ModuleGen.GenerateModule(nodes);
 
 

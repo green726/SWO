@@ -21,7 +21,6 @@ public static class EXE
         LLVM.InitializeX86AsmParser();
         LLVM.InitializeX86AsmPrinter();
 
-
         IntPtr fileNamePtr = Marshal.StringToHGlobalAuto(fileName);
         // Marshal.FreeHGlobal(fileNamePtr); //BUG: this line breaks the code, maybe we are supposed to do it after we use the fileNamePtr?
 
