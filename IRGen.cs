@@ -13,7 +13,6 @@ public static class IRGen
 
     public static void generateNumberExpression(Parser.NumberExpression numberExpression)
     {
-
     }
 
 
@@ -63,6 +62,64 @@ public static class IRGen
 
         LLVM.DumpValue(valueStack.Peek());
     }
+
+    public static void generateBuiltin(Parser.FunctionCall builtIn)
+    {
+        if (builtIn.functionName == "print") builtIn.functionName = "printf";
+
+        LLVMValueRef funcRef = LLVM.GetNamedFunction(module, builtIn.functionName);
+
+        if (funcRef.Pointer == IntPtr.Zero)
+        {
+            throw new Exception("Unknown function referenced");
+        }
+
+        if (LLVM.CountParams(funcRef) != builtIn.args.Count)
+        {
+            throw new Exception("Incorrect # arguments passed");
+        }
+
+        int argumentCount = builtIn.args.Count;
+        var argsRef = new LLVMValueRef[argumentCount];
+        for (int i = 0; i < argumentCount; ++i)
+        {
+            evaluateNode(builtIn.args[i]);
+            argsRef[i] = valueStack.Pop();
+        }
+
+        valueStack.Push(LLVM.BuildCall(builder, funcRef, argsRef, "calltmp"));
+    }
+
+    public static void generateFunctionCall(Parser.FunctionCall funcCall)
+    {
+        if (funcCall.builtIn)
+        {
+            generateBuiltin(funcCall);
+            return;
+        }
+        LLVMValueRef funcRef = LLVM.GetNamedFunction(module, funcCall.functionName);
+
+        if (funcRef.Pointer == IntPtr.Zero)
+        {
+            throw new Exception("Unknown function referenced");
+        }
+
+        if (LLVM.CountParams(funcRef) != funcCall.args.Count)
+        {
+            throw new Exception("Incorrect # arguments passed");
+        }
+
+        int argumentCount = funcCall.args.Count;
+        var argsRef = new LLVMValueRef[argumentCount];
+        for (int i = 0; i < argumentCount; ++i)
+        {
+            evaluateNode(funcCall.args[i]);
+            argsRef[i] = valueStack.Pop();
+        }
+
+        valueStack.Push(LLVM.BuildCall(builder, funcRef, argsRef, "calltmp"));
+    }
+
 
     public static void generatePrototype(Parser.PrototypeAST prototype)
     {
@@ -163,11 +220,17 @@ public static class IRGen
     {
         switch (node.nodeType)
         {
+            case Parser.ASTNode.NodeType.Prototype:
+                generatePrototype((Parser.PrototypeAST)node);
+                break;
             case Parser.ASTNode.NodeType.Function:
                 generateFunction((Parser.FunctionAST)node);
                 break;
             case Parser.ASTNode.NodeType.BinaryExpression:
                 generateBinaryExpression((Parser.BinaryExpression)node);
+                break;
+            case Parser.ASTNode.NodeType.FunctionCall:
+                generateFunctionCall((Parser.FunctionCall)node);
                 break;
             case Parser.ASTNode.NodeType.NumberExpression:
                 break;
@@ -179,6 +242,14 @@ public static class IRGen
         builder = _builder;
         module = _module;
 
+        List<Util.Token> protoArgs = new List<Util.Token>();
+
+        protoArgs.Add(new Util.Token(Util.TokenType.Keyword, "double", 0, 0));
+        protoArgs.Add(new Util.Token(Util.TokenType.Keyword, "x", 0, 0));
+
+        Parser.PrototypeAST printProto = new Parser.PrototypeAST(0, 0, "printf", protoArgs);
+        nodes.Insert(0, printProto);
+
         foreach (Parser.ASTNode node in nodes)
         {
             evaluateNode(node);
@@ -187,7 +258,8 @@ public static class IRGen
             // {
             //     evaluateNode(child);
             // }
-            // LLVM.DumpValue(valueStack.Peek());
+            // Console.WriteLine("stack dump");
+            LLVM.DumpValue(valueStack.Peek());
         }
 
         // while (valueStack.Count > 0)
@@ -195,7 +267,9 @@ public static class IRGen
         //     Console.WriteLine(valueStack.Pop().PrintValueToString());
         // }
 
+        Console.WriteLine("LLVM module dump below");
         LLVM.DumpModule(module);
+        Console.WriteLine("");
     }
 
 }

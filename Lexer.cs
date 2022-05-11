@@ -16,7 +16,7 @@ public static class Lexer
         foreach (char ch in input)
         {
             bool isFinalChar = input.IndexOf(ch) == input.Length - 1;
-            if (ch == ' ' || isFinalChar || lastChar == ')' || lastChar == '}' || lastChar == '\n')
+            if (ch == ' ' || isFinalChar || ch == ')' || ch == '}' || lastChar == '\n')
             {
                 if (lastChar != ' ')
                 {
@@ -28,7 +28,7 @@ public static class Lexer
                     {
                         tokenList.Add(new Util.Token(Util.TokenType.Operator, stringBuilder.ToString(), 0, 0));
                     }
-                    else
+                    else if (stringBuilder.ToString() != " " && stringBuilder.ToString() != "")
                     {
                         tokenList.Add(new Util.Token(Util.TokenType.Keyword, stringBuilder.ToString(), 0, 0));
                     }
@@ -93,12 +93,12 @@ public static class Lexer
 
     public static void lexDelimiter(Util.TokenType type, StringBuilder builder, char ch, int column, int line)
     {
-        if (builder.ToString() == "")
+        if (builder.ToString() == "" && type != Util.TokenType.ParenDelimiterClose && type != Util.TokenType.BrackDelimiterClose && type != Util.TokenType.SquareDelimiterClose)
         {
             throw new ArgumentException($"Illegal delimeter usage at {line}:{column}");
         }
-        tokenList.Add(new Util.Token(Util.TokenType.Keyword, builder.ToString(), 0, 0));
-        tokenList.Add(new Util.Token(type, ch.ToString(), 0, 0));
+        if (builder.ToString() != "" && builder.ToString() != " ") tokenList.Add(new Util.Token(Util.TokenType.Keyword, builder.ToString(), 0, 0));
+        tokenList.Add(new Util.Token(type, ch.ToString(), 0, 0, true));
     }
 
 

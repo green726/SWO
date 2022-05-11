@@ -1,3 +1,4 @@
+using System;
 using LLVMSharp;
 using System.Runtime.InteropServices;
 
@@ -13,7 +14,7 @@ public static class EXE
     public static string targetErrorMsg = "";
     public static string writeErrorMsg = "";
 
-    public static void compileEXE(string fileName = "output.o")
+    public static void compileEXE(string fileName = "output.o", bool debugLogging = true)
     {
         LLVM.InitializeX86TargetInfo();
         LLVM.InitializeX86Target();
@@ -38,18 +39,28 @@ public static class EXE
         // string? dataRefString = Marshal.PtrToStringAuto(LLVM.CopyStringRepOfTargetData(dataRef));
         // LLVM.SetDataLayout(IRGen.module, dataRefString);
 
-        Console.WriteLine("TargetTriple:" + targetTriple);
-        Console.WriteLine("targetBool " + targetBool.Value);
-        Console.WriteLine("targetRef " + target.ToString());
-        Console.WriteLine("targetMachine " + targetMachine.ToString());
-        Console.WriteLine("targetErrorMsg " + targetErrorMsg);
+        if (debugLogging)
+        {
+
+            Console.WriteLine("beggining of to object debug info");
+
+            Console.WriteLine("TargetTriple:" + targetTriple);
+            Console.WriteLine("targetBool: " + targetBool.Value);
+            Console.WriteLine("targetRef: " + target.ToString());
+            Console.WriteLine("targetMachine: " + targetMachine.ToString());
+
+            if (targetErrorMsg != null && targetErrorMsg != "")
+            {
+                Console.WriteLine("targetErrorMsg: " + targetErrorMsg);
+            }
+        }
 
         // LLVM.TargetMachineEmitToMemoryBuffer(targetMachine, IRGen.module, LLVMCodeGenFileType.LLVMObjectFile, out writeErrorMsg, out memBuffer);
         LLVM.TargetMachineEmitToFile(targetMachine, IRGen.module, fileNamePtr, LLVMCodeGenFileType.LLVMObjectFile, out writeErrorMsg);
 
-        Console.WriteLine("writeErrorMsg " + writeErrorMsg);
-
-
-
+        if (writeErrorMsg != null && writeErrorMsg != "" && debugLogging)
+        {
+            Console.WriteLine("writeErrorMsg: " + writeErrorMsg);
+        }
     }
 }

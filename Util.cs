@@ -2,7 +2,7 @@ public static class Util
 {
     public static string[] delimeters = { "(", ")", "{", "}", "[", "]" };
     public static string[] builtinFuncs = { "print" };
-
+    public static TokenType[] delimTypes = { TokenType.ParenDelimiterOpen, TokenType.ParenDelimiterClose, TokenType.BrackDelimiterOpen, TokenType.BrackDelimiterClose, TokenType.SquareDelimiterOpen, TokenType.SquareDelimiterClose };
 
     public enum TokenType
     {
@@ -25,7 +25,8 @@ public static class Util
         List<TokenType> ret = new List<TokenType>();
         foreach (TokenType type in Enum.GetValues(typeof(TokenType)))
         {
-            if (exceptedTypes.Contains(type)) {
+            if (exceptedTypes.Contains(type))
+            {
                 continue;
             }
             ret.Add(type);
@@ -48,17 +49,20 @@ public static class Util
         public TokenType type;
         public int line;
         public int column;
+        public bool isDelim = false;
 
-        public Token(TokenType type, string value, int line, int column)
+        public Token(TokenType type, string value, int line, int column, bool isDelim = false)
         {
+            this.isDelim = isDelim;
             this.value = value;
             this.type = type;
             this.line = line;
             this.column = column;
         }
 
-        public Token(TokenType type, char value, int line, int column)
+        public Token(TokenType type, char value, int line, int column, bool isDelim = false)
         {
+            this.isDelim = isDelim;
             this.value = value.ToString();
             this.type = type;
             this.line = line;
