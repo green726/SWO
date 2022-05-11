@@ -6,7 +6,7 @@ public static class ModuleGen
     public static void GenerateModule(List<Parser.ASTNode> nodes)
     {
         // Make the module, which holds all the code.
-        LLVMModuleRef module = LLVM.ModuleCreateWithName("HISSJIT");
+        LLVMModuleRef module = LLVM.ModuleCreateWithName("HISS");
         LLVMBuilderRef builder = LLVM.CreateBuilder();
         // LLVM.LinkInMCJIT();
         // LLVM.InitializeX86TargetMC();

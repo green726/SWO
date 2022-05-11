@@ -26,7 +26,6 @@ public static class EXE
         // Marshal.FreeHGlobal(fileNamePtr); //BUG: this line breaks the code, maybe we are supposed to do it after we use the fileNamePtr?
 
         string? fileNameFinal = Marshal.PtrToStringAuto(fileNamePtr);
-        Console.WriteLine("fileNamePostPtr " + fileNameFinal);
 
         targetTriple = Marshal.PtrToStringAuto(LLVM.GetDefaultTargetTriple());
 
@@ -41,9 +40,9 @@ public static class EXE
 
         if (debugLogging)
         {
+            Console.WriteLine("beggining of object file debug info");
 
-            Console.WriteLine("beggining of to object debug info");
-
+            Console.WriteLine("fileNamePostPtr " + fileNameFinal);
             Console.WriteLine("TargetTriple:" + targetTriple);
             Console.WriteLine("targetBool: " + targetBool.Value);
             Console.WriteLine("targetRef: " + target.ToString());
@@ -53,6 +52,9 @@ public static class EXE
             {
                 Console.WriteLine("targetErrorMsg: " + targetErrorMsg);
             }
+
+            string moduleStr = Marshal.PtrToStringAuto(LLVM.PrintModuleToString(IRGen.module));
+            File.WriteAllText("HISS-IR.txt", moduleStr);
         }
 
         // LLVM.TargetMachineEmitToMemoryBuffer(targetMachine, IRGen.module, LLVMCodeGenFileType.LLVMObjectFile, out writeErrorMsg, out memBuffer);

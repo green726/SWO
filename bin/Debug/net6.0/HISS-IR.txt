@@ -1,0 +1,10 @@
+; ModuleID = 'HISS'
+source_filename = "HISS"
+
+declare double @printf(double)
+
+define double @0() {
+body:
+  %calltmp = call double @printf(double (double)* @printf)
+  ret double %calltmp
+}

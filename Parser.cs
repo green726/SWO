@@ -150,7 +150,9 @@ public static class Parser
             this.functionName = token.value;
             this.args = args ??= new List<ASTNode>();
 
-            nodes.Add(this);
+            PrototypeAST proto = new PrototypeAST(this.line, this.column);
+            FunctionAST func = new FunctionAST(proto, this);
+            nodes.Add(func);
 
         }
 
@@ -460,6 +462,14 @@ public static class Parser
     public static List<ASTNode> beginParse(List<Util.Token> _tokenList)
     {
         tokenList = _tokenList;
+        List<Util.Token> protoArgs = new List<Util.Token>();
+
+        protoArgs.Add(new Util.Token(Util.TokenType.Keyword, "double", 0, 0));
+        protoArgs.Add(new Util.Token(Util.TokenType.Keyword, "x", 0, 0));
+
+        Parser.PrototypeAST printProto = new Parser.PrototypeAST(0, 0, "printf", protoArgs);
+        nodes.Add(printProto);
+
         parseTokenRecursive(tokenList[0], 0);
 
         Console.WriteLine("BEGIN OF PARSER DEBUG");
