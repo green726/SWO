@@ -51,6 +51,22 @@ public static class Parser
         }
     }
 
+    public class StringAST : ASTNode
+    {
+        public string value;
+
+        public StringAST(Util.Token token)
+        {
+            checkToken(token, expectedType: Util.TokenType.Keyword);
+
+            this.value = token.value;
+
+            this.line = token.line;
+            this.column = token.column;
+        }
+
+    }
+
     public class PrototypeAST : ASTNode
     {
         public string name;
@@ -159,6 +175,11 @@ public static class Parser
         public override void addChild(ASTNode child)
         {
             args.Add(child);
+        }
+
+        public void addChildAtStart(ASTNode child)
+        {
+            args.Insert(0, child);
         }
     }
 
@@ -328,28 +349,33 @@ public static class Parser
         }
     }
 
-    public static void printBinary(BinaryExpression bin)
-    {
-        Console.WriteLine($"{bin.nodeType} op: {bin.operatorType} lhs type: {bin.leftHand.nodeType} rhs type: {bin.rightHand.nodeType} binop children below:");
-        printAST(bin.children);
-    }
-
-    public static void printFunc(FunctionAST func)
+    public static string printBinary(BinaryExpression bin)
     {
         StringBuilder stringBuilder = new StringBuilder();
-        Console.WriteLine($"{func.nodeType} name: {func.prototype.name} args: {Serialize(func.prototype.arguments.ToList())} body start: ");
+        stringBuilder.Append($"{bin.nodeType} op: {bin.operatorType} lhs type: {bin.leftHand.nodeType} rhs type: {bin.rightHand.nodeType} binop children below:");
+        stringBuilder.Append(printASTRet(bin.children));
 
-        printAST(func.body);
-
-        Console.WriteLine("function body end");
+        return stringBuilder.ToString();
     }
 
-    public static void printFuncCall(FunctionCall funcCall)
+    public static string printFunc(FunctionAST func)
     {
-        Console.WriteLine($"{funcCall.nodeType} with name of {funcCall.functionName} and args of {String.Join(", ", funcCall.args)}");
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.Append($"{func.nodeType} name: {func.prototype.name} args: {Serialize(func.prototype.arguments.ToList())} body start: ");
+
+        stringBuilder.Append(printASTRet(func.body));
+
+        stringBuilder.Append("function body end");
+
+        return stringBuilder.ToString();
     }
 
-    public static void printAST(List<ASTNode> nodesPrint)
+    public static string printFuncCall(FunctionCall funcCall)
+    {
+        return $"{funcCall.nodeType} with name of {funcCall.functionName} and args of {String.Join(", ", funcCall.args)}";
+    }
+
+    public static string printASTRet(List<ASTNode> nodesPrint)
     {
         StringBuilder stringBuilder = new StringBuilder();
 
@@ -359,21 +385,60 @@ public static class Parser
             {
                 case ASTNode.NodeType.BinaryExpression:
                     BinaryExpression bin = (BinaryExpression)node;
-                    printBinary(bin);
+                    stringBuilder.Append(printBinary(bin));
+                    stringBuilder.Append("\n");
                     break;
                 case ASTNode.NodeType.Function:
                     FunctionAST func = (FunctionAST)node;
-                    printFunc(func);
+                    stringBuilder.Append(printFunc(func));
+                    stringBuilder.Append("\n");
                     break;
                 case ASTNode.NodeType.FunctionCall:
                     FunctionCall funcCall = (FunctionCall)node;
-                    printFuncCall(funcCall);
+                    stringBuilder.Append(printFuncCall(funcCall));
+                    stringBuilder.Append("\n");
                     break;
                 default:
                     stringBuilder.Append(node.nodeType);
                     stringBuilder.Append("\n");
                     break;
             }
+
+
+        }
+        return stringBuilder.ToString();
+    }
+
+    public static void printAST(List<ASTNode> nodesPrint)
+    {
+        StringBuilder stringBuilder = new StringBuilder();
+        // Console.WriteLine(nodesPrint[0]);
+
+        foreach (ASTNode node in nodesPrint)
+        {
+            switch (node.nodeType)
+            {
+                case ASTNode.NodeType.BinaryExpression:
+                    BinaryExpression bin = (BinaryExpression)node;
+                    stringBuilder.Append(printBinary(bin));
+                    stringBuilder.Append("\n");
+                    break;
+                case ASTNode.NodeType.Function:
+                    FunctionAST func = (FunctionAST)node;
+                    stringBuilder.Append(printFunc(func));
+                    stringBuilder.Append("\n");
+                    break;
+                case ASTNode.NodeType.FunctionCall:
+                    FunctionCall funcCall = (FunctionCall)node;
+                    stringBuilder.Append(printFuncCall(funcCall));
+                    stringBuilder.Append("\n");
+                    break;
+                default:
+                    stringBuilder.Append(node.nodeType);
+                    stringBuilder.Append("\n");
+                    break;
+            }
+
 
         }
 
@@ -462,8 +527,10 @@ public static class Parser
     public static List<ASTNode> beginParse(List<Util.Token> _tokenList)
     {
         tokenList = _tokenList;
-        List<Util.Token> protoArgs = new List<Util.Token>();
 
+        parseTokenRecursive(tokenList[0], 0);
+
+        List<Util.Token> protoArgs = new List<Util.Token>();
 
         protoArgs.Add(new Util.Token(Util.TokenType.Keyword, "string", 0, 0));
         protoArgs.Add(new Util.Token(Util.TokenType.Keyword, "format", 0, 0));
@@ -471,9 +538,7 @@ public static class Parser
         protoArgs.Add(new Util.Token(Util.TokenType.Keyword, "x", 0, 0));
 
         Parser.PrototypeAST printProto = new Parser.PrototypeAST(0, 0, "printf", protoArgs);
-        nodes.Add(printProto);
-
-        parseTokenRecursive(tokenList[0], 0);
+        nodes.Insert(0, printProto);
 
         Console.WriteLine("BEGIN OF PARSER DEBUG");
         printAST(nodes);

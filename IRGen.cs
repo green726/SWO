@@ -63,26 +63,32 @@ public static class IRGen
         LLVM.DumpValue(valueStack.Peek());
     }
 
-    public static string evaluatePrintFormat(Parser.FunctionCall printCall)
+    public static Parser.StringAST evaluatePrintFormat(Parser.FunctionCall printCall)
     {
         if (printCall.args[0].nodeType == Parser.ASTNode.NodeType.NumberExpression)
         {
-            return "%f";
+            return new Parser.StringAST(new Util.Token(Util.TokenType.Keyword, "%f", 0, 0));
         }
 
-        return "%f";
+        return new Parser.StringAST(new Util.Token(Util.TokenType.Keyword, "%f", 0, 0));
     }
 
     public static void generateBuiltinCall(Parser.FunctionCall builtIn)
     {
-        string? printFormat = null;
+
+        Parser.StringAST printFormat;
         if (builtIn.functionName == "print")
         {
+            //FIX: code errors in here somewhere
+
             builtIn.functionName = "printf";
 
             printFormat = evaluatePrintFormat(builtIn);
+            Console.WriteLine("print format: " + printFormat);
 
-            //TODO: throw in the format string for printf
+
+            builtIn.addChildAtStart(printFormat);
+
         }
 
         LLVMValueRef funcRef = LLVM.GetNamedFunction(module, builtIn.functionName);
@@ -144,7 +150,6 @@ public static class IRGen
 
     public static void generatePrototype(Parser.PrototypeAST prototype)
     {
-
         //begin argument generation
         int argumentCount = prototype.arguments.Count();
         List<LLVMTypeRef> arguments = new List<LLVMTypeRef>();
@@ -180,7 +185,7 @@ public static class IRGen
                     case Util.ClassType.Int:
                         arguments.Add(LLVM.IntType(64));
                         break;
-
+                        //TODO: implement strings as char arrays and chars as ints
                         // case Util.ClassType.String:
                         //     arguments.Add(LLVM.);
                         //     break;
@@ -269,6 +274,7 @@ public static class IRGen
         foreach (Parser.ASTNode node in nodes)
         {
             evaluateNode(node);
+
 
             // foreach (Parser.ASTNode child in node.children)
             // {
