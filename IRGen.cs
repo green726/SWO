@@ -63,9 +63,27 @@ public static class IRGen
         LLVM.DumpValue(valueStack.Peek());
     }
 
+    public static string evaluatePrintFormat(Parser.FunctionCall printCall)
+    {
+        if (printCall.args[0].nodeType == Parser.ASTNode.NodeType.NumberExpression)
+        {
+            return "%f";
+        }
+
+        return "%f";
+    }
+
     public static void generateBuiltinCall(Parser.FunctionCall builtIn)
     {
-        if (builtIn.functionName == "print") builtIn.functionName = "printf";
+        string? printFormat = null;
+        if (builtIn.functionName == "print")
+        {
+            builtIn.functionName = "printf";
+
+            printFormat = evaluatePrintFormat(builtIn);
+
+            //TODO: throw in the format string for printf
+        }
 
         LLVMValueRef funcRef = LLVM.GetNamedFunction(module, builtIn.functionName);
 
@@ -81,7 +99,8 @@ public static class IRGen
 
         int argumentCount = builtIn.args.Count;
         var argsRef = new LLVMValueRef[argumentCount];
-        for (int i = 0; i < argumentCount; i++)
+
+        for (int i = 1; i < argumentCount; i++)
         {
             evaluateNode(builtIn.args[i]);
             argsRef[i] = valueStack.Pop();
@@ -235,6 +254,7 @@ public static class IRGen
                 generateFunctionCall((Parser.FunctionCall)node);
                 break;
             case Parser.ASTNode.NodeType.NumberExpression:
+                generateNumberExpression((Parser.NumberExpression)node);
                 break;
         }
     }

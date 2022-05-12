@@ -5,6 +5,6 @@ declare double @printf(double)
 
 define double @0() {
 body:
-  %calltmp = call double @printf(double (double)* @printf)
+  %calltmp = call double @printf(double 1.000000e+00)
   ret double %calltmp
 }

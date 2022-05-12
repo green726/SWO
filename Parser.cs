@@ -464,6 +464,9 @@ public static class Parser
         tokenList = _tokenList;
         List<Util.Token> protoArgs = new List<Util.Token>();
 
+
+        protoArgs.Add(new Util.Token(Util.TokenType.Keyword, "string", 0, 0));
+        protoArgs.Add(new Util.Token(Util.TokenType.Keyword, "format", 0, 0));
         protoArgs.Add(new Util.Token(Util.TokenType.Keyword, "double", 0, 0));
         protoArgs.Add(new Util.Token(Util.TokenType.Keyword, "x", 0, 0));
 
