@@ -1,20 +1,20 @@
 public class NumberExpression : ASTNode
+{
+    public double value;
+
+    public NumberExpression(Util.Token token, ASTNode? parent)
     {
-        public double value;
+        this.value = Double.Parse(token.value);
+        this.parent = parent;
 
-        public NumberExpression(Util.Token token, ASTNode? parent)
+        if (parent != null)
         {
-            this.value = Double.Parse(token.value);
-            this.parent = parent;
-
-            if (parent != null)
-            {
-                this.parent.addChild(this);
-            }
-            else
-            {
-                nodes.Add(this);
-            }
+            this.parent.addChild(this);
         }
-
+        else
+        {
+            Parser.nodes.Add(this);
+        }
     }
+
+}

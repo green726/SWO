@@ -1,15 +1,15 @@
 public class StringAST : ASTNode
+{
+    public string value;
+
+    public StringAST(Util.Token token)
     {
-        public string value;
+        Parser.checkToken(token, expectedType: Util.TokenType.Keyword);
 
-        public StringAST(Util.Token token)
-        {
-            checkToken(token, expectedType: Util.TokenType.Keyword);
+        this.value = token.value;
 
-            this.value = token.value;
-
-            this.line = token.line;
-            this.column = token.column;
-        }
-
+        this.line = token.line;
+        this.column = token.column;
     }
+
+}

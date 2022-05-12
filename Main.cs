@@ -17,7 +17,7 @@ public class greenlang
         {
             Console.WriteLine(token.type + " " + token.value);
         }
-        List<Parser.ASTNode> nodes = Parser.beginParse(lexedContent);
+        List<ASTNode> nodes = Parser.beginParse(lexedContent);
         ModuleGen.GenerateModule(nodes);
 
 

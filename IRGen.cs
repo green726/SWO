@@ -11,12 +11,12 @@ public static class IRGen
 
     private static Dictionary<string, LLVMValueRef> namedValues = new Dictionary<string, LLVMValueRef>();
 
-    public static void generateNumberExpression(Parser.NumberExpression numberExpression)
+    public static void generateNumberExpression(NumberExpression numberExpression)
     {
         valueStack.Push(LLVM.ConstReal(LLVM.DoubleType(), numberExpression.value));
     }
 
-    public static void generateBinaryExpression(Parser.BinaryExpression binaryExpression)
+    public static void generateBinaryExpression(BinaryExpression binaryExpression)
     {
 
         LLVMValueRef leftHand = new LLVMValueRef();
@@ -25,35 +25,33 @@ public static class IRGen
 
         switch (binaryExpression.leftHand.nodeType)
         {
-            case Parser.ASTNode.NodeType.NumberExpression:
-                Parser.NumberExpression leftHandExpr = (Parser.NumberExpression)binaryExpression.leftHand;
+            case ASTNode.NodeType.NumberExpression:
+                NumberExpression leftHandExpr = (NumberExpression)binaryExpression.leftHand;
                 leftHand = LLVM.ConstReal(LLVM.DoubleType(), leftHandExpr.value);
                 break;
-            case Parser.ASTNode.NodeType.BinaryExpression:
+            case ASTNode.NodeType.BinaryExpression:
                 leftHand = valueStack.Pop();
                 break;
         }
 
         switch (binaryExpression.rightHand.nodeType)
         {
-            case Parser.ASTNode.NodeType.NumberExpression:
-                Parser.NumberExpression rightHandExpr = (Parser.NumberExpression)binaryExpression.rightHand;
+            case ASTNode.NodeType.NumberExpression:
+                NumberExpression rightHandExpr = (NumberExpression)binaryExpression.rightHand;
                 rightHand = LLVM.ConstReal(LLVM.DoubleType(), rightHandExpr.value);
                 break;
         }
 
-
-
         switch (binaryExpression.operatorType)
         {
-            case Parser.BinaryExpression.OperatorType.Add:
+            case BinaryExpression.OperatorType.Add:
                 ir = LLVM.BuildFAdd(builder, leftHand, rightHand, "addtmp");
                 break;
         }
 
         valueStack.Push(ir);
 
-        foreach (Parser.ASTNode child in binaryExpression.children)
+        foreach (ASTNode child in binaryExpression.children)
         {
             Console.WriteLine(child.nodeType);
             evaluateNode(child);
@@ -63,20 +61,20 @@ public static class IRGen
         LLVM.DumpValue(valueStack.Peek());
     }
 
-    public static Parser.StringAST evaluatePrintFormat(Parser.FunctionCall printCall)
+    public static StringAST evaluatePrintFormat(FunctionCall printCall)
     {
-        if (printCall.args[0].nodeType == Parser.ASTNode.NodeType.NumberExpression)
+        if (printCall.args[0].nodeType == ASTNode.NodeType.NumberExpression)
         {
-            return new Parser.StringAST(new Util.Token(Util.TokenType.Keyword, "%f", 0, 0));
+            return new StringAST(new Util.Token(Util.TokenType.Keyword, "%f", 0, 0));
         }
 
-        return new Parser.StringAST(new Util.Token(Util.TokenType.Keyword, "%f", 0, 0));
+        return new StringAST(new Util.Token(Util.TokenType.Keyword, "%f", 0, 0));
     }
 
-    public static void generateBuiltinCall(Parser.FunctionCall builtIn)
+    public static void generateBuiltinCall(FunctionCall builtIn)
     {
 
-        Parser.StringAST printFormat;
+        StringAST printFormat;
         if (builtIn.functionName == "print")
         {
             //FIX: code errors in here somewhere
@@ -114,10 +112,9 @@ public static class IRGen
 
         valueStack.Push(LLVM.BuildCall(builder, funcRef, argsRef, "calltmp"));
 
-
     }
 
-    public static void generateFunctionCall(Parser.FunctionCall funcCall)
+    public static void generateFunctionCall(FunctionCall funcCall)
     {
         if (funcCall.builtIn)
         {
@@ -148,7 +145,7 @@ public static class IRGen
     }
 
 
-    public static void generatePrototype(Parser.PrototypeAST prototype)
+    public static void generatePrototype(PrototypeAST prototype)
     {
         //begin argument generation
         int argumentCount = prototype.arguments.Count();
@@ -213,7 +210,7 @@ public static class IRGen
         valueStack.Push(function);
     }
 
-    public static void generateFunction(Parser.FunctionAST funcNode)
+    public static void generateFunction(FunctionAST funcNode)
     {
         //TODO: change this in the future once more variables are added
         namedValues.Clear();
@@ -242,41 +239,41 @@ public static class IRGen
 
     }
 
-    public static void evaluateNode(Parser.ASTNode node)
+    public static void evaluateNode(ASTNode node)
     {
         switch (node.nodeType)
         {
-            case Parser.ASTNode.NodeType.Prototype:
-                generatePrototype((Parser.PrototypeAST)node);
+            case ASTNode.NodeType.Prototype:
+                generatePrototype((PrototypeAST)node);
                 break;
-            case Parser.ASTNode.NodeType.Function:
-                generateFunction((Parser.FunctionAST)node);
+            case ASTNode.NodeType.Function:
+                generateFunction((FunctionAST)node);
                 break;
-            case Parser.ASTNode.NodeType.BinaryExpression:
-                generateBinaryExpression((Parser.BinaryExpression)node);
+            case ASTNode.NodeType.BinaryExpression:
+                generateBinaryExpression((BinaryExpression)node);
                 break;
-            case Parser.ASTNode.NodeType.FunctionCall:
-                generateFunctionCall((Parser.FunctionCall)node);
+            case ASTNode.NodeType.FunctionCall:
+                generateFunctionCall((FunctionCall)node);
                 break;
-            case Parser.ASTNode.NodeType.NumberExpression:
-                generateNumberExpression((Parser.NumberExpression)node);
+            case ASTNode.NodeType.NumberExpression:
+                generateNumberExpression((NumberExpression)node);
                 break;
         }
     }
 
-    public static void generateIR(List<Parser.ASTNode> nodes, LLVMBuilderRef _builder, LLVMModuleRef _module)
+    public static void generateIR(List<ASTNode> nodes, LLVMBuilderRef _builder, LLVMModuleRef _module)
     {
         builder = _builder;
         module = _module;
 
 
 
-        foreach (Parser.ASTNode node in nodes)
+        foreach (ASTNode node in nodes)
         {
             evaluateNode(node);
 
 
-            // foreach (Parser.ASTNode child in node.children)
+            // foreach (ASTNode child in node.children)
             // {
             //     evaluateNode(child);
             // }
