@@ -15,7 +15,8 @@ public abstract class ASTNode
         Prototype,
         Function,
         FunctionCall,
-        BuiltinCall
+        BuiltinCall,
+        String
     }
     
     public virtual void addParent(ASTNode parent)

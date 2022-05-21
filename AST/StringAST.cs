@@ -1,11 +1,12 @@
-public class StringAST : ASTNode
+public class StringExpression : ASTNode
 {
     public string value;
 
-    public StringAST(Util.Token token)
+    public StringExpression(Util.Token token)
     {
         Parser.checkToken(token, expectedType: Util.TokenType.Keyword);
-
+    
+        this.nodeType = NodeType.String;
         this.value = token.value;
 
         this.line = token.line;

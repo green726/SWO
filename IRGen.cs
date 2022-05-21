@@ -2,18 +2,24 @@ using LLVMSharp;
 
 public static class IRGen
 {
+    public static int maxStringIntLength = 64;
 
     public static LLVMModuleRef module;
 
-    private static LLVMBuilderRef builder;
+    public static LLVMBuilderRef builder;
 
-    private static readonly Stack<LLVMValueRef> valueStack = new Stack<LLVMValueRef>();
+    public static readonly Stack<LLVMValueRef> valueStack = new Stack<LLVMValueRef>();
 
-    private static Dictionary<string, LLVMValueRef> namedValues = new Dictionary<string, LLVMValueRef>();
+    public static Dictionary<string, LLVMValueRef> namedValues = new Dictionary<string, LLVMValueRef>();
 
     public static void generateNumberExpression(NumberExpression numberExpression)
     {
         valueStack.Push(LLVM.ConstReal(LLVM.DoubleType(), numberExpression.value));
+    }
+
+    public static void generateStringExpression(StringExpression str)
+    {
+        valueStack.Push(LLVM.BuildGlobalString(builder, str.value, "strtmp"));
     }
 
     public static void generateBinaryExpression(BinaryExpression binaryExpression)
@@ -53,7 +59,6 @@ public static class IRGen
 
         foreach (ASTNode child in binaryExpression.children)
         {
-            Console.WriteLine(child.nodeType);
             evaluateNode(child);
 
         }
@@ -61,20 +66,20 @@ public static class IRGen
         LLVM.DumpValue(valueStack.Peek());
     }
 
-    public static StringAST evaluatePrintFormat(FunctionCall printCall)
+    public static StringExpression evaluatePrintFormat(FunctionCall printCall)
     {
         if (printCall.args[0].nodeType == ASTNode.NodeType.NumberExpression)
         {
-            return new StringAST(new Util.Token(Util.TokenType.Keyword, "%f", 0, 0));
+            return new StringExpression(new Util.Token(Util.TokenType.Keyword, "%f", 0, 0));
         }
 
-        return new StringAST(new Util.Token(Util.TokenType.Keyword, "%f", 0, 0));
+        return new StringExpression(new Util.Token(Util.TokenType.Keyword, "%f", 0, 0));
     }
 
     public static void generateBuiltinCall(FunctionCall builtIn)
     {
 
-        StringAST printFormat;
+        StringExpression printFormat;
         if (builtIn.functionName == "print")
         {
             //FIX: code errors in here somewhere
@@ -82,7 +87,6 @@ public static class IRGen
             builtIn.functionName = "printf";
 
             printFormat = evaluatePrintFormat(builtIn);
-            Console.WriteLine("print format: " + printFormat);
 
 
             builtIn.addChildAtStart(printFormat);
@@ -104,7 +108,7 @@ public static class IRGen
         int argumentCount = builtIn.args.Count;
         var argsRef = new LLVMValueRef[argumentCount];
 
-        for (int i = 1; i < argumentCount; i++)
+        for (int i = 0; i < argumentCount; i++)
         {
             evaluateNode(builtIn.args[i]);
             argsRef[i] = valueStack.Pop();
@@ -167,7 +171,6 @@ public static class IRGen
                 throw new Exception($"redefinition of function with different number of args (redfined to: {argumentCount})");
             }
         }
-
         else
         {
 
@@ -182,10 +185,10 @@ public static class IRGen
                     case Util.ClassType.Int:
                         arguments.Add(LLVM.IntType(64));
                         break;
-                        //TODO: implement strings as char arrays and chars as ints
-                        // case Util.ClassType.String:
-                        //     arguments.Add(LLVM.);
-                        //     break;
+                    //TODO: implement strings as char arrays and chars as ints
+                    case Util.ClassType.String:
+                        arguments.Add(LLVM.ArrayType(LLVM.Int8Type(), 3));
+                        break;
                 }
 
             }
@@ -239,6 +242,8 @@ public static class IRGen
 
     }
 
+
+
     public static void evaluateNode(ASTNode node)
     {
         switch (node.nodeType)
@@ -258,6 +263,10 @@ public static class IRGen
             case ASTNode.NodeType.NumberExpression:
                 generateNumberExpression((NumberExpression)node);
                 break;
+            case ASTNode.NodeType.String:
+                generateStringExpression((StringExpression)node);
+                break;
+
         }
     }
 
@@ -265,8 +274,6 @@ public static class IRGen
     {
         builder = _builder;
         module = _module;
-
-
 
         foreach (ASTNode node in nodes)
         {

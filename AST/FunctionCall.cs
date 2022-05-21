@@ -4,7 +4,7 @@ public class FunctionCall : ASTNode
     public bool builtIn = false;
     public List<ASTNode> args;
 
-    public FunctionCall(Util.Token token, List<ASTNode>? args, bool? builtInExpected = false)
+    public FunctionCall(Util.Token token, List<ASTNode>? args, bool? builtInExpected = false, ASTNode? parent = null)
     {
         this.nodeType = NodeType.FunctionCall;
 
@@ -20,8 +20,15 @@ public class FunctionCall : ASTNode
         this.functionName = token.value;
         this.args = args ??= new List<ASTNode>();
 
-        PrototypeAST proto = new PrototypeAST(this.line, this.column);
+        PrototypeAST proto = new PrototypeAST();
         FunctionAST func = new FunctionAST(proto, this);
+
+        if (parent != null)
+        {
+            parent.addChild(this);
+            return;
+        }
+
         Parser.nodes.Add(func);
     }
 

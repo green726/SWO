@@ -195,22 +195,61 @@ public static class Parser
             case Util.TokenType.ParenDelimiterOpen:
                 //treat it as a function call
                 //token would be the name, next token would be delim, so we grab all tokens starting from the one after that until final delim
-                FunctionCall funcCall = new FunctionCall(token, null, true);
+                FunctionCall funcCall = new FunctionCall(token, null, true, parent);
                 return funcCall;
         }
-        return null;
 
+        switch (parent.nodeType)
+        {
+            case ASTNode.NodeType.Prototype:
+                Console.WriteLine("encountered keyword with proto parent");
+                PrototypeAST proto = (PrototypeAST)parent;
+                proto.addItem(token);
+                break;
+        }
+
+        return parent;
+
+    }
+
+    public static ASTNode parseDelim(Util.Token token, int tokenIndex, ASTNode? parent = null)
+    {
+        switch (token.type)
+        {
+            case Util.TokenType.ParenDelimiterOpen:
+                // throw new Exception("invalid paren delimeter usage");
+                break;
+            case Util.TokenType.BrackDelimiterOpen:
+                parent = new PrototypeAST();
+                break;
+            case Util.TokenType.SquareDelimiterOpen:
+                parent = new FunctionAST((PrototypeAST)parent);
+                break;
+            case Util.TokenType.SquareDelimiterClose:
+                parent = null;
+                break;
+            case Util.TokenType.ParenDelimiterClose:
+                parent = null;
+                break;
+            case Util.TokenType.BrackDelimiterClose:
+                // parent = null;
+                break;
+        }
+        return parent;
     }
 
     public static bool parseTokenRecursive(Util.Token token, int tokenIndex, ASTNode? parent = null, Util.TokenType[]? expectedTypes = null)
     {
-
         ASTNode? previousNode = nodes.Count > 0 ? nodes.Last() : null;
 
         // Console.WriteLine($"parse loop {tokenIndex}: {printAST()}");
         if (token.type == Util.TokenType.EOF)
         {
             return true;
+        }
+        else if (token.type == Util.TokenType.EOL)
+        {
+            return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, parent);
         }
 
         if (expectedTypes != null)
@@ -236,9 +275,12 @@ public static class Parser
 
         if (token.isDelim)
         {
-            if (parent != null)
-                return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, parent);
+            ASTNode delimParent = parseDelim(token, tokenIndex, parent);
+            return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, delimParent);
+            // if (parent != null)
+            //     return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, parent);
         }
+
         return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1);
 
     }
@@ -257,7 +299,7 @@ public static class Parser
         protoArgs.Add(new Util.Token(Util.TokenType.Keyword, "double", 0, 0));
         protoArgs.Add(new Util.Token(Util.TokenType.Keyword, "x", 0, 0));
 
-        PrototypeAST printProto = new PrototypeAST(0, 0, "printf", protoArgs);
+        PrototypeAST printProto = new PrototypeAST("printf", protoArgs);
         nodes.Insert(0, printProto);
 
         Console.WriteLine("BEGIN OF PARSER DEBUG");

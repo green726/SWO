@@ -69,7 +69,7 @@ public class BinaryExpression : ASTNode
         else
         {
             //TODO: add the creation of an anonymous function for the binary expression here
-            PrototypeAST proto = new PrototypeAST(this.line, this.column);
+            PrototypeAST proto = new PrototypeAST();
             FunctionAST func = new FunctionAST(proto, this);
             Parser.nodes.Add(func);
         }

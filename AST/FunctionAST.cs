@@ -1,14 +1,17 @@
 public class FunctionAST : ASTNode
 {
     public PrototypeAST prototype;
-    public List<ASTNode> body;
+    public List<ASTNode>? body;
 
 
-    public FunctionAST(PrototypeAST prototype, List<ASTNode>? body = default(List<ASTNode>))
+    public FunctionAST(PrototypeAST prototype, List<ASTNode>? body = null)
     {
+        if (body == null) body = new List<ASTNode>();
         this.nodeType = NodeType.Function;
         this.prototype = prototype;
         this.body = body;
+
+        Parser.nodes.Add(this);
     }
 
     public FunctionAST(PrototypeAST prototype, ASTNode body)
@@ -17,6 +20,13 @@ public class FunctionAST : ASTNode
         this.prototype = prototype;
         this.body = new List<ASTNode>();
         this.body.Add(body);
+
+        Parser.nodes.Add(this);
+    }
+
+    public override void addChild(ASTNode child)
+    {
+        this.body.Add(child);
     }
 
 }
