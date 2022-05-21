@@ -37,6 +37,11 @@ public class FunctionCall : ASTNode
         args.Add(child);
     }
 
+    public override void removeChild(ASTNode child)
+    {
+        args.Remove(child);
+    }
+
     public void addChildAtStart(ASTNode child)
     {
         args.Insert(0, child);

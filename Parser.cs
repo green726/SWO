@@ -281,7 +281,7 @@ public static class Parser
             //     return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, parent);
         }
 
-        return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1);
+        return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, parent);
 
     }
 

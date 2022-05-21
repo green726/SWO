@@ -38,19 +38,30 @@ public class BinaryExpression : ASTNode
         }
 
         this.parent = parent;
-        if (previousNode.nodeType == NodeType.Function)
+        if (parent != null)
         {
-            FunctionAST prevFunc = (FunctionAST)previousNode;
-            Parser.checkNode(prevFunc.body.Last(), Parser.binaryExpectedNodes);
-            this.leftHand = prevFunc.body.Last();
+            if (this.parent.nodeType == NodeType.Function)
+            {
+                FunctionAST prevFunc = (FunctionAST)previousNode;
+                Parser.checkNode(prevFunc.body.Last(), Parser.binaryExpectedNodes);
+                this.leftHand = prevFunc.body.Last();
+            }
+            else if (this.parent.nodeType == NodeType.FunctionCall)
+            {
+                Console.WriteLine("bin op parent was func call");
+                FunctionCall prevCall = (FunctionCall)parent;
+                Parser.checkNode(prevCall.args.Last(), Parser.binaryExpectedNodes);
+                this.leftHand = prevCall.args.Last();
+            }
+            else
+            {
+                Parser.checkNode(previousNode, Parser.binaryExpectedNodes);
+                this.leftHand = previousNode;
+            }
         }
-        else
+        if (this.leftHand.nodeType == ASTNode.NodeType.NumberExpression)
         {
-            Parser.checkNode(previousNode, Parser.binaryExpectedNodes);
-            this.leftHand = previousNode;
-        }
-        if (this.leftHand.parent == null && this.leftHand.nodeType == ASTNode.NodeType.NumberExpression)
-        {
+            Console.WriteLine("adding bin op as parent of lh");
             this.leftHand.addParent(this);
         }
         else if (parent == null && this.leftHand.nodeType == NodeType.BinaryExpression)
@@ -60,7 +71,6 @@ public class BinaryExpression : ASTNode
 
 
         // this.rightHand = new NumberExpression(checkToken(nextToken, Util.tokenType.number), this);
-
 
         if (this.parent != null)
         {

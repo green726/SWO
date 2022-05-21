@@ -18,18 +18,29 @@ public abstract class ASTNode
         BuiltinCall,
         String
     }
-    
+
     public virtual void addParent(ASTNode parent)
     {
-        this.parent = parent;
         if (this.parent != null)
+        {
+            this.parent.removeChild(this);
+        }
+        if (parent != null)
         {
             Parser.nodes.Remove(this);
         }
+        this.parent = parent;
+
     }
 
     public virtual void addChild(ASTNode child)
     {
         children.Add(child);
+    }
+
+    public virtual void removeChild(ASTNode child)
+    {
+        Console.WriteLine("ASTNode remove child called");
+        children.Remove(child);
     }
 }
