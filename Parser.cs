@@ -16,8 +16,6 @@ public static class Parser
         public static List<ASTNode> primaryChildren = new List<ASTNode>();
     }
 
-
-
     public static void checkNode(ASTNode? node, ASTNode.NodeType[] expectedTypes)
     {
         if (node == null)
@@ -191,12 +189,14 @@ public static class Parser
         switch (nextToken.type)
         {
             case Util.TokenType.SquareDelimiterOpen:
+                FunctionCall funcCall = new FunctionCall(token, null, false, parent);
+                return funcCall;
                 break;
             case Util.TokenType.ParenDelimiterOpen:
                 //treat it as a function call
                 //token would be the name, next token would be delim, so we grab all tokens starting from the one after that until final delim
-                FunctionCall funcCall = new FunctionCall(token, null, true, parent);
-                return funcCall;
+                FunctionCall builtinCall = new FunctionCall(token, null, true, parent);
+                return builtinCall;
         }
 
         switch (parent.nodeType)
@@ -223,7 +223,15 @@ public static class Parser
                 parent = new PrototypeAST();
                 break;
             case Util.TokenType.SquareDelimiterOpen:
-                parent = new FunctionAST((PrototypeAST)parent);
+                switch (parent.nodeType)
+                {
+                    case ASTNode.NodeType.Prototype:
+                        parent = new FunctionAST((PrototypeAST)parent);
+                        break;
+                    case ASTNode.NodeType.FunctionCall:
+                        break;
+                }
+
                 break;
             case Util.TokenType.SquareDelimiterClose:
                 parent = null;

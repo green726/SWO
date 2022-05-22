@@ -5,8 +5,14 @@ source_filename = "HISS"
 
 declare double @printf([3 x i8], double)
 
-define double @main() {
+define double @test() {
 body:
   %calltmp = call double @printf([3 x i8]* @strtmp, double 2.000000e+00)
+  ret double %calltmp
+}
+
+define double @main() {
+body:
+  %calltmp = call double @test()
   ret double %calltmp
 }
