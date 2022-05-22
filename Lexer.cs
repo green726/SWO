@@ -19,7 +19,7 @@ public static class Lexer
         {
             column++;
             bool isFinalChar = input.IndexOf(ch) == input.Length - 1;
-            if (ch == ' ' || isFinalChar || ch == ')' || ch == '}' || lastChar == '\n')
+            if (ch == ' ' || isFinalChar || ch == '\n' || ch == ')' || ch == '}' || lastChar == '\n')
             {
                 if (lastChar != ' ')
                 {

@@ -25,6 +25,7 @@ public static class IRGen
     public static void generateBinaryExpression(BinaryExpression binaryExpression)
     {
 
+        Console.WriteLine("evaluating binary expression");
         LLVMValueRef leftHand = new LLVMValueRef();
         LLVMValueRef rightHand = new LLVMValueRef();
         LLVMValueRef ir = new LLVMValueRef();
@@ -34,6 +35,7 @@ public static class IRGen
             case ASTNode.NodeType.NumberExpression:
                 NumberExpression leftHandExpr = (NumberExpression)binaryExpression.leftHand;
                 leftHand = LLVM.ConstReal(LLVM.DoubleType(), leftHandExpr.value);
+                Console.WriteLine("left hand value: " + leftHandExpr.value);
                 break;
             case ASTNode.NodeType.BinaryExpression:
                 leftHand = valueStack.Pop();
@@ -44,6 +46,7 @@ public static class IRGen
         {
             case ASTNode.NodeType.NumberExpression:
                 NumberExpression rightHandExpr = (NumberExpression)binaryExpression.rightHand;
+                Console.WriteLine("right hand value: " + rightHandExpr.value);
                 rightHand = LLVM.ConstReal(LLVM.DoubleType(), rightHandExpr.value);
                 break;
         }
@@ -57,13 +60,12 @@ public static class IRGen
 
         valueStack.Push(ir);
 
-        foreach (ASTNode child in binaryExpression.children)
-        {
-            evaluateNode(child);
+        // foreach (ASTNode child in binaryExpression.children)
+        // {
+        //     evaluateNode(child);
+        // }
 
-        }
-
-        LLVM.DumpValue(valueStack.Peek());
+        // LLVM.DumpValue(valueStack.Peek());
     }
 
     public static StringExpression evaluatePrintFormat(FunctionCall printCall)
@@ -141,6 +143,7 @@ public static class IRGen
         var argsRef = new LLVMValueRef[argumentCount];
         for (int i = 0; i < argumentCount; ++i)
         {
+            Console.WriteLine($"evaulating arg of type {funcCall.args[i]}");
             evaluateNode(funcCall.args[i]);
             argsRef[i] = valueStack.Pop();
         }
@@ -246,6 +249,7 @@ public static class IRGen
 
     public static void evaluateNode(ASTNode node)
     {
+        Console.WriteLine($"evaluating node of type {node.nodeType}");
         switch (node.nodeType)
         {
             case ASTNode.NodeType.Prototype:
@@ -274,6 +278,8 @@ public static class IRGen
     {
         builder = _builder;
         module = _module;
+
+        Console.WriteLine("EEEE");
 
         foreach (ASTNode node in nodes)
         {

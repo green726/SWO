@@ -24,6 +24,11 @@ public class FunctionAST : ASTNode
         Parser.nodes.Add(this);
     }
 
+    public override void removeChild(ASTNode child)
+    {
+        this.body.Remove(child);
+    }
+
     public override void addChild(ASTNode child)
     {
         this.body.Add(child);

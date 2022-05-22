@@ -38,11 +38,11 @@ public class BinaryExpression : ASTNode
         }
 
         this.parent = parent;
-        if (parent != null)
+        if (this.parent != null)
         {
             if (this.parent.nodeType == NodeType.Function)
             {
-                FunctionAST prevFunc = (FunctionAST)previousNode;
+                FunctionAST prevFunc = (FunctionAST)parent;
                 Parser.checkNode(prevFunc.body.Last(), Parser.binaryExpectedNodes);
                 this.leftHand = prevFunc.body.Last();
             }
@@ -72,16 +72,16 @@ public class BinaryExpression : ASTNode
 
         // this.rightHand = new NumberExpression(checkToken(nextToken, Util.tokenType.number), this);
 
-        if (this.parent != null)
+        if (this.parent == null)
         {
-            this.parent.addChild(this);
+            //NOTE: - commented out below code is to throw in an anonymous function 
+            // PrototypeAST proto = new PrototypeAST();
+            // FunctionAST func = new FunctionAST(proto, this);
+            Parser.nodes.Add(this);
         }
         else
         {
-            //TODO: add the creation of an anonymous function for the binary expression here
-            PrototypeAST proto = new PrototypeAST();
-            FunctionAST func = new FunctionAST(proto, this);
-            Parser.nodes.Add(func);
+            this.parent.addChild(this);
         }
     }
     public override void addChild(ASTNode child)

@@ -1,7 +1,7 @@
 public abstract class ASTNode
 {
     public List<ASTNode> children = new List<ASTNode>();
-    public ASTNode? parent;
+    public ASTNode? parent = null;
 
     public int line = 0;
     public int column = 0;

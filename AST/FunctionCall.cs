@@ -20,8 +20,9 @@ public class FunctionCall : ASTNode
         this.functionName = token.value;
         this.args = args ??= new List<ASTNode>();
 
-        PrototypeAST proto = new PrototypeAST();
-        FunctionAST func = new FunctionAST(proto, this);
+        //NOTE: commented out below is to throw in an anonymous function
+        // PrototypeAST proto = new PrototypeAST();
+        // FunctionAST func = new FunctionAST(proto, this);
 
         if (parent != null)
         {
@@ -29,7 +30,7 @@ public class FunctionCall : ASTNode
             return;
         }
 
-        Parser.nodes.Add(func);
+        Parser.nodes.Add(this);
     }
 
     public override void addChild(ASTNode child)
