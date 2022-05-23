@@ -2,17 +2,24 @@
 source_filename = "HISS"
 
 @strtmp = private unnamed_addr constant [3 x i8] c"%f\00", align 1
+@strtmp.1 = private unnamed_addr constant [3 x i8] c"%f\00", align 1
 
 declare double @printf([3 x i8], double)
 
-define double @test() {
+define double @test1() {
 body:
   %calltmp = call double @printf([3 x i8]* @strtmp, double 2.000000e+00)
   ret double %calltmp
 }
 
+define double @test2() {
+body:
+  %calltmp = call double @printf([3 x i8]* @strtmp.1, double 4.000000e+00)
+  ret double %calltmp
+}
+
 define double @main() {
 body:
-  %calltmp = call double @test()
+  %calltmp = call double @test1()
   ret double %calltmp
 }

@@ -1,9 +1,12 @@
-{test} [
+{test1} [
 print(1 + 1)
 ]
 
-{main} [
-test[]
+{test2} [
+print(2 + 2)
 ]
 
-
+{main} [
+test1[]
+test2[]
+]

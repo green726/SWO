@@ -24,8 +24,6 @@ public static class IRGen
 
     public static void generateBinaryExpression(BinaryExpression binaryExpression)
     {
-
-        Console.WriteLine("evaluating binary expression");
         LLVMValueRef leftHand = new LLVMValueRef();
         LLVMValueRef rightHand = new LLVMValueRef();
         LLVMValueRef ir = new LLVMValueRef();
@@ -143,7 +141,6 @@ public static class IRGen
         var argsRef = new LLVMValueRef[argumentCount];
         for (int i = 0; i < argumentCount; ++i)
         {
-            Console.WriteLine($"evaulating arg of type {funcCall.args[i]}");
             evaluateNode(funcCall.args[i]);
             argsRef[i] = valueStack.Pop();
         }
@@ -227,29 +224,31 @@ public static class IRGen
 
         LLVM.PositionBuilderAtEnd(builder, LLVM.AppendBasicBlock(function, "body"));
 
-        try
+        // try
+        // {
+        foreach (ASTNode bodyNode in funcNode.body)
         {
-            evaluateNode(funcNode.body.First());
+            Console.WriteLine($"body node type {bodyNode.nodeType}");
+            evaluateNode(bodyNode);
         }
-        catch (Exception)
-        {
-            LLVM.DeleteFunction(function);
-            throw;
-        }
+        // }
+        // catch (Exception)
+        // {
+        //     LLVM.DeleteFunction(function);
+        //     throw;
+        // }
 
         LLVM.BuildRet(builder, valueStack.Pop());
 
         LLVM.VerifyFunction(function, LLVMVerifierFailureAction.LLVMPrintMessageAction);
 
         valueStack.Push(function);
-
     }
 
 
 
     public static void evaluateNode(ASTNode node)
     {
-        Console.WriteLine($"evaluating node of type {node.nodeType}");
         switch (node.nodeType)
         {
             case ASTNode.NodeType.Prototype:
@@ -279,7 +278,6 @@ public static class IRGen
         builder = _builder;
         module = _module;
 
-        Console.WriteLine("EEEE");
 
         foreach (ASTNode node in nodes)
         {
