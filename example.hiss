@@ -2,7 +2,6 @@ use stdlib.io.printf
 use stdlib.io
 use stdlib
 
-
 mut x = 0
 const y = 0
 
@@ -56,4 +55,3 @@ test2()
 }
 
 --------
-
