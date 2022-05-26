@@ -50,7 +50,6 @@ public static class Lexer
                     tokenList.Add(new Util.Token(Util.TokenType.EOL, ch.ToString(), line, column));
                     lastChar = ch;
                     stringBuilder = new StringBuilder();
-                    Console.WriteLine("encountered new line char");
                     line++;
                     column = 0;
                     continue;

@@ -130,7 +130,6 @@ public static class Parser
     public static void printAST(List<ASTNode> nodesPrint)
     {
         StringBuilder stringBuilder = new StringBuilder();
-        // Console.WriteLine(nodesPrint[0]);
 
         foreach (ASTNode node in nodesPrint)
         {
@@ -274,12 +273,8 @@ public static class Parser
     public static bool parseTokenRecursive(Util.Token token, int tokenIndex, ASTNode? parent = null, Util.TokenType[]? expectedTypes = null, int delimLevel = 0)
     {
 
-        Console.WriteLine("delimLevel: " + delimLevel);
-        Console.WriteLine("");
-        Console.WriteLine("currentToken: " + token.value + " current token type: " + token.type);
         ASTNode? previousNode = nodes.Count > 0 ? nodes.Last() : null;
 
-        // Console.WriteLine($"parse loop {tokenIndex}: {printAST()}");
         if (token.type == Util.TokenType.EOF)
         {
             return true;
@@ -338,9 +333,9 @@ public static class Parser
         PrototypeAST printProto = new PrototypeAST("printf", protoArgs);
         nodes.Insert(0, printProto);
 
-        Console.WriteLine("BEGIN OF PARSER DEBUG");
+        Console.WriteLine("Parser debug info below");
         printAST(nodes);
-        Console.WriteLine("END OF PARSER DEBUG");
+        Console.WriteLine("Parser debug info finsihed");
 
         return nodes;
     }

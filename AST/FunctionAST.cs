@@ -31,7 +31,6 @@ public class FunctionAST : ASTNode
 
     public override void addChild(ASTNode child)
     {
-        Console.WriteLine($"adding child of type | {child.nodeType} | to func of name | {this.prototype.name} | ");
         this.body.Add(child);
     }
 

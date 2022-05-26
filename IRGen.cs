@@ -33,7 +33,6 @@ public static class IRGen
             case ASTNode.NodeType.NumberExpression:
                 NumberExpression leftHandExpr = (NumberExpression)binaryExpression.leftHand;
                 leftHand = LLVM.ConstReal(LLVM.DoubleType(), leftHandExpr.value);
-                Console.WriteLine("left hand value: " + leftHandExpr.value);
                 break;
             case ASTNode.NodeType.BinaryExpression:
                 leftHand = valueStack.Pop();
@@ -44,7 +43,6 @@ public static class IRGen
         {
             case ASTNode.NodeType.NumberExpression:
                 NumberExpression rightHandExpr = (NumberExpression)binaryExpression.rightHand;
-                Console.WriteLine("right hand value: " + rightHandExpr.value);
                 rightHand = LLVM.ConstReal(LLVM.DoubleType(), rightHandExpr.value);
                 break;
         }
@@ -120,7 +118,6 @@ public static class IRGen
 
     public static void generateFunctionCall(FunctionCall funcCall)
     {
-        Console.WriteLine($"funcCall to name: {funcCall.functionName}");
         if (funcCall.builtIn)
         {
             generateBuiltinCall(funcCall);
@@ -237,9 +234,6 @@ public static class IRGen
         //     throw;
         // }
 
-        Console.WriteLine("value stack peek from func body below");
-        LLVM.DumpValue(valueStack.Peek());
-        Console.WriteLine("end of value stack peek");
         LLVM.BuildRet(builder, valueStack.Pop());
 
         LLVM.VerifyFunction(function, LLVMVerifierFailureAction.LLVMPrintMessageAction);

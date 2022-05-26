@@ -48,7 +48,6 @@ public class BinaryExpression : ASTNode
             }
             else if (this.parent.nodeType == NodeType.FunctionCall)
             {
-                Console.WriteLine("bin op parent was func call");
                 FunctionCall prevCall = (FunctionCall)parent;
                 Parser.checkNode(prevCall.args.Last(), Parser.binaryExpectedNodes);
                 this.leftHand = prevCall.args.Last();
@@ -61,7 +60,6 @@ public class BinaryExpression : ASTNode
         }
         if (this.leftHand.nodeType == ASTNode.NodeType.NumberExpression)
         {
-            Console.WriteLine("adding bin op as parent of lh");
             this.leftHand.addParent(this);
         }
         else if (parent == null && this.leftHand.nodeType == NodeType.BinaryExpression)
