@@ -1,0 +1,59 @@
+use stdlib.io.printf
+use stdlib.io
+use stdlib
+
+
+mut x = 0
+const y = 0
+
+{printf string format int x} []
+
+{test1} [
+print(1 + 1)
+]
+
+{test2} [
+print(2 + 2)
+]
+
+{main} [
+test1[]
+test2[]
+]
+
+--------
+
+@printf(string format, int x) {}
+
+@test1() {
+print!(1 + 1)
+}
+
+@test2() {
+print!(2 + 2)
+}
+
+@main() {
+test1()
+test2()
+}
+
+--------
+
+fn printf(string format, int x) {}
+
+fn test1() {
+print(1 + 1)
+}
+
+fn test2() {
+print(2 + 2)
+}
+
+fn test3() {
+test1()
+test2()
+}
+
+--------
+

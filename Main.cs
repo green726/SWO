@@ -1,5 +1,4 @@
-﻿
-public class greenlang
+﻿public class greenlang
 {
     private static string fileContents;
 
