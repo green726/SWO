@@ -180,7 +180,7 @@ public static class Parser
         return ret;
     }
 
-    public static ASTNode parseKeyword(Util.Token token, int tokenIndex, ASTNode? parent = null)
+    public static List<dynamic> parseKeyword(Util.Token token, int tokenIndex, ASTNode? parent = null, int delimLevel = 0)
     {
         List<dynamic> ret = new List<dynamic>();
         Util.Token nextToken = tokenList[tokenIndex + 1];
@@ -190,37 +190,38 @@ public static class Parser
         {
             case Util.TokenType.SquareDelimiterOpen:
                 FunctionCall funcCall = new FunctionCall(token, null, false, parent);
-                return funcCall;
+                return new List<dynamic>() { funcCall, delimLevel };
                 break;
             case Util.TokenType.ParenDelimiterOpen:
                 //treat it as a function call
                 //token would be the name, next token would be delim, so we grab all tokens starting from the one after that until final delim
                 FunctionCall builtinCall = new FunctionCall(token, null, true, parent);
-                return builtinCall;
+                return new List<dynamic>() { builtinCall, delimLevel };
         }
 
         switch (parent.nodeType)
         {
             case ASTNode.NodeType.Prototype:
-                Console.WriteLine("encountered keyword with proto parent");
                 PrototypeAST proto = (PrototypeAST)parent;
                 proto.addItem(token);
                 break;
         }
 
-        return parent;
+        return new List<dynamic>() { parent, delimLevel };
 
     }
 
-    public static ASTNode parseDelim(Util.Token token, int tokenIndex, ASTNode? parent = null)
+    public static List<dynamic> parseDelim(Util.Token token, int tokenIndex, ASTNode? parent = null, int delimLevel = 0)
     {
         switch (token.type)
         {
             case Util.TokenType.ParenDelimiterOpen:
                 // throw new Exception("invalid paren delimeter usage");
+                delimLevel++;
                 break;
             case Util.TokenType.BrackDelimiterOpen:
                 parent = new PrototypeAST();
+                delimLevel++;
                 break;
             case Util.TokenType.SquareDelimiterOpen:
                 switch (parent.nodeType)
@@ -231,23 +232,51 @@ public static class Parser
                     case ASTNode.NodeType.FunctionCall:
                         break;
                 }
-
+                delimLevel++;
                 break;
             case Util.TokenType.SquareDelimiterClose:
-                parent = null;
+                delimLevel--;
+                if (delimLevel == 0)
+                {
+                    parent = null;
+                }
+                else if (parent != null)
+                {
+                    parent = parent.parent;
+                }
                 break;
             case Util.TokenType.ParenDelimiterClose:
-                parent = null;
+                delimLevel--;
+                if (delimLevel == 0)
+                {
+                    parent = null;
+                }
+                else if (parent != null)
+                {
+                    parent = parent.parent;
+                }
                 break;
             case Util.TokenType.BrackDelimiterClose:
-                // parent = null;
+                // if (delimLevel == 0)
+                // {
+                //     parent = null;
+                // }
+                // if (parent != null)
+                // {
+                //     parent = parent.parent;
+                // }
+                delimLevel--;
                 break;
         }
-        return parent;
+        return new List<dynamic>() { parent, delimLevel };
     }
 
-    public static bool parseTokenRecursive(Util.Token token, int tokenIndex, ASTNode? parent = null, Util.TokenType[]? expectedTypes = null)
+    public static bool parseTokenRecursive(Util.Token token, int tokenIndex, ASTNode? parent = null, Util.TokenType[]? expectedTypes = null, int delimLevel = 0)
     {
+
+        Console.WriteLine("delimLevel: " + delimLevel);
+        Console.WriteLine("");
+        Console.WriteLine("currentToken: " + token.value + " current token type: " + token.type);
         ASTNode? previousNode = nodes.Count > 0 ? nodes.Last() : null;
 
         // Console.WriteLine($"parse loop {tokenIndex}: {printAST()}");
@@ -257,7 +286,7 @@ public static class Parser
         }
         else if (token.type == Util.TokenType.EOL)
         {
-            return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, parent);
+            return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, parent, delimLevel: delimLevel);
         }
 
         if (expectedTypes != null)
@@ -273,26 +302,25 @@ public static class Parser
 
             case Util.TokenType.Operator:
                 BinaryExpression binExpr = new BinaryExpression(token, previousNode, tokenList[tokenIndex + 1], parent);
-                return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, binExpr, binaryExpectedTokens);
+                return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, binExpr, binaryExpectedTokens, delimLevel: delimLevel);
 
             case Util.TokenType.Keyword:
-                ASTNode keyword = parseKeyword(token, tokenIndex, parent);
+                List<dynamic> keywordRet = parseKeyword(token, tokenIndex, parent, delimLevel);
                 //0 is the keyword ASTNode, 1 is the next token, and 2 is the next token index
-                return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, keyword);
+                return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, keywordRet[0], delimLevel: keywordRet[1]);
         }
 
         if (token.isDelim)
         {
-            ASTNode delimParent = parseDelim(token, tokenIndex, parent);
-            return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, delimParent);
+            List<dynamic> delimRet = parseDelim(token, tokenIndex, parent, delimLevel);
+            ASTNode delimParent = delimRet[0];
+            return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, delimParent, delimLevel: delimRet[1]);
             // if (parent != null)
             //     return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, parent);
         }
-
-        return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, parent);
+        return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, parent, delimLevel: delimLevel);
 
     }
-
 
     public static List<ASTNode> beginParse(List<Util.Token> _tokenList)
     {
@@ -316,5 +344,4 @@ public static class Parser
 
         return nodes;
     }
-
 }

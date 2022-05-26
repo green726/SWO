@@ -2,7 +2,7 @@ using LLVMSharp;
 
 public static class BinaryExpressionGen
 {
-    public static void generateBinaryExpression(BinaryExpression binaryExpression)
+   public static void generateBinaryExpression(BinaryExpression binaryExpression)
     {
 
         LLVMValueRef leftHand = new LLVMValueRef();

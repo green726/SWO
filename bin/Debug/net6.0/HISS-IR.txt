@@ -21,5 +21,6 @@ body:
 define double @main() {
 body:
   %calltmp = call double @test1()
-  ret double %calltmp
+  %calltmp1 = call double @test2()
+  ret double %calltmp1
 }

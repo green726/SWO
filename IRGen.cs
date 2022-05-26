@@ -120,6 +120,7 @@ public static class IRGen
 
     public static void generateFunctionCall(FunctionCall funcCall)
     {
+        Console.WriteLine($"funcCall to name: {funcCall.functionName}");
         if (funcCall.builtIn)
         {
             generateBuiltinCall(funcCall);
@@ -207,7 +208,6 @@ public static class IRGen
             LLVM.SetValueName(param, argumentName);
 
             namedValues[argumentName] = param;
-            argLoopIndex++;
         }
 
         valueStack.Push(function);
@@ -226,10 +226,9 @@ public static class IRGen
 
         // try
         // {
-        foreach (ASTNode bodyNode in funcNode.body)
+        for (var i = 0; i < funcNode.body.Count(); i++)
         {
-            Console.WriteLine($"body node type {bodyNode.nodeType}");
-            evaluateNode(bodyNode);
+            evaluateNode(funcNode.body[i]);
         }
         // }
         // catch (Exception)
@@ -238,6 +237,9 @@ public static class IRGen
         //     throw;
         // }
 
+        Console.WriteLine("value stack peek from func body below");
+        LLVM.DumpValue(valueStack.Peek());
+        Console.WriteLine("end of value stack peek");
         LLVM.BuildRet(builder, valueStack.Pop());
 
         LLVM.VerifyFunction(function, LLVMVerifierFailureAction.LLVMPrintMessageAction);

@@ -26,7 +26,9 @@ public class FunctionCall : ASTNode
 
         if (parent != null)
         {
-            parent.addChild(this);
+            this.parent = parent;
+            Console.WriteLine($"func call name: {this.functionName} | with parent of type: {this.parent.nodeType}");
+            this.parent.addChild(this);
             return;
         }
 

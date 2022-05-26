@@ -1,7 +1,7 @@
 public class FunctionAST : ASTNode
 {
     public PrototypeAST prototype;
-    public List<ASTNode>? body;
+    public List<ASTNode> body;
 
 
     public FunctionAST(PrototypeAST prototype, List<ASTNode>? body = null)
@@ -31,6 +31,7 @@ public class FunctionAST : ASTNode
 
     public override void addChild(ASTNode child)
     {
+        Console.WriteLine($"adding child of type | {child.nodeType} | to func of name | {this.prototype.name} | ");
         this.body.Add(child);
     }
 
