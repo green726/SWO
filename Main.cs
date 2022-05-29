@@ -12,10 +12,11 @@
 
         List<Util.Token> lexedContent = Lexer.lex(fileContents);
 
-        // foreach (Util.Token token in lexedContent)
-        // {
-        //     Console.WriteLine(token.type + " " + token.value);
-        // }
+        foreach (Util.Token token in lexedContent)
+        {
+            Console.WriteLine(token.type + " " + token.value);
+        }
+
         List<ASTNode> nodes = Parser.beginParse(lexedContent);
         ModuleGen.GenerateModule(nodes);
 

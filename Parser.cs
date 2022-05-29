@@ -185,20 +185,7 @@ public static class Parser
         Util.Token nextToken = tokenList[tokenIndex + 1];
         int nextTokenIndex = tokenIndex + 1;
 
-        switch (nextToken.type)
-        {
-            case Util.TokenType.SquareDelimiterOpen:
-                FunctionCall funcCall = new FunctionCall(token, null, false, parent);
-                return new List<dynamic>() { funcCall, delimLevel };
-                break;
-            case Util.TokenType.ParenDelimiterOpen:
-                //treat it as a function call
-                //token would be the name, next token would be delim, so we grab all tokens starting from the one after that until final delim
-                FunctionCall builtinCall = new FunctionCall(token, null, true, parent);
-                return new List<dynamic>() { builtinCall, delimLevel };
-        }
-
-        switch (parent.nodeType)
+        switch (parent?.nodeType)
         {
             case ASTNode.NodeType.Prototype:
                 PrototypeAST proto = (PrototypeAST)parent;
@@ -206,8 +193,25 @@ public static class Parser
                 break;
         }
 
-        return new List<dynamic>() { parent, delimLevel };
+        if (token.value[0] == '@')
+        {
+            PrototypeAST proto = new PrototypeAST(token.value.Substring(1));
+            return new List<dynamic>() { proto, delimLevel };
+        }
+        else if (token.value.EndsWith("!"))
+        {
+            //treat it as a function call
+            //token would be the name, next token would be delim, so we grab all tokens starting from the one after that until final delim
+            FunctionCall builtinCall = new FunctionCall(token, null, true, parent);
+            return new List<dynamic>() { builtinCall, delimLevel };
+        }
+        else if (nextToken.type == Util.TokenType.ParenDelimiterOpen)
+        {
+            FunctionCall funcCall = new FunctionCall(token, null, false, parent);
+            return new List<dynamic>() { funcCall, delimLevel };
+        }
 
+        return new List<dynamic>() { parent, delimLevel };
     }
 
     public static List<dynamic> parseDelim(Util.Token token, int tokenIndex, ASTNode? parent = null, int delimLevel = 0)
@@ -215,19 +219,25 @@ public static class Parser
         switch (token.type)
         {
             case Util.TokenType.ParenDelimiterOpen:
-                // throw new Exception("invalid paren delimeter usage");
+                // switch (parent?.nodeType)
+                // {
+                //     case ASTNode.NodeType.Prototype:
+                //     
+                // }
                 delimLevel++;
                 break;
             case Util.TokenType.BrackDelimiterOpen:
-                parent = new PrototypeAST();
+                // switch (parent?.nodeType)
+                // {
+                //     case ASTNode.NodeType.Prototype:
+                //         parent = new FunctionAST((PrototypeAST)parent);
+                //         break;
+                // }
                 delimLevel++;
                 break;
             case Util.TokenType.SquareDelimiterOpen:
-                switch (parent.nodeType)
+                switch (parent?.nodeType)
                 {
-                    case ASTNode.NodeType.Prototype:
-                        parent = new FunctionAST((PrototypeAST)parent);
-                        break;
                     case ASTNode.NodeType.FunctionCall:
                         break;
                 }
@@ -246,6 +256,11 @@ public static class Parser
                 break;
             case Util.TokenType.ParenDelimiterClose:
                 delimLevel--;
+                if (parent.nodeType == ASTNode.NodeType.Prototype)
+                {
+                    parent = new FunctionAST((PrototypeAST)parent, new List<ASTNode>());
+                    break;
+                }
                 if (delimLevel == 0)
                 {
                     parent = null;
