@@ -2,11 +2,37 @@
 source_filename = "HISS"
 
 @strtmp = private unnamed_addr constant [3 x i8] c"%f\00", align 1
+@strtmp.1 = private unnamed_addr constant [3 x i8] c"/n\00", align 1
+@strtmp.2 = private unnamed_addr constant [3 x i8] c"%f\00", align 1
+@strtmp.3 = private unnamed_addr constant [3 x i8] c"%f\00", align 1
+@strtmp.4 = private unnamed_addr constant [3 x i8] c"/n\00", align 1
+@strtmp.5 = private unnamed_addr constant [3 x i8] c"%f\00", align 1
+@strtmp.6 = private unnamed_addr constant [3 x i8] c"/n\00", align 1
+@strtmp.7 = private unnamed_addr constant [3 x i8] c"%f\00", align 1
+@strtmp.8 = private unnamed_addr constant [3 x i8] c"%f\00", align 1
+@strtmp.9 = private unnamed_addr constant [3 x i8] c"/n\00", align 1
 
 declare double @printf([3 x i8], double)
 
+define double @test1() {
+body:
+  %calltmp = call double @printf([3 x i8]* @strtmp, [3 x i8]* @strtmp.1)
+  %calltmp1 = call double @printf([3 x i8]* @strtmp.2, double 1.000000e+00)
+  %calltmp2 = call double @printf([3 x i8]* @strtmp.3, [3 x i8]* @strtmp.4)
+  ret double %calltmp2
+}
+
+define double @test2() {
+body:
+  %calltmp = call double @printf([3 x i8]* @strtmp.5, [3 x i8]* @strtmp.6)
+  %calltmp1 = call double @printf([3 x i8]* @strtmp.7, double 2.000000e+00)
+  %calltmp2 = call double @printf([3 x i8]* @strtmp.8, [3 x i8]* @strtmp.9)
+  ret double %calltmp2
+}
+
 define double @main() {
 body:
-  %calltmp = call double @printf([3 x i8]* @strtmp, double 2.000000e+00)
-  ret double %calltmp
+  %calltmp = call double @test1()
+  %calltmp1 = call double @test2()
+  ret double %calltmp1
 }

@@ -1,17 +1,18 @@
 functions:
     functions are declared like this:
     ```
-    {foo arg1type arg1, arg2type arg2 [
+    @foo (arg1type arg1, arg2type arg2) {
 
-    ]}
+    }
     ```
     functions are called like this:
     ```
-    foo[arg1, arg2]
-    ```
-    HISS built-in functions are called like this:
-    ```
     foo(arg1, arg2)
     ```
+    HISS builtin functions are called like this:
+    ```
+    print!(1)
+    ```
+
     for now all functions return ints
 
