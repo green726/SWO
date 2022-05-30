@@ -22,6 +22,43 @@ public static class IRGen
         valueStack.Push(LLVM.BuildGlobalString(builder, str.value, "strtmp"));
     }
 
+    // public static void generateVariableExpression(VariableExpression varExp)
+    // {
+    //
+    // }
+
+    public static void generateVariableAssignment(VariableAssignment varAss)
+    {
+        bool isString = false;
+        LLVMTypeRef typeLLVM = LLVMTypeRef.DoubleType();
+        LLVMValueRef constRef = LLVM.ConstReal(LLVMTypeRef.DoubleType(), 0.0);
+
+        switch (varAss.type.value)
+        {
+            case "double":
+                typeLLVM = LLVMTypeRef.DoubleType();
+                constRef = LLVM.ConstReal(LLVMTypeRef.DoubleType(), Double.Parse(varAss.strValue));
+                break;
+            case "int":
+                typeLLVM = LLVMTypeRef.Int64Type();
+                constRef = LLVM.ConstInt(LLVMTypeRef.Int64Type(), ulong.Parse(varAss.strValue), true);
+                break;
+            case "string":
+                isString = true;
+                break;
+
+        }
+        if (isString)
+        {
+            valueStack.Push(LLVM.BuildGlobalString(builder, varAss.strValue, varAss.name));
+            return;
+        }
+
+        LLVMValueRef varRef = LLVM.AddGlobal(module, typeLLVM, varAss.name);
+        LLVM.SetInitializer(varRef, constRef);
+        valueStack.Push(varRef);
+    }
+
     public static void generateBinaryExpression(BinaryExpression binaryExpression)
     {
         LLVMValueRef leftHand = new LLVMValueRef();
@@ -167,19 +204,17 @@ public static class IRGen
         else
         {
 
-            foreach (KeyValuePair<Util.ClassType, string> arg in prototype.arguments)
+            foreach (KeyValuePair<TypeAST, string> arg in prototype.arguments)
             {
-                switch (arg.Key)
+                switch (arg.Key.value)
                 {
-                    case Util.ClassType.Double:
+                    case "double":
                         arguments.Add(LLVM.DoubleType());
                         break;
-
-                    case Util.ClassType.Int:
+                    case "int":
                         arguments.Add(LLVM.IntType(64));
                         break;
-                    //TODO: implement strings as char arrays and chars as ints
-                    case Util.ClassType.String:
+                    case "string":
                         arguments.Add(LLVM.ArrayType(LLVM.Int8Type(), 3));
                         break;
                 }
@@ -192,7 +227,7 @@ public static class IRGen
         }
 
         int argLoopIndex = 0;
-        foreach (KeyValuePair<Util.ClassType, string> arg in prototype.arguments)
+        foreach (KeyValuePair<TypeAST, string> arg in prototype.arguments)
         {
             string argumentName = arg.Value;
 
@@ -259,6 +294,9 @@ public static class IRGen
                 break;
             case ASTNode.NodeType.StringExpression:
                 generateStringExpression((StringExpression)node);
+                break;
+            case ASTNode.NodeType.VariableAssignment:
+                generateVariableAssignment((VariableAssignment)node);
                 break;
 
         }

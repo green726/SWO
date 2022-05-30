@@ -95,7 +95,7 @@ public static class Parser
 
     public static string printVarAss(VariableAssignment varAss)
     {
-        return $"{varAss.nodeType} with type of {varAss.type.value} and assignmentop of {varAss.assignmentOp} and name of {varAss.name} and mutability of {varAss.mutable}";
+        return $"{varAss.nodeType} with type of {varAss.type.value} and assignmentop of {varAss.assignmentOp} and name of {varAss.name} and mutability of {varAss.mutable} and value of {varAss.strValue}";
     }
 
     public static string printASTRet(List<ASTNode> nodesPrint)
@@ -319,7 +319,7 @@ public static class Parser
         }
         else if (token.type == Util.TokenType.EOL)
         {
-            return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, parent, delimLevel: delimLevel);
+            return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, null, delimLevel: delimLevel);
         }
 
         if (expectedTypes != null)
@@ -330,6 +330,11 @@ public static class Parser
         switch (token.type)
         {
             case Util.TokenType.Number:
+                if (parent.nodeType == ASTNode.NodeType.VariableAssignment)
+                {
+                    parent.addChild(token);
+                    break;
+                }
                 new NumberExpression(token, parent);
                 break;
 

@@ -36,5 +36,7 @@ public class VariableAssignment : ASTNode
 
         }
         childLoop++;
+
     }
+
 }

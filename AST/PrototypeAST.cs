@@ -1,9 +1,9 @@
 public class PrototypeAST : ASTNode
 {
     public string name;
-    public Dictionary<Util.ClassType, string> arguments = new Dictionary<Util.ClassType, string>();
+    public Dictionary<TypeAST, string> arguments = new Dictionary<TypeAST, string>();
     private bool typePredicted = true;
-    private Util.ClassType prevType = Util.ClassType.Double;
+    private TypeAST prevType;
 
     public PrototypeAST(string name = "", List<Util.Token> arguments = null)
     {
@@ -23,13 +23,13 @@ public class PrototypeAST : ASTNode
                     switch (item.value)
                     {
                         case "double":
-                            prevType = Util.ClassType.Double;
+                            prevType = new TypeAST("double");
                             break;
                         case "int":
-                            prevType = Util.ClassType.Int;
+                            prevType = new TypeAST("int");
                             break;
                         case "string":
-                            prevType = Util.ClassType.String;
+                            prevType = new TypeAST("string");
                             break;
                         default:
                             throw new ArgumentException($"expected type declaration but got something else at {item.line}:{item.column}");
@@ -46,7 +46,7 @@ public class PrototypeAST : ASTNode
         }
         else
         {
-            this.arguments = new Dictionary<Util.ClassType, string>();
+            this.arguments = new Dictionary<TypeAST, string>();
         }
     }
 
@@ -63,13 +63,13 @@ public class PrototypeAST : ASTNode
                 switch (item.value)
                 {
                     case "double":
-                        prevType = Util.ClassType.Double;
+                        prevType = new TypeAST("double");
                         break;
                     case "int":
-                        prevType = Util.ClassType.Int;
+                        prevType = new TypeAST("int");
                         break;
                     case "string":
-                        prevType = Util.ClassType.String;
+                        prevType = new TypeAST("string");
                         break;
                     default:
                         throw new ArgumentException($"expected type declaration but got something else at {item.line}:{item.column}");
