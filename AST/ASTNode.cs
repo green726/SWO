@@ -10,13 +10,15 @@ public abstract class ASTNode
 
     public enum NodeType
     {
+        VariableExpression,
         NumberExpression,
         BinaryExpression,
+        VariableAssignment,
         Prototype,
         Function,
         FunctionCall,
         BuiltinCall,
-        String
+        StringExpression
     }
 
     public virtual void addParent(ASTNode parent)
@@ -36,6 +38,10 @@ public abstract class ASTNode
     public virtual void addChild(ASTNode child)
     {
         children.Add(child);
+    }
+
+    public virtual void addChild(Util.Token child)
+    {
     }
 
     public virtual void removeChild(ASTNode child)

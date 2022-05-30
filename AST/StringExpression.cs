@@ -5,8 +5,8 @@ public class StringExpression : ASTNode
     public StringExpression(Util.Token token)
     {
         Parser.checkToken(token, expectedType: Util.TokenType.Keyword);
-    
-        this.nodeType = NodeType.String;
+
+        this.nodeType = NodeType.StringExpression;
         this.value = token.value;
 
         this.line = token.line;

@@ -93,6 +93,11 @@ public static class Parser
         return $"{funcCall.nodeType} with name of {funcCall.functionName} and args of {String.Join(", ", funcCall.args)}";
     }
 
+    public static string printVarAss(VariableAssignment varAss)
+    {
+        return $"{varAss.nodeType} with type of {varAss.type.value} and assignmentop of {varAss.assignmentOp} and name of {varAss.name} and mutability of {varAss.mutable}";
+    }
+
     public static string printASTRet(List<ASTNode> nodesPrint)
     {
         StringBuilder stringBuilder = new StringBuilder();
@@ -150,6 +155,11 @@ public static class Parser
                     stringBuilder.Append(printFuncCall(funcCall));
                     stringBuilder.Append("\n");
                     break;
+                case ASTNode.NodeType.VariableAssignment:
+                    VariableAssignment varAss = (VariableAssignment)node;
+                    stringBuilder.Append(printVarAss(varAss));
+                    stringBuilder.Append("\n");
+                    break;
                 default:
                     stringBuilder.Append(node.nodeType);
                     stringBuilder.Append("\n");
@@ -191,9 +201,22 @@ public static class Parser
                 PrototypeAST proto = (PrototypeAST)parent;
                 proto.addItem(token);
                 break;
+            case ASTNode.NodeType.VariableAssignment:
+                parent.addChild(token);
+                break;
         }
 
-        if (token.value[0] == '@')
+        if (token.value == "var")
+        {
+            VariableAssignment varAss = new VariableAssignment(token, true);
+            return new List<dynamic>() { varAss, delimLevel };
+        }
+        else if (token.value == "const")
+        {
+            VariableAssignment constAss = new VariableAssignment(token, false);
+            return new List<dynamic>() { constAss, delimLevel };
+        }
+        else if (token.value[0] == '@')
         {
             PrototypeAST proto = new PrototypeAST(token.value.Substring(1));
             return new List<dynamic>() { proto, delimLevel };
@@ -318,6 +341,17 @@ public static class Parser
                 List<dynamic> keywordRet = parseKeyword(token, tokenIndex, parent, delimLevel);
                 //0 is the keyword ASTNode, 1 is the next token, and 2 is the next token index
                 return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, keywordRet[0], delimLevel: keywordRet[1]);
+
+            case Util.TokenType.AssignmentOp:
+                if (parent.nodeType == ASTNode.NodeType.VariableAssignment)
+                {
+                    parent.addChild(token);
+                }
+                else
+                {
+                    throw new Exception($"illegal assignment op at {token.line}:{token.column}");
+                }
+                break;
         }
 
         if (token.isDelim)

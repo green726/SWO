@@ -15,6 +15,7 @@ public static class Util
         BrackDelimiterClose,
         SquareDelimiterOpen,
         SquareDelimiterClose,
+        AssignmentOp,
         Text,
         EOL, //end of line,
         EOF //end of file

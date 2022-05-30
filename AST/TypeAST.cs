@@ -1,9 +1,10 @@
 public class TypeAST
 {
-    public string type;
+    public string value;
 
     public TypeAST(Util.Token token)
     {
+        this.value = token.value;
         
     }
 }

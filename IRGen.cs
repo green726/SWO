@@ -74,7 +74,7 @@ public static class IRGen
         return new StringExpression(new Util.Token(Util.TokenType.Keyword, "%f", 0, 0));
     }
 
-    public static void generateBuiltinCall(FunctionCall builtIn, bool recursion = false)
+    public static void generateBuiltinCall(FunctionCall builtIn)
     {
         StringExpression printFormat;
         if (builtIn.functionName == "print")
@@ -84,11 +84,6 @@ public static class IRGen
             printFormat = evaluatePrintFormat(builtIn);
 
             builtIn.addChildAtStart(printFormat);
-            if (recursion == false)
-            {
-                //BUG: below code doesnt print a new line - prob issue with strings
-                generateBuiltinCall(new FunctionCall(new Util.Token(Util.TokenType.Keyword, "print!", builtIn.line, builtIn.column, false), new List<ASTNode>() { new StringExpression(new Util.Token(Util.TokenType.Keyword, "/n", builtIn.line, builtIn.column, false)) }, true, builtIn.parent), true);
-            }
         }
 
         LLVMValueRef funcRef = LLVM.GetNamedFunction(module, builtIn.functionName);
@@ -262,7 +257,7 @@ public static class IRGen
             case ASTNode.NodeType.NumberExpression:
                 generateNumberExpression((NumberExpression)node);
                 break;
-            case ASTNode.NodeType.String:
+            case ASTNode.NodeType.StringExpression:
                 generateStringExpression((StringExpression)node);
                 break;
 

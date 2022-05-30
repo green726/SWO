@@ -4,7 +4,8 @@ using System.Text;
 public static class Lexer
 {
     private static List<Util.Token> tokenList;
-    private static string[] operators = { "+", "-", "*", "/" };
+    private static string[] binOps = { "+", "-", "*", "/" };
+    private static string[] assignmentOps = { "=", "+=", "-=", "*=", "/=" };
 
     public static List<Util.Token> lex(string input)
     {
@@ -27,9 +28,13 @@ public static class Lexer
                     {
                         tokenList.Add(new Util.Token(Util.TokenType.Number, stringBuilder.ToString(), line, column));
                     }
-                    else if (operators.Contains(stringBuilder.ToString()))
+                    else if (binOps.Contains(stringBuilder.ToString()))
                     {
                         tokenList.Add(new Util.Token(Util.TokenType.Operator, stringBuilder.ToString(), line, column));
+                    }
+                    else if (assignmentOps.Contains(stringBuilder.ToString()))
+                    {
+                        tokenList.Add(new Util.Token(Util.TokenType.AssignmentOp, stringBuilder.ToString(), line, column, false));
                     }
                     else if (stringBuilder.ToString() != " " && stringBuilder.ToString() != "")
                     {
