@@ -16,7 +16,7 @@ public class FunctionCall : ASTNode
         }
         if (builtInExpected == true && this.builtIn == false)
         {
-            throw new ParserException("builtin function expected but name does not exist", token);
+            throw new ParserException($"builtin function expected but {builtinName} is not one", token);
         }
 
         this.functionName = this.builtIn ? builtinName : token.value;

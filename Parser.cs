@@ -436,16 +436,26 @@ public static class Parser
         newLineAss.addChild(new Util.Token(Util.TokenType.AssignmentOp, "=", 0, 0));
         newLineAss.addChild(new Util.Token(Util.TokenType.String, "\"\n\"", 0, 0));
 
-        List<Util.Token> protoArgs = new List<Util.Token>();
+        List<Util.Token> printProtoArgs = new List<Util.Token>();
 
-        protoArgs.Add(new Util.Token(Util.TokenType.Keyword, "string", 0, 0));
-        protoArgs.Add(new Util.Token(Util.TokenType.Keyword, "format", 0, 0));
-        protoArgs.Add(new Util.Token(Util.TokenType.Keyword, "double", 0, 0));
-        protoArgs.Add(new Util.Token(Util.TokenType.Keyword, "x", 0, 0));
+        printProtoArgs.Add(new Util.Token(Util.TokenType.Keyword, "string", 0, 0));
+        printProtoArgs.Add(new Util.Token(Util.TokenType.Keyword, "format", 0, 0));
+        printProtoArgs.Add(new Util.Token(Util.TokenType.Keyword, "double", 0, 0));
+        printProtoArgs.Add(new Util.Token(Util.TokenType.Keyword, "x", 0, 0));
         Util.Token printToken = new Util.Token(Util.TokenType.Keyword, "@printf", 0, 0);
 
-
-        PrototypeAST printProto = new PrototypeAST(printToken, protoArgs);
+        PrototypeAST printProto = new PrototypeAST(printToken, printProtoArgs);
         nodes.Insert(0, printProto);
+
+        List<Util.Token> printlnProtoArgs = new List<Util.Token>();
+
+        printlnProtoArgs.Add(new Util.Token(Util.TokenType.Keyword, "double", 0, 0));
+        printlnProtoArgs.Add(new Util.Token(Util.TokenType.Keyword, "x", 0, 0));
+        Util.Token printlnToken = new Util.Token(Util.TokenType.Keyword, "@println", 0, 0);
+
+        PrototypeAST printlnProto = new PrototypeAST(printlnToken, printlnProtoArgs);
+        nodes.Insert(0, printlnProto);
+
+
     }
 }

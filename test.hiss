@@ -1,12 +1,11 @@
 const string e = "hi"
 
 @test1 () {
-print!(e)
-print!(nl)
+println!(e)
 }
 
 @test2 () {
-print!(2)
+println!(2)
 }
 
 @main () {

@@ -6,6 +6,9 @@ source_filename = "HISS"
 @strtmp = private unnamed_addr constant [3 x i8] c"%s\00", align 1
 @strtmp.1 = private unnamed_addr constant [3 x i8] c"%s\00", align 1
 @strtmp.2 = private unnamed_addr constant [3 x i8] c"%f\00", align 1
+@strtmp.3 = private unnamed_addr constant [3 x i8] c"%s\00", align 1
+
+declare double @println(double)
 
 declare double @printf([3 x i8], double)
 
@@ -21,7 +24,9 @@ body:
 define double @test2() {
 body:
   %calltmp = call double @printf([3 x i8]* @strtmp.2, double 2.000000e+00)
-  ret double %calltmp
+  %nl = load [2 x i8], [2 x i8]* @nl, align 1
+  %calltmp1 = call double @printf([3 x i8]* @strtmp.3, [2 x i8]* @nl)
+  ret double %calltmp1
 }
 
 define double @main() {

@@ -196,16 +196,27 @@ public static class IRGen
 
     public static void generateBuiltinCall(FunctionCall builtIn)
     {
-        Console.WriteLine($"builtin arg count: {builtIn.args.Count}");
         StringExpression printFormat;
-        if (builtIn.functionName == "print")
+        switch (builtIn.functionName)
         {
-            builtIn.functionName = "printf";
+            case "print":
+                builtIn.functionName = "printf";
 
-            printFormat = evaluatePrintFormat(builtIn);
+                printFormat = evaluatePrintFormat(builtIn);
 
-            builtIn.addChildAtStart(printFormat);
+                builtIn.addChildAtStart(printFormat);
+                break;
+            case "println":
+                builtIn.functionName = "printf";
+
+                printFormat = evaluatePrintFormat(builtIn);
+
+                builtIn.addChildAtStart(printFormat);
+
+                FunctionCall printNLCall = new FunctionCall(new Util.Token(Util.TokenType.Keyword, "print!", builtIn.line, builtIn.column), new List<ASTNode>() { new VariableExpression(new Util.Token(Util.TokenType.Keyword, "nl", builtIn.line, builtIn.column), parentRequired: false) }, true, builtIn.parent);
+                break;
         }
+
 
         LLVMValueRef funcRef = LLVM.GetNamedFunction(module, builtIn.functionName);
 
@@ -214,10 +225,10 @@ public static class IRGen
             throw new GenException($"Unknown function ({builtIn.functionName}) referenced", builtIn);
         }
 
-        // if (LLVM.CountParams(funcRef) != builtIn.args.Count)
-        // {
-        //     throw new GenException($"Incorrect # arguments passed ({builtIn.args.Count} passed but {LLVM.CountParams(funcRef)} required)", builtIn);
-        // }
+        if (LLVM.CountParams(funcRef) != builtIn.args.Count)
+        {
+            throw new GenException($"Incorrect # arguments passed ({builtIn.args.Count} passed but {LLVM.CountParams(funcRef)} required)", builtIn);
+        }
 
         int argumentCount = builtIn.args.Count;
         var argsRef = new LLVMValueRef[argumentCount];
