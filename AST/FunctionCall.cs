@@ -48,7 +48,6 @@ public class FunctionCall : ASTNode
 
     public void addChildAtStart(ASTNode child)
     {
-        Console.WriteLine($"adding arg of type {child.nodeType} to builtin");
         args.Insert(0, child);
     }
 }

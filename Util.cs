@@ -16,6 +16,7 @@ public static class Util
         SquareDelimiterOpen,
         SquareDelimiterClose,
         AssignmentOp,
+        String,
         Text,
         EOL, //end of line,
         EOF //end of file
@@ -59,6 +60,12 @@ public static class Util
             this.type = type;
             this.line = line;
             this.column = column;
+
+            if (this.type == TokenType.String)
+            {
+                this.value = value.Substring(1);
+                this.value = this.value.Substring(0, (this.value.Length - 1));
+            }
         }
 
         public Token(TokenType type, char value, int line, int column, bool isDelim = false)

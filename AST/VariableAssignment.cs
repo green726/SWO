@@ -1,9 +1,9 @@
 public class VariableAssignment : ASTNode
 {
-    public string name;
+    public string name = "";
     public TypeAST type;
-    public string assignmentOp;
-    public string strValue;
+    public string assignmentOp = "";
+    public string strValue = "";
     public bool mutable = false;
     private int childLoop = 0;
 
@@ -12,7 +12,8 @@ public class VariableAssignment : ASTNode
         this.mutable = mutable;
         this.nodeType = NodeType.VariableAssignment;
         Parser.nodes.Add(this);
-        Parser.globalVars.Add(this);
+        Parser.globalVarAss.Add(this);
+        Parser.globalVars.Add(this.name, this.type);
     }
 
     public override void addChild(Util.Token child)
@@ -38,6 +39,24 @@ public class VariableAssignment : ASTNode
         }
         childLoop++;
 
+    }
+
+    public override void addChild(ASTNode node)
+    {
+        switch (node.nodeType)
+        {
+            case NodeType.StringExpression:
+                if (childLoop == 3)
+                {
+                    StringExpression strExp = (StringExpression)node;
+                    this.strValue = strExp.value;
+                }
+                else
+                {
+                    throw new ParserException($"Illegal value (type {node.nodeType}) of variable {this.name}", node);
+                }
+                break;
+        }
     }
 
 }

@@ -9,7 +9,7 @@ public static class Lexer
 
     public static List<Util.Token> lex(string input)
     {
-        int line = 0;
+        int line = 1;
         int column = 0;
         tokenList = new List<Util.Token>();
         char lastChar = new char();
@@ -24,6 +24,13 @@ public static class Lexer
             {
                 if (lastChar != ' ')
                 {
+                    char firstChar = ' ';
+                    try
+                    {
+                        firstChar = stringBuilder.ToString()[0];
+                    }
+                    catch
+                    { }
                     if (int.TryParse(stringBuilder.ToString(), out int result))
                     {
                         tokenList.Add(new Util.Token(Util.TokenType.Number, stringBuilder.ToString(), line, column));
@@ -36,7 +43,11 @@ public static class Lexer
                     {
                         tokenList.Add(new Util.Token(Util.TokenType.AssignmentOp, stringBuilder.ToString(), line, column, false));
                     }
-                    else if (stringBuilder.ToString() != " " && stringBuilder.ToString() != "")
+                    else if (firstChar == '"' && stringBuilder.ToString().EndsWith('"'))
+                    {
+                        tokenList.Add(new Util.Token(Util.TokenType.String, stringBuilder.ToString(), line, column));
+                    }
+                    else if (stringBuilder.ToString().Replace(" ", "") != "" && stringBuilder.ToString() != "")
                     {
                         tokenList.Add(new Util.Token(Util.TokenType.Keyword, stringBuilder.ToString(), line, column));
                     }

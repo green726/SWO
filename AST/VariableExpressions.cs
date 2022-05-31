@@ -7,7 +7,7 @@ public class VariableExpression : ASTNode
         varName = token.value;
         bool exists = false;
 
-        foreach (VariableAssignment varAss in Parser.globalVars)
+        foreach (VariableAssignment varAss in Parser.globalVarAss)
         {
             if (this.varName == varAss.name)
             {
@@ -18,7 +18,7 @@ public class VariableExpression : ASTNode
 
         if (exists == false)
         {
-            throw new ParserException($"Uknown variable referenced {this.varName}", token);
+            throw new ParserException($"Unknown variable referenced {this.varName}", token);
         }
 
         if (parent != null)

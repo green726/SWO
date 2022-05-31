@@ -1,4 +1,4 @@
-const double e = 1
+const string e = "hi"
 
 @test1 () {
 print!(e)

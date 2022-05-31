@@ -7,7 +7,8 @@ public static class Parser
     public static List<ASTNode> nodes = new List<ASTNode>();
     public static List<Util.Token> tokenList;
 
-    public static List<VariableAssignment> globalVars = new List<VariableAssignment>();
+    public static List<VariableAssignment> globalVarAss = new List<VariableAssignment>();
+    public static Dictionary<string, TypeAST> globalVars = new Dictionary<string, TypeAST>();
 
     public static Util.TokenType[] binaryExpectedTokens = { Util.TokenType.Number };
     public static Util.TokenType[] delimiterExpectedTokens = { Util.TokenType.Keyword };
@@ -100,7 +101,7 @@ public static class Parser
 
     public static string printVarAss(VariableAssignment varAss)
     {
-        return $"{varAss.nodeType} with type of {varAss.type.value} and assignmentop of {varAss.assignmentOp} and name of {varAss.name} and mutability of {varAss.mutable} and value of {varAss.strValue}";
+        return $"{varAss.nodeType} with type of {varAss?.type.value} and assignmentop of {varAss.assignmentOp} and name of {varAss.name} and mutability of {varAss.mutable} and value of {varAss.strValue}";
     }
 
     public static string printProto(PrototypeAST proto)
@@ -385,7 +386,7 @@ public static class Parser
                 return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, keywordRet[0], delimLevel: keywordRet[1]);
 
             case Util.TokenType.AssignmentOp:
-                if (parent.nodeType == ASTNode.NodeType.VariableAssignment)
+                if (parent?.nodeType == ASTNode.NodeType.VariableAssignment)
                 {
                     parent.addChild(token);
                 }
@@ -394,6 +395,9 @@ public static class Parser
                     throw new ParserException($"illegal assignment op", token);
                 }
                 break;
+            case Util.TokenType.String:
+                new StringExpression(token, parent);
+                return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, parent, delimLevel: delimLevel);
         }
 
         if (token.isDelim)

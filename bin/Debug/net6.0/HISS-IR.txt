@@ -1,16 +1,16 @@
 ; ModuleID = 'HISS'
 source_filename = "HISS"
 
-@e = global double 1.000000e+00
-@strtmp = private unnamed_addr constant [3 x i8] c"%f\00", align 1
+@e = global [3 x i8] c"hi\00"
+@strtmp = private unnamed_addr constant [3 x i8] c"%s\00", align 1
 @strtmp.1 = private unnamed_addr constant [3 x i8] c"%f\00", align 1
 
 declare double @printf([3 x i8], double)
 
 define double @test1() {
 body:
-  %e = load double, double* @e, align 8
-  %calltmp = call double @printf([3 x i8]* @strtmp, double %e)
+  %e = load [3 x i8], [3 x i8]* @e, align 1
+  %calltmp = call double @printf([3 x i8]* @strtmp, [3 x i8]* @e)
   ret double %calltmp
 }
 

@@ -1,4 +1,12 @@
+using System.Runtime.InteropServices;
 using LLVMSharp;
+
+/*below is gep generation (prob useless)
+ //below zero next to ulong is the index of the element you want to grab a pointer to
+        LLVMValueRef[] arrIndices = { LLVM.ConstInt(LLVM.Int64Type(), (ulong)0, false) };
+        LLVMValueRef gepRef = LLVM.BuildInBoundsGEP(builder, globalRef, arrIndices, varExp.varName);
+        valueStack.Push(gepRef);
+ */
 
 public static class IRGen
 {
@@ -10,7 +18,9 @@ public static class IRGen
 
     public static readonly Stack<LLVMValueRef> valueStack = new Stack<LLVMValueRef>();
 
-    public static Dictionary<string, LLVMValueRef> namedValues = new Dictionary<string, LLVMValueRef>();
+    public static Dictionary<string, LLVMValueRef> namedValuesLLVM = new Dictionary<string, LLVMValueRef>();
+
+    public static Dictionary<string, VariableAssignment> namedGlobalsAST = new Dictionary<string, VariableAssignment>();
 
     public static void generateNumberExpression(NumberExpression numberExpression)
     {
@@ -26,12 +36,46 @@ public static class IRGen
     {
         LLVMValueRef globalRef = LLVM.GetNamedGlobal(module, varExp.varName);
         LLVMValueRef load = LLVM.BuildLoad(builder, globalRef, varExp.varName);
-
         valueStack.Push(load);
+
+        if (namedGlobalsAST[varExp.varName].type.value != "string")
+        {
+            return;
+        }
+
+        //NOTE: below stuff doesnt seem to do anything but maybe it will so leaving it be
+        LLVMValueRef[] arrIndices = { LLVM.ConstInt(LLVM.Int64Type(), (ulong)0, false) };
+        LLVMValueRef gepRef = LLVM.BuildInBoundsGEP(builder, globalRef, arrIndices, varExp.varName);
+        valueStack.Push(gepRef);
+
+    }
+
+    public static void buildGlobalString(VariableAssignment varAss)
+    {
+
+        List<int> asciiArr = new List<int>();
+
+        LLVMValueRef[] intsRef = new LLVMValueRef[varAss.strValue.Length + 1];
+
+        for (int i = 0; i < varAss.strValue.Length; i++)
+        {
+            int code = (char)varAss.strValue[i];
+            intsRef[i] = LLVM.ConstInt(LLVM.Int8Type(), (ulong)code, false);
+        }
+
+        intsRef[intsRef.Length - 1] = LLVM.ConstInt(LLVM.Int8Type(), (ulong)0, false);
+
+        LLVMValueRef arrayRef = LLVM.ConstArray(LLVMTypeRef.Int8Type(), intsRef);
+        LLVMValueRef globalArr = LLVM.AddGlobal(module, LLVMTypeRef.ArrayType(LLVMTypeRef.Int8Type(), (uint)varAss.strValue.Length + 1), varAss.name);
+        LLVM.SetInitializer(globalArr, arrayRef);
+
+        valueStack.Push(globalArr);
+
     }
 
     public static void generateVariableAssignment(VariableAssignment varAss)
     {
+        namedGlobalsAST.Add(varAss.name, varAss);
         bool isString = false;
         LLVMTypeRef typeLLVM = LLVMTypeRef.DoubleType();
         LLVMValueRef constRef = LLVM.ConstReal(LLVMTypeRef.DoubleType(), 0.0);
@@ -44,7 +88,7 @@ public static class IRGen
                 break;
             case "int":
                 typeLLVM = LLVMTypeRef.Int64Type();
-                constRef = LLVM.ConstInt(LLVMTypeRef.Int64Type(), ulong.Parse(varAss.strValue), true);
+                constRef = LLVM.ConstInt(LLVMTypeRef.Int64Type(), (ulong)int.Parse(varAss.strValue), true);
                 break;
             case "string":
                 isString = true;
@@ -53,7 +97,7 @@ public static class IRGen
         }
         if (isString)
         {
-            valueStack.Push(LLVM.BuildGlobalString(builder, varAss.strValue, varAss.name));
+            buildGlobalString(varAss);
             return;
         }
 
@@ -106,16 +150,36 @@ public static class IRGen
 
     public static StringExpression evaluatePrintFormat(FunctionCall printCall)
     {
-        if (printCall.args[0].nodeType == ASTNode.NodeType.NumberExpression)
+        switch (printCall.args[0].nodeType)
         {
-            return new StringExpression(new Util.Token(Util.TokenType.Keyword, "%f", 0, 0));
+            case ASTNode.NodeType.NumberExpression:
+                return new StringExpression(new Util.Token(Util.TokenType.String, "\"%f\"", 0, 0), printCall, true);
+            case ASTNode.NodeType.StringExpression:
+                return new StringExpression(new Util.Token(Util.TokenType.String, "\"%s\"", 0, 0), printCall, true);
+            case ASTNode.NodeType.VariableExpression:
+                VariableExpression varExpr = (VariableExpression)printCall.args[0];
+                return evaluatePrintFormat(printCall, namedGlobalsAST[varExpr.varName].type);
         }
 
-        return new StringExpression(new Util.Token(Util.TokenType.Keyword, "%f", 0, 0));
+        return new StringExpression(new Util.Token(Util.TokenType.String, "\"%f\"", 0, 0), printCall, true);
+    }
+
+    public static StringExpression evaluatePrintFormat(FunctionCall printCall, TypeAST type)
+    {
+        switch (type.value)
+        {
+            case "double":
+                return new StringExpression(new Util.Token(Util.TokenType.String, "\"%f\"", 0, 0), printCall, true);
+            case "string":
+                return new StringExpression(new Util.Token(Util.TokenType.String, "\"%s\"", 0, 0), printCall, true);
+        }
+
+        return new StringExpression(new Util.Token(Util.TokenType.String, "\"%f\"", 0, 0), printCall, true);
     }
 
     public static void generateBuiltinCall(FunctionCall builtIn)
     {
+        Console.WriteLine($"builtin arg count: {builtIn.args.Count}");
         StringExpression printFormat;
         if (builtIn.functionName == "print")
         {
@@ -133,10 +197,10 @@ public static class IRGen
             throw new GenException($"Unknown function ({builtIn.functionName}) referenced", builtIn);
         }
 
-        if (LLVM.CountParams(funcRef) != builtIn.args.Count)
-        {
-            throw new GenException("Incorrect # arguments passed", builtIn);
-        }
+        // if (LLVM.CountParams(funcRef) != builtIn.args.Count)
+        // {
+        //     throw new GenException($"Incorrect # arguments passed ({builtIn.args.Count} passed but {LLVM.CountParams(funcRef)} required)", builtIn);
+        // }
 
         int argumentCount = builtIn.args.Count;
         var argsRef = new LLVMValueRef[argumentCount];
@@ -146,6 +210,7 @@ public static class IRGen
             // Console.WriteLine("builtin with arg of: " + Parser.printASTRet(new List<ASTNode>() { builtIn.args[i] }));
             evaluateNode(builtIn.args[i]);
             argsRef[i] = valueStack.Pop();
+            // Console.WriteLine(argsRef[i]);
         }
 
         valueStack.Push(LLVM.BuildCall(builder, funcRef, argsRef, "calltmp"));
@@ -238,7 +303,7 @@ public static class IRGen
             LLVMValueRef param = LLVM.GetParam(function, (uint)argLoopIndex);
             LLVM.SetValueName(param, argumentName);
 
-            namedValues[argumentName] = param;
+            namedValuesLLVM[argumentName] = param;
         }
 
         valueStack.Push(function);
@@ -247,7 +312,7 @@ public static class IRGen
     public static void generateFunction(FunctionAST funcNode)
     {
         //TODO: change this in the future once more variables are added
-        namedValues.Clear();
+        namedValuesLLVM.Clear();
 
         generatePrototype(funcNode.prototype);
 
@@ -279,6 +344,7 @@ public static class IRGen
 
     public static void evaluateNode(ASTNode node)
     {
+        // Console.WriteLine($"evaulating node of type {node.nodeType}");
         switch (node.nodeType)
         {
             case ASTNode.NodeType.Prototype:
