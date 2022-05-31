@@ -1,11 +1,11 @@
-const string e = "hi"
+const string e = "hello"
 
 @test1 () {
 println!(e)
 }
 
 @test2 () {
-println!(2)
+println!("world")
 }
 
 @main () {
