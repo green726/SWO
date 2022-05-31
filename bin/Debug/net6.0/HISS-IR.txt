@@ -9,19 +9,19 @@ declare double @printf([3 x i8], double)
 
 define double @test1() {
 body:
-  ret double* @eeee
-  %calltmp = call double @printf([3 x i8]* @strtmp, double ()* @test1)
+  %calltmp = call double @printf([3 x i8]* @strtmp, double 1.000000e+00)
+  ret double %calltmp
 }
 
 define double @test2() {
 body:
+  %calltmp = call double @printf([3 x i8]* @strtmp.1, double 2.000000e+00)
   ret double %calltmp
-  %calltmp = call double @printf([3 x i8]* @strtmp.1, double ()* @test2)
 }
 
 define double @main() {
 body:
-  ret double %calltmp
   %calltmp = call double @test1()
   %calltmp1 = call double @test2()
+  ret double %calltmp1
 }

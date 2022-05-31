@@ -7,6 +7,8 @@ public static class Parser
     public static List<ASTNode> nodes = new List<ASTNode>();
     public static List<Util.Token> tokenList;
 
+    public static List<VariableAssignment> globalVars = new List<VariableAssignment>();
+
     public static Util.TokenType[] binaryExpectedTokens = { Util.TokenType.Number };
     public static Util.TokenType[] delimiterExpectedTokens = { Util.TokenType.Keyword };
     public static ASTNode.NodeType[] binaryExpectedNodes = { ASTNode.NodeType.NumberExpression, ASTNode.NodeType.BinaryExpression };
@@ -101,6 +103,11 @@ public static class Parser
         return $"{varAss.nodeType} with type of {varAss.type.value} and assignmentop of {varAss.assignmentOp} and name of {varAss.name} and mutability of {varAss.mutable} and value of {varAss.strValue}";
     }
 
+    public static string printProto(PrototypeAST proto)
+    {
+        return $"{proto.nodeType} with name of {proto.name}";
+    }
+
     public static string printASTRet(List<ASTNode> nodesPrint)
     {
         StringBuilder stringBuilder = new StringBuilder();
@@ -122,6 +129,21 @@ public static class Parser
                 case ASTNode.NodeType.FunctionCall:
                     FunctionCall funcCall = (FunctionCall)node;
                     stringBuilder.Append(printFuncCall(funcCall));
+                    stringBuilder.Append("\n");
+                    break;
+                case ASTNode.NodeType.VariableAssignment:
+                    VariableAssignment varAss = (VariableAssignment)node;
+                    stringBuilder.Append(printVarAss(varAss));
+                    stringBuilder.Append("\n");
+                    break;
+                case ASTNode.NodeType.Prototype:
+                    PrototypeAST proto = (PrototypeAST)node;
+                    stringBuilder.Append(printProto(proto));
+                    stringBuilder.Append("\n");
+                    break;
+                case ASTNode.NodeType.NumberExpression:
+                    NumberExpression numExp = (NumberExpression)node;
+                    stringBuilder.Append($"{numExp.nodeType} of value {numExp.value}");
                     stringBuilder.Append("\n");
                     break;
                 default:
@@ -161,6 +183,11 @@ public static class Parser
                 case ASTNode.NodeType.VariableAssignment:
                     VariableAssignment varAss = (VariableAssignment)node;
                     stringBuilder.Append(printVarAss(varAss));
+                    stringBuilder.Append("\n");
+                    break;
+                case ASTNode.NodeType.Prototype:
+                    PrototypeAST proto = (PrototypeAST)node;
+                    stringBuilder.Append(printProto(proto));
                     stringBuilder.Append("\n");
                     break;
                 default:
@@ -203,10 +230,10 @@ public static class Parser
             case ASTNode.NodeType.Prototype:
                 PrototypeAST proto = (PrototypeAST)parent;
                 proto.addItem(token);
-                break;
+                return new List<dynamic>() { parent, delimLevel };
             case ASTNode.NodeType.VariableAssignment:
                 parent.addChild(token);
-                break;
+                return new List<dynamic>() { parent, delimLevel };
         }
 
         if (token.value == "var")
@@ -236,6 +263,7 @@ public static class Parser
             return new List<dynamic>() { funcCall, delimLevel };
         }
 
+        new VariableExpression(token);
         return new List<dynamic>() { parent, delimLevel };
     }
 
@@ -392,7 +420,7 @@ public static class Parser
         protoArgs.Add(new Util.Token(Util.TokenType.Keyword, "format", 0, 0));
         protoArgs.Add(new Util.Token(Util.TokenType.Keyword, "double", 0, 0));
         protoArgs.Add(new Util.Token(Util.TokenType.Keyword, "x", 0, 0));
-        Util.Token printToken = new Util.Token(Util.TokenType.Keyword, "printf", 0, 0, false);
+        Util.Token printToken = new Util.Token(Util.TokenType.Keyword, "@printf", 0, 0);
 
 
         PrototypeAST printProto = new PrototypeAST(printToken, protoArgs);

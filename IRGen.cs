@@ -22,10 +22,10 @@ public static class IRGen
         valueStack.Push(LLVM.BuildGlobalString(builder, str.value, "strtmp"));
     }
 
-    // public static void generateVariableExpression(VariableExpression varExp)
-    // {
-    //
-    // }
+    public static void generateVariableExpression(VariableExpression varExp)
+    {
+        valueStack.Push(LLVM.GetNamedGlobal(module, varExp.varName));
+    }
 
     public static void generateVariableAssignment(VariableAssignment varAss)
     {
@@ -140,6 +140,7 @@ public static class IRGen
 
         for (int i = 0; i < argumentCount; i++)
         {
+            // Console.WriteLine("builtin with arg of: " + Parser.printASTRet(new List<ASTNode>() { builtIn.args[i] }));
             evaluateNode(builtIn.args[i]);
             argsRef[i] = valueStack.Pop();
         }
@@ -297,6 +298,9 @@ public static class IRGen
                 break;
             case ASTNode.NodeType.VariableAssignment:
                 generateVariableAssignment((VariableAssignment)node);
+                break;
+            case ASTNode.NodeType.VariableExpression:
+                generateVariableExpression((VariableExpression)node);
                 break;
 
         }

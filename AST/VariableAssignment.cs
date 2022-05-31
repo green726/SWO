@@ -12,6 +12,7 @@ public class VariableAssignment : ASTNode
         this.mutable = mutable;
         this.nodeType = NodeType.VariableAssignment;
         Parser.nodes.Add(this);
+        Parser.globalVars.Add(this);
     }
 
     public override void addChild(Util.Token child)
