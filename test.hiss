@@ -1,7 +1,9 @@
 const string e = "hi"
+const string nl = "\n"
 
 @test1 () {
 print!(e)
+print!(nl)
 }
 
 @test2 () {

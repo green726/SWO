@@ -8,7 +8,6 @@ public static class Parser
     public static List<Util.Token> tokenList;
 
     public static List<VariableAssignment> globalVarAss = new List<VariableAssignment>();
-    public static Dictionary<string, TypeAST> globalVars = new Dictionary<string, TypeAST>();
 
     public static Util.TokenType[] binaryExpectedTokens = { Util.TokenType.Number };
     public static Util.TokenType[] delimiterExpectedTokens = { Util.TokenType.Keyword };

@@ -53,20 +53,37 @@ public static class IRGen
     public static void buildGlobalString(VariableAssignment varAss)
     {
 
-        List<int> asciiArr = new List<int>();
+        List<LLVMValueRef> asciiList = new List<LLVMValueRef>();
 
-        LLVMValueRef[] intsRef = new LLVMValueRef[varAss.strValue.Length + 1];
-
-        for (int i = 0; i < varAss.strValue.Length; i++)
+        bool escaped = false;
+        foreach (char ch in varAss.strValue)
         {
-            int code = (char)varAss.strValue[i];
-            intsRef[i] = LLVM.ConstInt(LLVM.Int8Type(), (ulong)code, false);
+            if (ch == '\\')
+            {
+                escaped = true;
+                continue;
+            }
+            if (escaped)
+            {
+                switch (ch)
+                {
+                    case 'n':
+                        int newLineCode = 10;
+                        asciiList.Add(LLVM.ConstInt(LLVM.Int8Type(), (ulong)newLineCode, false));
+                        escaped = false;
+                        continue;
+                }
+            }
+            int code = (int)ch;
+            asciiList.Add(LLVM.ConstInt(LLVM.Int8Type(), (ulong)code, false));
+            escaped = false;
         }
+        asciiList.Add(LLVM.ConstInt(LLVM.Int8Type(), (ulong)0, false));
 
-        intsRef[intsRef.Length - 1] = LLVM.ConstInt(LLVM.Int8Type(), (ulong)0, false);
+        LLVMValueRef[] intsRef = asciiList.ToArray();
 
         LLVMValueRef arrayRef = LLVM.ConstArray(LLVMTypeRef.Int8Type(), intsRef);
-        LLVMValueRef globalArr = LLVM.AddGlobal(module, LLVMTypeRef.ArrayType(LLVMTypeRef.Int8Type(), (uint)varAss.strValue.Length + 1), varAss.name);
+        LLVMValueRef globalArr = LLVM.AddGlobal(module, LLVMTypeRef.ArrayType(LLVMTypeRef.Int8Type(), (uint)intsRef.Length), varAss.name);
         LLVM.SetInitializer(globalArr, arrayRef);
 
         valueStack.Push(globalArr);

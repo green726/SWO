@@ -13,7 +13,6 @@ public class VariableAssignment : ASTNode
         this.nodeType = NodeType.VariableAssignment;
         Parser.nodes.Add(this);
         Parser.globalVarAss.Add(this);
-        Parser.globalVars.Add(this.name, this.type);
     }
 
     public override void addChild(Util.Token child)
