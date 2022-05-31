@@ -24,7 +24,10 @@ public static class IRGen
 
     public static void generateVariableExpression(VariableExpression varExp)
     {
-        valueStack.Push(LLVM.GetNamedGlobal(module, varExp.varName));
+        LLVMValueRef globalRef = LLVM.GetNamedGlobal(module, varExp.varName);
+        LLVMValueRef load = LLVM.BuildLoad(builder, globalRef, varExp.varName);
+
+        valueStack.Push(load);
     }
 
     public static void generateVariableAssignment(VariableAssignment varAss)

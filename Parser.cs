@@ -263,7 +263,7 @@ public static class Parser
             return new List<dynamic>() { funcCall, delimLevel };
         }
 
-        new VariableExpression(token);
+        new VariableExpression(token, parent);
         return new List<dynamic>() { parent, delimLevel };
     }
 

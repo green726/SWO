@@ -1,7 +1,7 @@
-const double eeee = 1
+const double e = 1
 
 @test1 () {
-print!(1)
+print!(e)
 }
 
 @test2 () {
