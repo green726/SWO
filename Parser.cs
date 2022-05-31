@@ -415,6 +415,14 @@ public static class Parser
     {
         tokenList = _tokenList;
 
+        Util.Token newLineAssToken = new Util.Token(Util.TokenType.Keyword, "const", 0, 0);
+        VariableAssignment newLineAss = new VariableAssignment(newLineAssToken, false);
+        newLineAss.addChild(new Util.Token(Util.TokenType.Keyword, "string", 0, 0));
+        newLineAss.addChild(new Util.Token(Util.TokenType.Keyword, "nl", 0, 0));
+        newLineAss.addChild(new Util.Token(Util.TokenType.AssignmentOp, "=", 0, 0));
+        newLineAss.addChild(new Util.Token(Util.TokenType.String, "\"\n\"", 0, 0));
+
+
         parseTokenRecursive(tokenList[0], 0);
 
         List<Util.Token> protoArgs = new List<Util.Token>();

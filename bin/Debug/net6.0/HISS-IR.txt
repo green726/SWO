@@ -1,8 +1,8 @@
 ; ModuleID = 'HISS'
 source_filename = "HISS"
 
-@e = global [3 x i8] c"hi\00"
 @nl = global [2 x i8] c"\0A\00"
+@e = global [3 x i8] c"hi\00"
 @strtmp = private unnamed_addr constant [3 x i8] c"%s\00", align 1
 @strtmp.1 = private unnamed_addr constant [3 x i8] c"%s\00", align 1
 @strtmp.2 = private unnamed_addr constant [3 x i8] c"%f\00", align 1
