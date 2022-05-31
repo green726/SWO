@@ -11,6 +11,9 @@ public static class Parser
     public static Util.TokenType[] delimiterExpectedTokens = { Util.TokenType.Keyword };
     public static ASTNode.NodeType[] binaryExpectedNodes = { ASTNode.NodeType.NumberExpression, ASTNode.NodeType.BinaryExpression };
 
+    public static int prevLine = 0;
+    public static int prevColumn = 0;
+
     public static class topAST
     {
         public static List<ASTNode> primaryChildren = new List<ASTNode>();
@@ -20,14 +23,14 @@ public static class Parser
     {
         if (node == null)
         {
-            throw new ArgumentException($"expected a node at (line and column goes here) but got null");
+            throw new ParserException($"expected a node at but got null", prevLine, prevColumn);
         }
 
         foreach (ASTNode.NodeType expectedNodeType in expectedTypes)
         {
             if (node.nodeType != expectedNodeType && expectedNodeType == expectedTypes.Last())
             {
-                throw new ArgumentException($"expected type {string.Join(", ", expectedTypes)} but got {node.nodeType}");
+                throw new ParserException($"expected type {string.Join(", ", expectedTypes)} but got {node.nodeType}", node);
             }
             else if (node.nodeType == expectedNodeType)
             {
@@ -40,7 +43,7 @@ public static class Parser
     {
         if (token == null)
         {
-            throw new ArgumentException($"expected a token at {token.line}:{token.column} but got null");
+            throw new ParserException($"expected a token but got null", prevLine, prevColumn);
         }
 
         if (expectedTypes != null)
@@ -49,7 +52,7 @@ public static class Parser
             {
                 if (token.type != expectedTokenType && expectedTokenType == expectedTypes.Last())
                 {
-                    throw new ArgumentException($"expected token of type {string.Join(", ", expectedTypes)} but got {token.type} at {token.line}:{token.column}");
+                    throw new ParserException($"expected token of type {string.Join(", ", expectedTypes)} but got {token.type}", token);
                 }
                 else if (token.type == expectedTokenType)
                 {
@@ -62,7 +65,7 @@ public static class Parser
         {
             if (token.type != expectedType)
             {
-                throw new ArgumentException($"expected token of type {expectedType} but got {token.type} at {token.line}:{token.column}");
+                throw new ParserException($"expected token of type {expectedType} but got {token.type}", token);
             }
         }
     }
@@ -218,13 +221,12 @@ public static class Parser
         }
         else if (token.value[0] == '@')
         {
-            PrototypeAST proto = new PrototypeAST(token.value.Substring(1));
+            PrototypeAST proto = new PrototypeAST(token);
             return new List<dynamic>() { proto, delimLevel };
         }
         else if (token.value.EndsWith("!"))
         {
-            //treat it as a function call
-            //token would be the name, next token would be delim, so we grab all tokens starting from the one after that until final delim
+            //treat it as a builtin call
             FunctionCall builtinCall = new FunctionCall(token, null, true, parent);
             return new List<dynamic>() { builtinCall, delimLevel };
         }
@@ -310,7 +312,10 @@ public static class Parser
 
     public static bool parseTokenRecursive(Util.Token token, int tokenIndex, ASTNode? parent = null, Util.TokenType[]? expectedTypes = null, int delimLevel = 0)
     {
+        prevLine = token.line;
+        prevColumn = token.column;
 
+        // Console.WriteLine($"token of value: {token.value} and parent of {parent?.nodeType}");
         ASTNode? previousNode = nodes.Count > 0 ? nodes.Last() : null;
 
         if (token.type == Util.TokenType.EOF)
@@ -319,7 +324,11 @@ public static class Parser
         }
         else if (token.type == Util.TokenType.EOL)
         {
-            return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, null, delimLevel: delimLevel);
+            if (parent?.nodeType != ASTNode.NodeType.Function)
+            {
+                return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, null, delimLevel: delimLevel);
+            }
+            return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, parent, delimLevel: delimLevel);
         }
 
         if (expectedTypes != null)
@@ -354,7 +363,7 @@ public static class Parser
                 }
                 else
                 {
-                    throw new Exception($"illegal assignment op at {token.line}:{token.column}");
+                    throw new ParserException($"illegal assignment op", token);
                 }
                 break;
         }
@@ -383,8 +392,10 @@ public static class Parser
         protoArgs.Add(new Util.Token(Util.TokenType.Keyword, "format", 0, 0));
         protoArgs.Add(new Util.Token(Util.TokenType.Keyword, "double", 0, 0));
         protoArgs.Add(new Util.Token(Util.TokenType.Keyword, "x", 0, 0));
+        Util.Token printToken = new Util.Token(Util.TokenType.Keyword, "printf", 0, 0, false);
 
-        PrototypeAST printProto = new PrototypeAST("printf", protoArgs);
+
+        PrototypeAST printProto = new PrototypeAST(printToken, protoArgs);
         nodes.Insert(0, printProto);
 
         Console.WriteLine("Parser debug info below");

@@ -2,7 +2,8 @@ public class NumberExpression : ASTNode
 {
     public double value;
 
-    public NumberExpression(Util.Token token, ASTNode? parent)
+    public NumberExpression(Util.Token token, ASTNode? parent) : base(token)
+
     {
         this.value = Double.Parse(token.value);
         this.parent = parent;

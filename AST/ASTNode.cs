@@ -8,6 +8,18 @@ public abstract class ASTNode
 
     public NodeType nodeType;
 
+    protected ASTNode(Util.Token token)
+    {
+        this.line = token.line;
+        this.column = token.column;
+    }
+
+    protected ASTNode(ASTNode node)
+    {
+        this.line = node.line;
+        this.column = node.column;
+    }
+
     public enum NodeType
     {
         VariableExpression,
@@ -46,7 +58,6 @@ public abstract class ASTNode
 
     public virtual void removeChild(ASTNode child)
     {
-        Console.WriteLine("ASTNode remove child called");
         children.Remove(child);
     }
 }

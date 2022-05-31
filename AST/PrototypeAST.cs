@@ -5,10 +5,10 @@ public class PrototypeAST : ASTNode
     private bool typePredicted = true;
     private TypeAST prevType;
 
-    public PrototypeAST(string name = "", List<Util.Token> arguments = null)
+    public PrototypeAST(Util.Token token, List<Util.Token> arguments = null) : base(token)
     {
         this.nodeType = NodeType.Prototype;
-        this.name = name;
+        this.name = token.value.Substring(1);
 
 
         if (arguments != null)
@@ -20,20 +20,21 @@ public class PrototypeAST : ASTNode
                 {
 
                     Parser.checkToken(item, expectedType: Util.TokenType.Keyword);
-                    switch (item.value)
-                    {
-                        case "double":
-                            prevType = new TypeAST("double");
-                            break;
-                        case "int":
-                            prevType = new TypeAST("int");
-                            break;
-                        case "string":
-                            prevType = new TypeAST("string");
-                            break;
-                        default:
-                            throw new ArgumentException($"expected type declaration but got something else at {item.line}:{item.column}");
-                    }
+                    prevType = new TypeAST(new Util.Token(Util.TokenType.Keyword, item.value, this.line, this.column));
+                    // switch (item.value)
+                    // {
+                    //     case "double":
+                    //         prevType = new TypeAST(new Util.Token(Util.TokenType.Keyword, "double", this.line, this.column));
+                    //         break;
+                    //     case "int":
+                    //         prevType = new TypeAST(new Util.Token(Util.TokenType.Keyword, "int", this.line, this.column));
+                    //         break;
+                    //     case "string":
+                    //         prevType = new TypeAST(new Util.Token(Util.TokenType.Keyword, "string", this.line, this.column));
+                    //         break;
+                    //     default:
+                    //         throw new ArgumentException($"expected type declaration but got something else at {item.line}:{item.column}");
+                    // }
                 }
                 else
                 {
@@ -60,20 +61,21 @@ public class PrototypeAST : ASTNode
             {
 
                 Parser.checkToken(item, expectedType: Util.TokenType.Keyword);
-                switch (item.value)
-                {
-                    case "double":
-                        prevType = new TypeAST("double");
-                        break;
-                    case "int":
-                        prevType = new TypeAST("int");
-                        break;
-                    case "string":
-                        prevType = new TypeAST("string");
-                        break;
-                    default:
-                        throw new ArgumentException($"expected type declaration but got something else at {item.line}:{item.column}");
-                }
+                prevType = new TypeAST(new Util.Token(Util.TokenType.Keyword, item.value, this.line, this.column));
+                // switch (item.value)
+                // {
+                //     case "double":
+                //         prevType = new TypeAST("double");
+                //         break;
+                //     case "int":
+                //         prevType = new TypeAST("int");
+                //         break;
+                //     case "string":
+                //         prevType = new TypeAST("string");
+                //         break;
+                //     default:
+                //         throw new ArgumentException($"expected type declaration but got something else at {item.line}:{item.column}");
+                // }
             }
             else
             {

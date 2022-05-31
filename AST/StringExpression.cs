@@ -2,7 +2,7 @@ public class StringExpression : ASTNode
 {
     public string value;
 
-    public StringExpression(Util.Token token)
+    public StringExpression(Util.Token token) : base(token)
     {
         Parser.checkToken(token, expectedType: Util.TokenType.Keyword);
 

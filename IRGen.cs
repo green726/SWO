@@ -127,12 +127,12 @@ public static class IRGen
 
         if (funcRef.Pointer == IntPtr.Zero)
         {
-            throw new Exception("Unknown function referenced");
+            throw new GenException($"Unknown function ({builtIn.functionName}) referenced", builtIn);
         }
 
         if (LLVM.CountParams(funcRef) != builtIn.args.Count)
         {
-            throw new Exception("Incorrect # arguments passed");
+            throw new GenException("Incorrect # arguments passed", builtIn);
         }
 
         int argumentCount = builtIn.args.Count;
@@ -159,12 +159,12 @@ public static class IRGen
 
         if (funcRef.Pointer == IntPtr.Zero)
         {
-            throw new Exception("Unknown function referenced");
+            throw new GenException("Unknown function referenced", funcCall);
         }
 
         if (LLVM.CountParams(funcRef) != funcCall.args.Count)
         {
-            throw new Exception("Incorrect # arguments passed");
+            throw new GenException("Incorrect # arguments passed", funcCall);
         }
 
         int argumentCount = funcCall.args.Count;
@@ -192,13 +192,13 @@ public static class IRGen
             // If func already has a body, reject this.
             if (LLVM.CountBasicBlocks(function) != 0)
             {
-                throw new Exception($"redefinition of function named {prototype.name}");
+                throw new GenException($"redefinition of function named {prototype.name}", prototype);
             }
 
             // if func originally took a different number of args, reject.
             if (LLVM.CountParams(function) != argumentCount)
             {
-                throw new Exception($"redefinition of function with different number of args (redfined to: {argumentCount})");
+                throw new GenException($"redefinition of function with different number of args (redfined to: {argumentCount})", prototype);
             }
         }
         else

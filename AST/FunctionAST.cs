@@ -4,7 +4,7 @@ public class FunctionAST : ASTNode
     public List<ASTNode> body;
 
 
-    public FunctionAST(PrototypeAST prototype, List<ASTNode>? body = null)
+    public FunctionAST(PrototypeAST prototype, List<ASTNode>? body = null) : base(prototype)
     {
         if (body == null) body = new List<ASTNode>();
         this.nodeType = NodeType.Function;
@@ -14,7 +14,8 @@ public class FunctionAST : ASTNode
         Parser.nodes.Add(this);
     }
 
-    public FunctionAST(PrototypeAST prototype, ASTNode body)
+    public FunctionAST(PrototypeAST prototype, ASTNode body) : base(prototype)
+
     {
         this.nodeType = NodeType.Function;
         this.prototype = prototype;

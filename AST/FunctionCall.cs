@@ -4,7 +4,8 @@ public class FunctionCall : ASTNode
     public bool builtIn = false;
     public List<ASTNode> args;
 
-    public FunctionCall(Util.Token token, List<ASTNode>? args, bool? builtInExpected = false, ASTNode? parent = null)
+    public FunctionCall(Util.Token token, List<ASTNode>? args, bool? builtInExpected = false, ASTNode? parent = null) : base(token)
+
     {
         this.nodeType = NodeType.FunctionCall;
         string builtinName = token.value.Substring(0, (token.value.Length - 1));
@@ -15,7 +16,7 @@ public class FunctionCall : ASTNode
         }
         if (builtInExpected == true && this.builtIn == false)
         {
-            throw new ArgumentException("builtin function expected but name does not exist");
+            throw new ParserException("builtin function expected but name does not exist", token);
         }
 
         this.functionName = this.builtIn ? builtinName : token.value;

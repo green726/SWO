@@ -12,11 +12,9 @@ public class BinaryExpression : ASTNode
         Divide
     }
 
-    public BinaryExpression(Util.Token token, ASTNode? previousNode, Util.Token nextToken, ASTNode? parent)
-    {
-        this.line = token.line;
-        this.column = token.column;
+    public BinaryExpression(Util.Token token, ASTNode? previousNode, Util.Token nextToken, ASTNode? parent) : base(token)
 
+    {
         //TODO: implement operator precedence parsing
         this.nodeType = NodeType.BinaryExpression;
         switch (token.value)
@@ -34,7 +32,7 @@ public class BinaryExpression : ASTNode
                 this.operatorType = OperatorType.Divide;
                 break;
             default:
-                throw new ArgumentException("op " + token.value + " is not a valid operator");
+                throw new ParserException("op " + token.value + " is not a valid binary operator", token);
         }
 
         this.parent = parent;
