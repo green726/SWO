@@ -1,3 +1,5 @@
+//TODO: double check the previous node stuff for binexpr
+
 using System.Text;
 using static System.Text.Json.JsonSerializer;
 using System.Linq;
@@ -11,7 +13,7 @@ public static class Parser
 
     public static Util.TokenType[] binaryExpectedTokens = { Util.TokenType.Number };
     public static Util.TokenType[] delimiterExpectedTokens = { Util.TokenType.Keyword };
-    public static ASTNode.NodeType[] binaryExpectedNodes = { ASTNode.NodeType.NumberExpression, ASTNode.NodeType.BinaryExpression };
+    public static ASTNode.NodeType[] binaryExpectedNodes = { ASTNode.NodeType.NumberExpression, ASTNode.NodeType.BinaryExpression, ASTNode.NodeType.VariableExpression };
 
     public static int prevLine = 0;
     public static int prevColumn = 0;
@@ -33,6 +35,26 @@ public static class Parser
             if (node.nodeType != expectedNodeType && expectedNodeType == expectedTypes.Last())
             {
                 throw new ParserException($"expected type {string.Join(", ", expectedTypes)} but got {node.nodeType}", node);
+            }
+            else if (node.nodeType == expectedNodeType)
+            {
+                break;
+            }
+        }
+    }
+
+    public static void checkNode(ASTNode? node, ASTNode.NodeType[] expectedTypes, ParserException except)
+    {
+        if (node == null)
+        {
+            throw new ParserException($"expected a node at but got null", prevLine, prevColumn);
+        }
+
+        foreach (ASTNode.NodeType expectedNodeType in expectedTypes)
+        {
+            if (node.nodeType != expectedNodeType && expectedNodeType == expectedTypes.Last())
+            {
+                throw except;
             }
             else if (node.nodeType == expectedNodeType)
             {
@@ -108,6 +130,11 @@ public static class Parser
         return $"{proto.nodeType} with name of {proto.name}";
     }
 
+    public static string printIfStat(IfStatement ifStat)
+    {
+        return $"if statement with expression of {printBinary(ifStat.expression)}";
+    }
+
     public static string printASTRet(List<ASTNode> nodesPrint)
     {
         StringBuilder stringBuilder = new StringBuilder();
@@ -144,6 +171,11 @@ public static class Parser
                 case ASTNode.NodeType.NumberExpression:
                     NumberExpression numExp = (NumberExpression)node;
                     stringBuilder.Append($"{numExp.nodeType} of value {numExp.value}");
+                    stringBuilder.Append("\n");
+                    break;
+                case ASTNode.NodeType.IfStatement:
+                    IfStatement ifStat = (IfStatement)node;
+                    stringBuilder.Append(printIfStat(ifStat));
                     stringBuilder.Append("\n");
                     break;
                 default:
@@ -188,6 +220,11 @@ public static class Parser
                 case ASTNode.NodeType.Prototype:
                     PrototypeAST proto = (PrototypeAST)node;
                     stringBuilder.Append(printProto(proto));
+                    stringBuilder.Append("\n");
+                    break;
+                case ASTNode.NodeType.IfStatement:
+                    IfStatement ifStat = (IfStatement)node;
+                    stringBuilder.Append(printIfStat(ifStat));
                     stringBuilder.Append("\n");
                     break;
                 default:
@@ -245,6 +282,11 @@ public static class Parser
         {
             VariableAssignment constAss = new VariableAssignment(token, false);
             return new List<dynamic>() { constAss, delimLevel };
+        }
+        else if (token.value == "if")
+        {
+            IfStatement ifStat = new IfStatement(token, parent);
+            return new List<dynamic>() { ifStat, delimLevel };
         }
         else if (token.value[0] == '@')
         {
@@ -316,6 +358,11 @@ public static class Parser
                 }
                 if (delimLevel == 0)
                 {
+                    switch (parent.nodeType)
+                    {
+                        case ASTNode.NodeType.IfStatement:
+                            break;
+                    }
                     parent = null;
                 }
                 else if (parent != null)
@@ -367,6 +414,7 @@ public static class Parser
         switch (token.type)
         {
             case Util.TokenType.Number:
+
                 if (parent.nodeType == ASTNode.NodeType.VariableAssignment)
                 {
                     parent.addChild(token);
@@ -459,3 +507,7 @@ public static class Parser
 
     }
 }
+
+// HCPr(yellow) <-> H3O(+) + Pr(-)(red)
+
+

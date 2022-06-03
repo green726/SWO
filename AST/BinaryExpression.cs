@@ -9,7 +9,8 @@ public class BinaryExpression : ASTNode
         Add,
         Subtract,
         Multiply,
-        Divide
+        Divide,
+        Equals,
     }
 
     public BinaryExpression(Util.Token token, ASTNode? previousNode, Util.Token nextToken, ASTNode? parent) : base(token)
@@ -31,6 +32,9 @@ public class BinaryExpression : ASTNode
             case "/":
                 this.operatorType = OperatorType.Divide;
                 break;
+            case "==":
+                this.operatorType = OperatorType.Equals;
+                break;
             default:
                 throw new ParserException("op " + token.value + " is not a valid binary operator", token);
         }
@@ -50,13 +54,19 @@ public class BinaryExpression : ASTNode
                 Parser.checkNode(prevCall.args.Last(), Parser.binaryExpectedNodes);
                 this.leftHand = prevCall.args.Last();
             }
+            else if (this.parent.nodeType == NodeType.IfStatement)
+            {
+                IfStatement ifStat = (IfStatement)parent;
+                this.leftHand = ifStat.children.Last();
+                ifStat.children.RemoveAt(ifStat.children.Count - 1);
+            }
             else
             {
                 Parser.checkNode(previousNode, Parser.binaryExpectedNodes);
                 this.leftHand = previousNode;
             }
         }
-        if (this.leftHand.nodeType == ASTNode.NodeType.NumberExpression)
+        if (this.leftHand.nodeType == ASTNode.NodeType.NumberExpression && this.leftHand.nodeType == NodeType.VariableExpression)
         {
             this.leftHand.addParent(this);
         }

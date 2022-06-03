@@ -123,6 +123,18 @@ public static class IRGen
         valueStack.Push(varRef);
     }
 
+    public static void generateIfStatment(IfStatement ifStat)
+    {
+        generateBinaryExpression(ifStat.expression);
+        LLVMValueRef binExpr = valueStack.Pop();
+        Console.WriteLine("ifStat binExpr below");
+        LLVM.DumpValue(binExpr);
+
+        LLVMBasicBlockRef block = LLVM.GetInsertBlock(builder).GetBasicBlockParent();
+
+        // LLVM.Block
+    }
+
     public static void generateBinaryExpression(BinaryExpression binaryExpression)
     {
         LLVMValueRef leftHand = new LLVMValueRef();
@@ -152,6 +164,9 @@ public static class IRGen
         {
             case BinaryExpression.OperatorType.Add:
                 ir = LLVM.BuildFAdd(builder, leftHand, rightHand, "addtmp");
+                break;
+            case BinaryExpression.OperatorType.Equals:
+                ir = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealONE, leftHand, rightHand, "comparetmp");
                 break;
         }
 
@@ -398,6 +413,9 @@ public static class IRGen
                 break;
             case ASTNode.NodeType.VariableExpression:
                 generateVariableExpression((VariableExpression)node);
+                break;
+            case ASTNode.NodeType.IfStatement:
+                generateIfStatment((IfStatement)node);
                 break;
 
         }

@@ -4,7 +4,7 @@ using System.Text;
 public static class Lexer
 {
     private static List<Util.Token> tokenList;
-    private static string[] binOps = { "+", "-", "*", "/" };
+    private static string[] binOps = { "+", "-", "*", "/", "==" };
     private static string[] assignmentOps = { "=", "+=", "-=", "*=", "/=" };
 
     public static List<Util.Token> lex(string input)

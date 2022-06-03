@@ -1,14 +1,5 @@
-const string e = "hello"
-
-@test1 () {
-println!(e)
-}
-
-@test2 () {
-println!("world")
-}
-
 @main () {
-test1()
-test2()
+    if (1 == 1) {
+
+    }
 }
