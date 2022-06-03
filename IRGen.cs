@@ -125,14 +125,51 @@ public static class IRGen
 
     public static void generateIfStatment(IfStatement ifStat)
     {
+        //evaluates the condition as a bool
         generateBinaryExpression(ifStat.expression);
-        LLVMValueRef binExpr = valueStack.Pop();
-        Console.WriteLine("ifStat binExpr below");
-        LLVM.DumpValue(binExpr);
+        LLVMValueRef condValue = valueStack.Pop();
 
-        LLVMBasicBlockRef block = LLVM.GetInsertBlock(builder).GetBasicBlockParent();
+        //gets the parent block (function)
+        LLVMBasicBlockRef parentBlock = LLVM.GetInsertBlock(builder).GetBasicBlockParent();
 
-        // LLVM.Block
+        //inserts the then and else blocks
+        LLVM.PositionBuilderAtEnd(builder, parentBlock);
+        LLVMBasicBlockRef thenBlock = LLVM.AppendBasicBlock(parentBlock, "then");
+        LLVMBasicBlockRef elseBlock = LLVM.AppendBasicBlock(parentBlock, "else");
+        LLVMBasicBlockRef mergeBlock = LLVM.AppendBasicBlock(parentBlock, "ifCont");
+        LLVM.BuildCondBr(builder, condValue, thenBlock, elseBlock);
+
+        //puts builder at the end of the then block to write code for it
+        LLVM.PositionBuilderAtEnd(builder, thenBlock);
+
+        //populate the then
+        foreach (ASTNode node in ifStat.body)
+        {
+            evaluateNode(node);
+        }
+
+        //phi node stuff
+        LLVM.BuildBr(builder, mergeBlock);
+
+        //reset the then block in case builder was moved while populating it
+        thenBlock = LLVM.GetInsertBlock(builder);
+
+        //position the builder for the else
+        LLVM.PositionBuilderAtEnd(builder, elseBlock);
+
+        //for loop like thethen statment can go below for the else
+
+        LLVM.BuildBr(builder, mergeBlock);
+
+        //resets else block
+        elseBlock = LLVM.GetInsertBlock(builder);
+
+        LLVM.PositionBuilderAtEnd(builder, mergeBlock);
+
+        LLVMValueRef phiRef = LLVM.BuildPhi(builder, LLVM.DoubleType(), "iftmp");
+        LLVM.AddIncoming(phiRef, new LLVMValueRef[] { }, new LLVMBasicBlockRef[] { thenBlock, elseBlock }, 2);
+        
+
     }
 
     public static void generateBinaryExpression(BinaryExpression binaryExpression)

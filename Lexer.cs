@@ -20,7 +20,7 @@ public static class Lexer
         {
             column++;
             bool isFinalChar = input.IndexOf(ch) == input.Length - 1;
-            if (ch == ' ' || isFinalChar || ch == '\n' || ch == ')' || ch == '}' || lastChar == '\n')
+            if (ch == ' ' || isFinalChar /* || ch == '\n' */ || ch == ')' || ch == '}' || lastChar == '\n')
             {
                 if (lastChar != ' ')
                 {
@@ -118,7 +118,7 @@ public static class Lexer
         // {
         //     throw new ArgumentException($"Illegal delimeter usage( \"{ch}\" ) at {line}:{column}");
         // }
-        if (builder.ToString() != "" && builder.ToString() != " ") tokenList.Add(new Util.Token(Util.TokenType.Keyword, builder.ToString(), line, column));
+        // if (builder.ToString() != "" && builder.ToString() != " ") tokenList.Add(new Util.Token(Util.TokenType.Keyword, builder.ToString(), line, column));
         tokenList.Add(new Util.Token(type, ch.ToString(), line, column, true));
     }
 

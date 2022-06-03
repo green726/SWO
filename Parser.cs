@@ -322,12 +322,16 @@ public static class Parser
                 delimLevel++;
                 break;
             case Util.TokenType.BrackDelimiterOpen:
-                // switch (parent?.nodeType)
-                // {
-                //     case ASTNode.NodeType.Prototype:
-                //         parent = new FunctionAST((PrototypeAST)parent);
-                //         break;
-                // }
+                switch (parent?.nodeType)
+                {
+                    // case ASTNode.NodeType.Prototype:
+                    //     parent = new FunctionAST((PrototypeAST)parent);
+                    //     break;
+                    case ASTNode.NodeType.IfStatement:
+                        parent.addChild(token);
+                        break;
+                }
+
                 delimLevel++;
                 break;
             case Util.TokenType.SquareDelimiterOpen:

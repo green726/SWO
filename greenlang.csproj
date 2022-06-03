@@ -8,8 +8,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="libLLVM" Version="12.0.0" />
+    <PackageReference Include="libllvm" Version="14.0.0" />
     <PackageReference Include="LLVMSharp" Version="5.0.0" />
-  </ItemGroup>
+    </ItemGroup>
+
+    <PropertyGroup>
+    <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == ''">$(NETCoreSdkRuntimeIdentifier)</RuntimeIdentifier>
+    </PropertyGroup>
 
 </Project>
