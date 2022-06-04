@@ -142,11 +142,14 @@ public static class IRGen
         //puts builder at the end of the then block to write code for it
         LLVM.PositionBuilderAtEnd(builder, thenBlock);
 
+
+        List<LLVMValueRef> thenValRefs = new List<LLVMValueRef>();
         //populate the then
         foreach (ASTNode node in ifStat.body)
         {
-            evaluateNode(node);
+            thenValRefs.Add(valueStack.Pop());
         }
+
 
         //phi node stuff
         LLVM.BuildBr(builder, mergeBlock);
@@ -167,8 +170,9 @@ public static class IRGen
         LLVM.PositionBuilderAtEnd(builder, mergeBlock);
 
         LLVMValueRef phiRef = LLVM.BuildPhi(builder, LLVM.DoubleType(), "iftmp");
-        LLVM.AddIncoming(phiRef, new LLVMValueRef[] { }, new LLVMBasicBlockRef[] { thenBlock, elseBlock }, 2);
-        
+        LLVM.AddIncoming(phiRef, thenValRefs.ToArray(), new LLVMBasicBlockRef[] { thenBlock }, 0);
+
+
 
     }
 
@@ -420,6 +424,40 @@ public static class IRGen
         valueStack.Push(function);
     }
 
+    // public static void evaluateNodeRet(ASTNode node)
+    // {
+    //     switch (node.nodeType)
+    //     {
+    //         case ASTNode.NodeType.Prototype:
+    //             generatePrototype((PrototypeAST)node);
+    //             break;
+    //         case ASTNode.NodeType.Function:
+    //             generateFunction((FunctionAST)node);
+    //             break;
+    //         case ASTNode.NodeType.BinaryExpression:
+    //             generateBinaryExpression((BinaryExpression)node);
+    //             break;
+    //         case ASTNode.NodeType.FunctionCall:
+    //             generateFunctionCall((FunctionCall)node);
+    //             break;
+    //         case ASTNode.NodeType.NumberExpression:
+    //             generateNumberExpression((NumberExpression)node);
+    //             break;
+    //         case ASTNode.NodeType.StringExpression:
+    //             generateStringExpression((StringExpression)node);
+    //             break;
+    //         case ASTNode.NodeType.VariableAssignment:
+    //             generateVariableAssignment((VariableAssignment)node);
+    //             break;
+    //         case ASTNode.NodeType.VariableExpression:
+    //             generateVariableExpression((VariableExpression)node);
+    //             break;
+    //         case ASTNode.NodeType.IfStatement:
+    //             generateIfStatment((IfStatement)node);
+    //             break;
+    //
+    //     }
+    // }
 
 
     public static void evaluateNode(ASTNode node)
