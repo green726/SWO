@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "HISS": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}
