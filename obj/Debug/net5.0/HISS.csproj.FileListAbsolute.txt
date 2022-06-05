@@ -25,7 +25,6 @@ D:\Coding\HISS\bin\Debug\net5.0\HISS.deps.json
 D:\Coding\HISS\bin\Debug\net5.0\HISS.runtimeconfig.json
 D:\Coding\HISS\bin\Debug\net5.0\HISS.runtimeconfig.dev.json
 D:\Coding\HISS\bin\Debug\net5.0\HISS.dll
-D:\Coding\HISS\bin\Debug\net5.0\ref\HISS.dll
 D:\Coding\HISS\bin\Debug\net5.0\HISS.pdb
 D:\Coding\HISS\bin\Debug\net5.0\LLVMSharp.dll
 D:\Coding\HISS\bin\Debug\net5.0\runtimes\linux-x64\native\libLLVM.so
@@ -42,3 +41,4 @@ D:\Coding\HISS\obj\Debug\net5.0\HISS.dll
 D:\Coding\HISS\obj\Debug\net5.0\ref\HISS.dll
 D:\Coding\HISS\obj\Debug\net5.0\HISS.pdb
 D:\Coding\HISS\obj\Debug\net5.0\HISS.genruntimeconfig.cache
+D:\Coding\HISS\obj\Debug\net5.0\refint\HISS.dll

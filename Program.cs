@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using LLVMSharp;
 
 public class HISS
 {
@@ -8,7 +9,6 @@ public class HISS
 
     static void Main(string[] args)
     {
-
         string fileToRead = args.Length != 0 ? args[0] : "/coding/HISS/src/test.hiss";
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))

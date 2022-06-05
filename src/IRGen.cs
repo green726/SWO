@@ -519,7 +519,7 @@ public static class IRGen
         }
 
         Console.WriteLine("LLVM module dump below");
-        LLVM.DumpModule(module);
+        // LLVM.DumpModule(module);
         Console.WriteLine("");
     }
 

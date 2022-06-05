@@ -26,18 +26,22 @@ public static class EXE
         IntPtr fileNamePtr = Marshal.StringToHGlobalAuto(fileName);
         // Marshal.FreeHGlobal(fileNamePtr); //BUG: this line breaks the code, maybe we are supposed to do it after we use the fileNamePtr?
 
-        string? fileNameFinal = Marshal.PtrToStringAuto(fileNamePtr);
+        // string? fileNameFinal = Marshal.PtrToStringAuto(fileNamePtr);
 
-        targetTriple = Marshal.PtrToStringAuto(LLVM.GetDefaultTargetTriple());
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            targetTriple = Marshal.PtrToStringUTF8(LLVM.GetDefaultTargetTriple());
+        }
+        else
+        {
+            targetTriple = Marshal.PtrToStringAuto(LLVM.GetDefaultTargetTriple());
+        }
+
 
         if (debugLogging)
         {
             Console.WriteLine("beggining of object file debug info");
-
-            Console.WriteLine("fileNamePostPtr " + fileNameFinal);
             Console.WriteLine("TargetTriple:" + targetTriple);
-            Console.WriteLine("targetBool: " + targetBool.Value);
-            Console.WriteLine("targetRef: " + target.ToString());
 
         }
 
@@ -54,7 +58,7 @@ public static class EXE
         {
             Console.WriteLine("beggining of object file debug info");
 
-            Console.WriteLine("fileNamePostPtr " + fileNameFinal);
+            // Console.WriteLine("fileNamePostPtr " + fileNameFinal);
             Console.WriteLine("TargetTriple:" + targetTriple);
             Console.WriteLine("targetBool: " + targetBool.Value);
             Console.WriteLine("targetRef: " + target.ToString());
