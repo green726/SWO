@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
 using LLVMSharp;
 
 /*below is gep generation (prob useless)
@@ -507,7 +503,7 @@ public static class IRGen
 
         foreach (ASTNode node in nodes)
         {
-            // evaluateNode(node);
+            evaluateNode(node);
 
 
             // foreach (ASTNode child in node.children)
@@ -519,7 +515,7 @@ public static class IRGen
         }
 
         Console.WriteLine("LLVM module dump below");
-        // LLVM.DumpModule(module);
+        LLVM.DumpModule(module);
         Console.WriteLine("");
     }
 

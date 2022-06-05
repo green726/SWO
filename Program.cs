@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using LLVMSharp;
 
 public class HISS
 {
     private static string fileContents;
+    private static bool windows = false;
 
     static void Main(string[] args)
     {
@@ -14,6 +14,11 @@ public class HISS
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
             fileToRead = args.Length != 0 ? args[0] : "/home/green726/coding/HISS/src/test.hiss";
+        }
+
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            windows = true;
         }
 
 
@@ -33,6 +38,6 @@ public class HISS
         ModuleGen.GenerateModule(nodes);
 
 
-        EXE.compileEXE();
+        EXE.compileEXE(windows);
     }
 }

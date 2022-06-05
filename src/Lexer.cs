@@ -1,6 +1,4 @@
 
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 public static class Lexer
@@ -49,7 +47,7 @@ public static class Lexer
                     {
                         tokenList.Add(new Util.Token(Util.TokenType.String, stringBuilder.ToString(), line, column));
                     }
-                    else if (stringBuilder.ToString().Replace(" ", "") != "" && stringBuilder.ToString() != "")
+                    else if (stringBuilder.ToString() != " " && stringBuilder.ToString() != "")
                     {
                         tokenList.Add(new Util.Token(Util.TokenType.Keyword, stringBuilder.ToString(), line, column));
                     }
@@ -120,7 +118,7 @@ public static class Lexer
         // {
         //     throw new ArgumentException($"Illegal delimeter usage( \"{ch}\" ) at {line}:{column}");
         // }
-        // if (builder.ToString() != "" && builder.ToString() != " ") tokenList.Add(new Util.Token(Util.TokenType.Keyword, builder.ToString(), line, column));
+        if (builder.ToString() != "" && builder.ToString() != " ") tokenList.Add(new Util.Token(Util.TokenType.Keyword, builder.ToString(), line, column));
         tokenList.Add(new Util.Token(type, ch.ToString(), line, column, true));
     }
 

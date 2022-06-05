@@ -1,0 +1,17 @@
+D:\Coding\HISS\obj\Debug\net6.0\HISS.csproj.AssemblyReference.cache
+D:\Coding\HISS\obj\Debug\net6.0\HISS.GeneratedMSBuildEditorConfig.editorconfig
+D:\Coding\HISS\obj\Debug\net6.0\HISS.AssemblyInfoInputs.cache
+D:\Coding\HISS\obj\Debug\net6.0\HISS.AssemblyInfo.cs
+D:\Coding\HISS\obj\Debug\net6.0\HISS.csproj.CoreCompileInputs.cache
+D:\Coding\HISS\bin\Debug\net6.0\HISS.exe
+D:\Coding\HISS\bin\Debug\net6.0\HISS.deps.json
+D:\Coding\HISS\bin\Debug\net6.0\HISS.runtimeconfig.json
+D:\Coding\HISS\bin\Debug\net6.0\HISS.dll
+D:\Coding\HISS\bin\Debug\net6.0\HISS.pdb
+D:\Coding\HISS\bin\Debug\net6.0\LLVMSharp.dll
+D:\Coding\HISS\obj\Debug\net6.0\HISS.csproj.CopyComplete
+D:\Coding\HISS\obj\Debug\net6.0\HISS.dll
+D:\Coding\HISS\obj\Debug\net6.0\refint\HISS.dll
+D:\Coding\HISS\obj\Debug\net6.0\HISS.pdb
+D:\Coding\HISS\obj\Debug\net6.0\HISS.genruntimeconfig.cache
+D:\Coding\HISS\obj\Debug\net6.0\ref\HISS.dll

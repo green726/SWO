@@ -1,5 +1,4 @@
 using LLVMSharp;
-using System.Collections.Generic;
 
 public static class ModuleGen
 {

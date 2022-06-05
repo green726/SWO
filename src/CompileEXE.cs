@@ -1,7 +1,5 @@
-using System;
 using LLVMSharp;
 using System.Runtime.InteropServices;
-using System.IO;
 
 public static class EXE
 {
@@ -12,10 +10,11 @@ public static class EXE
     public static LLVMPassManagerRef passManager = new LLVMPassManagerRef();
     public static LLVMMemoryBufferRef memBuffer = new LLVMMemoryBufferRef();
 
+
     public static string targetErrorMsg = "";
     public static string writeErrorMsg = "";
 
-    public static void compileEXE(string fileName = "output.o", bool debugLogging = true)
+    public static void compileEXE(bool windows, string fileName = "output.o", bool debugLogging = true)
     {
         LLVM.InitializeX86TargetInfo();
         LLVM.InitializeX86Target();
@@ -23,27 +22,25 @@ public static class EXE
         LLVM.InitializeX86AsmParser();
         LLVM.InitializeX86AsmPrinter();
 
-        IntPtr fileNamePtr = Marshal.StringToHGlobalAuto(fileName);
+        IntPtr fileNamePtr;
         // Marshal.FreeHGlobal(fileNamePtr); //BUG: this line breaks the code, maybe we are supposed to do it after we use the fileNamePtr?
 
-        // string? fileNameFinal = Marshal.PtrToStringAuto(fileNamePtr);
 
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        if (windows)
         {
             targetTriple = Marshal.PtrToStringUTF8(LLVM.GetDefaultTargetTriple());
+            fileNamePtr = Marshal.StringToHGlobalAnsi(fileName);
         }
         else
         {
             targetTriple = Marshal.PtrToStringAuto(LLVM.GetDefaultTargetTriple());
+            fileNamePtr = Marshal.StringToHGlobalAuto(fileName);
         }
 
 
-        if (debugLogging)
-        {
-            Console.WriteLine("beggining of object file debug info");
-            Console.WriteLine("TargetTriple:" + targetTriple);
+        string? fileNameFinal = Marshal.PtrToStringAuto(fileNamePtr);
 
-        }
+
 
         targetBool = LLVM.GetTargetFromTriple(targetTriple, out target, out targetErrorMsg);
         targetMachine = LLVM.CreateTargetMachine(target, targetTriple, "generic", "", LLVMCodeGenOptLevel.LLVMCodeGenLevelDefault, LLVMRelocMode.LLVMRelocDefault, LLVMCodeModel.LLVMCodeModelDefault);
@@ -58,7 +55,7 @@ public static class EXE
         {
             Console.WriteLine("beggining of object file debug info");
 
-            // Console.WriteLine("fileNamePostPtr " + fileNameFinal);
+            Console.WriteLine("fileNamePostPtr " + fileNameFinal);
             Console.WriteLine("TargetTriple:" + targetTriple);
             Console.WriteLine("targetBool: " + targetBool.Value);
             Console.WriteLine("targetRef: " + target.ToString());
@@ -68,14 +65,28 @@ public static class EXE
             {
                 Console.WriteLine("targetErrorMsg: " + targetErrorMsg);
             }
-
-            string moduleStr = Marshal.PtrToStringAuto(LLVM.PrintModuleToString(IRGen.module));
-            File.WriteAllText("HISS-IR.txt", moduleStr);
+            if (windows)
+            {
+                Console.WriteLine("IR writing for windows (doesn't work so doesn't do it)");
+                /* moduleStr =  */
+                // LLVM.PrintModuleToFile(IRGen.module, $"{fileName}-IR", out string errorMsg);
+            }
+            else
+            {
+                string moduleStr = Marshal.PtrToStringAuto(LLVM.PrintModuleToString(IRGen.module));
+                File.WriteAllText($"{fileName}-IR", moduleStr);
+            }
         }
 
         // LLVM.TargetMachineEmitToMemoryBuffer(targetMachine, IRGen.module, LLVMCodeGenFileType.LLVMObjectFile, out writeErrorMsg, out memBuffer);
-        LLVM.TargetMachineEmitToFile(targetMachine, IRGen.module, fileNamePtr, LLVMCodeGenFileType.LLVMObjectFile, out writeErrorMsg);
-
+        if (windows)
+        {
+            LLVM.TargetMachineEmitToFile(targetMachine, IRGen.module, fileNamePtr, LLVMCodeGenFileType.LLVMObjectFile, out writeErrorMsg);
+        }
+        else
+        {
+            LLVM.TargetMachineEmitToFile(targetMachine, IRGen.module, fileNamePtr, LLVMCodeGenFileType.LLVMObjectFile, out writeErrorMsg);
+        }
         if (writeErrorMsg != null && writeErrorMsg != "" && debugLogging)
         {
             Console.WriteLine("writeErrorMsg: " + writeErrorMsg);
