@@ -3,6 +3,7 @@
 using System.Text;
 using static System.Text.Json.JsonSerializer;
 
+
 public static class Parser
 {
     public static List<ASTNode> nodes = new List<ASTNode>();
@@ -131,7 +132,7 @@ public static class Parser
 
     public static string printIfStat(IfStatement ifStat)
     {
-        return $"if statement with expression of {printBinary(ifStat.expression)}";
+        return $"if statement with expression of {printBinary(ifStat.expression)} and body of ( {printASTRet(ifStat.body)} ) body end";
     }
 
     public static string printASTRet(List<ASTNode> nodesPrint)
@@ -371,6 +372,7 @@ public static class Parser
                 else if (parent != null)
                 {
                     parent = parent.parent;
+                    Console.WriteLine($"set parent delim to parent.parent (parent.parent is type {parent?.nodeType})");
                 }
                 break;
             case Util.TokenType.BrackDelimiterClose:
@@ -510,7 +512,4 @@ public static class Parser
 
     }
 }
-
-// HCPr(yellow) <-> H3O(+) + Pr(-)(red)
-
 

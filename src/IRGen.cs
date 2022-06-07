@@ -156,6 +156,7 @@ public static class IRGen
         //reset the then block in case builder was moved while populating it
         thenBlock = LLVM.GetInsertBlock(builder);
 
+        Console.WriteLine("got to else build");
         //position the builder for the else
         LLVM.PositionBuilderAtEnd(builder, elseBlock);
 
@@ -167,10 +168,13 @@ public static class IRGen
         elseBlock = LLVM.GetInsertBlock(builder);
 
         LLVM.PositionBuilderAtEnd(builder, mergeBlock);
+        
+        Console.WriteLine("pre phi ref creation");
 
         LLVMValueRef phiRef = LLVM.BuildPhi(builder, LLVM.DoubleType(), "iftmp");
+        Console.WriteLine("post phi ref creation");
         LLVM.AddIncoming(phiRef, thenValRefs.ToArray(), new LLVMBasicBlockRef[] { thenBlock }, 0);
-
+        Console.WriteLine("post phi ref incoming addition");
 
 
     }
