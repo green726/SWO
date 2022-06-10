@@ -168,15 +168,15 @@ public static class IRGen
         elseBlock = LLVM.GetInsertBlock(builder);
 
         LLVM.PositionBuilderAtEnd(builder, mergeBlock);
-        
+
         Console.WriteLine("pre phi ref creation");
 
         LLVMValueRef phiRef = LLVM.BuildPhi(builder, LLVM.DoubleType(), "iftmp");
         Console.WriteLine("post phi ref creation");
-        LLVM.AddIncoming(phiRef, thenValRefs.ToArray(), new LLVMBasicBlockRef[] { thenBlock }, 0);
+        // LLVM.AddIncoming(phiRef, thenValRefs.ToArray(), new LLVMBasicBlockRef[] { thenBlock }, 0);
         Console.WriteLine("post phi ref incoming addition");
 
-
+        LLVM.DumpModule(module);
     }
 
     public static void generateBinaryExpression(BinaryExpression binaryExpression)
@@ -210,7 +210,7 @@ public static class IRGen
                 ir = LLVM.BuildFAdd(builder, leftHand, rightHand, "addtmp");
                 break;
             case BinaryExpression.OperatorType.Equals:
-                ir = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealONE, leftHand, rightHand, "comparetmp");
+                ir = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealUEQ, leftHand, rightHand, "comparetmp");
                 break;
         }
 
@@ -221,7 +221,9 @@ public static class IRGen
         //     evaluateNode(child);
         // }
 
-        // LLVM.DumpValue(valueStack.Peek());
+        Console.WriteLine($"Value stack peek after bin below");
+        LLVM.DumpValue(valueStack.Peek());
+        Console.WriteLine("");
     }
 
     public static StringExpression evaluatePrintFormat(FunctionCall printCall)
@@ -465,7 +467,6 @@ public static class IRGen
 
     public static void evaluateNode(ASTNode node)
     {
-        // Console.WriteLine($"evaulating node of type {node.nodeType}");
         switch (node.nodeType)
         {
             case ASTNode.NodeType.Prototype:
@@ -508,7 +509,7 @@ public static class IRGen
         foreach (ASTNode node in nodes)
         {
             evaluateNode(node);
-
+            Console.WriteLine("successfully evaluated node of type " + node.nodeType);
 
             // foreach (ASTNode child in node.children)
             // {
