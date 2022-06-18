@@ -154,6 +154,14 @@ public static class IRGen
             thenValRefs.Add(valueStack.Pop());
         }
 
+        List<LLVMValueRef> elseValRefs = new List<LLVMValueRef>();
+
+        // foreach (ASTNode elseNode in elseStat.body)
+        // {
+        //     evalueateNode(elseNode);
+        //     elseValRefs.Add(valueStack.Pop());
+        // }
+
 
         //phi node stuff
         LLVM.BuildBr(builder, mergeBlock);
@@ -174,7 +182,7 @@ public static class IRGen
         LLVM.PositionBuilderAtEnd(builder, mergeBlock);
 
         LLVMValueRef phiRef = LLVM.BuildPhi(builder, LLVM.DoubleType(), "iftmp");
-        LLVM.AddIncoming(phiRef, thenValRefs.ToArray(), new LLVMBasicBlockRef[] { thenBlock }, 0);
+        LLVM.AddIncoming(phiRef, new LLVMValueRef[] { thenValRefs[0], elseValRefs[0] }, new LLVMBasicBlockRef[] { thenBlock, elseBlock }, 2);
     }
 
     public static void generateBinaryExpression(BinaryExpression binaryExpression)
