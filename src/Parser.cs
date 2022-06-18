@@ -404,7 +404,7 @@ public static class Parser
         }
         else if (token.type == Util.TokenType.EOL)
         {
-            if (parent?.nodeType != ASTNode.NodeType.Function)
+            if (parent?.nodeType != ASTNode.NodeType.Function && parent?.nodeType != ASTNode.NodeType.IfStatement)
             {
                 return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, null, delimLevel: delimLevel);
             }

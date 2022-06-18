@@ -26,19 +26,21 @@ public static class EXE
         // Marshal.FreeHGlobal(fileNamePtr); //BUG: this line breaks the code, maybe we are supposed to do it after we use the fileNamePtr?
 
 
+        string? fileNameFinal;
         if (windows)
         {
             targetTriple = Marshal.PtrToStringUTF8(LLVM.GetDefaultTargetTriple());
             fileNamePtr = Marshal.StringToHGlobalAnsi(fileName);
+            fileNameFinal = Marshal.PtrToStringAnsi(fileNamePtr);
         }
         else
         {
             targetTriple = Marshal.PtrToStringAuto(LLVM.GetDefaultTargetTriple());
             fileNamePtr = Marshal.StringToHGlobalAuto(fileName);
+            fileNameFinal = Marshal.PtrToStringAuto(fileNamePtr);
         }
 
 
-        string? fileNameFinal = Marshal.PtrToStringAuto(fileNamePtr);
 
 
 

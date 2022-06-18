@@ -128,14 +128,18 @@ public static class IRGen
         generateBinaryExpression(ifStat.expression);
         LLVMValueRef condValue = valueStack.Pop();
 
+        // Console.WriteLine("llvm module dump post condValue below");
+        // LLVM.DumpModule(module);
+
         //gets the parent block (function)
         LLVMBasicBlockRef parentBlock = LLVM.GetInsertBlock(builder).GetBasicBlockParent();
 
-        //inserts the then and else blocks
-        LLVM.PositionBuilderAtEnd(builder, parentBlock);
         LLVMBasicBlockRef thenBlock = LLVM.AppendBasicBlock(parentBlock, "then");
+
         LLVMBasicBlockRef elseBlock = LLVM.AppendBasicBlock(parentBlock, "else");
+
         LLVMBasicBlockRef mergeBlock = LLVM.AppendBasicBlock(parentBlock, "ifCont");
+
         LLVM.BuildCondBr(builder, condValue, thenBlock, elseBlock);
 
         //puts builder at the end of the then block to write code for it
@@ -144,8 +148,9 @@ public static class IRGen
 
         List<LLVMValueRef> thenValRefs = new List<LLVMValueRef>();
         //populate the then
-        foreach (ASTNode node in ifStat.body)
+        foreach (ASTNode thenNode in ifStat.body.ToArray())
         {
+            evaluateNode(thenNode);
             thenValRefs.Add(valueStack.Pop());
         }
 
@@ -156,7 +161,6 @@ public static class IRGen
         //reset the then block in case builder was moved while populating it
         thenBlock = LLVM.GetInsertBlock(builder);
 
-        Console.WriteLine("got to else build");
         //position the builder for the else
         LLVM.PositionBuilderAtEnd(builder, elseBlock);
 
@@ -169,14 +173,8 @@ public static class IRGen
 
         LLVM.PositionBuilderAtEnd(builder, mergeBlock);
 
-        Console.WriteLine("pre phi ref creation");
-
         LLVMValueRef phiRef = LLVM.BuildPhi(builder, LLVM.DoubleType(), "iftmp");
-        Console.WriteLine("post phi ref creation");
-        // LLVM.AddIncoming(phiRef, thenValRefs.ToArray(), new LLVMBasicBlockRef[] { thenBlock }, 0);
-        Console.WriteLine("post phi ref incoming addition");
-
-        LLVM.DumpModule(module);
+        LLVM.AddIncoming(phiRef, thenValRefs.ToArray(), new LLVMBasicBlockRef[] { thenBlock }, 0);
     }
 
     public static void generateBinaryExpression(BinaryExpression binaryExpression)
