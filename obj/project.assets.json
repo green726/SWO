@@ -6804,8 +6804,7 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\mguin\\.nuget\\packages\\": {},
-    "D:\\Coding\\vs-code-shared\\NuGetPackages": {}
+    "C:\\Users\\mguin\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
@@ -6816,19 +6815,13 @@
       "packagesPath": "C:\\Users\\mguin\\.nuget\\packages\\",
       "outputPath": "D:\\Coding\\HISS\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "D:\\Coding\\vs-code-shared\\NuGetPackages"
-      ],
       "configFilePaths": [
-        "C:\\Users\\mguin\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "C:\\Users\\mguin\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net6.0"
       ],
       "sources": {
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {

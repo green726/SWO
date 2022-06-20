@@ -132,7 +132,7 @@ public static class Parser
 
     public static string printIfStat(IfStatement ifStat)
     {
-        return $"if statement with expression of {printBinary(ifStat.expression)} and body of ( {printASTRet(ifStat.body)} ) body end";
+        return $"if statement with expression of {printBinary(ifStat.expression)} and body of ( {printASTRet(ifStat.thenFunc.body)} ) body end";
     }
 
     public static string printASTRet(List<ASTNode> nodesPrint)

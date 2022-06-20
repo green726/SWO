@@ -1,9 +1,11 @@
-using System.Collections.Generic;
+
 
 public class IfStatement : ASTNode
 {
     public BinaryExpression expression = null;
-    public List<ASTNode> body = new List<ASTNode>();
+    // public List<ASTNode> thenBody = new List<ASTNode>();
+    public FunctionAST thenFunc;
+    public ElseStatement? elseStat;
     private bool isBody = false;
     // private bool isStat = true;
 
@@ -12,6 +14,13 @@ public class IfStatement : ASTNode
     {
         this.nodeType = NodeType.IfStatement;
         parent?.addChild(this);
+
+        elseStat = new ElseStatement(this, token);
+
+
+        PrototypeAST thenProto = new PrototypeAST(token, false);
+        thenFunc = new FunctionAST(thenProto, new List<ASTNode>());
+
     }
 
     public override void addChild(ASTNode child)
@@ -31,7 +40,7 @@ public class IfStatement : ASTNode
         }
         else if (isBody == true)
         {
-            body.Add(child);
+            thenFunc.addChild(child);
         }
         else
         {
