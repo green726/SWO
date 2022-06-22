@@ -5,7 +5,8 @@ public class IfStatement : ASTNode
     public BinaryExpression expression = null;
     // public List<ASTNode> thenBody = new List<ASTNode>();
     public FunctionAST thenFunc;
-    public ElseStatement? elseStat;
+    public FunctionCall thenCall;
+    public ElseStatement elseStat;
     private bool isBody = false;
     // private bool isStat = true;
 
@@ -15,11 +16,20 @@ public class IfStatement : ASTNode
         this.nodeType = NodeType.IfStatement;
         parent?.addChild(this);
 
-        elseStat = new ElseStatement(this, token);
 
 
-        PrototypeAST thenProto = new PrototypeAST(token, false);
-        thenFunc = new FunctionAST(thenProto, new List<ASTNode>());
+        Util.Token thenProtoTok = new Util.Token(Util.TokenType.Keyword, "@then" + Parser.ifFuncNum, token.line, token.column);
+        PrototypeAST thenProto = new PrototypeAST(thenProtoTok);
+        this.thenFunc = new FunctionAST(thenProto, new List<ASTNode>(), topLevel: false);
+
+
+        Util.Token thenCallTok = new Util.Token(Util.TokenType.Keyword, "then" + Parser.ifFuncNum, token.line, token.column);
+        this.thenCall = new FunctionCall(thenCallTok, null, topLevel: false);
+
+
+        this.elseStat = new ElseStatement(this, token);
+
+        Parser.ifFuncNum++;
 
     }
 

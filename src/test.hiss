@@ -1,6 +1,9 @@
 
 @main () {
-    if (1 == 1) {
+    if (1 == 2) {
     println!("hi")
+    }
+    else {
+    println!("bye")
     }
 }

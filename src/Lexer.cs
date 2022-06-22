@@ -56,8 +56,6 @@ public static class Lexer
                 }
                 else
                 {
-                    lastChar = ch;
-                    continue;
                 }
             }
             switch (ch)

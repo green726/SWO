@@ -7,7 +7,7 @@ public class FunctionCall : ASTNode
     public bool builtIn = false;
     public List<ASTNode> args;
 
-    public FunctionCall(Util.Token token, List<ASTNode>? args, bool? builtInExpected = false, ASTNode? parent = null) : base(token)
+    public FunctionCall(Util.Token token, List<ASTNode>? args, bool? builtInExpected = false, ASTNode? parent = null, bool topLevel = true) : base(token)
 
     {
         this.nodeType = NodeType.FunctionCall;
@@ -36,7 +36,11 @@ public class FunctionCall : ASTNode
             return;
         }
 
-        Parser.nodes.Add(this);
+        else if (topLevel)
+        {
+            Parser.nodes.Add(this);
+
+        }
     }
 
     public override void addChild(ASTNode child)

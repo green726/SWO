@@ -14,7 +14,7 @@ public static class EXE
     public static string targetErrorMsg = "";
     public static string writeErrorMsg = "";
 
-    public static void compileEXE(bool windows, string fileName = "output.o", bool debugLogging = true)
+    public static void compileEXE(bool windows, string fileName = "output", bool debugLogging = true)
     {
         LLVM.InitializeX86TargetInfo();
         LLVM.InitializeX86Target();
@@ -30,13 +30,13 @@ public static class EXE
         if (windows)
         {
             targetTriple = Marshal.PtrToStringUTF8(LLVM.GetDefaultTargetTriple());
-            fileNamePtr = Marshal.StringToHGlobalAnsi(fileName);
+            fileNamePtr = Marshal.StringToHGlobalAnsi(fileName + ".o");
             fileNameFinal = Marshal.PtrToStringAnsi(fileNamePtr);
         }
         else
         {
             targetTriple = Marshal.PtrToStringAuto(LLVM.GetDefaultTargetTriple());
-            fileNamePtr = Marshal.StringToHGlobalAuto(fileName);
+            fileNamePtr = Marshal.StringToHGlobalAuto(fileName + ".o");
             fileNameFinal = Marshal.PtrToStringAuto(fileNamePtr);
         }
 

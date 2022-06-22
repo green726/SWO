@@ -18,6 +18,8 @@ public static class Parser
     public static int prevLine = 0;
     public static int prevColumn = 0;
 
+    public static int ifFuncNum = 0;
+
     public static class topAST
     {
         public static List<ASTNode> primaryChildren = new List<ASTNode>();
@@ -132,7 +134,12 @@ public static class Parser
 
     public static string printIfStat(IfStatement ifStat)
     {
-        return $"if statement with expression of {printBinary(ifStat.expression)} and body of ( {printASTRet(ifStat.thenFunc.body)} ) body end";
+        return $"if statement with expression of {printBinary(ifStat.expression)} and body of ( {printASTRet(ifStat.thenFunc.body)} ) body end | else statement: {printElseStat(ifStat.elseStat)}";
+    }
+
+    public static string printElseStat(ElseStatement elseStat)
+    {
+        return $"else statement with body of ( {printASTRet(elseStat.elseFunc.body)} )";
     }
 
     public static string printASTRet(List<ASTNode> nodesPrint)
@@ -288,6 +295,11 @@ public static class Parser
             IfStatement ifStat = new IfStatement(token, parent);
             return new List<dynamic>() { ifStat, delimLevel };
         }
+        else if (token.value == "else")
+        {
+            IfStatement ifParent = (IfStatement)parent;
+            return new List<dynamic>() { ifParent.elseStat, delimLevel };
+        }
         else if (token.value[0] == '@')
         {
             PrototypeAST proto = new PrototypeAST(token);
@@ -404,7 +416,7 @@ public static class Parser
         }
         else if (token.type == Util.TokenType.EOL)
         {
-            if (parent?.nodeType != ASTNode.NodeType.Function && parent?.nodeType != ASTNode.NodeType.IfStatement)
+            if (parent?.nodeType != ASTNode.NodeType.Function && parent?.nodeType != ASTNode.NodeType.IfStatement && parent?.nodeType != ASTNode.NodeType.ElseStatement)
             {
                 return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, null, delimLevel: delimLevel);
             }

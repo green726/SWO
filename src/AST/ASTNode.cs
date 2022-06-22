@@ -34,7 +34,8 @@ public abstract class ASTNode
         BuiltinCall,
         StringExpression,
         TypeAST,
-        IfStatement
+        IfStatement,
+        ElseStatement
     }
 
     public virtual void addParent(ASTNode parent)

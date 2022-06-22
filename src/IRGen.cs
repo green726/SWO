@@ -124,6 +124,9 @@ public static class IRGen
 
     public static void generateIfStatment(IfStatement ifStat)
     {
+
+
+
         //evaluates the condition as a bool
         generateBinaryExpression(ifStat.expression);
         LLVMValueRef condValue = valueStack.Pop();
@@ -142,22 +145,15 @@ public static class IRGen
 
         LLVM.BuildCondBr(builder, condValue, thenBlock, elseBlock);
 
+        generateFunction(ifStat.thenFunc);
+        generateFunction(ifStat.elseStat.elseFunc);
+
         //puts builder at the end of the then block to write code for it
         LLVM.PositionBuilderAtEnd(builder, thenBlock);
 
 
-        generateFunction(ifStat.thenFunc);
+        generateFunctionCall(ifStat.thenCall);
         LLVMValueRef thenValRef = valueStack.Pop();
-
-        generateFunction(ifStat.elseStat.elseFunc);
-        // generateFunctionCall(new FunctionCall(new Util.Token(Util.TokenType.String, )))
-        LLVMValueRef elseValRef = valueStack.Pop();
-
-        // foreach (ASTNode elseNode in elseStat.body)
-        // {
-        //     evalueateNode(elseNode);
-        //     elseValRefs.Add(valueStack.Pop());
-        // }
 
 
         //phi node stuff
@@ -166,20 +162,33 @@ public static class IRGen
         //reset the then block in case builder was moved while populating it
         thenBlock = LLVM.GetInsertBlock(builder);
 
+
         //position the builder for the else
         LLVM.PositionBuilderAtEnd(builder, elseBlock);
 
-        //for loop like thethen statment can go below for the else
+        generateFunctionCall(ifStat.elseStat.elseCall);
+        LLVMValueRef elseValRef = valueStack.Pop();
+
 
         LLVM.BuildBr(builder, mergeBlock);
 
         //resets else block
         elseBlock = LLVM.GetInsertBlock(builder);
 
+        // LLVM.PositionBuilderAtEnd(builder, mergeBlock);
+
+
+
+        LLVM.PositionBuilderAtEnd(builder, mergeBlock);
+
         LLVM.PositionBuilderAtEnd(builder, mergeBlock);
 
         LLVMValueRef phiRef = LLVM.BuildPhi(builder, LLVM.DoubleType(), "iftmp");
         LLVM.AddIncoming(phiRef, new LLVMValueRef[] { thenValRef, elseValRef }, new LLVMBasicBlockRef[] { thenBlock, elseBlock }, 2);
+
+        valueStack.Push(phiRef);
+
+        // LLVM.BuildRet(builder, phiRef);
     }
 
     public static void generateBinaryExpression(BinaryExpression binaryExpression)
@@ -320,12 +329,12 @@ public static class IRGen
 
         if (funcRef.Pointer == IntPtr.Zero)
         {
-            throw new GenException("Unknown function referenced", funcCall);
+            throw new GenException($"Unknown function ({funcCall.functionName}) referenced", funcCall);
         }
 
         if (LLVM.CountParams(funcRef) != funcCall.args.Count)
         {
-            throw new GenException("Incorrect # arguments passed", funcCall);
+            throw new GenException($"Incorrect # arguments passed ({funcCall.args.Count} passed but {LLVM.CountParams(funcRef)} required)", funcCall);
         }
 
         int argumentCount = funcCall.args.Count;
@@ -410,7 +419,7 @@ public static class IRGen
 
         LLVMValueRef function = valueStack.Pop();
 
-        LLVM.PositionBuilderAtEnd(builder, LLVM.AppendBasicBlock(function, "body"));
+        LLVM.PositionBuilderAtEnd(builder, LLVM.AppendBasicBlock(function, "entry"));
 
         // try
         // {
