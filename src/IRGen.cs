@@ -28,7 +28,14 @@ public static class IRGen
 
     public static void generateStringExpression(StringExpression str)
     {
-        valueStack.Push(LLVM.BuildGlobalString(builder, str.value, "strtmp"));
+        if (str.builtInString)
+        {
+            
+        }
+        else
+        {
+            valueStack.Push(LLVM.BuildGlobalString(builder, str.value, "strtmp"));
+        }
     }
 
     public static void generateVariableExpression(VariableExpression varExp)
@@ -199,6 +206,10 @@ public static class IRGen
 
         switch (binaryExpression.leftHand.nodeType)
         {
+            case ASTNode.NodeType.VariableExpression:
+                evaluateNode(binaryExpression.leftHand);
+                leftHand = valueStack.Pop();
+                break;
             case ASTNode.NodeType.NumberExpression:
                 NumberExpression leftHandExpr = (NumberExpression)binaryExpression.leftHand;
                 leftHand = LLVM.ConstReal(LLVM.DoubleType(), leftHandExpr.value);
@@ -210,6 +221,10 @@ public static class IRGen
 
         switch (binaryExpression.rightHand.nodeType)
         {
+            case ASTNode.NodeType.VariableExpression:
+                evaluateNode(binaryExpression.rightHand);
+                rightHand = valueStack.Pop();
+                break;
             case ASTNode.NodeType.NumberExpression:
                 NumberExpression rightHandExpr = (NumberExpression)binaryExpression.rightHand;
                 rightHand = LLVM.ConstReal(LLVM.DoubleType(), rightHandExpr.value);

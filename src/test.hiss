@@ -1,6 +1,7 @@
+const double ee = 1
 
 @main () {
-    if (1 == 2) {
+    if (ee == 1) {
     println!("hi")
     }
     else {

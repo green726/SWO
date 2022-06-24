@@ -1,13 +1,15 @@
 public class StringExpression : ASTNode
 {
     public string value;
+    public bool builtInString;
 
-    public StringExpression(Util.Token token, ASTNode? parent = null, bool dontAdd = false) : base(token)
+    public StringExpression(Util.Token token, ASTNode? parent = null, bool dontAdd = false, bool builtInString = false) : base(token)
     {
         Parser.checkToken(token, expectedType: Util.TokenType.String);
 
         this.nodeType = NodeType.StringExpression;
         this.value = token.value;
+        this.builtInString = builtInString;
 
         if (dontAdd == true)
         {

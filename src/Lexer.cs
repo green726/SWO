@@ -11,18 +11,19 @@ public static class Lexer
     {
         int line = 1;
         int column = 0;
+        int charNum = 0;
         tokenList = new List<Util.Token>();
         char lastChar = new char();
         StringBuilder stringBuilder = new StringBuilder();
 
-
         foreach (char ch in input)
         {
+            charNum++;
             column++;
             bool isFinalChar = input.IndexOf(ch) == input.Length - 1;
-            if (ch == ' ' || isFinalChar /* || ch == '\n' */ || ch == ')' || ch == '}' || lastChar == '\n')
+            if (ch == ' ' || isFinalChar || ch == '\n' || ch == ')' || ch == '}'/*  || lastChar == '\n' */)
             {
-                if (lastChar != ' ')
+                if (lastChar != ' ' && lastChar != null)
                 {
                     char firstChar = ' ';
                     try
@@ -47,7 +48,7 @@ public static class Lexer
                     {
                         tokenList.Add(new Util.Token(Util.TokenType.String, stringBuilder.ToString(), line, column));
                     }
-                    else if (stringBuilder.ToString() != " " && stringBuilder.ToString() != "")
+                    else if (stringBuilder.ToString() != " " && stringBuilder.ToString() != "" && stringBuilder.ToString() != "\n")
                     {
                         tokenList.Add(new Util.Token(Util.TokenType.Keyword, stringBuilder.ToString(), line, column));
                     }
@@ -99,8 +100,9 @@ public static class Lexer
                     continue;
             }
 
-            if (ch != ' ')
+            if (ch != ' ' && ch.ToString() != null && (int)ch != 13)
             {
+                // Console.WriteLine($"Appending char: {ch} with code: {(int)ch} and char num of {charNum}");
                 stringBuilder.Append(ch.ToString());
             }
             lastChar = ch;
