@@ -35,7 +35,8 @@ public abstract class ASTNode
         StringExpression,
         TypeAST,
         IfStatement,
-        ElseStatement
+        ElseStatement,
+        ForLoop,
     }
 
     public virtual void addParent(ASTNode parent)

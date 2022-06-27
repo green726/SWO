@@ -16,3 +16,12 @@ functions:
 
     for now all functions return ints
 
+    ```
+    for (i = 0, i < 10, i++) {
+
+    }
+
+    for (i in 30) {
+
+    }
+    ```

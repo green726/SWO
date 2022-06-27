@@ -30,7 +30,43 @@ public static class IRGen
     {
         if (str.builtInString)
         {
-            
+            switch (str.value)
+            {
+                case "\"%s\"":
+                    LLVMValueRef stringFormatRef = LLVM.GetNamedGlobal(module, "stringFormat");
+                    if (stringFormatRef.Pointer == IntPtr.Zero)
+                    {
+                        valueStack.Push(LLVM.BuildGlobalString(builder, str.value, "stringFormat"));
+                    }
+                    else
+                    {
+                        valueStack.Push(stringFormatRef);
+                    }
+                    break;
+                case "\"%f\"":
+                    LLVMValueRef numberFormatRef = LLVM.GetNamedGlobal(module, "numberFormat");
+                    if (numberFormatRef.Pointer == IntPtr.Zero)
+                    {
+                        valueStack.Push(LLVM.BuildGlobalString(builder, str.value, "numberFormat"));
+                    }
+                    else
+                    {
+                        valueStack.Push(numberFormatRef);
+                    }
+                    break;
+                case "\"\n\"":
+                    LLVMValueRef newLineRef = LLVM.GetNamedGlobal(module, "newLine");
+                    if (newLineRef.Pointer == IntPtr.Zero)
+                    {
+                        valueStack.Push(LLVM.BuildGlobalString(builder, str.value, "newLine"));
+                    }
+                    else
+                    {
+                        valueStack.Push(newLineRef);
+                    }
+                    break;
+            }
+
         }
         else
         {
@@ -50,9 +86,9 @@ public static class IRGen
         }
 
         //NOTE: below stuff doesnt seem to do anything but maybe it will so leaving it be
-        LLVMValueRef[] arrIndices = { LLVM.ConstInt(LLVM.Int64Type(), (ulong)0, false) };
-        LLVMValueRef gepRef = LLVM.BuildInBoundsGEP(builder, globalRef, arrIndices, varExp.varName);
-        valueStack.Push(gepRef);
+        // LLVMValueRef[] arrIndices = { LLVM.ConstInt(LLVM.Int64Type(), (ulong)0, false) };
+        // LLVMValueRef gepRef = LLVM.BuildInBoundsGEP(builder, globalRef, arrIndices, varExp.varName);
+        // valueStack.Push(gepRef);
 
     }
 

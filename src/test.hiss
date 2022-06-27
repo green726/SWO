@@ -1,10 +1,7 @@
 const double ee = 1
 
 @main () {
-    if (ee == 1) {
-    println!("hi")
-    }
-    else {
-    println!("bye")
+    for (i in 10) {
+    print!(i)
     }
 }

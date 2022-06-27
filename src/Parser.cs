@@ -142,6 +142,10 @@ public static class Parser
         return $"else statement with body of ( {printASTRet(elseStat.elseFunc.body)} )";
     }
 
+    public static string printForLoop(ForLoop forLoop) {
+        return $"For loop with ";
+    }
+
     public static string printASTRet(List<ASTNode> nodesPrint)
     {
         StringBuilder stringBuilder = new StringBuilder();
@@ -183,6 +187,11 @@ public static class Parser
                 case ASTNode.NodeType.IfStatement:
                     IfStatement ifStat = (IfStatement)node;
                     stringBuilder.Append(printIfStat(ifStat));
+                    stringBuilder.Append("\n");
+                    break;
+                case ASTNode.NodeType.ForLoop:
+                    ForLoop forLoop = (ForLoop)node;
+                    stringBuilder.Append(printForLoop(forLoop));
                     stringBuilder.Append("\n");
                     break;
                 default:
@@ -232,6 +241,11 @@ public static class Parser
                 case ASTNode.NodeType.IfStatement:
                     IfStatement ifStat = (IfStatement)node;
                     stringBuilder.Append(printIfStat(ifStat));
+                    stringBuilder.Append("\n");
+                    break;
+                case ASTNode.NodeType.ForLoop:
+                    ForLoop forLoop = (ForLoop)node;
+                    stringBuilder.Append(printForLoop(forLoop));
                     stringBuilder.Append("\n");
                     break;
                 default:
@@ -299,6 +313,11 @@ public static class Parser
         {
             IfStatement ifParent = (IfStatement)parent;
             return new List<dynamic>() { ifParent.elseStat, delimLevel };
+        }
+        else if (token.value == "for")
+        {
+            ForLoop forLoop = new ForLoop(token);
+            return new List<dynamic>() { forLoop, delimLevel };
         }
         else if (token.value[0] == '@')
         {
