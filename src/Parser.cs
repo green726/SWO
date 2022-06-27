@@ -142,8 +142,9 @@ public static class Parser
         return $"else statement with body of ( {printASTRet(elseStat.elseFunc.body)} )";
     }
 
-    public static string printForLoop(ForLoop forLoop) {
-        return $"For loop with ";
+    public static string printForLoop(ForLoop forLoop)
+    {
+        return $"For loop with iteration object of {forLoop.iterationObject} and index obj of {printASTRet(new List<ASTNode>() { forLoop.index })} complexity of {forLoop.complex} and body of ( {printASTRet(forLoop.body)} ) body end";
     }
 
     public static string printASTRet(List<ASTNode> nodesPrint)
@@ -316,7 +317,7 @@ public static class Parser
         }
         else if (token.value == "for")
         {
-            ForLoop forLoop = new ForLoop(token);
+            ForLoop forLoop = new ForLoop(token, parent);
             return new List<dynamic>() { forLoop, delimLevel };
         }
         else if (token.value[0] == '@')
@@ -345,11 +346,13 @@ public static class Parser
         switch (token.type)
         {
             case Util.TokenType.ParenDelimiterOpen:
-                // switch (parent?.nodeType)
-                // {
-                //     case ASTNode.NodeType.Prototype:
-                //     
-                // }
+                switch (parent?.nodeType)
+                {
+                    case ASTNode.NodeType.ForLoop:
+                        parent.addChild(token);
+                        break;
+
+                }
                 delimLevel++;
                 break;
             case Util.TokenType.BrackDelimiterOpen:

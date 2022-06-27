@@ -1,22 +1,29 @@
 
 public class ForLoop : ASTNode
 {
-    public VariableAssignment index;
-    public VariableAssignment value;
+    public VariableAssignment index; // current index of loop
+    public VariableAssignment value; // current value of loop (if applicable)
     public List<ASTNode> body;
     public bool isBody = false;
     public int parseIteration = 0;
     public bool complex = false;
     public bool valueLoop = false;
-    public dynamic iterationObject;
-    public dynamic iterationValue;
+    public dynamic iterationObject; // object to be iterated over 
+    public dynamic iterationValue; // amount to iterate by 
 
-    public ForLoop(Util.Token token) : base(token)
+    public ForLoop(Util.Token token, ASTNode parent) : base(token)
     {
         this.nodeType = NodeType.ForLoop;
         this.body = new List<ASTNode>();
 
-
+        if (parent != null)
+        {
+            parent.addChild(this);
+        }
+        else
+        {
+            throw new ParserException("illegal parentless for loop", this);
+        }
         parseIteration++;
     }
 
@@ -49,6 +56,8 @@ public class ForLoop : ASTNode
                     {
                         throw new ParserException($"expected keyword but got {child.type}", child);
                     }
+                    this.index = new VariableAssignment(new Util.Token(Util.TokenType.Keyword), false);
+
                     break;
                 case 3:
                     if (child.value == "=")
@@ -82,7 +91,8 @@ public class ForLoop : ASTNode
                         switch (child.type)
                         {
                             case Util.TokenType.Number:
-                                iterationObject = Int64.Parse(child.value);
+                                Console.WriteLine($"adding iteration object with value of {child.value}");
+                                iterationObject = Int32.Parse(child.value);
                                 break;
                             default:
                                 throw new ParserException("non numerical for loops not yet supported", child);
