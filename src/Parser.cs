@@ -124,7 +124,7 @@ public static class Parser
 
     public static string printVarAss(VariableAssignment varAss)
     {
-        return $"{varAss.nodeType} with type of {varAss?.type.value} and assignmentop of {varAss.assignmentOp} and name of {varAss.name} and mutability of {varAss.mutable} and value of {varAss.strValue}";
+        return $"{varAss.nodeType} with type of {varAss?.type.value} and assignmentop of {varAss?.assignmentOp} and name of {varAss?.name} and mutability of {varAss.mutable} and value of {varAss.strValue}";
     }
 
     public static string printProto(PrototypeAST proto)
@@ -144,7 +144,7 @@ public static class Parser
 
     public static string printForLoop(ForLoop forLoop)
     {
-        return $"For loop with iteration object of {forLoop.iterationObject} and index obj of {printASTRet(new List<ASTNode>() { forLoop.index })} complexity of {forLoop.complex} and body of ( {printASTRet(forLoop.body)} ) body end";
+        return $"For loop with iteration object of {forLoop.iterationObject} and index obj of {printVarAss(forLoop.index)} complexity of {forLoop.complex} and body of ( {printASTRet(forLoop.body)} ) body end";
     }
 
     public static string printASTRet(List<ASTNode> nodesPrint)
@@ -336,6 +336,11 @@ public static class Parser
             FunctionCall funcCall = new FunctionCall(token, null, false, parent);
             return new List<dynamic>() { funcCall, delimLevel };
         }
+        else if (parent.nodeType == ASTNode.NodeType.ForLoop)
+        {
+            parent.addChild(token);
+            return new List<dynamic>() { parent, delimLevel };
+        }
 
         new VariableExpression(token, parent);
         return new List<dynamic>() { parent, delimLevel };
@@ -343,6 +348,7 @@ public static class Parser
 
     public static List<dynamic> parseDelim(Util.Token token, int tokenIndex, ASTNode? parent = null, int delimLevel = 0)
     {
+        // Console.WriteLine($"parsing delim {token.value} with parent of {parent}");
         switch (token.type)
         {
             case Util.TokenType.ParenDelimiterOpen:
@@ -351,7 +357,6 @@ public static class Parser
                     case ASTNode.NodeType.ForLoop:
                         parent.addChild(token);
                         break;
-
                 }
                 delimLevel++;
                 break;
@@ -362,6 +367,9 @@ public static class Parser
                     //     parent = new FunctionAST((PrototypeAST)parent);
                     //     break;
                     case ASTNode.NodeType.IfStatement:
+                        parent.addChild(token);
+                        break;
+                    case ASTNode.NodeType.ForLoop:
                         parent.addChild(token);
                         break;
                 }
@@ -394,6 +402,10 @@ public static class Parser
                     parent = new FunctionAST((PrototypeAST)parent, new List<ASTNode>());
                     break;
                 }
+                else if (parent.nodeType == ASTNode.NodeType.ForLoop)
+                {
+                    break;
+                }
                 if (delimLevel == 0)
                 {
                     switch (parent.nodeType)
@@ -406,7 +418,7 @@ public static class Parser
                 else if (parent != null)
                 {
                     parent = parent.parent;
-                    Console.WriteLine($"set parent delim to parent.parent (parent.parent is type {parent?.nodeType})");
+                    Console.WriteLine($"set parent delim ({token.value}) at {token.line}:{token.column} to parent.parent (parent.parent is type {parent?.nodeType})");
                 }
                 break;
             case Util.TokenType.BrackDelimiterClose:

@@ -25,3 +25,9 @@ functions:
 
     }
     ```
+
+    variables are declared like this:
+
+    ```
+const double ee = 1
+    ```

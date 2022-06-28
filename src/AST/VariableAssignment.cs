@@ -26,7 +26,7 @@ public class VariableAssignment : ASTNode
                 this.name = child.value;
                 break;
             case 2:
-                if (child.type != Util.TokenType.AssignmentOp) throw new ParserException($"expected assignment op but got {child.type}", child);
+                if (child.type != Util.TokenType.AssignmentOp) throw new ParserException($"expected assignment op but got {child.type} in a variable assignment", child);
                 this.assignmentOp = child.value;
                 break;
             case 3:
