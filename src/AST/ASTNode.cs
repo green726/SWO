@@ -37,6 +37,7 @@ public abstract class ASTNode
         IfStatement,
         ElseStatement,
         ForLoop,
+        PhiVariable
     }
 
     public virtual void addParent(ASTNode parent)

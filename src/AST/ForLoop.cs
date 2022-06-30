@@ -1,15 +1,15 @@
 
 public class ForLoop : ASTNode
 {
-    public VariableAssignment index; // current index of loop
-    public VariableAssignment value; // current value of loop (if applicable)
+    public PhiVariable index; // current index of loop
+    public PhiVariable value; // current value of loop (if applicable)
     public List<ASTNode> body;
     public bool isBody = false;
     public int parseIteration;
     public bool complex = false;
     public bool valueLoop = false;
     public dynamic iterationObject; // object to be iterated over 
-    public dynamic iterationValue; // amount to iterate by 
+    public dynamic stepValue; // amount to iterate by 
 
     private Util.Token indexName;
     private Util.Token valueName;
@@ -60,7 +60,7 @@ public class ForLoop : ASTNode
                     {
                         throw new ParserException($"expected keyword but got {child.type}", child);
                     }
-                    this.index = new VariableAssignment(new Util.Token(Util.TokenType.Keyword, "const", child.line, child.column), false);
+                    this.index = new PhiVariable(this);
                     this.indexName = child;
                     break;
                 case 3:
@@ -70,7 +70,7 @@ public class ForLoop : ASTNode
                     }
                     else
                     {
-                        iterationValue = 1;
+                        stepValue = new NumberExpression(new Util.Token(Util.TokenType.Number, "1", this.line, this.column), this);
                         if (child.value == "in")
                         {
 
@@ -95,13 +95,15 @@ public class ForLoop : ASTNode
                         switch (child.type)
                         {
                             // case Util.TokenType.Number:
-                            //     Console.WriteLine($"adding iteration object with value of {child.value}");
-                            //     iterationObject = Int32.Parse(child.value);
-                            //     this.index.addChild(new Util.Token(Util.TokenType.Keyword, "double", child.line, child.column));
-                            //     this.index.addChild(child);
-                            //     this.index.addChild(new Util.Token(Util.TokenType.AssignmentOp, "=", child.line, child.column));
-                            //     this.index.addChild(new Util.Token(Util.TokenType.Number, "0", child.line, child.column));
-                            //     break;
+                            // Console.WriteLine($"adding iteration object with value of {child.value}");
+                            // iterationObject = Int32.Parse(child.value);
+                            // this.index.addChild(new Util.Token(Util.TokenType.Keyword, "double", child.line, child.column));
+                            // this.index.addChild(child);
+                            // this.index.addChild(new Util.Token(Util.TokenType.AssignmentOp, "=", child.line, child.column));
+                            // this.index.addChild(new Util.Token(Util.TokenType.Number, "0", child.line, child.column));
+                            // this.index.setType("double");
+                            // this.index.setValue()
+                            // break;
                             default:
                                 throw new ParserException($"non numerical for loops not yet supported (you used {child.value} instead of a number)", child);
                         }
@@ -149,17 +151,50 @@ public class ForLoop : ASTNode
         else if (parseIteration == 4 && child.nodeType == NodeType.NumberExpression && !isBody)
         {
             NumberExpression numExpr = (NumberExpression)child;
-            iterationObject = numExpr.value;
-            this.index.addChild(new Util.Token(Util.TokenType.Keyword, "double", child.line, child.column));
-            this.index.addChild(this.indexName);
-            this.index.addChild(new Util.Token(Util.TokenType.AssignmentOp, "=", child.line, child.column));
-            this.index.addChild(new Util.Token(Util.TokenType.Number, "0", child.line, child.column));
+            iterationObject = numExpr;
+            this.index.setName(this.indexName.value);
+            this.index.setValue("0");
+            this.index.setType("double");
             parseIteration++;
         }
-        else
-        {
-            throw new ParserException($"illegal addition of ASTNode child of type ({child.nodeType}) to for loop", child);
-        }
+        // else
+        // {
+        //     throw new ParserException($"illegal addition of ASTNode child of type ({child.nodeType}) to for loop", child);
+        // }
 
+    }
+}
+
+public class PhiVariable : ASTNode
+{
+    public string name;
+    public TypeAST type;
+    public string value;
+    public NumberExpression numExpr;
+
+    public PhiVariable(ASTNode node) : base(node)
+    {
+        this.nodeType = NodeType.PhiVariable;
+        this.parent = node;
+    }
+
+    public void setValue(string value)
+    {
+        this.value = value;
+
+        Util.Token numExprToken = new Util.Token(Util.TokenType.Number, value, this.line, this.column);
+        this.numExpr = new NumberExpression(numExprToken, this);
+    }
+
+    public void setType(string type)
+    {
+        Util.Token typeToken = new Util.Token(Util.TokenType.Keyword, type, this.line, this.column);
+        this.type = new TypeAST(typeToken);
+    }
+
+    public void setName(string name)
+    {
+        Console.WriteLine($"setting phi var name to {name}");
+        this.name = name;
     }
 }

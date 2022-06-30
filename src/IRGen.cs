@@ -74,22 +74,46 @@ public static class IRGen
         }
     }
 
-    public static void generateVariableExpression(VariableExpression varExp)
+    public static void generateVariableExpression(VariableExpression varExpr)
     {
-        LLVMValueRef globalRef = LLVM.GetNamedGlobal(module, varExp.varName);
-        LLVMValueRef load = LLVM.BuildLoad(builder, globalRef, varExp.varName);
+        LLVMValueRef varRef = LLVM.GetNamedGlobal(module, varExpr.varName);
+        if (varRef.Pointer == IntPtr.Zero)
+        {
+            varRef = namedValuesLLVM[varExpr.varName];
+            if (varRef.Pointer != IntPtr.Zero)
+            {
+                valueStack.Push(varRef);
+                return;
+            }
+        }
+        LLVMValueRef load = LLVM.BuildLoad(builder, varRef, varExpr.varName);
+
         valueStack.Push(load);
 
-        if (namedGlobalsAST[varExp.varName].type.value != "string")
-        {
-            return;
-        }
+        // if (namedGlobalsAST[varExpr.varName].type.value != "string")
+        // {
+        //     return;
+        // }
 
         //NOTE: below stuff doesnt seem to do anything but maybe it will so leaving it be
         // LLVMValueRef[] arrIndices = { LLVM.ConstInt(LLVM.Int64Type(), (ulong)0, false) };
         // LLVMValueRef gepRef = LLVM.BuildInBoundsGEP(builder, globalRef, arrIndices, varExp.varName);
         // valueStack.Push(gepRef);
 
+    }
+
+    public static void generateVariableExpression(PhiVariable varExpr)
+    {
+        LLVMValueRef varRef = namedValuesLLVM[varExpr.name];
+        if (varRef.Pointer != IntPtr.Zero)
+        {
+            valueStack.Push(varRef);
+            return;
+        }
+        else
+        {
+            throw new GenException($"could not find local phi variable named {varExpr.name}", varExpr);
+        }
     }
 
     public static void buildGlobalString(VariableAssignment varAss)
@@ -248,9 +272,15 @@ public static class IRGen
                 break;
             case ASTNode.NodeType.NumberExpression:
                 NumberExpression leftHandExpr = (NumberExpression)binaryExpression.leftHand;
+                Console.WriteLine("bin expr left hand num expr with value of " + leftHandExpr.value);
                 leftHand = LLVM.ConstReal(LLVM.DoubleType(), leftHandExpr.value);
+                LLVM.DumpValue(leftHand);
                 break;
             case ASTNode.NodeType.BinaryExpression:
+                leftHand = valueStack.Pop();
+                break;
+            case ASTNode.NodeType.PhiVariable:
+                generateVariableExpression((PhiVariable)binaryExpression.leftHand);
                 leftHand = valueStack.Pop();
                 break;
         }
@@ -265,6 +295,10 @@ public static class IRGen
                 NumberExpression rightHandExpr = (NumberExpression)binaryExpression.rightHand;
                 rightHand = LLVM.ConstReal(LLVM.DoubleType(), rightHandExpr.value);
                 break;
+            case ASTNode.NodeType.PhiVariable:
+                generateVariableExpression((PhiVariable)binaryExpression.rightHand);
+                rightHand = valueStack.Pop();
+                break;
         }
 
         switch (binaryExpression.operatorType)
@@ -274,6 +308,13 @@ public static class IRGen
                 break;
             case BinaryExpression.OperatorType.Equals:
                 ir = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealUEQ, leftHand, rightHand, "comparetmp");
+                break;
+            case BinaryExpression.OperatorType.LessThan:
+                Console.WriteLine("left hand value dump below");
+                LLVM.DumpValue(leftHand);
+                Console.WriteLine();
+                LLVMValueRef cmpRef = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealULT, leftHand, rightHand, "comparetmp");
+                ir = LLVM.BuildUIToFP(builder, cmpRef, LLVMTypeRef.DoubleType(), "booltmp");
                 break;
         }
 
@@ -289,6 +330,18 @@ public static class IRGen
         Console.WriteLine("");
     }
 
+    public static TypeAST LLVMTypeToASTType(LLVMTypeRef type, ASTNode parent)
+    {
+        Console.WriteLine($"Converting llvm type with kind of {type.TypeKind}");
+        switch (type.TypeKind)
+        {
+            case LLVMTypeKind.LLVMDoubleTypeKind:
+                return new TypeAST(new Util.Token(Util.TokenType.Keyword, "double", parent.line, parent.column));
+        }
+
+        return null;
+    }
+
     public static StringExpression evaluatePrintFormat(FunctionCall printCall)
     {
         switch (printCall.args[0].nodeType)
@@ -299,7 +352,17 @@ public static class IRGen
                 return new StringExpression(new Util.Token(Util.TokenType.String, "\"%s\"", 0, 0), printCall, true);
             case ASTNode.NodeType.VariableExpression:
                 VariableExpression varExpr = (VariableExpression)printCall.args[0];
-                return evaluatePrintFormat(printCall, namedGlobalsAST[varExpr.varName].type);
+                if (namedGlobalsAST.ContainsKey(varExpr.varName))
+                {
+                    return evaluatePrintFormat(printCall, namedGlobalsAST[varExpr.varName].type);
+                }
+                else if (namedValuesLLVM.ContainsKey(varExpr.varName))
+                {
+                    TypeAST printType = LLVMTypeToASTType(namedValuesLLVM[varExpr.varName].TypeOf(), printCall);
+                    return evaluatePrintFormat(printCall, printType);
+                }
+                throw new GenException($"attempting to print variable that does not exist | name: {varExpr.varName})", printCall);
+
         }
 
         return new StringExpression(new Util.Token(Util.TokenType.String, "\"%f\"", 0, 0), printCall, true);
@@ -313,6 +376,8 @@ public static class IRGen
                 return new StringExpression(new Util.Token(Util.TokenType.String, "\"%f\"", 0, 0), printCall, true);
             case "string":
                 return new StringExpression(new Util.Token(Util.TokenType.String, "\"%s\"", 0, 0), printCall, true);
+            default:
+                throw new GenException($"attempting to print obj of unknown type | obj: {printCall.args[0]} type: {type}", printCall);
         }
 
         return new StringExpression(new Util.Token(Util.TokenType.String, "\"%f\"", 0, 0), printCall, true);
@@ -327,13 +392,16 @@ public static class IRGen
                 builtIn.functionName = "printf";
 
                 printFormat = evaluatePrintFormat(builtIn);
+                // Console.WriteLine("successfully evaluated print format");
 
                 builtIn.addChildAtStart(printFormat);
+                // Console.WriteLine("appended child to start of print call");
                 break;
             case "println":
                 builtIn.functionName = "printf";
 
                 printFormat = evaluatePrintFormat(builtIn);
+                Console.WriteLine("successfully evaluated print format");
 
                 builtIn.addChildAtStart(printFormat);
 
@@ -344,10 +412,13 @@ public static class IRGen
 
         LLVMValueRef funcRef = LLVM.GetNamedFunction(module, builtIn.functionName);
 
+
         if (funcRef.Pointer == IntPtr.Zero)
         {
             throw new GenException($"Unknown function ({builtIn.functionName}) referenced", builtIn);
         }
+
+
 
         if (LLVM.CountParams(funcRef) != builtIn.args.Count)
         {
@@ -357,15 +428,18 @@ public static class IRGen
         int argumentCount = builtIn.args.Count;
         var argsRef = new LLVMValueRef[argumentCount];
 
+
         for (int i = 0; i < argumentCount; i++)
         {
             // Console.WriteLine("builtin with arg of: " + Parser.printASTRet(new List<ASTNode>() { builtIn.args[i] }));
             evaluateNode(builtIn.args[i]);
             argsRef[i] = valueStack.Pop();
             // Console.WriteLine(argsRef[i]);
+            // Console.WriteLine($"evaluated builtin arg of {builtIn.args[i]}");
         }
 
         valueStack.Push(LLVM.BuildCall(builder, funcRef, argsRef, "calltmp"));
+        // Console.WriteLine("successfully evaluated builtin call");
 
     }
 
@@ -492,41 +566,116 @@ public static class IRGen
         valueStack.Push(function);
     }
 
-    // public static void evaluateNodeRet(ASTNode node)
-    // {
-    //     switch (node.nodeType)
-    //     {
-    //         case ASTNode.NodeType.Prototype:
-    //             generatePrototype((PrototypeAST)node);
-    //             break;
-    //         case ASTNode.NodeType.Function:
-    //             generateFunction((FunctionAST)node);
-    //             break;
-    //         case ASTNode.NodeType.BinaryExpression:
-    //             generateBinaryExpression((BinaryExpression)node);
-    //             break;
-    //         case ASTNode.NodeType.FunctionCall:
-    //             generateFunctionCall((FunctionCall)node);
-    //             break;
-    //         case ASTNode.NodeType.NumberExpression:
-    //             generateNumberExpression((NumberExpression)node);
-    //             break;
-    //         case ASTNode.NodeType.StringExpression:
-    //             generateStringExpression((StringExpression)node);
-    //             break;
-    //         case ASTNode.NodeType.VariableAssignment:
-    //             generateVariableAssignment((VariableAssignment)node);
-    //             break;
-    //         case ASTNode.NodeType.VariableExpression:
-    //             generateVariableExpression((VariableExpression)node);
-    //             break;
-    //         case ASTNode.NodeType.IfStatement:
-    //             generateIfStatment((IfStatement)node);
-    //             break;
-    //
-    //     }
-    // }
+    public static void generateForLoop(ForLoop forLoop)
+    {
 
+        //evaluate the starting value of the loop index obj
+        generateNumberExpression(forLoop.index.numExpr);
+        LLVMValueRef startValRef = valueStack.Pop();
+
+        //create the basic blocks for the loop
+        LLVMBasicBlockRef parentBlock = LLVM.GetInsertBlock(builder).GetBasicBlockParent();
+        LLVMBasicBlockRef preHeaderBlock = LLVM.GetInsertBlock(builder);
+        LLVMBasicBlockRef loopBlock = LLVM.AppendBasicBlock(parentBlock, "loop");
+
+        //create the condition break
+        LLVM.BuildBr(builder, loopBlock);
+
+        LLVM.PositionBuilderAtEnd(builder, loopBlock);
+
+        //create the index obj for the loop
+        generatePhiVar(forLoop.index);
+        LLVMValueRef phiVarRef = valueStack.Pop();
+
+        //initialize it with its start value
+        LLVM.AddIncoming(phiVarRef, new LLVMValueRef[] { startValRef }, new LLVMBasicBlockRef[] { preHeaderBlock }, 1);
+
+        //check if there is already a variable with this name and if so temporarily invalidate it and replace it with the phi var ref
+        LLVMValueRef oldVariableRef = new LLVMValueRef();
+        // VariableAssignment oldVariable = null;
+        // VariableAssignment phiVarAss = new VariableAssignment(new Util.Token(Util.TokenType.Keyword, ""), false);
+
+
+        bool oldVariablePresent = false;
+        if (namedValuesLLVM.ContainsKey(forLoop.index.name))
+        {
+            oldVariableRef = namedValuesLLVM[forLoop.index.name];
+            oldVariablePresent = true;
+            namedValuesLLVM[forLoop.index.name] = phiVarRef;
+            // namedGlobalsAST[forLoop.index.name] =
+        }
+        else
+        {
+            Console.WriteLine($"adding phiVarRef with name of {forLoop.index.name} to named values");
+            namedValuesLLVM.Add(forLoop.index.name, phiVarRef);
+        }
+
+        //emit the body of the loop
+        foreach (ASTNode node in forLoop.body)
+        {
+            evaluateNode(node);
+        }
+
+        Console.WriteLine("successfully evaluated for loop body");
+
+        //evaluate the step variable - might need to change this idk
+        evaluateNode(forLoop.stepValue);
+        LLVMValueRef stepVarRef = valueStack.Pop();
+
+        //increment the phivar by the step value
+        LLVMValueRef nextVarRef = LLVM.BuildFAdd(builder, phiVarRef, stepVarRef, "nextvar");
+
+        //evaluate the end condition of the loop:
+
+        //create a new comparison expression with the end value as the left hand
+        BinaryExpression endBinExpr = new BinaryExpression(new Util.Token(Util.TokenType.Operator, "<", forLoop.line, forLoop.column), forLoop.index, forLoop);
+
+        //add 0 as the right hand of the binary expression - IDK why I do this, but LLVM did so ill figure it out later
+        endBinExpr.addChild(forLoop.iterationObject);
+
+        //generate the LLVM binary expression for the ending condition
+        generateBinaryExpression(endBinExpr);
+
+        LLVMValueRef endCondRef = valueStack.Pop();
+
+        LLVMValueRef zeroRef = LLVM.ConstReal(LLVMTypeRef.DoubleType(), 0);
+        LLVMValueRef loopCondRef = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealONE, endCondRef, zeroRef, "loopcond");
+
+        // generate the post loop basic block
+        LLVMBasicBlockRef endOfLoopBlock = LLVM.GetInsertBlock(builder);
+        LLVMBasicBlockRef postLoopBlock = LLVM.AppendBasicBlock(parentBlock, "postloop");
+
+        //create the condition break to evalaute where to go (ie run loop again or break out of loop)
+        LLVM.BuildCondBr(builder, loopCondRef, loopBlock, postLoopBlock);
+
+        //reposition the builder
+        LLVM.PositionBuilderAtEnd(builder, postLoopBlock);
+
+        //various cleanups are below 
+
+        //update the phivarref with the new values
+        LLVM.AddIncoming(phiVarRef, new LLVMValueRef[] { nextVarRef }, new LLVMBasicBlockRef[] { endOfLoopBlock }, 1);
+
+        //either replace the phiVarRef with the old variable in the vars dictionary, or remove it altogether
+        if (oldVariablePresent)
+        {
+            namedValuesLLVM[forLoop.index.name] = oldVariableRef;
+        }
+        else
+        {
+            Console.WriteLine("removing phi var ref from named values");
+            namedValuesLLVM.Remove(forLoop.index.name);
+        }
+
+        valueStack.Push(LLVM.ConstReal(LLVMTypeRef.DoubleType(), 0));
+
+    }
+
+    public static void generatePhiVar(PhiVariable phiVar)
+    {
+        LLVMValueRef phiVarRef = LLVM.BuildPhi(builder, LLVMTypeRef.DoubleType(), phiVar.name);
+        valueStack.Push(phiVarRef);
+    }
 
     public static void evaluateNode(ASTNode node)
     {
@@ -558,6 +707,12 @@ public static class IRGen
                 break;
             case ASTNode.NodeType.IfStatement:
                 generateIfStatment((IfStatement)node);
+                break;
+            case ASTNode.NodeType.ForLoop:
+                generateForLoop((ForLoop)node);
+                break;
+            case ASTNode.NodeType.PhiVariable:
+                generatePhiVar((PhiVariable)node);
                 break;
 
         }

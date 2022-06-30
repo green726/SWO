@@ -13,9 +13,10 @@ public class BinaryExpression : ASTNode
         Multiply,
         Divide,
         Equals,
+        LessThan,
     }
 
-    public BinaryExpression(Util.Token token, ASTNode? previousNode, Util.Token nextToken, ASTNode? parent) : base(token)
+    public BinaryExpression(Util.Token token, ASTNode? previousNode, ASTNode? parent) : base(token)
 
     {
         //TODO: implement operator precedence parsing
@@ -36,6 +37,9 @@ public class BinaryExpression : ASTNode
                 break;
             case "==":
                 this.operatorType = OperatorType.Equals;
+                break;
+            case "<":
+                this.operatorType = OperatorType.LessThan;
                 break;
             default:
                 throw new ParserException("op " + token.value + " is not a valid binary operator", token);

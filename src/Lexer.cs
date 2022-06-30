@@ -4,7 +4,7 @@ using System.Text;
 public static class Lexer
 {
     private static List<Util.Token> tokenList;
-    private static string[] binOps = { "+", "-", "*", "/", "==" };
+    private static string[] binOps = { "+", "-", "*", "/", "==", "<" };
     private static string[] assignmentOps = { "=", "+=", "-=", "*=", "/=" };
 
     public static List<Util.Token> lex(string input)
@@ -23,7 +23,7 @@ public static class Lexer
             bool isFinalChar = input.IndexOf(ch) == input.Length - 1;
             if (ch == ' ' || isFinalChar || ch == '\n' || ch == ')' || ch == '}'/*  || lastChar == '\n' */)
             {
-                if (lastChar != ' ' && lastChar != null)
+                if (lastChar != ' ')
                 {
                     char firstChar = ' ';
                     try
@@ -100,9 +100,8 @@ public static class Lexer
                     continue;
             }
 
-            if (ch != ' ' && ch.ToString() != null && (int)ch != 13)
+            if (ch != ' ' && (int)ch != 13)
             {
-                // Console.WriteLine($"Appending char: {ch} with code: {(int)ch} and char num of {charNum}");
                 stringBuilder.Append(ch.ToString());
             }
             lastChar = ch;

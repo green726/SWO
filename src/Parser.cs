@@ -13,7 +13,7 @@ public static class Parser
 
     public static Util.TokenType[] binaryExpectedTokens = { Util.TokenType.Number };
     public static Util.TokenType[] delimiterExpectedTokens = { Util.TokenType.Keyword };
-    public static ASTNode.NodeType[] binaryExpectedNodes = { ASTNode.NodeType.NumberExpression, ASTNode.NodeType.BinaryExpression, ASTNode.NodeType.VariableExpression };
+    public static ASTNode.NodeType[] binaryExpectedNodes = { ASTNode.NodeType.NumberExpression, ASTNode.NodeType.BinaryExpression, ASTNode.NodeType.VariableExpression, ASTNode.NodeType.PhiVariable };
 
     public static int prevLine = 0;
     public static int prevColumn = 0;
@@ -144,7 +144,12 @@ public static class Parser
 
     public static string printForLoop(ForLoop forLoop)
     {
-        return $"For loop with iteration object of {forLoop.iterationObject} and index obj of {printVarAss(forLoop.index)} complexity of {forLoop.complex} and body of ( {printASTRet(forLoop.body)} ) body end";
+        return $"For loop with iteration object of {forLoop.iterationObject} and index obj of {printPhiVar(forLoop.index)} complexity of {forLoop.complex} and body of ( {printASTRet(forLoop.body)} ) body end";
+    }
+
+    public static string printPhiVar(PhiVariable phiVar)
+    {
+        return $"phi variable with type of {phiVar.type.value} and name of {phiVar.name} and value of {phiVar.value}";
     }
 
     public static string printASTRet(List<ASTNode> nodesPrint)
@@ -450,7 +455,7 @@ public static class Parser
         }
         else if (token.type == Util.TokenType.EOL)
         {
-            if (parent?.nodeType != ASTNode.NodeType.Function && parent?.nodeType != ASTNode.NodeType.IfStatement && parent?.nodeType != ASTNode.NodeType.ElseStatement)
+            if (parent?.nodeType != ASTNode.NodeType.Function && parent?.nodeType != ASTNode.NodeType.IfStatement && parent?.nodeType != ASTNode.NodeType.ElseStatement && parent?.nodeType != ASTNode.NodeType.ForLoop && tokenList[tokenIndex - 1].value != "{")
             {
                 return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, null, delimLevel: delimLevel);
             }
@@ -475,7 +480,7 @@ public static class Parser
                 break;
 
             case Util.TokenType.Operator:
-                BinaryExpression binExpr = new BinaryExpression(token, previousNode, tokenList[tokenIndex + 1], parent);
+                BinaryExpression binExpr = new BinaryExpression(token, previousNode, parent);
                 return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, binExpr, binaryExpectedTokens, delimLevel: delimLevel);
 
             case Util.TokenType.Keyword:
