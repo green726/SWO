@@ -49,8 +49,8 @@ public abstract class ASTNode
         if (parent != null)
         {
             Parser.nodes.Remove(this);
+            this.parent = parent;
         }
-        this.parent = parent;
 
     }
 

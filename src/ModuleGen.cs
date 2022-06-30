@@ -21,34 +21,36 @@ public static class ModuleGen
         //     return;
         // }
         //
-        // // Create a function pass manager for this engine
-        // LLVMPassManagerRef passManager = LLVM.CreateFunctionPassManagerForModule(module);
+        // Create a function pass manager for this engine
+        LLVMPassManagerRef passManager = LLVM.CreatePassManager();
         //
         // // Set up the optimizer pipeline.  Start with registering info about how the
         // // target lays out data structures.
-        // // LLVM.DisposeTargetData(LLVM.GetExecutionEngineTargetData(engine));
-        //
-        // // Provide basic AliasAnalysis support for GVN.
-        // LLVM.AddBasicAliasAnalysisPass(passManager);
-        //
-        // // Promote allocas to registers.
-        // LLVM.AddPromoteMemoryToRegisterPass(passManager);
-        //
-        // // Do simple "peephole" optimizations and bit-twiddling optzns.
-        // LLVM.AddInstructionCombiningPass(passManager);
-        //
-        // // Reassociate expressions.
-        // LLVM.AddReassociatePass(passManager);
-        //
-        // // Eliminate Common SubExpressions.
-        // LLVM.AddGVNPass(passManager);
-        //
-        // // Simplify the control flow graph (deleting unreachable blocks, etc).
-        // LLVM.AddCFGSimplificationPass(passManager);
-        //
+        // LLVM.DisposeTargetData(LLVM.GetExecutionEngineTargetData(engine));
+
+        // Provide basic AliasAnalysis support for GVN.
+        LLVM.AddBasicAliasAnalysisPass(passManager);
+
+
+        // Promote allocas to registers.
+        LLVM.AddPromoteMemoryToRegisterPass(passManager);
+
+
+        // Do simple "peephole" optimizations and bit-twiddling optzns.
+        LLVM.AddInstructionCombiningPass(passManager);
+
+        // Reassociate expressions.
+        LLVM.AddReassociatePass(passManager);
+
+        // Eliminate Common SubExpressions.
+        LLVM.AddGVNPass(passManager);
+        
+        // Simplify the control flow graph (deleting unreachable blocks, etc).
+        LLVM.AddCFGSimplificationPass(passManager);
+        
         // LLVM.InitializeFunctionPassManager(passManager);
 
-        IRGen.generateIR(nodes, builder, module);
+        IRGen.generateIR(nodes, builder, module, passManager);
 
 
     }

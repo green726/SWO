@@ -446,8 +446,8 @@ public static class Parser
         prevLine = token.line;
         prevColumn = token.column;
 
-        // Console.WriteLine($"token of value: {token.value} and parent of {parent?.nodeType}");
-        ASTNode? previousNode = nodes.Count > 0 ? nodes.Last() : null;
+        Console.WriteLine($"token of value: {token.value} and parent of {parent?.nodeType}");
+        ASTNode? previousNode = nodes.Count > 0 && tokenIndex > 0 ? nodes.Last() : null;
 
         if (token.type == Util.TokenType.EOF)
         {
@@ -455,7 +455,7 @@ public static class Parser
         }
         else if (token.type == Util.TokenType.EOL)
         {
-            if (parent?.nodeType != ASTNode.NodeType.Function && parent?.nodeType != ASTNode.NodeType.IfStatement && parent?.nodeType != ASTNode.NodeType.ElseStatement && parent?.nodeType != ASTNode.NodeType.ForLoop && tokenList[tokenIndex - 1].value != "{")
+            if (parent?.nodeType != ASTNode.NodeType.Function && parent?.nodeType != ASTNode.NodeType.IfStatement && parent?.nodeType != ASTNode.NodeType.ElseStatement && parent?.nodeType != ASTNode.NodeType.ForLoop /* && tokenList[tokenIndex - 1].value != "{" */)
             {
                 return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, null, delimLevel: delimLevel);
             }

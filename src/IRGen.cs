@@ -15,11 +15,19 @@ public static class IRGen
 
     public static LLVMBuilderRef builder;
 
+    public static LLVMPassManagerRef passManager;
+
     public static readonly Stack<LLVMValueRef> valueStack = new Stack<LLVMValueRef>();
 
     public static Dictionary<string, LLVMValueRef> namedValuesLLVM = new Dictionary<string, LLVMValueRef>();
 
     public static Dictionary<string, VariableAssignment> namedGlobalsAST = new Dictionary<string, VariableAssignment>();
+
+    public static LLVMBasicBlockRef mainEntryBlock;
+    public static bool mainBuilt = false;
+    public static List<ASTNode> nodesToBuild = new List<ASTNode>();
+
+    public static Dictionary<string, LLVMValueRef> namedMutablesLLVM = new Dictionary<string, LLVMValueRef>();
 
     public static void generateNumberExpression(NumberExpression numberExpression)
     {
@@ -79,11 +87,20 @@ public static class IRGen
         LLVMValueRef varRef = LLVM.GetNamedGlobal(module, varExpr.varName);
         if (varRef.Pointer == IntPtr.Zero)
         {
-            varRef = namedValuesLLVM[varExpr.varName];
-            if (varRef.Pointer != IntPtr.Zero)
+            if (namedMutablesLLVM.ContainsKey(varExpr.varName))
             {
-                valueStack.Push(varRef);
+                //code to load a stack mut
+                valueStack.Push(LLVM.BuildLoad(builder, namedMutablesLLVM[varExpr.varName], varExpr.varName));
                 return;
+            }
+            else
+            {
+                varRef = namedValuesLLVM[varExpr.varName];
+                if (varRef.Pointer != IntPtr.Zero)
+                {
+                    valueStack.Push(varRef);
+                    return;
+                }
             }
         }
         LLVMValueRef load = LLVM.BuildLoad(builder, varRef, varExpr.varName);
@@ -156,37 +173,63 @@ public static class IRGen
 
     }
 
-    public static void generateVariableAssignment(VariableAssignment varAss)
+    public static (LLVMValueRef, LLVMTypeRef) generateVariableValue(VariableAssignment varAss)
     {
-        namedGlobalsAST.Add(varAss.name, varAss);
-        bool isString = false;
         LLVMTypeRef typeLLVM = LLVMTypeRef.DoubleType();
-        LLVMValueRef constRef = LLVM.ConstReal(LLVMTypeRef.DoubleType(), 0.0);
-
+        LLVMValueRef valRef = LLVM.ConstReal(LLVMTypeRef.DoubleType(), 0.0);
         switch (varAss.type.value)
         {
             case "double":
                 typeLLVM = LLVMTypeRef.DoubleType();
-                constRef = LLVM.ConstReal(LLVMTypeRef.DoubleType(), Double.Parse(varAss.strValue));
+                valRef = LLVM.ConstReal(LLVMTypeRef.DoubleType(), Double.Parse(varAss.strValue));
                 break;
             case "int":
                 typeLLVM = LLVMTypeRef.Int64Type();
-                constRef = LLVM.ConstInt(LLVMTypeRef.Int64Type(), (ulong)int.Parse(varAss.strValue), true);
+                valRef = LLVM.ConstInt(LLVMTypeRef.Int64Type(), (ulong)int.Parse(varAss.strValue), true);
                 break;
-            case "string":
-                isString = true;
-                break;
-
         }
-        if (isString)
+        return (valRef, typeLLVM);
+    }
+
+    public static void generateVariableAssignment(VariableAssignment varAss)
+    {
+
+        if (varAss.type.value == "string")
         {
             buildGlobalString(varAss);
             return;
         }
 
-        LLVMValueRef varRef = LLVM.AddGlobal(module, typeLLVM, varAss.name);
-        LLVM.SetInitializer(varRef, constRef);
-        valueStack.Push(varRef);
+        (LLVMValueRef valRef, LLVMTypeRef typeLLVM) = generateVariableValue(varAss);
+
+        if (!varAss.mutable)
+        {
+            LLVMValueRef constRef = LLVM.AddGlobal(module, typeLLVM, varAss.name);
+            LLVM.SetInitializer(constRef, valRef);
+            valueStack.Push(constRef);
+        }
+        else
+        {
+            if (!mainBuilt)
+            {
+                // Console.WriteLine("")
+                nodesToBuild.Add(varAss);
+                return;
+            }
+            LLVM.PositionBuilderAtEnd(builder, mainEntryBlock);
+            Console.WriteLine($"building for mutable var with name of {varAss.name} and type of");
+            LLVM.DumpType(typeLLVM);
+            Console.WriteLine();
+            LLVMValueRef allocaRef = LLVM.BuildAlloca(builder, typeLLVM, varAss.name);
+            valueStack.Push(allocaRef);
+            Console.WriteLine("built and pushed alloca");
+            LLVMValueRef storeRef = LLVM.BuildStore(builder, valRef, allocaRef);
+            valueStack.Push(storeRef);
+
+            namedMutablesLLVM.Add(varAss.name, allocaRef);
+        }
+
+        namedGlobalsAST.Add(varAss.name, varAss);
     }
 
     public static void generateIfStatment(IfStatement ifStat)
@@ -543,11 +586,24 @@ public static class IRGen
         generatePrototype(funcNode.prototype);
 
         LLVMValueRef function = valueStack.Pop();
+        LLVMBasicBlockRef entryBlock = LLVM.AppendBasicBlock(function, "entry");
 
-        LLVM.PositionBuilderAtEnd(builder, LLVM.AppendBasicBlock(function, "entry"));
+        LLVM.PositionBuilderAtEnd(builder, entryBlock);
 
         // try
         // {
+
+        if (funcNode.prototype.name == "main")
+        {
+            Console.WriteLine("main func identified");
+            mainEntryBlock = entryBlock;
+            mainBuilt = true;
+            foreach (ASTNode node in nodesToBuild)
+            {
+                evaluateNode(node);
+            }
+        }
+
         for (var i = 0; i < funcNode.body.Count(); i++)
         {
             evaluateNode(funcNode.body[i]);
@@ -562,6 +618,8 @@ public static class IRGen
         LLVM.BuildRet(builder, valueStack.Pop());
 
         LLVM.VerifyFunction(function, LLVMVerifierFailureAction.LLVMPrintMessageAction);
+
+
 
         valueStack.Push(function);
     }
@@ -718,10 +776,11 @@ public static class IRGen
         }
     }
 
-    public static void generateIR(List<ASTNode> nodes, LLVMBuilderRef _builder, LLVMModuleRef _module)
+    public static void generateIR(List<ASTNode> nodes, LLVMBuilderRef _builder, LLVMModuleRef _module, LLVMPassManagerRef _passManager)
     {
         builder = _builder;
         module = _module;
+        passManager = _passManager;
 
 
         foreach (ASTNode node in nodes)
@@ -736,6 +795,8 @@ public static class IRGen
             // Console.WriteLine("stack dump");
             // LLVM.DumpValue(valueStack.Peek());
         }
+
+        LLVM.RunPassManager(passManager, module);
 
         Console.WriteLine("LLVM module dump below");
         LLVM.DumpModule(module);

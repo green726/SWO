@@ -6,6 +6,7 @@ public class VariableExpression : ASTNode
     {
         varName = token.value;
         bool exists = false;
+        this.parent = parent;
 
         //NOTE: below is commented out b/c i think that LLVm IR will do it for me
         // foreach (VariableAssignment varAss in Parser.globalVarAss)

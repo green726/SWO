@@ -72,7 +72,7 @@ public class BinaryExpression : ASTNode
                 this.leftHand = previousNode;
             }
         }
-        if (this.leftHand.nodeType == ASTNode.NodeType.NumberExpression && this.leftHand.nodeType == NodeType.VariableExpression)
+        if (this.leftHand.nodeType == ASTNode.NodeType.NumberExpression || this.leftHand.nodeType == NodeType.VariableExpression)
         {
             this.leftHand.addParent(this);
         }
