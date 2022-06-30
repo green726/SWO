@@ -10,5 +10,5 @@ public class GenException : Exception
     {
     }
 
-    public override string? StackTrace => "";
+    // public override string? StackTrace => "";
 }

@@ -66,10 +66,15 @@ public class BinaryExpression : ASTNode
                 this.leftHand = ifStat.children.Last();
                 ifStat.children.RemoveAt(ifStat.children.Count - 1);
             }
+            else if (this.parent.nodeType == NodeType.VariableAssignment)
+            {
+                VariableAssignment varAss = (VariableAssignment)parent;
+                varAss.addChild(this);
+                return;
+            }
             else
             {
                 Parser.checkNode(previousNode, Parser.binaryExpectedNodes);
-                this.leftHand = previousNode;
             }
         }
         if (this.leftHand.nodeType == ASTNode.NodeType.NumberExpression || this.leftHand.nodeType == NodeType.VariableExpression)

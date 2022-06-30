@@ -2,5 +2,8 @@ var double ee = 1
 
 
 @main () {
-print!(ee + 1)
+ee = ee + 1
+
+
+print!(ee)
 }

@@ -35,11 +35,13 @@ public class FunctionAST : ASTNode
 
     public override void removeChild(ASTNode child)
     {
+        base.removeChild(child);
         this.body.Remove(child);
     }
 
     public override void addChild(ASTNode child)
     {
+        base.addChild(child);
         this.body.Add(child);
     }
 

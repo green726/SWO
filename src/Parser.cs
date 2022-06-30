@@ -124,7 +124,14 @@ public static class Parser
 
     public static string printVarAss(VariableAssignment varAss)
     {
-        return $"{varAss.nodeType} with type of {varAss?.type.value} and assignmentop of {varAss?.assignmentOp} and name of {varAss?.name} and mutability of {varAss.mutable} and value of {varAss.strValue}";
+        if (!varAss.reassignment)
+        {
+            return $"{varAss.nodeType} with type of {varAss?.type.value} and assignmentop of {varAss?.assignmentOp} and name of {varAss?.name} and mutability of {varAss.mutable} and value of {varAss.strValue}";
+        }
+        else
+        {
+            return $"{varAss.nodeType} with name of {varAss.name} and children of [{printASTRet(varAss.children)}]";
+        }
     }
 
     public static string printProto(PrototypeAST proto)
@@ -495,7 +502,10 @@ public static class Parser
                 }
                 else
                 {
-                    throw new ParserException($"illegal assignment op", token);
+                    VariableAssignment varAss = new VariableAssignment(token, true, parent);
+                    return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, varAss, delimLevel: delimLevel);
+                    // VariableReAssignment varReAss = new VariableReAssignment(token);
+                    // return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, varReAss, delimLevel: delimLevel);
                 }
                 break;
             case Util.TokenType.String:

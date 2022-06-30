@@ -14,6 +14,6 @@ public class ParserException : Exception
     {
     }
 
-    public override string? StackTrace => "";
+    // public override string? StackTrace => "";
 
 }
