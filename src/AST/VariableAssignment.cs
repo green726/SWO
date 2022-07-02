@@ -8,7 +8,9 @@ public class VariableAssignment : ASTNode
     private int childLoop = 0;
 
     public bool reassignment = false;
+    public bool binReassignment = false;
     public BinaryExpression? bin = null;
+    public ASTNode targetValue = null;
 
     public VariableAssignment(Util.Token token, bool mutable, ASTNode? parent = null) : base(token)
     {
@@ -121,10 +123,17 @@ public class VariableAssignment : ASTNode
                     {
                         BinaryExpression binExpr = (BinaryExpression)node;
                         binExpr.leftHand = this.children.Last();
+                        this.binReassignment = true;
                         this.bin = binExpr;
+                    }
+                    else
+                    {
+                        this.binReassignment = false;
+                        this.targetValue = this.children.Last();
                     }
                     break;
             }
+            this.targetValue = node;
             this.children.Add(node);
             childLoop++;
         }

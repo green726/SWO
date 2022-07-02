@@ -246,11 +246,20 @@ public static class IRGen
 
             // LLVMValueRef loadRef = LLVM.BuildLoad(builder, namedMutablesLLVM[binVarName], binVarName);
             // valueStack.Push(loadRef);
-
-            generateBinaryExpression(varAss.bin);
-            LLVMValueRef binValRef = valueStack.Pop();
-            LLVMValueRef storeRef = LLVM.BuildStore(builder, binValRef, namedMutablesLLVM[varAss.name]);
-            valueStack.Push(storeRef);
+            if (varAss.binReassignment)
+            {
+                generateBinaryExpression(varAss.bin);
+                LLVMValueRef binValRef = valueStack.Pop();
+                LLVMValueRef storeRef = LLVM.BuildStore(builder, binValRef, namedMutablesLLVM[varAss.name]);
+                valueStack.Push(storeRef);
+            }
+            else
+            {
+                evaluateNode(varAss.targetValue);
+                LLVMValueRef targetValRef = valueStack.Pop();
+                LLVMValueRef storeRef = LLVM.BuildStore(builder, targetValRef, namedMutablesLLVM[varAss.name]);
+                valueStack.Push(storeRef);
+            }
         }
     }
 

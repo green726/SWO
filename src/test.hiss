@@ -6,8 +6,8 @@ var double twiceAgo = 0
     for (i in 20) {
         current = prev + twiceAgo
         print!(current)
-        twiceAgo = prev + 0 
-        prev = current + 0
+        twiceAgo = prev
+        prev = current
     }
 }
 
