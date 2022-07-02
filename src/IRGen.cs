@@ -193,43 +193,77 @@ public static class IRGen
 
     public static void generateVariableAssignment(VariableAssignment varAss)
     {
-
-        if (varAss.type.value == "string")
+        if (!varAss.reassignment)
         {
-            buildGlobalString(varAss);
-            return;
-        }
+            if (varAss.type.value == "string")
+            {
+                buildGlobalString(varAss);
+                return;
+            }
 
-        (LLVMValueRef valRef, LLVMTypeRef typeLLVM) = generateVariableValue(varAss);
+            (LLVMValueRef valRef, LLVMTypeRef typeLLVM) = generateVariableValue(varAss);
 
-        if (!varAss.mutable)
-        {
-            LLVMValueRef constRef = LLVM.AddGlobal(module, typeLLVM, varAss.name);
-            LLVM.SetInitializer(constRef, valRef);
-            valueStack.Push(constRef);
+            if (!varAss.mutable)
+            {
+                LLVMValueRef constRef = LLVM.AddGlobal(module, typeLLVM, varAss.name);
+                LLVM.SetInitializer(constRef, valRef);
+                valueStack.Push(constRef);
+            }
+            else
+            {
+                if (!mainBuilt)
+                {
+                    // Console.WriteLine("")
+                    nodesToBuild.Add(varAss);
+                    return;
+                }
+                LLVM.PositionBuilderAtEnd(builder, mainEntryBlock);
+                Console.WriteLine($"building for mutable var with name of {varAss.name} and type of");
+                LLVM.DumpType(typeLLVM);
+                Console.WriteLine();
+                LLVMValueRef allocaRef = LLVM.BuildAlloca(builder, typeLLVM, varAss.name);
+                valueStack.Push(allocaRef);
+                Console.WriteLine("built and pushed alloca");
+                LLVMValueRef storeRef = LLVM.BuildStore(builder, valRef, allocaRef);
+                valueStack.Push(storeRef);
+
+                namedMutablesLLVM.Add(varAss.name, allocaRef);
+            }
+
+            namedGlobalsAST.Add(varAss.name, varAss);
         }
         else
         {
-            if (!mainBuilt)
+            VariableAssignment originalVarAss = namedGlobalsAST[varAss.name];
+
+            if (originalVarAss.type.value == "string")
             {
-                // Console.WriteLine("")
-                nodesToBuild.Add(varAss);
-                return;
+                throw new GenException("mutable strings not yet supported", varAss);
             }
-            LLVM.PositionBuilderAtEnd(builder, mainEntryBlock);
-            Console.WriteLine($"building for mutable var with name of {varAss.name} and type of");
-            LLVM.DumpType(typeLLVM);
-            Console.WriteLine();
-            LLVMValueRef allocaRef = LLVM.BuildAlloca(builder, typeLLVM, varAss.name);
-            valueStack.Push(allocaRef);
-            Console.WriteLine("built and pushed alloca");
-            LLVMValueRef storeRef = LLVM.BuildStore(builder, valRef, allocaRef);
+
+            (LLVMValueRef valRef, LLVMTypeRef typeLLVM) = generateVariableValue(originalVarAss);
+
+
+            VariableExpression binVarExpr;
+            string binVarName;
+            if (varAss.bin.leftHand.nodeType == ASTNode.NodeType.VariableExpression)
+            {
+                binVarExpr = (VariableExpression)varAss.bin.leftHand;
+                binVarName = binVarExpr.varName;
+            }
+            else
+            {
+                binVarExpr = (VariableExpression)varAss.bin.rightHand;
+                binVarName = binVarExpr.varName;
+            }
+            // LLVMValueRef loadRef = LLVM.BuildLoad(builder, namedMutablesLLVM[binVarName], binVarName);
+            // valueStack.Push(loadRef);
+
+            generateBinaryExpression(varAss.bin);
+            LLVMValueRef binValRef = valueStack.Pop();
+            LLVMValueRef storeRef = LLVM.BuildStore(builder, binValRef, namedMutablesLLVM[binVarName]);
             valueStack.Push(storeRef);
-
-            namedMutablesLLVM.Add(varAss.name, allocaRef);
         }
-
-        namedGlobalsAST.Add(varAss.name, varAss);
     }
 
     public static void generateIfStatment(IfStatement ifStat)
@@ -448,7 +482,7 @@ public static class IRGen
 
                 builtIn.addChildAtStart(printFormat);
 
-                FunctionCall printNLCall = new FunctionCall(new Util.Token(Util.TokenType.Keyword, "print!", builtIn.line, builtIn.column), new List<ASTNode>() { new VariableExpression(new Util.Token(Util.TokenType.Keyword, "nl", builtIn.line, builtIn.column), parentRequired: false) }, true, builtIn.parent);
+                FunctionCall printNLCall = new FunctionCall(new Util.Token(Util.TokenType.Keyword, "print!", builtIn.line, builtIn.column), new List<ASTNode>() { new VariableExpression(new Util.Token(Util.TokenType.Keyword, "nl", builtIn.line, builtIn.column), parentRequired: false) }, true, builtIn.parent, false);
                 break;
         }
 

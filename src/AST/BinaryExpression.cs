@@ -19,6 +19,8 @@ public class BinaryExpression : ASTNode
     public BinaryExpression(Util.Token token, ASTNode? previousNode, ASTNode? parent) : base(token)
 
     {
+        this.newLineReset = true;
+
         //TODO: implement operator precedence parsing
         this.nodeType = NodeType.BinaryExpression;
         switch (token.value)
@@ -107,9 +109,14 @@ public class BinaryExpression : ASTNode
         if (child.nodeType == ASTNode.NodeType.BinaryExpression)
         {
         }
-        else
+        else if (rightHand == null)
         {
             this.rightHand = child;
+        }
+        else if (rightHand != null)
+        {
+            this.parent.addChild(child);
+            child.addParent(this.parent);
         }
     }
 }

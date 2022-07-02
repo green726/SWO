@@ -3,7 +3,5 @@ var double ee = 1
 
 @main () {
 ee = ee + 1
-
-
 print!(ee)
 }

@@ -44,10 +44,10 @@ public static class ModuleGen
 
         // Eliminate Common SubExpressions.
         LLVM.AddGVNPass(passManager);
-        
+
         // Simplify the control flow graph (deleting unreachable blocks, etc).
         LLVM.AddCFGSimplificationPass(passManager);
-        
+
         // LLVM.InitializeFunctionPassManager(passManager);
 
         IRGen.generateIR(nodes, builder, module, passManager);

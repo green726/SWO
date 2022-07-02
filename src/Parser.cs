@@ -340,7 +340,7 @@ public static class Parser
         else if (token.value.EndsWith("!"))
         {
             //treat it as a builtin call
-            FunctionCall builtinCall = new FunctionCall(token, null, true, parent);
+            FunctionCall builtinCall = new FunctionCall(token, null, true, parent, false);
             return new List<dynamic>() { builtinCall, delimLevel };
         }
         else if (nextToken.type == Util.TokenType.ParenDelimiterOpen)
@@ -462,11 +462,22 @@ public static class Parser
         }
         else if (token.type == Util.TokenType.EOL)
         {
-            if (parent?.nodeType != ASTNode.NodeType.Function && parent?.nodeType != ASTNode.NodeType.IfStatement && parent?.nodeType != ASTNode.NodeType.ElseStatement && parent?.nodeType != ASTNode.NodeType.ForLoop /* && tokenList[tokenIndex - 1].value != "{" */)
+            if (delimLevel > 0)
+            {
+                while (parent.newLineReset == true)
+                {
+                    parent = parent.parent;
+                }
+            }
+
+            else if (parent?.nodeType != ASTNode.NodeType.Function && parent?.nodeType != ASTNode.NodeType.IfStatement && parent?.nodeType != ASTNode.NodeType.ElseStatement && parent?.nodeType != ASTNode.NodeType.ForLoop /* && tokenList[tokenIndex - 1].value != "{" */ && delimLevel == 0)
             {
                 return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, null, delimLevel: delimLevel);
             }
-            return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, parent, delimLevel: delimLevel);
+            else
+            {
+                return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, parent, delimLevel: delimLevel);
+            }
         }
 
         if (expectedTypes != null)

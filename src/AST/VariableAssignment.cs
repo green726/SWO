@@ -12,9 +12,10 @@ public class VariableAssignment : ASTNode
 
     public VariableAssignment(Util.Token token, bool mutable, ASTNode? parent = null) : base(token)
     {
+        this.newLineReset = true;
+
         this.mutable = mutable;
         this.nodeType = NodeType.VariableAssignment;
-        Parser.nodes.Add(this);
         Parser.globalVarAss.Add(this);
 
         if (token.value != "const" && token.value != "var")
@@ -22,6 +23,7 @@ public class VariableAssignment : ASTNode
             reassignment = true;
             if (parent != null)
             {
+
                 ASTNode prevNode = parent.children.Last();
                 if (prevNode.nodeType == NodeType.VariableExpression)
                 {
@@ -30,18 +32,26 @@ public class VariableAssignment : ASTNode
                     prevVarExpr.addParent(this);
                     this.children.Add(prevVarExpr);
                 }
+                this.parent = parent;
+                this.parent.addChild(this);
             }
             else
             {
-                ASTNode prevNode = Parser.nodes.Last();
-                if (prevNode.nodeType == ASTNode.NodeType.VariableExpression)
-                {
-                    VariableExpression prevVarExpr = (VariableExpression)prevNode;
-                    this.name = prevVarExpr.varName;
-                    prevVarExpr.addParent(this);
-                    this.children.Add(prevVarExpr);
-                }
+                throw new ParserException("illegal top level variable reassignment", token);
+                // ASTNode prevNode = Parser.nodes.Last();
+                // if (prevNode.nodeType == ASTNode.NodeType.VariableExpression)
+                // {
+                //     VariableExpression prevVarExpr = (VariableExpression)prevNode;
+                //     this.name = prevVarExpr.varName;
+                //     prevVarExpr.addParent(this);
+                //     this.children.Add(prevVarExpr);
+                // }
             }
+        }
+        else
+        {
+
+            Parser.nodes.Add(this);
         }
     }
 

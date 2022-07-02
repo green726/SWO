@@ -10,6 +10,8 @@ public abstract class ASTNode
 
     public NodeType nodeType;
 
+    public bool newLineReset = false;
+
     protected ASTNode(Util.Token token)
     {
         this.line = token.line;
