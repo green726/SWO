@@ -38,6 +38,7 @@ public class ForLoop : ASTNode
         if (isBody)
         {
             throw new ParserException($"illegal token usage ({child.value}) in for loop body", child);
+            // return;
         }
         else
         {
@@ -81,6 +82,7 @@ public class ForLoop : ASTNode
                         }
                         else
                         {
+                            // return;
                             throw new ParserException($"illegal token ({child.value}) in for loop", child);
                         }
                     }
@@ -162,6 +164,12 @@ public class ForLoop : ASTNode
         //     throw new ParserException($"illegal addition of ASTNode child of type ({child.nodeType}) to for loop", child);
         // }
 
+    }
+
+    public override void removeChild(ASTNode child)
+    {
+        base.removeChild(child);
+        body.Remove(child);
     }
 }
 

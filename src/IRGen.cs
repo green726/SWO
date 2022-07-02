@@ -244,24 +244,12 @@ public static class IRGen
             (LLVMValueRef valRef, LLVMTypeRef typeLLVM) = generateVariableValue(originalVarAss);
 
 
-            VariableExpression binVarExpr;
-            string binVarName;
-            if (varAss.bin.leftHand.nodeType == ASTNode.NodeType.VariableExpression)
-            {
-                binVarExpr = (VariableExpression)varAss.bin.leftHand;
-                binVarName = binVarExpr.varName;
-            }
-            else
-            {
-                binVarExpr = (VariableExpression)varAss.bin.rightHand;
-                binVarName = binVarExpr.varName;
-            }
             // LLVMValueRef loadRef = LLVM.BuildLoad(builder, namedMutablesLLVM[binVarName], binVarName);
             // valueStack.Push(loadRef);
 
             generateBinaryExpression(varAss.bin);
             LLVMValueRef binValRef = valueStack.Pop();
-            LLVMValueRef storeRef = LLVM.BuildStore(builder, binValRef, namedMutablesLLVM[binVarName]);
+            LLVMValueRef storeRef = LLVM.BuildStore(builder, binValRef, namedMutablesLLVM[varAss.name]);
             valueStack.Push(storeRef);
         }
     }
@@ -344,6 +332,8 @@ public static class IRGen
         switch (binaryExpression.leftHand.nodeType)
         {
             case ASTNode.NodeType.VariableExpression:
+                VariableExpression leftHandVarExpr = (VariableExpression)binaryExpression.leftHand;
+                Console.WriteLine("generating bin expr with lhs of var expr that has name of " + leftHandVarExpr.varName);
                 evaluateNode(binaryExpression.leftHand);
                 leftHand = valueStack.Pop();
                 break;
@@ -357,6 +347,7 @@ public static class IRGen
                 leftHand = valueStack.Pop();
                 break;
             case ASTNode.NodeType.PhiVariable:
+
                 generateVariableExpression((PhiVariable)binaryExpression.leftHand);
                 leftHand = valueStack.Pop();
                 break;
@@ -365,6 +356,8 @@ public static class IRGen
         switch (binaryExpression.rightHand.nodeType)
         {
             case ASTNode.NodeType.VariableExpression:
+                VariableExpression rightHandVarExpr = (VariableExpression)binaryExpression.rightHand;
+                Console.WriteLine("generating bin expr with rhs of var expr that has name of " + rightHandVarExpr.varName);
                 evaluateNode(binaryExpression.rightHand);
                 rightHand = valueStack.Pop();
                 break;
@@ -830,7 +823,7 @@ public static class IRGen
             // LLVM.DumpValue(valueStack.Peek());
         }
 
-        LLVM.RunPassManager(passManager, module);
+        // LLVM.RunPassManager(passManager, module);
 
         Console.WriteLine("LLVM module dump below");
         LLVM.DumpModule(module);

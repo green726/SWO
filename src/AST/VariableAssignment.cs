@@ -94,6 +94,7 @@ public class VariableAssignment : ASTNode
 
     public override void addChild(ASTNode node)
     {
+        Console.WriteLine("adding child of node type " + node.nodeType + "to varass");
         if (!reassignment)
         {
             switch (node.nodeType)
@@ -121,10 +122,10 @@ public class VariableAssignment : ASTNode
                         BinaryExpression binExpr = (BinaryExpression)node;
                         binExpr.leftHand = this.children.Last();
                         this.bin = binExpr;
-                        this.children.Add(binExpr);
                     }
                     break;
             }
+            this.children.Add(node);
             childLoop++;
         }
     }

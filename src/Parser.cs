@@ -11,7 +11,7 @@ public static class Parser
 
     public static List<VariableAssignment> globalVarAss = new List<VariableAssignment>();
 
-    public static Util.TokenType[] binaryExpectedTokens = { Util.TokenType.Number };
+    public static Util.TokenType[] binaryExpectedTokens = { Util.TokenType.Number, Util.TokenType.Keyword };
     public static Util.TokenType[] delimiterExpectedTokens = { Util.TokenType.Keyword };
     public static ASTNode.NodeType[] binaryExpectedNodes = { ASTNode.NodeType.NumberExpression, ASTNode.NodeType.BinaryExpression, ASTNode.NodeType.VariableExpression, ASTNode.NodeType.PhiVariable };
 
@@ -296,16 +296,6 @@ public static class Parser
         Util.Token nextToken = tokenList[tokenIndex + 1];
         int nextTokenIndex = tokenIndex + 1;
 
-        switch (parent?.nodeType)
-        {
-            case ASTNode.NodeType.Prototype:
-                PrototypeAST proto = (PrototypeAST)parent;
-                proto.addItem(token);
-                return new List<dynamic>() { parent, delimLevel };
-            case ASTNode.NodeType.VariableAssignment:
-                parent.addChild(token);
-                return new List<dynamic>() { parent, delimLevel };
-        }
 
         if (token.value == "var")
         {
@@ -348,11 +338,33 @@ public static class Parser
             FunctionCall funcCall = new FunctionCall(token, null, false, parent);
             return new List<dynamic>() { funcCall, delimLevel };
         }
+
         else if (parent.nodeType == ASTNode.NodeType.ForLoop)
         {
-            parent.addChild(token);
-            return new List<dynamic>() { parent, delimLevel };
+            ForLoop forLoop = (ForLoop)parent;
+            if (!forLoop.isBody)
+            {
+                parent.addChild(token);
+                return new List<dynamic>() { parent, delimLevel };
+            }
         }
+
+        switch (parent?.nodeType)
+        {
+            case ASTNode.NodeType.Prototype:
+                PrototypeAST proto = (PrototypeAST)parent;
+                proto.addItem(token);
+                return new List<dynamic>() { parent, delimLevel };
+            case ASTNode.NodeType.VariableAssignment:
+                VariableAssignment varAss = (VariableAssignment)parent;
+                if (varAss.reassignment) {
+                    break;
+                }
+                    parent.addChild(token);
+                return new List<dynamic>() { parent, delimLevel };
+        }
+
+
 
         new VariableExpression(token, parent);
         return new List<dynamic>() { parent, delimLevel };

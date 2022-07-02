@@ -1,7 +1,12 @@
-var double ee = 1 
-
+var double prev = 0
+var double current = 0
+var double printObj = 0
 
 @main () {
-ee = ee + 1
-print!(ee)
+    for (i in 20) {
+        current = current + 1
+        printObj = current + prev
+        print!(printObj)
+        prev = current + 0
+    }
 }

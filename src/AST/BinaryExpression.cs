@@ -77,9 +77,10 @@ public class BinaryExpression : ASTNode
             else
             {
                 Parser.checkNode(previousNode, Parser.binaryExpectedNodes);
+                this.leftHand = previousNode;
             }
         }
-        if (this.leftHand.nodeType == ASTNode.NodeType.NumberExpression || this.leftHand.nodeType == NodeType.VariableExpression)
+        if (this?.leftHand?.nodeType == ASTNode.NodeType.NumberExpression || this?.leftHand?.nodeType == NodeType.VariableExpression)
         {
             this.leftHand.addParent(this);
         }
