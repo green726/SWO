@@ -357,10 +357,11 @@ public static class Parser
                 return new List<dynamic>() { parent, delimLevel };
             case ASTNode.NodeType.VariableAssignment:
                 VariableAssignment varAss = (VariableAssignment)parent;
-                if (varAss.reassignment) {
+                if (varAss.reassignment)
+                {
                     break;
                 }
-                    parent.addChild(token);
+                parent.addChild(token);
                 return new List<dynamic>() { parent, delimLevel };
         }
 

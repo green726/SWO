@@ -1,12 +1,18 @@
-var double prev = 0
+var double prev = 1
 var double current = 0
-var double printObj = 0
+var double twiceAgo = 0
 
 @main () {
     for (i in 20) {
-        current = current + 1
-        printObj = current + prev
-        print!(printObj)
+        current = prev + twiceAgo
+        print!(current)
+        twiceAgo = prev + 0 
         prev = current + 0
     }
 }
+
+
+
+
+
+
