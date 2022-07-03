@@ -1,14 +1,7 @@
-var double prev = 1
-var double current = 0
-var double twiceAgo = 0
+const double houses = 2
 
 @main () {
-    for (i in 20) {
-        current = prev + twiceAgo
-        print!(current)
-        twiceAgo = prev
-        prev = current
-    }
+print!(housas)
 }
 
 

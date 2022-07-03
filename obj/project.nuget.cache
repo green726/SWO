@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "/VwIiIse1MNwgZXhjjmMBVOuAnhUJ1CvnpTby1T33cWtu2mNFuD9upwlT5GLJtGKZztSNFgRAVFT8RJARjCjtg==",
+  "dgSpecHash": "9e39zEEeM3MSVVw7hd/+v9AQErJgBVQqjhsX+SXyb3FvZh1TT6gXUpS0uJC7Z6MGNbtxvVp0oPFKVUNfo5hulQ==",
   "success": true,
   "projectFilePath": "/home/green726/coding/HISS/HISS.csproj",
   "expectedPackageFiles": [
@@ -51,6 +51,7 @@
     "/home/green726/.nuget/packages/runtime.unix.system.net.sockets/4.3.0/runtime.unix.system.net.sockets.4.3.0.nupkg.sha512",
     "/home/green726/.nuget/packages/runtime.unix.system.private.uri/4.3.0/runtime.unix.system.private.uri.4.3.0.nupkg.sha512",
     "/home/green726/.nuget/packages/runtime.unix.system.runtime.extensions/4.3.0/runtime.unix.system.runtime.extensions.4.3.0.nupkg.sha512",
+    "/home/green726/.nuget/packages/symspell/6.7.2/symspell.6.7.2.nupkg.sha512",
     "/home/green726/.nuget/packages/system.appcontext/4.3.0/system.appcontext.4.3.0.nupkg.sha512",
     "/home/green726/.nuget/packages/system.buffers/4.3.0/system.buffers.4.3.0.nupkg.sha512",
     "/home/green726/.nuget/packages/system.collections/4.3.0/system.collections.4.3.0.nupkg.sha512",
@@ -110,9 +111,9 @@
     "/home/green726/.nuget/packages/system.threading.timer/4.3.0/system.threading.timer.4.3.0.nupkg.sha512",
     "/home/green726/.nuget/packages/system.xml.readerwriter/4.3.0/system.xml.readerwriter.4.3.0.nupkg.sha512",
     "/home/green726/.nuget/packages/system.xml.xdocument/4.3.0/system.xml.xdocument.4.3.0.nupkg.sha512",
-    "/home/green726/.nuget/packages/microsoft.netcore.app.runtime.linux-x64/6.0.2/microsoft.netcore.app.runtime.linux-x64.6.0.2.nupkg.sha512",
     "/home/green726/.nuget/packages/microsoft.aspnetcore.app.ref/6.0.2/microsoft.aspnetcore.app.ref.6.0.2.nupkg.sha512",
-    "/home/green726/.nuget/packages/microsoft.aspnetcore.app.runtime.linux-x64/6.0.2/microsoft.aspnetcore.app.runtime.linux-x64.6.0.2.nupkg.sha512"
+    "/home/green726/.nuget/packages/microsoft.aspnetcore.app.runtime.linux-x64/6.0.2/microsoft.aspnetcore.app.runtime.linux-x64.6.0.2.nupkg.sha512",
+    "/home/green726/.nuget/packages/microsoft.netcore.app.runtime.linux-x64/6.0.2/microsoft.netcore.app.runtime.linux-x64.6.0.2.nupkg.sha512"
   ],
   "logs": []
 }

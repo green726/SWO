@@ -267,6 +267,27 @@
           }
         }
       },
+      "SymSpell/6.7.2": {
+        "type": "package",
+        "compile": {
+          "lib/netcoreapp3.0/SymSpell.dll": {}
+        },
+        "runtime": {
+          "lib/netcoreapp3.0/SymSpell.dll": {}
+        },
+        "contentFiles": {
+          "contentFiles/any/netcoreapp3.0/frequency_bigramdictionary_en_243_342.txt": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/netcoreapp3.0/frequency_dictionary_en_82_765.txt": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          }
+        }
+      },
       "System.AppContext/4.3.0": {
         "type": "package",
         "dependencies": {
@@ -1717,6 +1738,27 @@
         },
         "runtime": {
           "runtimes/unix/lib/netstandard1.5/System.Runtime.Extensions.dll": {}
+        }
+      },
+      "SymSpell/6.7.2": {
+        "type": "package",
+        "compile": {
+          "lib/netcoreapp3.0/SymSpell.dll": {}
+        },
+        "runtime": {
+          "lib/netcoreapp3.0/SymSpell.dll": {}
+        },
+        "contentFiles": {
+          "contentFiles/any/netcoreapp3.0/frequency_bigramdictionary_en_243_342.txt": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/netcoreapp3.0/frequency_dictionary_en_82_765.txt": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          }
         }
       },
       "System.AppContext/4.3.0": {
@@ -3610,6 +3652,31 @@
         "runtime.unix.system.runtime.extensions.4.3.0.nupkg.sha512",
         "runtime.unix.system.runtime.extensions.nuspec",
         "runtimes/unix/lib/netstandard1.5/System.Runtime.Extensions.dll"
+      ]
+    },
+    "SymSpell/6.7.2": {
+      "sha512": "cUbU8kqnVZmoOGNMmFk6IyJzEN14HZNAZZMvmXo+h6wNFI9Boinl69hycTNdPKYSGcgJB68jfSa2S6R42BhczQ==",
+      "type": "package",
+      "path": "symspell/6.7.2",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "content/frequency_bigramdictionary_en_243_342.txt",
+        "content/frequency_dictionary_en_82_765.txt",
+        "contentFiles/any/net461/frequency_bigramdictionary_en_243_342.txt",
+        "contentFiles/any/net461/frequency_dictionary_en_82_765.txt",
+        "contentFiles/any/net47/frequency_bigramdictionary_en_243_342.txt",
+        "contentFiles/any/net47/frequency_dictionary_en_82_765.txt",
+        "contentFiles/any/netcoreapp3.0/frequency_bigramdictionary_en_243_342.txt",
+        "contentFiles/any/netcoreapp3.0/frequency_dictionary_en_82_765.txt",
+        "contentFiles/any/netstandard2.0/frequency_bigramdictionary_en_243_342.txt",
+        "contentFiles/any/netstandard2.0/frequency_dictionary_en_82_765.txt",
+        "lib/net461/SymSpell.dll",
+        "lib/net47/SymSpell.dll",
+        "lib/netcoreapp3.0/SymSpell.dll",
+        "lib/netstandard2.0/SymSpell.dll",
+        "symspell.6.7.2.nupkg.sha512",
+        "symspell.nuspec"
       ]
     },
     "System.AppContext/4.3.0": {
@@ -6802,6 +6869,7 @@
   },
   "projectFileDependencyGroups": {
     "net6.0": [
+      "SymSpell >= 6.7.2",
       "libLLVM >= 14.0.0",
       "llvmSharp >= 5.0.0"
     ]
@@ -6843,6 +6911,10 @@
       "net6.0": {
         "targetAlias": "net6.0",
         "dependencies": {
+          "SymSpell": {
+            "target": "Package",
+            "version": "[6.7.2, )"
+          },
           "libLLVM": {
             "target": "Package",
             "version": "[14.0.0, )"

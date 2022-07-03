@@ -38,6 +38,10 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "dependencies": {
+            "SymSpell": {
+              "target": "Package",
+              "version": "[6.7.2, )"
+            },
             "libLLVM": {
               "target": "Package",
               "version": "[14.0.0, )"

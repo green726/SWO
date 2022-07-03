@@ -12,10 +12,21 @@ public class GenException : Exception
 
     public GenException(string msg) : base(msg) { }
 
-    public static GenException FactoryMethod(string whatHappened, string recommendedFix, string codeExcerpt, ASTNode node)
+    public static GenException FactoryMethod(string whatHappened, string recommendedFix, ASTNode node, bool typoSuspected = false, string typoString = "")
     {
-        string codeBlock = getCodeBlock(node);
-        string input = $"{whatHappened} - ```\n{codeExcerpt}```, \n How You Can Fix This: \n {recommendedFix} \n Error Was Thrown At {node.line}:{node.column}";
+        string input = "";
+        if (typoSuspected)
+        {
+            string codeBlock = getCodeBlock(node);
+            List<string> typoFixes = Typo.spellCheck(typoString);
+            input = $"{whatHappened} - ```\n{codeBlock}```, \n How You Can Fix This: \n {recommendedFix} \n Possible typo solutions: {string.Join(", ", typoFixes)}\n Error Was Thrown At {node.line}:{node.column}";
+        }
+        else
+        {
+            string codeBlock = getCodeBlock(node);
+            input = $"{whatHappened} - ```\n{codeBlock}```, \n How You Can Fix This: \n {recommendedFix} \n Error Was Thrown At {node.line}:{node.column}";
+        }
+
         return new GenException(input);
     }
 

@@ -9,6 +9,8 @@ public class HISS
 
     static void Main(string[] args)
     {
+        Typo.initialize();
+
         string fileToRead = args.Length != 0 ? args[0] : "/coding/HISS/src/test.hiss";
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
@@ -20,7 +22,6 @@ public class HISS
         {
             windows = true;
         }
-
 
         string debugLoggingStr = args.Length != 0 ? args[1] : "true";
         bool debugLogging = debugLoggingStr == "true" ? true : false;

@@ -87,6 +87,7 @@ public static class IRGen
         LLVMValueRef varRef = LLVM.GetNamedGlobal(module, varExpr.varName);
         if (varRef.Pointer == IntPtr.Zero)
         {
+            Console.WriteLine("var ref was pointer zero");
             if (namedMutablesLLVM.ContainsKey(varExpr.varName))
             {
                 //code to load a stack mut
@@ -102,10 +103,16 @@ public static class IRGen
                     return;
                 }
             }
-        }
-        LLVMValueRef load = LLVM.BuildLoad(builder, varRef, varExpr.varName);
 
-        valueStack.Push(load);
+            throw GenException.FactoryMethod("An unknown variable was referenced", "Likely a typo", varExpr, true, varExpr.varName);
+        }
+        else
+        {
+            LLVMValueRef load = LLVM.BuildLoad(builder, varRef, varExpr.varName);
+            valueStack.Push(load);
+            return;
+        }
+
 
         // if (namedGlobalsAST[varExpr.varName].type.value != "string")
         // {
@@ -440,7 +447,8 @@ public static class IRGen
                     TypeAST printType = LLVMTypeToASTType(namedValuesLLVM[varExpr.varName].TypeOf(), printCall);
                     return evaluatePrintFormat(printCall, printType);
                 }
-                throw new GenException($"attempting to print variable that does not exist | name: {varExpr.varName})", printCall);
+                throw GenException.FactoryMethod("An unknown variable was printed", "Likely a typo", varExpr, true, varExpr.varName);
+
 
         }
 
