@@ -6,23 +6,22 @@ public static class Typo
     private const int prefixLength = 7;
     private static SymSpell symSpell = new SymSpell(initialCapacity, maxEditDistance, prefixLength);
 
-    public static void initialize()
+    private static string bigPath = AppDomain.CurrentDomain.BaseDirectory + "../../../../src/Dictionaries/typo-dictionary.txt";
+    private static string littlePath = AppDomain.CurrentDomain.BaseDirectory + "../../../../src/Dictionaries/hiss-dictionary.txt";
+    private static int termIndex = 0; //column of the term in the dictionary text file
+    private static int countIndex = 1; //column of the term frequency in the dictionary text file
+
+    public static List<string> spellCheck(string input, bool loadLittle = true)
     {
-        string path = AppDomain.CurrentDomain.BaseDirectory + "../../../../src/typo-dictionary.txt"; //path referencing the SymSpell core project
-        int termIndex = 0; //column of the term in the dictionary text file
-        int countIndex = 1; //column of the term frequency in the dictionary text file
-        if (!symSpell.LoadDictionary(path, termIndex, countIndex))
+        if (loadLittle)
         {
-            Console.WriteLine("File not found!");
-            //press any key to exit program
-            Console.ReadKey();
-            return;
+            loadDict(littlePath);
+        }
+        else
+        {
+            loadDict(bigPath);
         }
 
-    }
-
-    public static List<string> spellCheck(string input)
-    {
         List<string> retList = new List<string>();
 
         const SymSpell.Verbosity verbosity = SymSpell.Verbosity.Closest;
@@ -37,7 +36,24 @@ public static class Typo
             }
         }
 
+        if (retList.Count < 1)
+        {
+            return spellCheck(input, false);
+        }
+
+
         return retList;
+    }
+
+    public static void loadDict(string path)
+    {
+        if (!symSpell.LoadDictionary(path, termIndex, countIndex))
+        {
+            Console.WriteLine("File not found!");
+            //press any key to exit program
+            Console.ReadKey();
+            return;
+        }
     }
 
 }

@@ -1,7 +1,7 @@
 const double houses = 2
 
 @main () {
-print!(housas)
+print!(hostes)
 }
 
 
