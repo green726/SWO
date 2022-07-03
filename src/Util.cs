@@ -7,7 +7,8 @@ public static class Util
     public enum TokenType
     {
         Operator,
-        Number,
+        Int,
+        Double,
         Keyword,
         ParenDelimiterOpen,
         ParenDelimiterClose,
@@ -52,6 +53,7 @@ public static class Util
         public int line;
         public int column;
         public bool isDelim = false;
+        public int charNum = 0;
 
         public Token(TokenType type, string value, int line, int column, bool isDelim = false)
         {
@@ -75,6 +77,26 @@ public static class Util
             this.type = type;
             this.line = line;
             this.column = column;
+        }
+
+        public Token(TokenType type, char value, int line, int column, int charNum, bool isDelim = false)
+        {
+            this.isDelim = isDelim;
+            this.value = value.ToString();
+            this.type = type;
+            this.line = line;
+            this.column = column;
+            this.charNum = charNum;
+        }
+
+        public Token(TokenType type, string value, int line, int column, int charNum, bool isDelim = false)
+        {
+            this.isDelim = isDelim;
+            this.value = value.ToString();
+            this.type = type;
+            this.line = line;
+            this.column = column;
+            this.charNum = charNum;
         }
 
     }

@@ -44,7 +44,7 @@ public class BinaryExpression : ASTNode
                 this.operatorType = OperatorType.LessThan;
                 break;
             default:
-                throw new ParserException("op " + token.value + " is not a valid binary operator", token);
+                throw ParserException.FactoryMethod("An unknown binary operator was used", "use a known binary operator (such as \" == \" for comparison or \" + \" for addition)", token);
         }
 
         this.parent = parent;
@@ -106,7 +106,7 @@ public class BinaryExpression : ASTNode
     }
     public override void addChild(ASTNode child)
     {
-        this.children.Add(child);
+        base.addChild(child);
         if (child.nodeType == ASTNode.NodeType.BinaryExpression)
         {
         }

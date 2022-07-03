@@ -27,7 +27,6 @@ public class ElseStatement : ASTNode
 
     public override void addChild(Util.Token child)
     {
-
-        throw new ParserException($"illegal child ({child.value}) added to if statement", child);
+        throw ParserException.FactoryMethod($"Illegal child was added to an if statement", "No recommended fix", child);
     }
 }

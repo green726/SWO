@@ -11,7 +11,7 @@ public static class Parser
 
     public static List<VariableAssignment> globalVarAss = new List<VariableAssignment>();
 
-    public static Util.TokenType[] binaryExpectedTokens = { Util.TokenType.Number, Util.TokenType.Keyword };
+    public static Util.TokenType[] binaryExpectedTokens = { Util.TokenType.Int, Util.TokenType.Keyword };
     public static Util.TokenType[] delimiterExpectedTokens = { Util.TokenType.Keyword };
     public static ASTNode.NodeType[] binaryExpectedNodes = { ASTNode.NodeType.NumberExpression, ASTNode.NodeType.BinaryExpression, ASTNode.NodeType.VariableExpression, ASTNode.NodeType.PhiVariable };
 
@@ -20,10 +20,8 @@ public static class Parser
 
     public static int ifFuncNum = 0;
 
-    public static class topAST
-    {
-        public static List<ASTNode> primaryChildren = new List<ASTNode>();
-    }
+    //NOTE: below can be used to add user defined types (structs/classes)
+    public static List<string> typeList = new List<string>() { "double", "int", "string" };
 
     public static void checkNode(ASTNode? node, ASTNode.NodeType[] expectedTypes)
     {
@@ -500,7 +498,7 @@ public static class Parser
 
         switch (token.type)
         {
-            case Util.TokenType.Number:
+            case Util.TokenType.Int:
 
                 if (parent.nodeType == ASTNode.NodeType.VariableAssignment)
                 {

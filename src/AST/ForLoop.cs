@@ -26,7 +26,7 @@ public class ForLoop : ASTNode
         }
         else
         {
-            throw new ParserException("illegal parentless for loop", this);
+            throw ParserException.FactoryMethod("An illegal parentless (top level) for loop was created", "Place the for loop within a function", this);
         }
         parseIteration = 1;
     }
@@ -37,8 +37,7 @@ public class ForLoop : ASTNode
         base.addChild(child);
         if (isBody)
         {
-            throw new ParserException($"illegal token usage ({child.value}) in for loop body", child);
-            // return;
+            throw ParserException.FactoryMethod("An unknown value was added to the body of a for loop", "Remove the unknown value from the for loop", child);
         }
         else
         {
@@ -53,7 +52,7 @@ public class ForLoop : ASTNode
                 case 1:
                     if (child.type != Util.TokenType.ParenDelimiterOpen)
                     {
-                        throw new ParserException($"paren delimeter open expected but got {child.value}", child);
+                        throw ParserException.FactoryMethod("An \"(\" character was expected to begin the for loop but was not found", "add the \"(\" character or remove an illegal character", child);
                     }
                     break;
                 case 2:
@@ -71,7 +70,7 @@ public class ForLoop : ASTNode
                     }
                     else
                     {
-                        stepValue = new NumberExpression(new Util.Token(Util.TokenType.Number, "1", this.line, this.column), this);
+                        stepValue = new NumberExpression(new Util.Token(Util.TokenType.Int, "1", this.line, this.column), this);
                         if (child.value == "in")
                         {
 
@@ -83,7 +82,7 @@ public class ForLoop : ASTNode
                         else
                         {
                             // return;
-                            throw new ParserException($"illegal token ({child.value}) in for loop", child);
+                            throw ParserException.FactoryMethod("An illegal token was received in a for loop", "replace the illegal token with either \"for\" or \"of\"", child);
                         }
                     }
                     break;
@@ -106,8 +105,6 @@ public class ForLoop : ASTNode
                             // this.index.setType("double");
                             // this.index.setValue()
                             // break;
-                            default:
-                                throw new ParserException($"non numerical for loops not yet supported (you used {child.value} instead of a number)", child);
                         }
                     }
                     break;
@@ -124,7 +121,7 @@ public class ForLoop : ASTNode
                         }
                         else
                         {
-                            throw new ParserException($"closing parenthese expected but got {child.value}", child);
+                            throw ParserException.FactoryMethod("Expected closing parentheses in for loop but recieved an illegal character", "Add a closing parentheses to the end of the for loop or remove the illegal character", child);
                         }
                     }
                     break;
@@ -135,7 +132,7 @@ public class ForLoop : ASTNode
                     }
                     else
                     {
-                        throw new ParserException($"extra tokens in simple for loop (possibly meant to be complex?) | token was {child.value}", child);
+                        throw ParserException.FactoryMethod("extra values in declaration of a simple for loop (a for loop declared with \"in\" or \"of\")", "remove the extra values or turn the for loop into a complex loop (a c for loop)", child);
                     }
                     break;
             }
@@ -190,7 +187,7 @@ public class PhiVariable : ASTNode
     {
         this.value = value;
 
-        Util.Token numExprToken = new Util.Token(Util.TokenType.Number, value, this.line, this.column);
+        Util.Token numExprToken = new Util.Token(Util.TokenType.Int, value, this.line, this.column);
         this.numExpr = new NumberExpression(numExprToken, this);
     }
 

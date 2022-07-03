@@ -96,6 +96,7 @@ public class VariableAssignment : ASTNode
 
     public override void addChild(ASTNode node)
     {
+        base.addChild(node);
         Console.WriteLine("adding child of node type " + node.nodeType + "to varass");
         if (!reassignment)
         {
@@ -134,7 +135,6 @@ public class VariableAssignment : ASTNode
                     break;
             }
             this.targetValue = node;
-            this.children.Add(node);
             childLoop++;
         }
     }

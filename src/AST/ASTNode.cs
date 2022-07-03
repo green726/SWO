@@ -7,6 +7,9 @@ public abstract class ASTNode
 
     public int line = 0;
     public int column = 0;
+    public int charNum = 0;
+
+    public string codeExcerpt = "";
 
     public NodeType nodeType;
 
@@ -14,6 +17,8 @@ public abstract class ASTNode
 
     protected ASTNode(Util.Token token)
     {
+        this.charNum = token.charNum;
+        this.codeExcerpt = token.value;
         this.line = token.line;
         this.column = token.column;
     }
@@ -22,6 +27,8 @@ public abstract class ASTNode
     {
         this.line = node.line;
         this.column = node.column;
+        this.charNum = node.charNum;
+        this.codeExcerpt = node.codeExcerpt;
     }
 
     public enum NodeType
@@ -58,15 +65,18 @@ public abstract class ASTNode
 
     public virtual void addChild(ASTNode child)
     {
+        this.codeExcerpt += child.codeExcerpt;
         children.Add(child);
     }
 
     public virtual void addChild(Util.Token child)
     {
+        this.codeExcerpt += child.value;
     }
 
     public virtual void removeChild(ASTNode child)
     {
+        this.codeExcerpt.Replace(child.codeExcerpt, "");
         children.Remove(child);
     }
 }

@@ -19,7 +19,7 @@ public class FunctionCall : ASTNode
         }
         if (builtInExpected == true && this.builtIn == false)
         {
-            throw new ParserException($"builtin function expected but {builtinName} is not one", token);
+            throw ParserException.FactoryMethod("Builtin function call expected but no builtin function with a matching name was found", "Fix a possible typo? \n Remove the \"!\" at the end of the function call to unmark it as builting", token);
         }
 
         this.functionName = this.builtIn ? builtinName : token.value;
@@ -45,6 +45,7 @@ public class FunctionCall : ASTNode
 
     public override void addChild(ASTNode child)
     {
+        base.addChild(child);
         args.Add(child);
     }
 
@@ -57,5 +58,6 @@ public class FunctionCall : ASTNode
     public void addChildAtStart(ASTNode child)
     {
         args.Insert(0, child);
+        base.addChild(child);
     }
 }

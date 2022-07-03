@@ -7,8 +7,12 @@ public static class Lexer
     private static string[] binOps = { "+", "-", "*", "/", "==", "<" };
     private static string[] assignmentOps = { "=", "+=", "-=", "*=", "/=" };
 
+    public static string inputStr;
+
+
     public static List<Util.Token> lex(string input)
     {
+        inputStr = input;
         int line = 1;
         int column = 0;
         int charNum = 0;
@@ -34,23 +38,27 @@ public static class Lexer
                     { }
                     if (int.TryParse(stringBuilder.ToString(), out int result))
                     {
-                        tokenList.Add(new Util.Token(Util.TokenType.Number, stringBuilder.ToString(), line, column));
+                        tokenList.Add(new Util.Token(Util.TokenType.Int, stringBuilder.ToString(), line, column, charNum));
+                    }
+                    else if (double.TryParse(stringBuilder.ToString(), out double dubResult))
+                    {
+                        tokenList.Add(new Util.Token(Util.TokenType.Double, stringBuilder.ToString(), line, column, charNum));
                     }
                     else if (binOps.Contains(stringBuilder.ToString()))
                     {
-                        tokenList.Add(new Util.Token(Util.TokenType.Operator, stringBuilder.ToString(), line, column));
+                        tokenList.Add(new Util.Token(Util.TokenType.Operator, stringBuilder.ToString(), line, column, charNum));
                     }
                     else if (assignmentOps.Contains(stringBuilder.ToString()))
                     {
-                        tokenList.Add(new Util.Token(Util.TokenType.AssignmentOp, stringBuilder.ToString(), line, column, false));
+                        tokenList.Add(new Util.Token(Util.TokenType.AssignmentOp, stringBuilder.ToString(), line, column, charNum, false));
                     }
                     else if (firstChar == '"' && stringBuilder.ToString().EndsWith('"'))
                     {
-                        tokenList.Add(new Util.Token(Util.TokenType.String, stringBuilder.ToString(), line, column));
+                        tokenList.Add(new Util.Token(Util.TokenType.String, stringBuilder.ToString(), line, column, charNum));
                     }
                     else if (stringBuilder.ToString() != " " && stringBuilder.ToString() != "" && stringBuilder.ToString() != "\n")
                     {
-                        tokenList.Add(new Util.Token(Util.TokenType.Keyword, stringBuilder.ToString(), line, column));
+                        tokenList.Add(new Util.Token(Util.TokenType.Keyword, stringBuilder.ToString(), line, column, charNum));
                     }
                     stringBuilder = new StringBuilder();
                     lastChar = ch;
@@ -62,39 +70,39 @@ public static class Lexer
             switch (ch)
             {
                 case '\n':
-                    tokenList.Add(new Util.Token(Util.TokenType.EOL, ch.ToString(), line, column));
+                    tokenList.Add(new Util.Token(Util.TokenType.EOL, ch.ToString(), line, column, charNum));
                     lastChar = ch;
                     stringBuilder = new StringBuilder();
                     line++;
                     column = 0;
                     continue;
                 case '(':
-                    lexDelimiter(Util.TokenType.ParenDelimiterOpen, stringBuilder, ch, line, column);
+                    lexDelimiter(Util.TokenType.ParenDelimiterOpen, stringBuilder, ch, line, column, charNum);
                     lastChar = ch;
                     stringBuilder = new StringBuilder();
                     continue;
                 case ')':
-                    lexDelimiter(Util.TokenType.ParenDelimiterClose, stringBuilder, ch, line, column);
+                    lexDelimiter(Util.TokenType.ParenDelimiterClose, stringBuilder, ch, line, column, charNum);
                     lastChar = ch;
                     stringBuilder = new StringBuilder();
                     continue;
                 case '{':
-                    lexDelimiter(Util.TokenType.BrackDelimiterOpen, stringBuilder, ch, line, column);
+                    lexDelimiter(Util.TokenType.BrackDelimiterOpen, stringBuilder, ch, line, column, charNum);
                     lastChar = ch;
                     stringBuilder = new StringBuilder();
                     continue;
                 case '}':
-                    lexDelimiter(Util.TokenType.BrackDelimiterClose, stringBuilder, ch, line, column);
+                    lexDelimiter(Util.TokenType.BrackDelimiterClose, stringBuilder, ch, line, column, charNum);
                     lastChar = ch;
                     stringBuilder = new StringBuilder();
                     continue;
                 case '[':
-                    lexDelimiter(Util.TokenType.SquareDelimiterOpen, stringBuilder, ch, line, column);
+                    lexDelimiter(Util.TokenType.SquareDelimiterOpen, stringBuilder, ch, line, column, charNum);
                     lastChar = ch;
                     stringBuilder = new StringBuilder();
                     continue;
                 case ']':
-                    lexDelimiter(Util.TokenType.SquareDelimiterClose, stringBuilder, ch, line, column);
+                    lexDelimiter(Util.TokenType.SquareDelimiterClose, stringBuilder, ch, line, column, charNum);
                     lastChar = ch;
                     stringBuilder = new StringBuilder();
                     continue;
@@ -107,18 +115,21 @@ public static class Lexer
             lastChar = ch;
         }
 
-        tokenList.Add(new Util.Token(Util.TokenType.EOF, "", line, column));
+        tokenList.Add(new Util.Token(Util.TokenType.EOF, "", line, column, charNum));
         return tokenList;
     }
 
-    public static void lexDelimiter(Util.TokenType type, StringBuilder builder, char ch, int line, int column)
+    public static void lexDelimiter(Util.TokenType type, StringBuilder builder, char ch, int line, int column, int charNum)
     {
         // if (builder.ToString() == "" && type != Util.TokenType.ParenDelimiterClose && type != Util.TokenType.BrackDelimiterClose && type != Util.TokenType.SquareDelimiterClose && type != Util.TokenType.BrackDelimiterOpen)
         // {
         //     throw new ArgumentException($"Illegal delimeter usage( \"{ch}\" ) at {line}:{column}");
         // }
-        if (builder.ToString() != "" && builder.ToString() != " ") tokenList.Add(new Util.Token(Util.TokenType.Keyword, builder.ToString(), line, column));
-        tokenList.Add(new Util.Token(type, ch.ToString(), line, column, true));
+        if (builder.ToString() != "" && builder.ToString() != " ")
+        {
+            tokenList.Add(new Util.Token(Util.TokenType.Keyword, builder.ToString(), line, column, charNum));
+        }
+        tokenList.Add(new Util.Token(type, ch.ToString(), line, column, charNum, true));
     }
 
 
