@@ -9,6 +9,9 @@ public class HISS
 
     static void Main(string[] args)
     {
+        Typo.loadDict(Typo.Checker.Big);
+        Typo.loadDict(Typo.Checker.Little);
+
         string fileToRead = args.Length != 0 ? args[0] : "/coding/HISS/src/test.hiss";
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
