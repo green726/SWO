@@ -68,6 +68,7 @@ public class VariableAssignment : ASTNode
                     break;
                 case 1:
                     this.name = child.value;
+                    Typo.addToLittle(this);
                     break;
                 case 2:
                     if (child.type != Util.TokenType.AssignmentOp) throw new ParserException($"expected assignment op but got {child.type} in a variable assignment", child);

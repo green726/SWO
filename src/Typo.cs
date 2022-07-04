@@ -9,7 +9,7 @@ public static class Typo
     private const int bigPrefixLength = 7;
     private static SymSpell bigSym = new SymSpell(bigInitialCapacity, bigMaxEditDistance, bigPrefixLength);
 
-    private const int littleInitialCapacity = 82765;
+    private const int littleInitialCapacity = 0;
     private const int littleMaxEditDistance = 2;
     private const int littlePrefixLength = 7;
     private static SymSpell littleSym = new SymSpell(littleInitialCapacity, littleMaxEditDistance, littlePrefixLength);
@@ -18,6 +18,38 @@ public static class Typo
     private static string littlePath = AppDomain.CurrentDomain.BaseDirectory + "../../../../src/Dictionaries/hiss-dictionary.txt";
     private static int termIndex = 0; //column of the term in the dictionary text file
     private static int countIndex = 1; //column of the term frequency in the dictionary text file
+
+    private static string littleDictDefaults = @"print! 1
+print 1
+println! 1
+println 1
+main 1
+@main 1
+var 1
+const 1
+int 1
+double 1
+string 1
+for 1
+if 1
+else 1
+in 1
+";
+
+    private static StreamWriter littleWriter = new StreamWriter(littlePath, true);
+
+    public static void initialize()
+    {
+        loadDict(Checker.Little);
+        loadDict(Checker.Big);
+        // foreach (string line in littleDictDefaults)
+        // {
+        //     littleWriter.Write(line);
+        // }
+        System.IO.File.WriteAllText(littlePath, string.Empty);
+        littleWriter.Write(littleDictDefaults);
+        littleWriter.Flush();
+    }
 
     public static List<string> spellCheck(string input)
     {
@@ -30,6 +62,7 @@ public static class Typo
         foreach (SymSpell.SuggestItem suggestion in littleSuggestions)
         {
             retList.Add(suggestion.term);
+            // Console.WriteLine($"little suggestion: {suggestion.term}");
             if (retList.Count() > 4)
             {
                 break;
@@ -76,6 +109,20 @@ public static class Typo
                 return;
             }
         }
+    }
+
+    public static void addToLittle(ASTNode node)
+    {
+        switch (node.nodeType)
+        {
+            case ASTNode.NodeType.VariableAssignment:
+                VariableAssignment varAss = (VariableAssignment)node;
+                littleWriter.WriteLine($"{varAss.name} 1");
+                Console.WriteLine($"added var ass with name {varAss.name} to little dict");
+                break;
+        }
+        littleWriter.Flush();
+        loadDict(Checker.Little);
     }
 
     public enum Checker

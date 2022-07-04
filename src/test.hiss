@@ -1,7 +1,7 @@
-const double houses = 2
+const double cars = 2
 
 @main () {
-print!(hostes)
+print!(carss)
 }
 
 
