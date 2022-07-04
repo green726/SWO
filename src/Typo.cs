@@ -69,17 +69,16 @@ in 1
             }
         }
 
-        if (retList.Count < 1)
+
+        bigSuggestions = bigSym.Lookup(input, verbosity);
+        foreach (SymSpell.SuggestItem suggestion in bigSuggestions)
         {
-            bigSuggestions = bigSym.Lookup(input, verbosity);
-            retList = new List<string>();
-            foreach (SymSpell.SuggestItem suggestion in bigSuggestions)
+            if (!retList.Contains(suggestion.term)) {
+            retList.Add(suggestion.term);
+            }
+            if (retList.Count() >= 3)
             {
-                retList.Add(suggestion.term);
-                if (retList.Count() > 4)
-                {
-                    break;
-                }
+                break;
             }
         }
 
