@@ -6,10 +6,16 @@ public static class Config
 
     public static void initialize()
     {
-        string configInput = File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + "../../../../src/Config/Example.toml");
+        string configInput = File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + "../../../../src/Config/Test.toml");
 
-        var model = Toml.ToModel(configInput);
+        ConfigModel model = Toml.ToModel<ConfigModel>(configInput);
 
-        Console.WriteLine(((TomlTable)model["functions"]));
+        Console.WriteLine($"Function calling builtin marker enabled {model.functions.calling.builtin.marker.enabled}");
+
+
+        throw new Exception();
     }
+
 }
+
+

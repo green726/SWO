@@ -13,5 +13,3 @@ for 1
 if 1
 else 1
 in 1
-nl 1
-cars 1

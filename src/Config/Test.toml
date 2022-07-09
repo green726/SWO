@@ -1,0 +1,13 @@
+[functions.declaration]
+marker = "@" #could also be something like "func " - if you want the word to come before the function a space is required
+args.delimeters = ["(", ")"]
+args.seperator = ","
+body.delimeters = ["{", "}"]
+
+
+[functions.calling]
+args.delimeters = ["(", ")"]
+args.seperator = ","
+builtin.marker.enabled = true #if builtin marker is disabled compiler performance will degrade significantly
+builtin.marker.value = "!"
+builtin.marker.location = "end" #can also be set to beginning

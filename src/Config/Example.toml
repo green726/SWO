@@ -1,7 +1,7 @@
 
 
 [functions.declaration]
-declaration.marker = "@" #could also be something like "func " - if you want the word to come before the function a space is required
+marker = "@" #could also be something like "func " - if you want the word to come before the function a space is required
 args.delimeters = ["(", ")"]
 args.seperator = ","
 body.delimeters = ["{", "}"]
@@ -15,9 +15,10 @@ builtin.marker.value = "!"
 builtin.marker.location = "end" #can also be set to beginning
 
 [ifs]
-if.declaration.delimeters = ["(", ")"] #can be set to a blank string to not use if declaration delims - degrades compiler performance
-if.body.delimeters = ["{", "}"] #could also be ["then", "endif"]
+declaration.delimeters = ["(", ")"] #can be set to a blank string to not use if declaration delims - degrades compiler performance
+body.delimeters = ["{", "}"] #could also be ["then", "endif"]
+test.value = "hi"
 
 [fors]
-for.declaration.delimeters = ["(", ")"]
-for.body.delimeters = ["{", "}"]
+declaration.delimeters = ["(", ")"]
+body.delimeters = ["{", "}"]
