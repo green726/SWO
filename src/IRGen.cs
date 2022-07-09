@@ -31,7 +31,17 @@ public static class IRGen
 
     public static void generateNumberExpression(NumberExpression numberExpression)
     {
-        valueStack.Push(LLVM.ConstReal(LLVM.DoubleType(), numberExpression.value));
+        switch (numberExpression.type.value)
+        {
+            case "double":
+                valueStack.Push(LLVM.ConstReal(LLVM.DoubleType(), numberExpression.value));
+                break;
+            case "int":
+                valueStack.Push(LLVM.ConstReal(LLVM.Int64Type(), numberExpression.value));
+                break;
+
+
+        }
     }
 
     public static void generateStringExpression(StringExpression str)
