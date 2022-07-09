@@ -238,3 +238,5 @@ D:\Coding\HISS\obj\Debug\net6.0\win-x64\refint\HISS.dll
 D:\Coding\HISS\obj\Debug\net6.0\win-x64\HISS.pdb
 D:\Coding\HISS\obj\Debug\net6.0\win-x64\HISS.genruntimeconfig.cache
 D:\Coding\HISS\obj\Debug\net6.0\win-x64\ref\HISS.dll
+D:\Coding\HISS\bin\Debug\net6.0\win-x64\SymSpell.dll
+D:\Coding\HISS\bin\Debug\net6.0\win-x64\Tomlyn.dll

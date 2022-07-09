@@ -36,7 +36,9 @@ else 1
 in 1
 ";
 
-    private static StreamWriter littleWriter = new StreamWriter(littlePath, true);
+    private static StreamWriter littleWriter;
+
+    private static Stream fileStream;
 
     public static void initialize()
     {
@@ -46,9 +48,13 @@ in 1
         // {
         //     littleWriter.Write(line);
         // }
-        System.IO.File.WriteAllText(littlePath, string.Empty);
+
+        File.Delete(littlePath);
+        fileStream = new FileStream(littlePath, FileMode.Append);
+        littleWriter = new StreamWriter(fileStream);
         littleWriter.Write(littleDictDefaults);
-        littleWriter.Flush();
+        // littleWriter.Flush();
+        littleWriter.Close();
     }
 
     public static List<string> spellCheck(string input)
@@ -63,22 +69,25 @@ in 1
         {
             retList.Add(suggestion.term);
             // Console.WriteLine($"little suggestion: {suggestion.term}");
-            if (retList.Count() > 4)
+            if (retList.Count() > 3)
             {
                 break;
             }
         }
 
-
-        bigSuggestions = bigSym.Lookup(input, verbosity);
-        foreach (SymSpell.SuggestItem suggestion in bigSuggestions)
+        if (retList.Count() == 0)
         {
-            if (!retList.Contains(suggestion.term)) {
-            retList.Add(suggestion.term);
-            }
-            if (retList.Count() >= 3)
+            bigSuggestions = bigSym.Lookup(input, verbosity);
+            foreach (SymSpell.SuggestItem suggestion in bigSuggestions)
             {
-                break;
+                if (!retList.Contains(suggestion.term))
+                {
+                    retList.Add(suggestion.term);
+                }
+                if (retList.Count() >= 3)
+                {
+                    break;
+                }
             }
         }
 
@@ -112,6 +121,9 @@ in 1
 
     public static void addToLittle(ASTNode node)
     {
+
+        fileStream = new FileStream(littlePath, FileMode.Append);
+        littleWriter = new StreamWriter(fileStream);
         switch (node.nodeType)
         {
             case ASTNode.NodeType.VariableAssignment:
@@ -120,7 +132,7 @@ in 1
                 Console.WriteLine($"added var ass with name {varAss.name} to little dict");
                 break;
         }
-        littleWriter.Flush();
+        littleWriter.Close();
         loadDict(Checker.Little);
     }
 
