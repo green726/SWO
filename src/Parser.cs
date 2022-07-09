@@ -295,12 +295,12 @@ public static class Parser
         int nextTokenIndex = tokenIndex + 1;
 
 
-        if (token.value == "var")
+        if (token.value == Config.options.variable.declaration.keyword.mutable)
         {
             VariableAssignment varAss = new VariableAssignment(token, true);
             return new List<dynamic>() { varAss, delimLevel };
         }
-        else if (token.value == "const")
+        else if (token.value == Config.options.variable.declaration.keyword.constant)
         {
             VariableAssignment constAss = new VariableAssignment(token, false);
             return new List<dynamic>() { constAss, delimLevel };

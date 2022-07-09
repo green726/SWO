@@ -1,3 +1,5 @@
+namespace ConfigModel;
+
 using System.Runtime.Serialization;
 
 public class ConfigModel
@@ -9,4 +11,6 @@ public class ConfigModel
 
     [DataMember(Name = "if")]
     public IfModel? ifModel { get; set; }
+
+    public VariableModel? variable { get; set; }
 }

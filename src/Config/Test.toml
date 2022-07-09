@@ -24,4 +24,7 @@ body.delimeters = ["{", "}"]
 declaration.delimeters = ["(", ")"] #can be set to a blank string to not use if declaration delims - degrades compiler performance
 body.delimeters = ["{", "}"] #could also be ["then", "endif"]
 
-
+[variable]
+declaration.keyword.constant = "const"
+declaration.keyword.mutable = "var"
+declaration.order = ["keyword", "type", "name", "assignment", "value"] #currently not customizable but will be in the future
