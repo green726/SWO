@@ -2,7 +2,7 @@ public static class Util
 {
     public static string[] delimeters = { "(", ")", "{", "}", "[", "]" };
     public static string[] builtinFuncs = { "print", "println" };
-    public static TokenType[] delimTypes = { TokenType.ParenDelimiterOpen, TokenType.ParenDelimiterClose, TokenType.BrackDelimiterOpen, TokenType.BrackDelimiterClose, TokenType.SquareDelimiterOpen, TokenType.SquareDelimiterClose };
+    // public static TokenType[] delimTypes = { TokenType.ParenDelimiterOpen, TokenType.ParenDelimiterClose, TokenType.BrackDelimiterOpen, TokenType.BrackDelimiterClose, TokenType.SquareDelimiterOpen, TokenType.SquareDelimiterClose };
 
     public enum TokenType
     {
@@ -10,12 +10,8 @@ public static class Util
         Int,
         Double,
         Keyword,
-        ParenDelimiterOpen,
-        ParenDelimiterClose,
-        BrackDelimiterOpen,
-        BrackDelimiterClose,
-        SquareDelimiterOpen,
-        SquareDelimiterClose,
+        DelimiterClose,
+        DelimiterOpen,
         AssignmentOp,
         String,
         Text,

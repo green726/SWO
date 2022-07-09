@@ -10,8 +10,15 @@ public class PrototypeAST : ASTNode
     public PrototypeAST(Util.Token token, List<Util.Token> arguments = null) : base(token)
     {
         this.nodeType = NodeType.Prototype;
-        this.name = token.value.Substring(1);
 
+        if (!Config.options.function.declaration.marker.word)
+        {
+            this.name = token.value.Substring(1);
+        }
+        else
+        {
+            this.name = "";
+        }
 
         if (arguments != null)
         {
@@ -51,6 +58,8 @@ public class PrototypeAST : ASTNode
         {
             this.arguments = new Dictionary<TypeAST, string>();
         }
+
+
     }
 
 

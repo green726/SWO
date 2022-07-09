@@ -1,6 +1,9 @@
+#legal options for delimeters are parentheses (), brackets {}, and square brackets [] - more will be added in the future
+
 
 [function.declaration]
-marker = "@" #could also be something like "func " - if you want the word to come before the function a space is required
+marker.value = "@" #could also be something like "func"
+marker.word = false #set to true if you want to use a percursor word such as func
 args.delimeters = ["(", ")"]
 args.seperator = ","
 body.delimeters = ["{", "}"]
@@ -9,9 +12,9 @@ body.delimeters = ["{", "}"]
 [function.calling]
 args.delimeters = ["(", ")"]
 args.seperator = ","
-builtin.marker.enabled = true #if builtin marker is disabled compiler performance will degrade significantly
+builtin.marker.enabled = true #if builtin marker is disabled compiler performance will degrade significantly - disabling this is not currently supported
 builtin.marker.value = "!"
-builtin.marker.location = "end" #can also be set to beginning
+builtin.marker.location = "end" #can also be set to "beginning"
 
 [loop.for]
 declaration.delimeters = ["(", ")"]

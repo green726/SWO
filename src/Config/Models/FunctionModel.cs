@@ -13,9 +13,15 @@ public class FunctionModel
 
 public class FunctionDeclarationModel
 {
-    public string? marker { get; set; }
+    public FunctionDeclarationMarker? marker { get; set; }
     public FunctionDeclarationArgs? args { get; set; }
     public FunctionDeclarationBody? body { get; set; }
+}
+
+public class FunctionDeclarationMarker
+{
+    public string? value { get; set; }
+    public bool word { get; set; }
 }
 
 public class FunctionDeclarationArgs

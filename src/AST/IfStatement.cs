@@ -65,7 +65,7 @@ public class IfStatement : ASTNode
         // {
         //     isStat = false;
         // }
-        if (child.type == Util.TokenType.BrackDelimiterOpen)
+        if (child.value == Config.options.ifModel.body.delimeters[0]/* Util.TokenType.BrackDelimiterOpen */)
         {
             isBody = true;
         }

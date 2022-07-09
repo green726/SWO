@@ -77,32 +77,32 @@ public static class Lexer
                     column = 0;
                     continue;
                 case '(':
-                    lexDelimiter(Util.TokenType.ParenDelimiterOpen, stringBuilder, ch, line, column, charNum);
+                    lexDelimiter(Util.TokenType.DelimiterOpen, stringBuilder, ch, line, column, charNum);
                     lastChar = ch;
                     stringBuilder = new StringBuilder();
                     continue;
                 case ')':
-                    lexDelimiter(Util.TokenType.ParenDelimiterClose, stringBuilder, ch, line, column, charNum);
+                    lexDelimiter(Util.TokenType.DelimiterClose, stringBuilder, ch, line, column, charNum);
                     lastChar = ch;
                     stringBuilder = new StringBuilder();
                     continue;
                 case '{':
-                    lexDelimiter(Util.TokenType.BrackDelimiterOpen, stringBuilder, ch, line, column, charNum);
+                    lexDelimiter(Util.TokenType.DelimiterOpen, stringBuilder, ch, line, column, charNum);
                     lastChar = ch;
                     stringBuilder = new StringBuilder();
                     continue;
                 case '}':
-                    lexDelimiter(Util.TokenType.BrackDelimiterClose, stringBuilder, ch, line, column, charNum);
+                    lexDelimiter(Util.TokenType.DelimiterClose, stringBuilder, ch, line, column, charNum);
                     lastChar = ch;
                     stringBuilder = new StringBuilder();
                     continue;
                 case '[':
-                    lexDelimiter(Util.TokenType.SquareDelimiterOpen, stringBuilder, ch, line, column, charNum);
+                    lexDelimiter(Util.TokenType.DelimiterOpen, stringBuilder, ch, line, column, charNum);
                     lastChar = ch;
                     stringBuilder = new StringBuilder();
                     continue;
                 case ']':
-                    lexDelimiter(Util.TokenType.SquareDelimiterClose, stringBuilder, ch, line, column, charNum);
+                    lexDelimiter(Util.TokenType.DelimiterClose, stringBuilder, ch, line, column, charNum);
                     lastChar = ch;
                     stringBuilder = new StringBuilder();
                     continue;

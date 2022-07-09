@@ -1,7 +1,11 @@
 const double cars = 2
 
+@stuff() {
+print!(cars)
+}
+
 @main () {
-print!(carss)
+stuff()
 }
 
 

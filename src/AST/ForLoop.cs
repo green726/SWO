@@ -41,7 +41,7 @@ public class ForLoop : ASTNode
         }
         else
         {
-            if (child.type == Util.TokenType.BrackDelimiterOpen && !isBody)
+            if (child.value == Config.options.loop.forModel.body.delimeters[0]/* Util.TokenType.BrackDelimiterOpen */ && !isBody)
             {
                 isBody = true;
                 return;
@@ -50,7 +50,7 @@ public class ForLoop : ASTNode
             switch (parseIteration)
             {
                 case 1:
-                    if (child.type != Util.TokenType.ParenDelimiterOpen)
+                    if (child.value != Config.options.loop.forModel.declaration.delimeters[0]/* Util.TokenType.ParenDelimiterOpen */)
                     {
                         throw ParserException.FactoryMethod("An \"(\" character was expected to begin the for loop but was not found", "add the \"(\" character or remove an illegal character", child);
                     }
@@ -115,7 +115,7 @@ public class ForLoop : ASTNode
                     }
                     else
                     {
-                        if (child.type == Util.TokenType.ParenDelimiterClose)
+                        if (child.value == Config.options.loop.forModel.declaration.delimeters[1]/* Util.TokenType.ParenDelimiterClose */)
                         {
                             isBody = true;
                         }
