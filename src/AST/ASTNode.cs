@@ -2,6 +2,8 @@ using System.Collections.Generic;
 
 public abstract class ASTNode
 {
+    Generator.Base generator;
+
     public List<ASTNode> children = new List<ASTNode>();
     public ASTNode? parent = null;
 

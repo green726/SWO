@@ -37,10 +37,8 @@ public static class IRGen
                 valueStack.Push(LLVM.ConstReal(LLVM.DoubleType(), numberExpression.value));
                 break;
             case "int":
-                valueStack.Push(LLVM.ConstReal(LLVM.Int64Type(), numberExpression.value));
+                valueStack.Push(LLVM.ConstInt(LLVM.Int64Type(), (ulong)numberExpression.value, true));
                 break;
-
-
         }
     }
 
@@ -443,6 +441,15 @@ public static class IRGen
         switch (printCall.args[0].nodeType)
         {
             case ASTNode.NodeType.NumberExpression:
+                NumberExpression numExpr = (NumberExpression)printCall.args[0];
+                if (numExpr.type.value == "int")
+                {
+                    return new StringExpression(new Util.Token(Util.TokenType.String, "\"%d\"", 0, 0), printCall, true);
+                }
+                else if (numExpr.type.value == "double")
+                {
+                    return new StringExpression(new Util.Token(Util.TokenType.String, "\"%f\"", 0, 0), printCall, true);
+                }
                 return new StringExpression(new Util.Token(Util.TokenType.String, "\"%f\"", 0, 0), printCall, true);
             case ASTNode.NodeType.StringExpression:
                 return new StringExpression(new Util.Token(Util.TokenType.String, "\"%s\"", 0, 0), printCall, true);
@@ -474,7 +481,7 @@ public static class IRGen
             case "string":
                 return new StringExpression(new Util.Token(Util.TokenType.String, "\"%s\"", 0, 0), printCall, true);
             default:
-                throw new GenException($"attempting to print obj of unknown type | obj: {printCall.args[0]} type: {type}", printCall);
+                throw new GenException($"attempting to print obj of illegal or unknown type | obj: {printCall.args[0]} type: {type}", printCall);
         }
 
         return new StringExpression(new Util.Token(Util.TokenType.String, "\"%f\"", 0, 0), printCall, true);
