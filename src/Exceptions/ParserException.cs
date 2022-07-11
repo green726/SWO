@@ -2,7 +2,7 @@ using System;
 
 public class ParserException : Exception
 {
-    public ParserException(string msg, ASTNode node) : base($"{msg} at {node?.line}:{node?.column}")
+    public ParserException(string msg, AST.Node node) : base($"{msg} at {node?.line}:{node?.column}")
     {
     }
 
@@ -37,7 +37,7 @@ public class ParserException : Exception
         return new ParserException(input);
     }
 
-    public static ParserException FactoryMethod(string whatHappened, string recommendedFix, ASTNode node, bool typoSuspected = false, string typoString = "")
+    public static ParserException FactoryMethod(string whatHappened, string recommendedFix, AST.Node node, bool typoSuspected = false, string typoString = "")
     {
         string input = "";
         if (typoSuspected)
@@ -55,7 +55,7 @@ public class ParserException : Exception
         return new ParserException(input);
     }
 
-    public static string getCodeBlock(ASTNode node)
+    public static string getCodeBlock(AST.Node node)
     {
         return node.codeExcerpt;
     }

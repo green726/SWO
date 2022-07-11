@@ -6,14 +6,14 @@ using static System.Text.Json.JsonSerializer;
 
 public static class Parser
 {
-    public static List<ASTNode> nodes = new List<ASTNode>();
+    public static List<AST.Node> nodes = new List<AST.Node>();
     public static List<Util.Token> tokenList;
 
-    public static List<VariableAssignment> globalVarAss = new List<VariableAssignment>();
+    public static List<AST.VariableAssignment> globalVarAss = new List<AST.VariableAssignment>();
 
     public static Util.TokenType[] binaryExpectedTokens = { Util.TokenType.Int, Util.TokenType.Keyword };
     public static Util.TokenType[] delimiterExpectedTokens = { Util.TokenType.Keyword };
-    public static ASTNode.NodeType[] binaryExpectedNodes = { ASTNode.NodeType.NumberExpression, ASTNode.NodeType.BinaryExpression, ASTNode.NodeType.VariableExpression, ASTNode.NodeType.PhiVariable };
+    public static AST.Node.NodeType[] binaryExpectedNodes = { AST.Node.NodeType.NumberExpression, AST.Node.NodeType.BinaryExpression, AST.Node.NodeType.VariableExpression, AST.Node.NodeType.PhiVariable };
 
     public static int prevLine = 0;
     public static int prevColumn = 0;
@@ -23,14 +23,14 @@ public static class Parser
     //NOTE: below can be used to add user defined types (structs/classes)
     public static List<string> typeList = new List<string>() { "double", "int", "string" };
 
-    public static void checkNode(ASTNode? node, ASTNode.NodeType[] expectedTypes)
+    public static void checkNode(AST.Node? node, AST.Node.NodeType[] expectedTypes)
     {
         if (node == null)
         {
             throw new ParserException($"expected a node at but got null", prevLine, prevColumn);
         }
 
-        foreach (ASTNode.NodeType expectedNodeType in expectedTypes)
+        foreach (AST.Node.NodeType expectedNodeType in expectedTypes)
         {
             if (node.nodeType != expectedNodeType && expectedNodeType == expectedTypes.Last())
             {
@@ -43,14 +43,14 @@ public static class Parser
         }
     }
 
-    public static void checkNode(ASTNode? node, ASTNode.NodeType[] expectedTypes, ParserException except)
+    public static void checkNode(AST.Node? node, AST.Node.NodeType[] expectedTypes, ParserException except)
     {
         if (node == null)
         {
             throw new ParserException($"expected a node at but got null", prevLine, prevColumn);
         }
 
-        foreach (ASTNode.NodeType expectedNodeType in expectedTypes)
+        foreach (AST.Node.NodeType expectedNodeType in expectedTypes)
         {
             if (node.nodeType != expectedNodeType && expectedNodeType == expectedTypes.Last())
             {
@@ -94,7 +94,7 @@ public static class Parser
         }
     }
 
-    public static string printBinary(BinaryExpression bin)
+    public static string printBinary(AST.BinaryExpression bin)
     {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.Append($"{bin.nodeType} op: {bin.operatorType} lhs type: {bin.leftHand.nodeType} rhs type: {bin.rightHand.nodeType} binop children below:");
@@ -103,7 +103,7 @@ public static class Parser
         return stringBuilder.ToString();
     }
 
-    public static string printFunc(FunctionAST func)
+    public static string printFunc(AST.Function func)
     {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.Append($"{func.nodeType} name: {func.prototype.name} args: {Serialize(func.prototype.arguments.ToList())} body start: ");
@@ -115,12 +115,12 @@ public static class Parser
         return stringBuilder.ToString();
     }
 
-    public static string printFuncCall(FunctionCall funcCall)
+    public static string printFuncCall(AST.FunctionCall funcCall)
     {
         return $"{funcCall.nodeType} with name of {funcCall.functionName} and args of {String.Join(", ", funcCall.args)}";
     }
 
-    public static string printVarAss(VariableAssignment varAss)
+    public static string printVarAss(AST.VariableAssignment varAss)
     {
         if (!varAss.reassignment)
         {
@@ -132,76 +132,76 @@ public static class Parser
         }
     }
 
-    public static string printProto(PrototypeAST proto)
+    public static string printProto(AST.Prototype proto)
     {
         return $"{proto.nodeType} with name of {proto.name}";
     }
 
-    public static string printIfStat(IfStatement ifStat)
+    public static string printIfStat(AST.IfStatement ifStat)
     {
         return $"if statement with expression of {printBinary(ifStat.expression)} and body of ( {printASTRet(ifStat.thenFunc.body)} ) body end | else statement: {printElseStat(ifStat.elseStat)}";
     }
 
-    public static string printElseStat(ElseStatement elseStat)
+    public static string printElseStat(AST.ElseStatement elseStat)
     {
         return $"else statement with body of ( {printASTRet(elseStat.elseFunc.body)} )";
     }
 
-    public static string printForLoop(ForLoop forLoop)
+    public static string printForLoop(AST.ForLoop forLoop)
     {
         return $"For loop with iteration object of {forLoop.iterationObject} and index obj of {printPhiVar(forLoop.index)} complexity of {forLoop.complex} and body of ( {printASTRet(forLoop.body)} ) body end";
     }
 
-    public static string printPhiVar(PhiVariable phiVar)
+    public static string printPhiVar(AST.PhiVariable phiVar)
     {
         return $"phi variable with type of {phiVar.type.value} and name of {phiVar.name} and value of {phiVar.value}";
     }
 
-    public static string printASTRet(List<ASTNode> nodesPrint)
+    public static string printASTRet(List<AST.Node> nodesPrint)
     {
         StringBuilder stringBuilder = new StringBuilder();
 
-        foreach (ASTNode node in nodesPrint)
+        foreach (AST.Node node in nodesPrint)
         {
             switch (node.nodeType)
             {
-                case ASTNode.NodeType.BinaryExpression:
-                    BinaryExpression bin = (BinaryExpression)node;
+                case AST.Node.NodeType.BinaryExpression:
+                    AST.BinaryExpression bin = (AST.BinaryExpression)node;
                     stringBuilder.Append(printBinary(bin));
                     stringBuilder.Append("\n");
                     break;
-                case ASTNode.NodeType.Function:
-                    FunctionAST func = (FunctionAST)node;
+                case AST.Node.NodeType.Function:
+                    AST.Function func = (AST.Function)node;
                     stringBuilder.Append(printFunc(func));
                     stringBuilder.Append("\n");
                     break;
-                case ASTNode.NodeType.FunctionCall:
-                    FunctionCall funcCall = (FunctionCall)node;
+                case AST.Node.NodeType.FunctionCall:
+                    AST.FunctionCall funcCall = (AST.FunctionCall)node;
                     stringBuilder.Append(printFuncCall(funcCall));
                     stringBuilder.Append("\n");
                     break;
-                case ASTNode.NodeType.VariableAssignment:
-                    VariableAssignment varAss = (VariableAssignment)node;
+                case AST.Node.NodeType.VariableAssignment:
+                    AST.VariableAssignment varAss = (AST.VariableAssignment)node;
                     stringBuilder.Append(printVarAss(varAss));
                     stringBuilder.Append("\n");
                     break;
-                case ASTNode.NodeType.Prototype:
-                    PrototypeAST proto = (PrototypeAST)node;
+                case AST.Node.NodeType.Prototype:
+                    AST.Prototype proto = (AST.Prototype)node;
                     stringBuilder.Append(printProto(proto));
                     stringBuilder.Append("\n");
                     break;
-                case ASTNode.NodeType.NumberExpression:
-                    NumberExpression numExp = (NumberExpression)node;
+                case AST.Node.NodeType.NumberExpression:
+                    AST.NumberExpression numExp = (AST.NumberExpression)node;
                     stringBuilder.Append($"{numExp.nodeType} of value {numExp.value}");
                     stringBuilder.Append("\n");
                     break;
-                case ASTNode.NodeType.IfStatement:
-                    IfStatement ifStat = (IfStatement)node;
+                case AST.Node.NodeType.IfStatement:
+                    AST.IfStatement ifStat = (AST.IfStatement)node;
                     stringBuilder.Append(printIfStat(ifStat));
                     stringBuilder.Append("\n");
                     break;
-                case ASTNode.NodeType.ForLoop:
-                    ForLoop forLoop = (ForLoop)node;
+                case AST.Node.NodeType.ForLoop:
+                    AST.ForLoop forLoop = (AST.ForLoop)node;
                     stringBuilder.Append(printForLoop(forLoop));
                     stringBuilder.Append("\n");
                     break;
@@ -216,46 +216,46 @@ public static class Parser
         return stringBuilder.ToString();
     }
 
-    public static void printAST(List<ASTNode> nodesPrint)
+    public static void printAST(List<AST.Node> nodesPrint)
     {
         StringBuilder stringBuilder = new StringBuilder();
 
-        foreach (ASTNode node in nodesPrint)
+        foreach (AST.Node node in nodesPrint)
         {
             switch (node.nodeType)
             {
-                case ASTNode.NodeType.BinaryExpression:
-                    BinaryExpression bin = (BinaryExpression)node;
+                case AST.Node.NodeType.BinaryExpression:
+                    AST.BinaryExpression bin = (AST.BinaryExpression)node;
                     stringBuilder.Append(printBinary(bin));
                     stringBuilder.Append("\n");
                     break;
-                case ASTNode.NodeType.Function:
-                    FunctionAST func = (FunctionAST)node;
+                case AST.Node.NodeType.Function:
+                    AST.Function func = (AST.Function)node;
                     stringBuilder.Append(printFunc(func));
                     stringBuilder.Append("\n");
                     break;
-                case ASTNode.NodeType.FunctionCall:
-                    FunctionCall funcCall = (FunctionCall)node;
+                case AST.Node.NodeType.FunctionCall:
+                    AST.FunctionCall funcCall = (AST.FunctionCall)node;
                     stringBuilder.Append(printFuncCall(funcCall));
                     stringBuilder.Append("\n");
                     break;
-                case ASTNode.NodeType.VariableAssignment:
-                    VariableAssignment varAss = (VariableAssignment)node;
+                case AST.Node.NodeType.VariableAssignment:
+                    AST.VariableAssignment varAss = (AST.VariableAssignment)node;
                     stringBuilder.Append(printVarAss(varAss));
                     stringBuilder.Append("\n");
                     break;
-                case ASTNode.NodeType.Prototype:
-                    PrototypeAST proto = (PrototypeAST)node;
+                case AST.Node.NodeType.Prototype:
+                    AST.Prototype proto = (AST.Prototype)node;
                     stringBuilder.Append(printProto(proto));
                     stringBuilder.Append("\n");
                     break;
-                case ASTNode.NodeType.IfStatement:
-                    IfStatement ifStat = (IfStatement)node;
+                case AST.Node.NodeType.IfStatement:
+                    AST.IfStatement ifStat = (AST.IfStatement)node;
                     stringBuilder.Append(printIfStat(ifStat));
                     stringBuilder.Append("\n");
                     break;
-                case ASTNode.NodeType.ForLoop:
-                    ForLoop forLoop = (ForLoop)node;
+                case AST.Node.NodeType.ForLoop:
+                    AST.ForLoop forLoop = (AST.ForLoop)node;
                     stringBuilder.Append(printForLoop(forLoop));
                     stringBuilder.Append("\n");
                     break;
@@ -288,7 +288,7 @@ public static class Parser
         return ret;
     }
 
-    public static List<dynamic> parseKeyword(Util.Token token, int tokenIndex, ASTNode? parent = null, int delimLevel = 0)
+    public static List<dynamic> parseKeyword(Util.Token token, int tokenIndex, AST.Node? parent = null, int delimLevel = 0)
     {
         List<dynamic> ret = new List<dynamic>();
         Util.Token nextToken = tokenList[tokenIndex + 1];
@@ -297,60 +297,60 @@ public static class Parser
 
         if (token.value == Config.options.variable.declaration.keyword.mutable)
         {
-            VariableAssignment varAss = new VariableAssignment(token, true);
+            AST.VariableAssignment varAss = new AST.VariableAssignment(token, true);
             return new List<dynamic>() { varAss, delimLevel };
         }
         else if (token.value == Config.options.variable.declaration.keyword.constant)
         {
-            VariableAssignment constAss = new VariableAssignment(token, false);
+            AST.VariableAssignment constAss = new AST.VariableAssignment(token, false);
             return new List<dynamic>() { constAss, delimLevel };
         }
         else if (token.value == "if")
         {
-            IfStatement ifStat = new IfStatement(token, parent);
+            AST.IfStatement ifStat = new AST.IfStatement(token, parent);
             return new List<dynamic>() { ifStat, delimLevel };
         }
         else if (token.value == "else")
         {
-            IfStatement ifParent = (IfStatement)parent;
+            AST.IfStatement ifParent = (AST.IfStatement)parent;
             return new List<dynamic>() { ifParent.elseStat, delimLevel };
         }
         else if (token.value == "for")
         {
-            ForLoop forLoop = new ForLoop(token, parent);
+            AST.ForLoop forLoop = new AST.ForLoop(token, parent);
             return new List<dynamic>() { forLoop, delimLevel };
         }
         else if (Config.options.function.declaration.marker.word && token.value == Config.options.function.declaration.marker.value)
         {
-            PrototypeAST proto = new PrototypeAST(token);
+            AST.Prototype proto = new AST.Prototype(token);
             return new List<dynamic>() { proto, delimLevel };
         }
         else if (!Config.options.function.declaration.marker.word && token.value[0].ToString() == Config.options.function.declaration.marker.value)
         {
-            PrototypeAST proto = new PrototypeAST(token);
+            AST.Prototype proto = new AST.Prototype(token);
             return new List<dynamic>() { proto, delimLevel };
         }
         else if (Config.options.function.calling.builtin.marker.location == "end" && token.value.EndsWith(Config.options.function.calling.builtin.marker.value))
         {
             //treat it as a builtin call
-            FunctionCall builtinCall = new FunctionCall(token, null, true, parent, false);
+            AST.FunctionCall builtinCall = new AST.FunctionCall(token, null, true, parent, false);
             return new List<dynamic>() { builtinCall, delimLevel };
         }
         else if (Config.options.function.calling.builtin.marker.location == "beginning" && token.value.StartsWith(Config.options.function.calling.builtin.marker.value))
         {
             //treat it as a builtin call
-            FunctionCall builtinCall = new FunctionCall(token, null, true, parent, false);
+            AST.FunctionCall builtinCall = new AST.FunctionCall(token, null, true, parent, false);
             return new List<dynamic>() { builtinCall, delimLevel };
         }
         else if (nextToken.value == Config.options.function.calling.args.delimeters[0])
         {
-            FunctionCall funcCall = new FunctionCall(token, null, false, parent);
+            AST.FunctionCall funcCall = new AST.FunctionCall(token, null, false, parent);
             return new List<dynamic>() { funcCall, delimLevel };
         }
 
-        else if (parent.nodeType == ASTNode.NodeType.ForLoop)
+        else if (parent.nodeType == AST.Node.NodeType.ForLoop)
         {
-            ForLoop forLoop = (ForLoop)parent;
+            AST.ForLoop forLoop = (AST.ForLoop)parent;
             if (!forLoop.isBody)
             {
                 parent.addChild(token);
@@ -360,12 +360,12 @@ public static class Parser
 
         switch (parent?.nodeType)
         {
-            case ASTNode.NodeType.Prototype:
-                PrototypeAST proto = (PrototypeAST)parent;
+            case AST.Node.NodeType.Prototype:
+                AST.Prototype proto = (AST.Prototype)parent;
                 proto.addItem(token);
                 return new List<dynamic>() { parent, delimLevel };
-            case ASTNode.NodeType.VariableAssignment:
-                VariableAssignment varAss = (VariableAssignment)parent;
+            case AST.Node.NodeType.VariableAssignment:
+                AST.VariableAssignment varAss = (AST.VariableAssignment)parent;
                 if (varAss.reassignment)
                 {
                     break;
@@ -376,11 +376,11 @@ public static class Parser
 
 
 
-        new VariableExpression(token, parent);
+        new AST.VariableExpression(token, parent);
         return new List<dynamic>() { parent, delimLevel };
     }
 
-    public static List<dynamic> parseDelim(Util.Token token, int tokenIndex, ASTNode? parent = null, int delimLevel = 0)
+    public static List<dynamic> parseDelim(Util.Token token, int tokenIndex, AST.Node? parent = null, int delimLevel = 0)
     {
 
         if (token.type == Util.TokenType.DelimiterOpen)
@@ -397,20 +397,20 @@ public static class Parser
         {
             switch (parent?.nodeType)
             {
-                case ASTNode.NodeType.ForLoop:
+                case AST.Node.NodeType.ForLoop:
                     delimLevel--;
                     return new List<dynamic>() { parent, delimLevel };
                     break;
-                case ASTNode.NodeType.IfStatement:
+                case AST.Node.NodeType.IfStatement:
                     break;
-                case ASTNode.NodeType.Function:
+                case AST.Node.NodeType.Function:
                     break;
-                case ASTNode.NodeType.Prototype:
+                case AST.Node.NodeType.Prototype:
                     parent = new FunctionAST((PrototypeAST)parent);
                     delimLevel--;
                     return new List<dynamic>() { parent, delimLevel };
                     break;
-                case ASTNode.NodeType.FunctionCall:
+                case AST.Node.NodeType.FunctionCall:
                     break;
                 default:
                     parent?.addChild(token);
@@ -435,7 +435,7 @@ public static class Parser
         //     case "(":
         //         switch (parent?.nodeType)
         //         {
-        //             case ASTNode.NodeType.ForLoop:
+        //             case AST.Node.NodeType.ForLoop:
         //                 parent.addChild(token);
         //                 break;
         //         }
@@ -444,13 +444,13 @@ public static class Parser
         //     case "{":
         //         switch (parent?.nodeType)
         //         {
-        //             // case ASTNode.NodeType.Prototype:
+        //             // case AST.Node.NodeType.Prototype:
         //             //     parent = new FunctionAST((PrototypeAST)parent);
         //             //     break;
-        //             case ASTNode.NodeType.IfStatement:
+        //             case AST.Node.NodeType.IfStatement:
         //                 parent.addChild(token);
         //                 break;
-        //             case ASTNode.NodeType.ForLoop:
+        //             case AST.Node.NodeType.ForLoop:
         //                 parent.addChild(token);
         //                 break;
         //         }
@@ -460,7 +460,7 @@ public static class Parser
         //     case "[":
         //         switch (parent?.nodeType)
         //         {
-        //             case ASTNode.NodeType.FunctionCall:
+        //             case AST.Node.NodeType.FunctionCall:
         //                 break;
         //         }
         //         delimLevel++;
@@ -478,12 +478,12 @@ public static class Parser
         //         break;
         //     case ")":
         //         delimLevel--;
-        //         if (parent.nodeType == ASTNode.NodeType.Prototype)
+        //         if (parent.nodeType == AST.Node.NodeType.Prototype)
         //         {
-        //             parent = new FunctionAST((PrototypeAST)parent, new List<ASTNode>());
+        //             parent = new FunctionAST((PrototypeAST)parent, new List<AST.Node>());
         //             break;
         //         }
-        //         else if (parent.nodeType == ASTNode.NodeType.ForLoop)
+        //         else if (parent.nodeType == AST.Node.NodeType.ForLoop)
         //         {
         //             break;
         //         }
@@ -491,7 +491,7 @@ public static class Parser
         //         {
         //             switch (parent.nodeType)
         //             {
-        //                 case ASTNode.NodeType.IfStatement:
+        //                 case AST.Node.NodeType.IfStatement:
         //                     break;
         //             }
         //             parent = null;
@@ -517,13 +517,13 @@ public static class Parser
         // return new List<dynamic>() { parent, delimLevel };
     }
 
-    public static bool parseTokenRecursive(Util.Token token, int tokenIndex, ASTNode? parent = null, Util.TokenType[]? expectedTypes = null, int delimLevel = 0)
+    public static bool parseTokenRecursive(Util.Token token, int tokenIndex, AST.Node? parent = null, Util.TokenType[]? expectedTypes = null, int delimLevel = 0)
     {
         prevLine = token.line;
         prevColumn = token.column;
 
         Console.WriteLine($"token of value: {token.value} and parent of {parent?.nodeType}");
-        ASTNode? previousNode = nodes.Count > 0 && tokenIndex > 0 ? nodes.Last() : null;
+        AST.Node? previousNode = nodes.Count > 0 && tokenIndex > 0 ? nodes.Last() : null;
 
         if (token.type == Util.TokenType.EOF)
         {
@@ -539,7 +539,7 @@ public static class Parser
                 }
             }
 
-            else if (parent?.nodeType != ASTNode.NodeType.Function && parent?.nodeType != ASTNode.NodeType.IfStatement && parent?.nodeType != ASTNode.NodeType.ElseStatement && parent?.nodeType != ASTNode.NodeType.ForLoop /* && tokenList[tokenIndex - 1].value != "{" */ && delimLevel == 0)
+            else if (parent?.nodeType != AST.Node.NodeType.Function && parent?.nodeType != AST.Node.NodeType.IfStatement && parent?.nodeType != AST.Node.NodeType.ElseStatement && parent?.nodeType != AST.Node.NodeType.ForLoop /* && tokenList[tokenIndex - 1].value != "{" */ && delimLevel == 0)
             {
                 return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, null, delimLevel: delimLevel);
             }
@@ -558,45 +558,45 @@ public static class Parser
         {
             case Util.TokenType.Int:
 
-                if (parent.nodeType == ASTNode.NodeType.VariableAssignment)
+                if (parent.nodeType == AST.Node.NodeType.VariableAssignment)
                 {
                     parent.addChild(token);
                     break;
                 }
-                new NumberExpression(token, parent);
+                new AST.NumberExpression(token, parent);
                 break;
 
             case Util.TokenType.Operator:
-                BinaryExpression binExpr = new BinaryExpression(token, previousNode, parent);
+                AST.BinaryExpression binExpr = new AST.BinaryExpression(token, previousNode, parent);
                 return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, binExpr, binaryExpectedTokens, delimLevel: delimLevel);
 
             case Util.TokenType.Keyword:
                 List<dynamic> keywordRet = parseKeyword(token, tokenIndex, parent, delimLevel);
-                //0 is the keyword ASTNode, 1 is the next token, and 2 is the next token index
+                //0 is the keyword AST.Node, 1 is the next token, and 2 is the next token index
                 return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, keywordRet[0], delimLevel: keywordRet[1]);
 
             case Util.TokenType.AssignmentOp:
-                if (parent?.nodeType == ASTNode.NodeType.VariableAssignment)
+                if (parent?.nodeType == AST.Node.NodeType.VariableAssignment)
                 {
                     parent.addChild(token);
                 }
                 else
                 {
-                    VariableAssignment varAss = new VariableAssignment(token, true, parent);
+                    AST.VariableAssignment varAss = new AST.VariableAssignment(token, true, parent);
                     return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, varAss, delimLevel: delimLevel);
                     // VariableReAssignment varReAss = new VariableReAssignment(token);
                     // return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, varReAss, delimLevel: delimLevel);
                 }
                 break;
             case Util.TokenType.String:
-                new StringExpression(token, parent);
+                new AST.StringExpression(token, parent);
                 return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, parent, delimLevel: delimLevel);
         }
 
         if (token.isDelim)
         {
             List<dynamic> delimRet = parseDelim(token, tokenIndex, parent, delimLevel);
-            ASTNode delimParent = delimRet[0];
+            AST.Node delimParent = delimRet[0];
             return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, delimParent, delimLevel: delimRet[1]);
             // if (parent != null)
             //     return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, parent);
@@ -605,7 +605,7 @@ public static class Parser
 
     }
 
-    public static List<ASTNode> beginParse(List<Util.Token> _tokenList)
+    public static List<AST.Node> beginParse(List<Util.Token> _tokenList)
     {
         tokenList = _tokenList;
 
@@ -624,7 +624,7 @@ public static class Parser
     public static void addLanguageBuiltins()
     {
         Util.Token newLineAssToken = new Util.Token(Util.TokenType.Keyword, "const", 0, 0);
-        VariableAssignment newLineAss = new VariableAssignment(newLineAssToken, false);
+        AST.VariableAssignment newLineAss = new AST.VariableAssignment(newLineAssToken, false);
         newLineAss.addChild(new Util.Token(Util.TokenType.Keyword, "string", 0, 0));
         newLineAss.addChild(new Util.Token(Util.TokenType.Keyword, "nl", 0, 0));
         newLineAss.addChild(new Util.Token(Util.TokenType.AssignmentOp, "=", 0, 0));
@@ -638,7 +638,7 @@ public static class Parser
         printProtoArgs.Add(new Util.Token(Util.TokenType.Keyword, "x", 0, 0));
         Util.Token printToken = new Util.Token(Util.TokenType.Keyword, "@printf", 0, 0);
 
-        PrototypeAST printProto = new PrototypeAST(printToken, printProtoArgs);
+        AST.Prototype printProto = new AST.Prototype(printToken, printProtoArgs);
         nodes.Insert(0, printProto);
 
         List<Util.Token> printlnProtoArgs = new List<Util.Token>();
@@ -647,7 +647,7 @@ public static class Parser
         printlnProtoArgs.Add(new Util.Token(Util.TokenType.Keyword, "x", 0, 0));
         Util.Token printlnToken = new Util.Token(Util.TokenType.Keyword, "@println", 0, 0);
 
-        PrototypeAST printlnProto = new PrototypeAST(printlnToken, printlnProtoArgs);
+        AST.Prototype printlnProto = new AST.Prototype(printlnToken, printlnProtoArgs);
         nodes.Insert(0, printlnProto);
 
 

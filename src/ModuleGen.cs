@@ -2,7 +2,7 @@ using LLVMSharp;
 
 public static class ModuleGen
 {
-    public static void GenerateModule(List<ASTNode> nodes)
+    public static void GenerateModule(List<AST.Node> nodes)
     {
         // Make the module, which holds all the code.
         LLVMModuleRef module = LLVM.ModuleCreateWithName("HISS");

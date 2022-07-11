@@ -21,11 +21,11 @@ public static class IRGen
 
     public static Dictionary<string, LLVMValueRef> namedValuesLLVM = new Dictionary<string, LLVMValueRef>();
 
-    public static Dictionary<string, VariableAssignment> namedGlobalsAST = new Dictionary<string, VariableAssignment>();
+    public static Dictionary<string, AST.VariableAssignment> namedGlobalsAST = new Dictionary<string, AST.VariableAssignment>();
 
     public static LLVMBasicBlockRef mainEntryBlock;
     public static bool mainBuilt = false;
-    public static List<ASTNode> nodesToBuild = new List<ASTNode>();
+    public static List<AST.Node> nodesToBuild = new List<AST.Node>();
 
     public static Dictionary<string, LLVMValueRef> namedMutablesLLVM = new Dictionary<string, LLVMValueRef>();
 
@@ -280,9 +280,6 @@ public static class IRGen
 
     public static void generateIfStatment(IfStatement ifStat)
     {
-
-
-
         //evaluates the condition as a bool
         generateBinaryExpression(ifStat.expression);
         LLVMValueRef condValue = valueStack.Pop();

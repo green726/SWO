@@ -1,17 +1,17 @@
+namespace AST;
 
-
-public class IfStatement : ASTNode
+public class IfStatement : AST.Node
 {
     public BinaryExpression expression = null;
-    // public List<ASTNode> thenBody = new List<ASTNode>();
-    public FunctionAST thenFunc;
+    // public List<AST.Node> thenBody = new List<AST.Node>();
+    public Function thenFunc;
     public FunctionCall thenCall;
     public ElseStatement elseStat;
     private bool isBody = false;
     // private bool isStat = true;
 
 
-    public IfStatement(Util.Token token, ASTNode? parent = null) : base(token)
+    public IfStatement(Util.Token token, AST.Node? parent = null) : base(token)
     {
         this.nodeType = NodeType.IfStatement;
         parent?.addChild(this);
@@ -19,8 +19,8 @@ public class IfStatement : ASTNode
 
 
         Util.Token thenProtoTok = new Util.Token(Util.TokenType.Keyword, "@then" + Parser.ifFuncNum, token.line, token.column);
-        PrototypeAST thenProto = new PrototypeAST(thenProtoTok);
-        this.thenFunc = new FunctionAST(thenProto, new List<ASTNode>(), topLevel: false);
+        Prototype thenProto = new Prototype(thenProtoTok);
+        this.thenFunc = new Function(thenProto, new List<AST.Node>(), topLevel: false);
 
 
         Util.Token thenCallTok = new Util.Token(Util.TokenType.Keyword, "then" + Parser.ifFuncNum, token.line, token.column);
@@ -33,7 +33,7 @@ public class IfStatement : ASTNode
 
     }
 
-    public override void addChild(ASTNode child)
+    public override void addChild(AST.Node child)
     {
         if (expression == null)
         {

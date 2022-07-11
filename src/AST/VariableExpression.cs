@@ -1,8 +1,10 @@
-public class VariableExpression : ASTNode
+namespace AST;
+
+public class VariableExpression : AST.Node
 {
     public string varName = "";
 
-    public VariableExpression(Util.Token token, ASTNode? parent = null, bool parentRequired = true) : base(token)
+    public VariableExpression(Util.Token token, AST.Node? parent = null, bool parentRequired = true) : base(token)
     {
         varName = token.value;
         bool exists = false;

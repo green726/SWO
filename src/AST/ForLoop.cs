@@ -1,9 +1,10 @@
+namespace AST;
 
-public class ForLoop : ASTNode
+public class ForLoop : AST.Node
 {
     public PhiVariable index; // current index of loop
     public PhiVariable value; // current value of loop (if applicable)
-    public List<ASTNode> body;
+    public List<AST.Node> body;
     public bool isBody = false;
     public int parseIteration;
     public bool complex = false;
@@ -14,10 +15,10 @@ public class ForLoop : ASTNode
     private Util.Token indexName;
     private Util.Token valueName;
 
-    public ForLoop(Util.Token token, ASTNode parent) : base(token)
+    public ForLoop(Util.Token token, AST.Node parent) : base(token)
     {
         this.nodeType = NodeType.ForLoop;
-        this.body = new List<ASTNode>();
+        this.body = new List<AST.Node>();
 
         if (parent != null)
         {
@@ -140,7 +141,7 @@ public class ForLoop : ASTNode
         }
     }
 
-    public override void addChild(ASTNode child)
+    public override void addChild(AST.Node child)
     {
         base.addChild(child);
         if (isBody)
@@ -158,26 +159,26 @@ public class ForLoop : ASTNode
         }
         // else
         // {
-        //     throw new ParserException($"illegal addition of ASTNode child of type ({child.nodeType}) to for loop", child);
+        //     throw new ParserException($"illegal addition of AST.Node child of type ({child.nodeType}) to for loop", child);
         // }
 
     }
 
-    public override void removeChild(ASTNode child)
+    public override void removeChild(AST.Node child)
     {
         base.removeChild(child);
         body.Remove(child);
     }
 }
 
-public class PhiVariable : ASTNode
+public class PhiVariable : AST.Node
 {
     public string name;
-    public TypeAST type;
+    public Type type;
     public string value;
     public NumberExpression numExpr;
 
-    public PhiVariable(ASTNode node) : base(node)
+    public PhiVariable(AST.Node node) : base(node)
     {
         this.nodeType = NodeType.PhiVariable;
         this.parent = node;
@@ -194,7 +195,7 @@ public class PhiVariable : ASTNode
     public void setType(string type)
     {
         Util.Token typeToken = new Util.Token(Util.TokenType.Keyword, type, this.line, this.column);
-        this.type = new TypeAST(typeToken);
+        this.type = new Type(typeToken);
     }
 
     public void setName(string name)

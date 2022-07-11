@@ -1,7 +1,9 @@
-public class VariableAssignment : ASTNode
+namespace AST;
+
+public class VariableAssignment : AST.Node
 {
     public string name = "";
-    public TypeAST type;
+    public Type type;
     public string assignmentOp = "";
     public string strValue = "";
     public bool mutable = false;
@@ -10,9 +12,9 @@ public class VariableAssignment : ASTNode
     public bool reassignment = false;
     public bool binReassignment = false;
     public BinaryExpression? bin = null;
-    public ASTNode targetValue = null;
+    public AST.Node targetValue = null;
 
-    public VariableAssignment(Util.Token token, bool mutable, ASTNode? parent = null) : base(token)
+    public VariableAssignment(Util.Token token, bool mutable, AST.Node? parent = null) : base(token)
     {
         this.newLineReset = true;
 
@@ -26,7 +28,7 @@ public class VariableAssignment : ASTNode
             if (parent != null)
             {
 
-                ASTNode prevNode = parent.children.Last();
+                AST.Node prevNode = parent.children.Last();
                 if (prevNode.nodeType == NodeType.VariableExpression)
                 {
                     VariableExpression prevVarExpr = (VariableExpression)prevNode;
@@ -40,8 +42,8 @@ public class VariableAssignment : ASTNode
             else
             {
                 throw new ParserException("illegal top level variable reassignment", token);
-                // ASTNode prevNode = Parser.nodes.Last();
-                // if (prevNode.nodeType == ASTNode.NodeType.VariableExpression)
+                // AST.Node prevNode = Parser.nodes.Last();
+                // if (prevNode.nodeType == AST.Node.NodeType.VariableExpression)
                 // {
                 //     VariableExpression prevVarExpr = (VariableExpression)prevNode;
                 //     this.name = prevVarExpr.varName;
@@ -64,7 +66,7 @@ public class VariableAssignment : ASTNode
             switch (childLoop)
             {
                 case 0:
-                    this.type = new TypeAST(child);
+                    this.type = new Type(child);
                     break;
                 case 1:
                     this.name = child.value;
@@ -95,7 +97,7 @@ public class VariableAssignment : ASTNode
 
     }
 
-    public override void addChild(ASTNode node)
+    public override void addChild(AST.Node node)
     {
         base.addChild(node);
         Console.WriteLine("adding child of node type " + node.nodeType + "to varass");

@@ -1,11 +1,13 @@
+namespace AST;
+
 using System;
 
-public class NumberExpression : ASTNode
+public class NumberExpression : AST.Node
 {
     public double value;
-    public TypeAST type;
+    public Type type;
 
-    public NumberExpression(Util.Token token, ASTNode? parent) : base(token)
+    public NumberExpression(Util.Token token, AST.Node? parent) : base(token)
 
     {
         this.nodeType = NodeType.NumberExpression;
@@ -13,11 +15,11 @@ public class NumberExpression : ASTNode
         {
             case Util.TokenType.Double:
                 this.value = Double.Parse(token.value);
-                this.type = new TypeAST("double", this);
+                this.type = new Type("double", this);
                 break;
             case Util.TokenType.Int:
                 this.value = Int64.Parse(token.value);
-                this.type = new TypeAST("int", this);
+                this.type = new Type("int", this);
                 break;
         }
         this.parent = parent;

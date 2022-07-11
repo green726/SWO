@@ -2,11 +2,11 @@ namespace Generator;
 
 public class ElseStatement : Base
 {
-    global::ElseStatement elseStat;
+    AST.ElseStatement elseStat;
 
-    public ElseStatement(ASTNode node)
+    public ElseStatement(AST.Node node)
     {
-        this.elseStat = (global::ElseStatement)node;
+        this.elseStat = (AST.ElseStatement)node;
     }
 
     public override void generate()

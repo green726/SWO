@@ -1,15 +1,17 @@
-public class TypeAST : ASTNode
+namespace AST;
+
+public class Type : AST.Node
 {
     public string value;
     public Util.ClassType defaultType;
 
-    public TypeAST(Util.Token token) : base(token)
+    public Type(Util.Token token) : base(token)
     {
         this.nodeType = NodeType.TypeAST;
         this.value = token.value;
     }
 
-    public TypeAST(string value, ASTNode parent) : base(parent)
+    public Type(string value, AST.Node parent) : base(parent)
     {
         this.nodeType = NodeType.TypeAST;
         this.value = value;

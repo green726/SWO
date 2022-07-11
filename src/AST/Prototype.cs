@@ -1,13 +1,15 @@
+namespace AST;
+
 using System.Collections.Generic;
 
-public class PrototypeAST : ASTNode
+public class Prototype : AST.Node
 {
     public string name;
-    public Dictionary<TypeAST, string> arguments = new Dictionary<TypeAST, string>();
+    public Dictionary<Type, string> arguments = new Dictionary<Type, string>();
     private bool typePredicted = true;
-    private TypeAST prevType;
+    private Type prevType;
 
-    public PrototypeAST(Util.Token token, List<Util.Token> arguments = null) : base(token)
+    public Prototype(Util.Token token, List<Util.Token> arguments = null) : base(token)
     {
         this.nodeType = NodeType.Prototype;
 
@@ -29,7 +31,7 @@ public class PrototypeAST : ASTNode
                 {
 
                     Parser.checkToken(item, expectedType: Util.TokenType.Keyword);
-                    prevType = new TypeAST(new Util.Token(Util.TokenType.Keyword, item.value, this.line, this.column));
+                    prevType = new Type(new Util.Token(Util.TokenType.Keyword, item.value, this.line, this.column));
                     // switch (item.value)
                     // {
                     //     case "double":
@@ -56,7 +58,7 @@ public class PrototypeAST : ASTNode
         }
         else
         {
-            this.arguments = new Dictionary<TypeAST, string>();
+            this.arguments = new Dictionary<Type, string>();
         }
 
 
@@ -73,7 +75,7 @@ public class PrototypeAST : ASTNode
             {
 
                 Parser.checkToken(item, expectedType: Util.TokenType.Keyword);
-                prevType = new TypeAST(new Util.Token(Util.TokenType.Keyword, item.value, this.line, this.column));
+                prevType = new Type(new Util.Token(Util.TokenType.Keyword, item.value, this.line, this.column));
                 // switch (item.value)
                 // {
                 //     case "double":

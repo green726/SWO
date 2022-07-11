@@ -2,11 +2,11 @@ namespace Generator;
 
 public class Function : Base
 {
-    FunctionAST func;
+    AST.Function func;
 
-    public Function(ASTNode node)
+    public Function(AST.Node node)
     {
-        this.func = (FunctionAST)node;
+        this.func = (AST.Function)node;
     }
 
     public override void generate()

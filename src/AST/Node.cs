@@ -1,11 +1,13 @@
+namespace AST;
+
 using System.Collections.Generic;
 
-public abstract class ASTNode
+public abstract class Node
 {
-    Generator.Base generator;
+    public Generator.Base generator;
 
-    public List<ASTNode> children = new List<ASTNode>();
-    public ASTNode? parent = null;
+    public List<Node> children = new List<Node>();
+    public Node? parent = null;
 
     public int line = 0;
     public int column = 0;
@@ -17,7 +19,7 @@ public abstract class ASTNode
 
     public bool newLineReset = false;
 
-    protected ASTNode(Util.Token token)
+    protected Node(Util.Token token)
     {
         this.charNum = token.charNum;
         this.codeExcerpt = token.value;
@@ -25,7 +27,7 @@ public abstract class ASTNode
         this.column = token.column;
     }
 
-    protected ASTNode(ASTNode node)
+    protected Node(Node node)
     {
         this.line = node.line;
         this.column = node.column;
@@ -51,7 +53,7 @@ public abstract class ASTNode
         PhiVariable
     }
 
-    public virtual void addParent(ASTNode parent)
+    public virtual void addParent(Node parent)
     {
         if (this.parent != null)
         {
@@ -65,7 +67,7 @@ public abstract class ASTNode
 
     }
 
-    public virtual void addChild(ASTNode child)
+    public virtual void addChild(Node child)
     {
         this.codeExcerpt += child.codeExcerpt;
         children.Add(child);
@@ -76,7 +78,7 @@ public abstract class ASTNode
         this.codeExcerpt += child.value;
     }
 
-    public virtual void removeChild(ASTNode child)
+    public virtual void removeChild(Node child)
     {
         this.codeExcerpt.Replace(child.codeExcerpt, "");
         children.Remove(child);

@@ -36,7 +36,7 @@ public class HISS
             Console.WriteLine(token.type + " " + token.value);
         }
 
-        List<ASTNode> nodes = Parser.beginParse(lexedContent);
+        List<AST.Node> nodes = Parser.beginParse(lexedContent);
         ModuleGen.GenerateModule(nodes);
 
 

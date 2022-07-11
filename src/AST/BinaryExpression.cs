@@ -1,9 +1,11 @@
+namespace AST;
+
 using System.Linq;
 
-public class BinaryExpression : ASTNode
+public class BinaryExpression : AST.Node
 {
-    public ASTNode leftHand;
-    public ASTNode? rightHand;
+    public AST.Node leftHand;
+    public AST.Node? rightHand;
     public OperatorType operatorType;
 
     public enum OperatorType
@@ -16,7 +18,7 @@ public class BinaryExpression : ASTNode
         LessThan,
     }
 
-    public BinaryExpression(Util.Token token, ASTNode? previousNode, ASTNode? parent) : base(token)
+    public BinaryExpression(Util.Token token, AST.Node? previousNode, AST.Node? parent) : base(token)
 
     {
         this.newLineReset = true;
@@ -52,7 +54,7 @@ public class BinaryExpression : ASTNode
         {
             if (this.parent.nodeType == NodeType.Function)
             {
-                FunctionAST prevFunc = (FunctionAST)parent;
+                Function prevFunc = (Function)parent;
                 Parser.checkNode(prevFunc.body.Last(), Parser.binaryExpectedNodes);
                 this.leftHand = prevFunc.body.Last();
             }
@@ -80,7 +82,7 @@ public class BinaryExpression : ASTNode
                 this.leftHand = previousNode;
             }
         }
-        if (this?.leftHand?.nodeType == ASTNode.NodeType.NumberExpression || this?.leftHand?.nodeType == NodeType.VariableExpression)
+        if (this?.leftHand?.nodeType == AST.Node.NodeType.NumberExpression || this?.leftHand?.nodeType == NodeType.VariableExpression)
         {
             this.leftHand.addParent(this);
         }
@@ -104,10 +106,10 @@ public class BinaryExpression : ASTNode
             this.parent.addChild(this);
         }
     }
-    public override void addChild(ASTNode child)
+    public override void addChild(AST.Node child)
     {
         base.addChild(child);
-        if (child.nodeType == ASTNode.NodeType.BinaryExpression)
+        if (child.nodeType == AST.Node.NodeType.BinaryExpression)
         {
         }
         else if (rightHand == null)

@@ -2,7 +2,7 @@ using System;
 
 public class GenException : Exception
 {
-    public GenException(string msg, ASTNode node) : base($"{msg} at {node.line}:{node.column}")
+    public GenException(string msg, AST.Node node) : base($"{msg} at {node.line}:{node.column}")
     {
     }
 
@@ -12,7 +12,7 @@ public class GenException : Exception
 
     public GenException(string msg) : base(msg) { }
 
-    public static GenException FactoryMethod(string whatHappened, string recommendedFix, ASTNode node, bool typoSuspected = false, string typoString = "")
+    public static GenException FactoryMethod(string whatHappened, string recommendedFix, AST.Node node, bool typoSuspected = false, string typoString = "")
     {
         string input = "";
         if (typoSuspected)
@@ -30,7 +30,7 @@ public class GenException : Exception
         return new GenException(input);
     }
 
-    public static string getCodeBlock(ASTNode node)
+    public static string getCodeBlock(AST.Node node)
     {
         return "";
     }

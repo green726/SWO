@@ -1,17 +1,19 @@
+namespace AST;
 
-public class ElseStatement : ASTNode
+
+public class ElseStatement : AST.Node
 {
-    public FunctionAST elseFunc;
+    public Function elseFunc;
     public FunctionCall elseCall;
 
-    public ElseStatement(ASTNode parent, Util.Token token) : base(token)
+    public ElseStatement(AST.Node parent, Util.Token token) : base(token)
     {
         this.nodeType = NodeType.ElseStatement;
 
         this.parent = parent;
         Util.Token elseProtoTok = new Util.Token(Util.TokenType.Keyword, "@else" + Parser.ifFuncNum, token.line, token.column);
-        PrototypeAST elseProto = new PrototypeAST(elseProtoTok);
-        this.elseFunc = new FunctionAST(elseProto, new List<ASTNode>(), topLevel: false);
+        Prototype elseProto = new Prototype(elseProtoTok);
+        this.elseFunc = new Function(elseProto, new List<AST.Node>(), topLevel: false);
 
 
         Util.Token thenCallTok = new Util.Token(Util.TokenType.Keyword, "else" + Parser.ifFuncNum, token.line, token.column);
@@ -19,7 +21,7 @@ public class ElseStatement : ASTNode
 
     }
 
-    public override void addChild(ASTNode child)
+    public override void addChild(AST.Node child)
     {
         elseFunc.addChild(child);
         base.addChild(child);

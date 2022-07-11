@@ -1,14 +1,16 @@
+namespace AST;
+
 using System.Collections.Generic;
 
-public class FunctionAST : ASTNode
+public class Function : AST.Node
 {
-    public PrototypeAST prototype;
-    public List<ASTNode> body;
+    public Prototype prototype;
+    public List<AST.Node> body;
 
 
-    public FunctionAST(PrototypeAST prototype, List<ASTNode>? body = null, bool topLevel = true) : base(prototype)
+    public Function(Prototype prototype, List<AST.Node>? body = null, bool topLevel = true) : base(prototype)
     {
-        if (body == null) body = new List<ASTNode>();
+        if (body == null) body = new List<AST.Node>();
         this.nodeType = NodeType.Function;
         this.prototype = prototype;
         this.body = body;
@@ -19,12 +21,12 @@ public class FunctionAST : ASTNode
         }
     }
 
-    public FunctionAST(PrototypeAST prototype, ASTNode body, bool topLevel = true) : base(prototype)
+    public Function(Prototype prototype, AST.Node body, bool topLevel = true) : base(prototype)
 
     {
         this.nodeType = NodeType.Function;
         this.prototype = prototype;
-        this.body = new List<ASTNode>();
+        this.body = new List<AST.Node>();
         this.body.Add(body);
 
         if (topLevel)
@@ -33,13 +35,13 @@ public class FunctionAST : ASTNode
         }
     }
 
-    public override void removeChild(ASTNode child)
+    public override void removeChild(AST.Node child)
     {
         base.removeChild(child);
         this.body.Remove(child);
     }
 
-    public override void addChild(ASTNode child)
+    public override void addChild(AST.Node child)
     {
         base.addChild(child);
         this.body.Add(child);

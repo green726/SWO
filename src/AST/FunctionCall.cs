@@ -1,13 +1,15 @@
+namespace AST;
+
 using System.Collections.Generic;
 using System.Linq;
 
-public class FunctionCall : ASTNode
+public class FunctionCall : AST.Node
 {
     public string? functionName;
     public bool builtIn = false;
-    public List<ASTNode> args;
+    public List<AST.Node> args;
 
-    public FunctionCall(Util.Token token, List<ASTNode>? args, bool? builtInExpected = false, ASTNode? parent = null, bool topLevel = false) : base(token)
+    public FunctionCall(Util.Token token, List<AST.Node>? args, bool? builtInExpected = false, AST.Node? parent = null, bool topLevel = false) : base(token)
 
     {
         this.nodeType = NodeType.FunctionCall;
@@ -23,7 +25,7 @@ public class FunctionCall : ASTNode
         }
 
         this.functionName = this.builtIn ? builtinName : token.value;
-        this.args = args ??= new List<ASTNode>();
+        this.args = args ??= new List<AST.Node>();
 
         //NOTE: commented out below is to throw in an anonymous function
         // PrototypeAST proto = new PrototypeAST();
@@ -43,19 +45,19 @@ public class FunctionCall : ASTNode
         }
     }
 
-    public override void addChild(ASTNode child)
+    public override void addChild(AST.Node child)
     {
         base.addChild(child);
         args.Add(child);
     }
 
-    public override void removeChild(ASTNode child)
+    public override void removeChild(AST.Node child)
     {
         args.Remove(child);
         base.removeChild(child);
     }
 
-    public void addChildAtStart(ASTNode child)
+    public void addChildAtStart(AST.Node child)
     {
         args.Insert(0, child);
         base.addChild(child);

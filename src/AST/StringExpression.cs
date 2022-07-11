@@ -1,9 +1,11 @@
-public class StringExpression : ASTNode
+namespace AST;
+
+public class StringExpression : AST.Node
 {
     public string value;
     public bool builtInString;
 
-    public StringExpression(Util.Token token, ASTNode? parent = null, bool dontAdd = false, bool builtInString = false) : base(token)
+    public StringExpression(Util.Token token, AST.Node? parent = null, bool dontAdd = false, bool builtInString = false) : base(token)
     {
         Parser.checkToken(token, expectedType: Util.TokenType.String);
 

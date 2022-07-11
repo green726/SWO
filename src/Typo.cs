@@ -119,15 +119,15 @@ in 1
         }
     }
 
-    public static void addToLittle(ASTNode node)
+    public static void addToLittle(AST.Node node)
     {
 
         fileStream = new FileStream(littlePath, FileMode.Append);
         littleWriter = new StreamWriter(fileStream);
         switch (node.nodeType)
         {
-            case ASTNode.NodeType.VariableAssignment:
-                VariableAssignment varAss = (VariableAssignment)node;
+            case AST.Node.NodeType.VariableAssignment:
+                AST.VariableAssignment varAss = (AST.VariableAssignment)node;
                 littleWriter.WriteLine($"{varAss.name} 1");
                 Console.WriteLine($"added var ass with name {varAss.name} to little dict");
                 break;
