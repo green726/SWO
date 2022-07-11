@@ -45,13 +45,13 @@ public class FunctionCall : Base
 
     public void generateBuiltinCall()
     {
-        StringExpression printFormat;
+        AST.StringExpression printFormat;
         switch (funcCall.functionName)
         {
             case "print":
                 funcCall.functionName = "printf";
 
-                printFormat = evaluatePrintFormat(funcCall);
+                printFormat = evaluatePrintFormat();
                 // Console.WriteLine("successfully evaluated print format");
 
                 funcCall.addChildAtStart(printFormat);
@@ -60,7 +60,7 @@ public class FunctionCall : Base
             case "println":
                 funcCall.functionName = "printf";
 
-                printFormat = evaluatePrintFormat(funcCall);
+                printFormat = evaluatePrintFormat();
                 Console.WriteLine("successfully evaluated print format");
 
                 funcCall.addChildAtStart(printFormat);
@@ -102,4 +102,56 @@ public class FunctionCall : Base
         // Console.WriteLine("successfully evaluated builtin call");
 
     }
+
+    public AST.StringExpression evaluatePrintFormat()
+    {
+        switch (funcCall.args[0].nodeType)
+        {
+            case AST.Node.NodeType.NumberExpression:
+                AST.NumberExpression numExpr = (AST.NumberExpression)funcCall.args[0];
+                if (numExpr.type.value == "int")
+                {
+                    return new AST.StringExpression(new Util.Token(Util.TokenType.String, "\"%d\"", 0, 0), funcCall, true);
+                }
+                else if (numExpr.type.value == "double")
+                {
+                    return new AST.StringExpression(new Util.Token(Util.TokenType.String, "\"%f\"", 0, 0), funcCall, true);
+                }
+                return new AST.StringExpression(new Util.Token(Util.TokenType.String, "\"%f\"", 0, 0), funcCall, true);
+            case AST.Node.NodeType.StringExpression:
+                return new AST.StringExpression(new Util.Token(Util.TokenType.String, "\"%s\"", 0, 0), funcCall, true);
+            case AST.Node.NodeType.VariableExpression:
+                AST.VariableExpression varExpr = (AST.VariableExpression)funcCall.args[0];
+                if (namedGlobalsAST.ContainsKey(varExpr.varName))
+                {
+                    return evaluatePrintFormat(namedGlobalsAST[varExpr.varName].type);
+                }
+                else if (namedValuesLLVM.ContainsKey(varExpr.varName))
+                {
+                    AST.Type printType = LLVMTypeToASTType(namedValuesLLVM[varExpr.varName].TypeOf(), funcCall);
+                    return evaluatePrintFormat(printType);
+                }
+                throw GenException.FactoryMethod("An unknown variable was printed", "Likely a typo", varExpr, true, varExpr.varName);
+
+
+        }
+
+        return new AST.StringExpression(new Util.Token(Util.TokenType.String, "\"%f\"", 0, 0), funcCall, true);
+    }
+
+    public AST.StringExpression evaluatePrintFormat(AST.Type type)
+    {
+        switch (type.value)
+        {
+            case "double":
+                return new AST.StringExpression(new Util.Token(Util.TokenType.String, "\"%f\"", 0, 0), funcCall, true);
+            case "string":
+                return new AST.StringExpression(new Util.Token(Util.TokenType.String, "\"%s\"", 0, 0), funcCall, true);
+            default:
+                throw new GenException($"attempting to print obj of illegal or unknown type | obj: {funcCall.args[0]} type: {type}", funcCall);
+        }
+
+        return new AST.StringExpression(new Util.Token(Util.TokenType.String, "\"%f\"", 0, 0), funcCall, true);
+    }
+
 }
