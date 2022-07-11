@@ -12,6 +12,7 @@ public class Prototype : AST.Node
     public Prototype(Util.Token token, List<Util.Token> arguments = null) : base(token)
     {
         this.nodeType = NodeType.Prototype;
+        this.generator = new Generator.Prototype(this);
 
         if (!Config.options.function.declaration.marker.word)
         {

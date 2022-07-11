@@ -7,9 +7,11 @@ public class StringExpression : AST.Node
 
     public StringExpression(Util.Token token, AST.Node? parent = null, bool dontAdd = false, bool builtInString = false) : base(token)
     {
+        this.nodeType = NodeType.StringExpression;
+        this.generator = new Generator.StringExpression(this);
+
         Parser.checkToken(token, expectedType: Util.TokenType.String);
 
-        this.nodeType = NodeType.StringExpression;
         this.value = token.value;
         this.builtInString = builtInString;
 

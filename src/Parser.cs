@@ -406,7 +406,7 @@ public static class Parser
                 case AST.Node.NodeType.Function:
                     break;
                 case AST.Node.NodeType.Prototype:
-                    parent = new FunctionAST((PrototypeAST)parent);
+                    parent = new AST.Function((AST.Prototype)parent);
                     delimLevel--;
                     return new List<dynamic>() { parent, delimLevel };
                     break;

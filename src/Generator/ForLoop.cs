@@ -3,7 +3,7 @@ namespace Generator;
 using LLVMSharp;
 using static IRGen;
 
-public class ForLoop
+public class ForLoop : Base
 {
     AST.ForLoop forLoop;
 
@@ -12,7 +12,7 @@ public class ForLoop
         this.forLoop = (AST.ForLoop)node;
     }
 
-    public void generateForLoop()
+    public override void generate()
     {
 
         //evaluate the starting value of the loop index obj
@@ -65,7 +65,7 @@ public class ForLoop
         Console.WriteLine("successfully evaluated for loop body");
 
         //evaluate the step variable - might need to change this idk
-        evaluateNode(forLoop.stepValue);
+        forLoop.stepValue.generator.generate();
         LLVMValueRef stepVarRef = valueStack.Pop();
 
         //increment the phivar by the step value

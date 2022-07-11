@@ -13,6 +13,8 @@ public class FunctionCall : AST.Node
 
     {
         this.nodeType = NodeType.FunctionCall;
+        this.generator = new Generator.FunctionCall(this);
+
         string builtinName = token.value.Substring(0, (token.value.Length - 1));
 
         if (Util.builtinFuncs.Contains(builtinName))

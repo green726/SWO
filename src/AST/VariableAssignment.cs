@@ -16,10 +16,12 @@ public class VariableAssignment : AST.Node
 
     public VariableAssignment(Util.Token token, bool mutable, AST.Node? parent = null) : base(token)
     {
+        this.nodeType = NodeType.VariableAssignment;
+        this.generator = new Generator.VariableAssignment(this);
+
         this.newLineReset = true;
 
         this.mutable = mutable;
-        this.nodeType = NodeType.VariableAssignment;
         Parser.globalVarAss.Add(this);
 
         if (token.value != "const" && token.value != "var")

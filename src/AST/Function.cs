@@ -10,8 +10,11 @@ public class Function : AST.Node
 
     public Function(Prototype prototype, List<AST.Node>? body = null, bool topLevel = true) : base(prototype)
     {
-        if (body == null) body = new List<AST.Node>();
         this.nodeType = NodeType.Function;
+        this.generator = new Generator.Function(this);
+
+
+        if (body == null) body = new List<AST.Node>();
         this.prototype = prototype;
         this.body = body;
 
@@ -25,6 +28,8 @@ public class Function : AST.Node
 
     {
         this.nodeType = NodeType.Function;
+        this.generator = new Generator.Function(this);
+
         this.prototype = prototype;
         this.body = new List<AST.Node>();
         this.body.Add(body);

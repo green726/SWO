@@ -14,11 +14,6 @@ public class Prototype : Base
 
     public override void generate()
     {
-
-    }
-
-    public void generatePrototype()
-    {
         //begin argument generation
         int argumentCount = proto.arguments.Count();
         List<LLVMTypeRef> arguments = new List<LLVMTypeRef>();

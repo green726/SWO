@@ -14,8 +14,9 @@ public class IfStatement : AST.Node
     public IfStatement(Util.Token token, AST.Node? parent = null) : base(token)
     {
         this.nodeType = NodeType.IfStatement;
-        parent?.addChild(this);
+        this.generator = new Generator.IfStatement(this);
 
+        parent?.addChild(this);
 
 
         Util.Token thenProtoTok = new Util.Token(Util.TokenType.Keyword, "@then" + Parser.ifFuncNum, token.line, token.column);

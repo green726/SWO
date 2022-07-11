@@ -11,6 +11,8 @@ public class NumberExpression : AST.Node
 
     {
         this.nodeType = NodeType.NumberExpression;
+        this.generator = new Generator.NumberExpression(this);
+
         switch (token.type)
         {
             case Util.TokenType.Double:

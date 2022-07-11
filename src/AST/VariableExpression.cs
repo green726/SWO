@@ -6,6 +6,10 @@ public class VariableExpression : AST.Node
 
     public VariableExpression(Util.Token token, AST.Node? parent = null, bool parentRequired = true) : base(token)
     {
+        this.nodeType = NodeType.VariableExpression;
+        this.generator = new Generator.VariableExpression(this);
+
+
         varName = token.value;
         bool exists = false;
         this.parent = parent;
@@ -32,5 +36,6 @@ public class VariableExpression : AST.Node
         {
             throw new ParserException($"Illegal variable expression {this.varName}", token);
         }
+
     }
 }

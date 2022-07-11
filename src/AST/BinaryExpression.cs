@@ -21,10 +21,12 @@ public class BinaryExpression : AST.Node
     public BinaryExpression(Util.Token token, AST.Node? previousNode, AST.Node? parent) : base(token)
 
     {
+        this.nodeType = NodeType.BinaryExpression;
+        this.generator = new Generator.BinaryExpression(this);
+
         this.newLineReset = true;
 
         //TODO: implement operator precedence parsing
-        this.nodeType = NodeType.BinaryExpression;
         switch (token.value)
         {
             case "+":
@@ -105,6 +107,7 @@ public class BinaryExpression : AST.Node
         {
             this.parent.addChild(this);
         }
+
     }
     public override void addChild(AST.Node child)
     {

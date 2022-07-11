@@ -12,11 +12,6 @@ public class VariableAssignment : Base
         this.varAss = (AST.VariableAssignment)node;
     }
 
-    public override void generate()
-    {
-
-    }
-
     public void buildGlobalString()
     {
 
@@ -75,7 +70,7 @@ public class VariableAssignment : Base
         return (valRef, typeLLVM);
     }
 
-    public void generateVariableAssignment()
+    public override void generate()
     {
         if (!varAss.reassignment)
         {

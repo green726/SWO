@@ -15,15 +15,10 @@ public class Function : Base
 
     public override void generate()
     {
-
-    }
-
-    public void generateFunction(AST.Function funcNode)
-    {
         //TODO: change this in the future once more variables are added
         namedValuesLLVM.Clear();
 
-        funcNode.prototype.generator.generate();
+        func.prototype.generator.generate();
 
         LLVMValueRef function = valueStack.Pop();
         LLVMBasicBlockRef entryBlock = LLVM.AppendBasicBlock(function, "entry");
@@ -33,7 +28,7 @@ public class Function : Base
         // try
         // {
 
-        if (funcNode.prototype.name == "main")
+        if (func.prototype.name == "main")
         {
             Console.WriteLine("main func identified");
             mainEntryBlock = entryBlock;
@@ -44,9 +39,9 @@ public class Function : Base
             }
         }
 
-        for (var i = 0; i < funcNode.body.Count(); i++)
+        for (var i = 0; i < func.body.Count(); i++)
         {
-            funcNode.body[i].generator.generate();
+            func.body[i].generator.generate();
         }
         // }
         // catch (Exception)

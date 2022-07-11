@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public abstract class Node
 {
-    public Generator.Base generator;
+    public Generator.Base? generator;
 
     public List<Node> children = new List<Node>();
     public Node? parent = null;
@@ -15,7 +15,7 @@ public abstract class Node
 
     public string codeExcerpt = "";
 
-    public NodeType nodeType;
+    public NodeType nodeType = NodeType.Unknown;
 
     public bool newLineReset = false;
 
@@ -37,6 +37,7 @@ public abstract class Node
 
     public enum NodeType
     {
+        Unknown,
         VariableExpression,
         NumberExpression,
         BinaryExpression,
@@ -46,7 +47,7 @@ public abstract class Node
         FunctionCall,
         BuiltinCall,
         StringExpression,
-        TypeAST,
+        Type,
         IfStatement,
         ElseStatement,
         ForLoop,

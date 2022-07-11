@@ -9,6 +9,7 @@ public class ElseStatement : AST.Node
     public ElseStatement(AST.Node parent, Util.Token token) : base(token)
     {
         this.nodeType = NodeType.ElseStatement;
+        this.generator = new Generator.ElseStatement(this);
 
         this.parent = parent;
         Util.Token elseProtoTok = new Util.Token(Util.TokenType.Keyword, "@else" + Parser.ifFuncNum, token.line, token.column);

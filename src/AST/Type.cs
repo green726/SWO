@@ -7,13 +7,17 @@ public class Type : AST.Node
 
     public Type(Util.Token token) : base(token)
     {
-        this.nodeType = NodeType.TypeAST;
+        this.nodeType = NodeType.Type;
+        this.generator = new Generator.Type(this);
+
         this.value = token.value;
     }
 
     public Type(string value, AST.Node parent) : base(parent)
     {
-        this.nodeType = NodeType.TypeAST;
+        this.nodeType = NodeType.Type;
+        this.generator = new Generator.Type(this);
+
         this.value = value;
     }
 

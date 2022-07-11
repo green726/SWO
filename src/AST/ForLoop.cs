@@ -18,6 +18,8 @@ public class ForLoop : AST.Node
     public ForLoop(Util.Token token, AST.Node parent) : base(token)
     {
         this.nodeType = NodeType.ForLoop;
+        this.generator = new Generator.ForLoop(this);
+
         this.body = new List<AST.Node>();
 
         if (parent != null)
@@ -181,6 +183,8 @@ public class PhiVariable : AST.Node
     public PhiVariable(AST.Node node) : base(node)
     {
         this.nodeType = NodeType.PhiVariable;
+        this.generator = new Generator.PhiVariable(this);
+
         this.parent = node;
     }
 
