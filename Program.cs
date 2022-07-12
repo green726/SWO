@@ -12,11 +12,13 @@ public class HISS
         Typo.initialize();
         Config.initialize();
 
-        string fileToRead = args.Length != 0 ? args[0] : "/coding/HISS/src/test.hiss";
+        CLI.parseOptions(args);
+
+        string fileToRead = /* args.Length != 0 ? args[0] : */ "/coding/HISS/src/test.hiss";
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
-            fileToRead = args.Length != 0 ? args[0] : "/home/green726/coding/HISS/src/test.hiss";
+            fileToRead = /* args.Length != 0 ? args[0] : */ "/home/green726/coding/HISS/src/test.hiss";
         }
 
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -24,7 +26,7 @@ public class HISS
             windows = true;
         }
 
-        string debugLoggingStr = args.Length != 0 ? args[1] : "true";
+        string debugLoggingStr = /* args.Length != 0 ? args[1] : */ "true";
         bool debugLogging = debugLoggingStr == "true" ? true : false;
 
         fileContents = System.IO.File.ReadAllText(@$"{fileToRead}");
