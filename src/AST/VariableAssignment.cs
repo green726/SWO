@@ -14,10 +14,13 @@ public class VariableAssignment : AST.Node
     public BinaryExpression? bin = null;
     public AST.Node targetValue = null;
 
+    public bool generated = false;
+
     public VariableAssignment(Util.Token token, bool mutable, AST.Node? parent = null) : base(token)
     {
         this.nodeType = NodeType.VariableAssignment;
         this.generator = new Generator.VariableAssignment(this);
+
 
         this.newLineReset = true;
 
@@ -59,6 +62,7 @@ public class VariableAssignment : AST.Node
 
             Parser.nodes.Add(this);
         }
+
     }
 
     public override void addChild(Util.Token child)
@@ -73,6 +77,7 @@ public class VariableAssignment : AST.Node
                 case 1:
                     this.name = child.value;
                     Typo.addToLittle(this);
+                    Parser.declaredGlobalsDict.Add(this.name, this);
                     break;
                 case 2:
                     if (child.type != Util.TokenType.AssignmentOp) throw new ParserException($"expected assignment op but got {child.type} in a variable assignment", child);

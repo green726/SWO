@@ -61,6 +61,7 @@ public class FunctionCall : Base
         switch (funcCall.functionName)
         {
             case "print":
+                Console.WriteLine("print call detected");
                 funcCall.functionName = "printf";
 
                 printFormat = evaluatePrintFormat();
@@ -133,9 +134,11 @@ public class FunctionCall : Base
             case AST.Node.NodeType.StringExpression:
                 return new AST.StringExpression(new Util.Token(Util.TokenType.String, "\"%s\"", 0, 0), funcCall, true);
             case AST.Node.NodeType.VariableExpression:
+                Console.WriteLine("printing with a var expr");
                 AST.VariableExpression varExpr = (AST.VariableExpression)funcCall.args[0];
                 if (namedGlobalsAST.ContainsKey(varExpr.varName))
                 {
+                    Console.WriteLine("found var expr in print in named globals ast");
                     return evaluatePrintFormat(namedGlobalsAST[varExpr.varName].type);
                 }
                 else if (namedValuesLLVM.ContainsKey(varExpr.varName))
@@ -143,9 +146,9 @@ public class FunctionCall : Base
                     AST.Type printType = LLVMTypeToASTType(namedValuesLLVM[varExpr.varName].TypeOf(), funcCall);
                     return evaluatePrintFormat(printType);
                 }
-                throw GenException.FactoryMethod("An unknown variable was printed", "Likely a typo", varExpr, true, varExpr.varName);
 
-
+                // throw GenException.FactoryMethod("An unknown variable was printed", "Likely a typo", varExpr, true, varExpr.varName);
+                break;
         }
 
         return new AST.StringExpression(new Util.Token(Util.TokenType.String, "\"%f\"", 0, 0), funcCall, true);
@@ -153,6 +156,7 @@ public class FunctionCall : Base
 
     public AST.StringExpression evaluatePrintFormat(AST.Type type)
     {
+        Console.WriteLine($"got to second print call evaluation with a type of " + type.value);
         switch (type.value)
         {
             case "double":

@@ -14,6 +14,7 @@ public class VariableAssignment : Base
 
     public void buildGlobalString()
     {
+        if (varAss.generated) { return; }
 
         List<LLVMValueRef> asciiList = new List<LLVMValueRef>();
 
@@ -72,6 +73,7 @@ public class VariableAssignment : Base
 
     public override void generate()
     {
+        if (varAss.generated) { return; }
         if (!varAss.reassignment)
         {
             if (varAss.type.value == "string")
@@ -108,7 +110,8 @@ public class VariableAssignment : Base
 
                 namedMutablesLLVM.Add(varAss.name, allocaRef);
             }
-
+        
+            Console.WriteLine("adding var to named globals with name of" + varAss.name);
             namedGlobalsAST.Add(varAss.name, varAss);
         }
         else

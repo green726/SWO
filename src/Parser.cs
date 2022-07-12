@@ -16,6 +16,7 @@ public static class Parser
     public static AST.Node.NodeType[] binaryExpectedNodes = { AST.Node.NodeType.NumberExpression, AST.Node.NodeType.BinaryExpression, AST.Node.NodeType.VariableExpression, AST.Node.NodeType.PhiVariable };
 
     public static Dictionary<string, AST.Function> declaredFunctionDict = new Dictionary<string, AST.Function>();
+    public static Dictionary<string, AST.VariableAssignment> declaredGlobalsDict = new Dictionary<string, AST.VariableAssignment>();
 
     public static int prevLine = 0;
     public static int prevColumn = 0;

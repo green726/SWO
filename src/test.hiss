@@ -1,4 +1,3 @@
-const int cars = 1
 
 
 @main () {
@@ -9,7 +8,7 @@ stuff()
 print!(cars)
 }
 
-
+const int cars = 1
 
 
 

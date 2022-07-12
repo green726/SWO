@@ -9,6 +9,8 @@ public class VariableModelDeclaration
 {
     public List<string>? order { get; set; } = new List<string>() { "keyword", "type", "name", "assignment", "value" };
 
+    public bool reorder {get; set; } = false;
+
     public VariableDeclarationKeyword? keyword { get; set; } = new VariableDeclarationKeyword();
 }
 

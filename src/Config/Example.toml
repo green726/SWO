@@ -36,3 +36,4 @@ body.delimeters = ["{", "}"] #could also be ["then", "endif"]
 declaration.keyword.constant = "const"
 declaration.keyword.mutable = "var"
 declaration.order = ["keyword", "type", "name", "assignment", "value"] #currently not customizable but will be in the future
+declaration.reorder = false #same thing as function declaration reording - will compile variables through their references - if a variable is reference and declared below that, it will still compile and run - degrades compiler performance

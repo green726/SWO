@@ -26,10 +26,22 @@ public class VariableExpression : Base
             }
             else
             {
+                if (namedValuesLLVM.ContainsKey(varExpr.varName)) {
                 varRef = namedValuesLLVM[varExpr.varName];
                 if (varRef.Pointer != IntPtr.Zero)
                 {
                     valueStack.Push(varRef);
+                    return;
+                }
+                }
+                else if (Config.options.variable.declaration.reorder && Parser.declaredGlobalsDict.ContainsKey(varExpr.varName))
+                {
+                    LLVMBasicBlockRef currentBlock = LLVM.GetInsertBlock(builder);
+                    AST.VariableAssignment varAss = Parser.declaredGlobalsDict[varExpr.varName];
+                    varAss.generator.generate();
+                    varAss.generated = true;
+                    LLVM.PositionBuilderAtEnd(builder, currentBlock);
+                    generate();
                     return;
                 }
             }
