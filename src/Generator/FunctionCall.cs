@@ -61,7 +61,7 @@ public class FunctionCall : Base
         switch (funcCall.functionName)
         {
             case "print":
-                Console.WriteLine("print call detected");
+                // Console.WriteLine("print call detected");
                 funcCall.functionName = "printf";
 
                 printFormat = evaluatePrintFormat();
@@ -104,15 +104,11 @@ public class FunctionCall : Base
 
         for (int i = 0; i < argumentCount; i++)
         {
-            // Console.WriteLine("builtin with arg of: " + Parser.printASTRet(new List<ASTNode>() { builtIn.args[i] }));
             funcCall.args[i].generator.generate();
             argsRef[i] = valueStack.Pop();
-            // Console.WriteLine(argsRef[i]);
-            // Console.WriteLine($"evaluated builtin arg of {builtIn.args[i]}");
         }
 
         valueStack.Push(LLVM.BuildCall(builder, funcRef, argsRef, "calltmp"));
-        // Console.WriteLine("successfully evaluated builtin call");
 
     }
 
@@ -134,11 +130,9 @@ public class FunctionCall : Base
             case AST.Node.NodeType.StringExpression:
                 return new AST.StringExpression(new Util.Token(Util.TokenType.String, "\"%s\"", 0, 0), funcCall, true);
             case AST.Node.NodeType.VariableExpression:
-                Console.WriteLine("printing with a var expr");
                 AST.VariableExpression varExpr = (AST.VariableExpression)funcCall.args[0];
                 if (namedGlobalsAST.ContainsKey(varExpr.varName))
                 {
-                    Console.WriteLine("found var expr in print in named globals ast");
                     return evaluatePrintFormat(namedGlobalsAST[varExpr.varName].type);
                 }
                 else if (namedValuesLLVM.ContainsKey(varExpr.varName))
@@ -146,12 +140,16 @@ public class FunctionCall : Base
                     AST.Type printType = LLVMTypeToASTType(namedValuesLLVM[varExpr.varName].TypeOf(), funcCall);
                     return evaluatePrintFormat(printType);
                 }
+                else if (Config.options.variable.declaration.reorder && Parser.declaredGlobalsDict.ContainsKey(varExpr.varName))
+                {
+                    return evaluatePrintFormat(Parser.declaredGlobalsDict[varExpr.varName].type);
+                }
 
-                // throw GenException.FactoryMethod("An unknown variable was printed", "Likely a typo", varExpr, true, varExpr.varName);
+                throw GenException.FactoryMethod("An unknown variable was printed", "Likely a typo", varExpr, true, varExpr.varName);
                 break;
         }
 
-        return new AST.StringExpression(new Util.Token(Util.TokenType.String, "\"%f\"", 0, 0), funcCall, true);
+        return new AST.StringExpression(new Util.Token(Util.TokenType.String, "\"%s\"", 0, 0), funcCall, true);
     }
 
     public AST.StringExpression evaluatePrintFormat(AST.Type type)
@@ -169,7 +167,7 @@ public class FunctionCall : Base
                 throw new GenException($"attempting to print obj of illegal or unknown type | obj: {funcCall.args[0]} type: {type.value}", funcCall);
         }
 
-        return new AST.StringExpression(new Util.Token(Util.TokenType.String, "\"%f\"", 0, 0), funcCall, true);
+        return new AST.StringExpression(new Util.Token(Util.TokenType.String, "\"%s\"", 0, 0), funcCall, true);
     }
 
 }

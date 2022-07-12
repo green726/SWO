@@ -195,3 +195,4 @@
 /home/green726/coding/HISS/obj/Debug/net6.0/arch-x64/HISS.pdb
 /home/green726/coding/HISS/obj/Debug/net6.0/arch-x64/HISS.genruntimeconfig.cache
 /home/green726/coding/HISS/bin/Debug/net6.0/arch-x64/SymSpell.dll
+/home/green726/coding/HISS/bin/Debug/net6.0/arch-x64/Tomlyn.dll
