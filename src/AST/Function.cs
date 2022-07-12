@@ -7,6 +7,8 @@ public class Function : AST.Node
     public Prototype prototype;
     public List<AST.Node> body;
 
+    public bool generated = false;
+
 
     public Function(Prototype prototype, List<AST.Node>? body = null, bool topLevel = true) : base(prototype)
     {
@@ -21,6 +23,11 @@ public class Function : AST.Node
         if (topLevel)
         {
             Parser.nodes.Add(this);
+        }
+
+        if (Config.options.function.declaration.reorder)
+        {
+            Parser.declaredFunctionDict.Add(prototype.name, this);
         }
     }
 
@@ -37,6 +44,11 @@ public class Function : AST.Node
         if (topLevel)
         {
             Parser.nodes.Add(this);
+        }
+
+        if (Config.options.function.declaration.reorder)
+        {
+            Parser.declaredFunctionDict.Add(prototype.name, this);
         }
     }
 

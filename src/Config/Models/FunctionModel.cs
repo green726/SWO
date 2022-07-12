@@ -18,6 +18,7 @@ public class FunctionDeclarationModel
     public FunctionDeclarationMarker? marker { get; set; } = new FunctionDeclarationMarker();
     public FunctionDeclarationArgs? args { get; set; } = new FunctionDeclarationArgs();
     public FunctionDeclarationBody? body { get; set; } = new FunctionDeclarationBody();
+    public bool reorder {get; set; } = false;
 }
 
 public class FunctionDeclarationMarker

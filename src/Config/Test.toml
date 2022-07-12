@@ -7,6 +7,7 @@ marker.word = false #set to true if you want to use a percursor word such as fun
 args.delimeters = ["(", ")"]
 args.seperator = ","
 body.delimeters = ["{", "}"]
+reorder = true
 
 
 [function.calling]

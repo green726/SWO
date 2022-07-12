@@ -23,7 +23,19 @@ public class FunctionCall : Base
 
         if (funcRef.Pointer == IntPtr.Zero)
         {
-            throw new GenException($"Unknown function ({funcCall.functionName}) referenced", funcCall);
+            if (Config.options.function.declaration.reorder && Parser.declaredFunctionDict.ContainsKey(funcCall.functionName))
+            {
+                LLVMBasicBlockRef currentBlock = LLVM.GetInsertBlock(builder);
+                AST.Function calledFunc = Parser.declaredFunctionDict[funcCall.functionName];
+                calledFunc.generator.generate();
+                calledFunc.generated = true;
+                LLVM.PositionBuilderAtEnd(builder, currentBlock);
+                funcRef = LLVM.GetNamedFunction(module, funcCall.functionName);
+            }
+            else
+            {
+                throw new GenException($"Unknown function ({funcCall.functionName}) referenced", funcCall);
+            }
         }
 
         if (LLVM.CountParams(funcRef) != funcCall.args.Count)
@@ -145,10 +157,12 @@ public class FunctionCall : Base
         {
             case "double":
                 return new AST.StringExpression(new Util.Token(Util.TokenType.String, "\"%f\"", 0, 0), funcCall, true);
+            case "int":
+                return new AST.StringExpression(new Util.Token(Util.TokenType.String, "\"%d\"", 0, 0), funcCall, true);
             case "string":
                 return new AST.StringExpression(new Util.Token(Util.TokenType.String, "\"%s\"", 0, 0), funcCall, true);
             default:
-                throw new GenException($"attempting to print obj of illegal or unknown type | obj: {funcCall.args[0]} type: {type}", funcCall);
+                throw new GenException($"attempting to print obj of illegal or unknown type | obj: {funcCall.args[0]} type: {type.value}", funcCall);
         }
 
         return new AST.StringExpression(new Util.Token(Util.TokenType.String, "\"%f\"", 0, 0), funcCall, true);

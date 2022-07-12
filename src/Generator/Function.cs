@@ -15,6 +15,7 @@ public class Function : Base
 
     public override void generate()
     {
+        if (func.generated) {return;}
         //TODO: change this in the future once more variables are added
         namedValuesLLVM.Clear();
 

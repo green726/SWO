@@ -1,11 +1,12 @@
-const double cars = 2
+const int cars = 1
 
-@stuff() {
-print!(cars)
-}
 
 @main () {
 stuff()
+}
+
+@stuff() {
+print!(cars)
 }
 
 

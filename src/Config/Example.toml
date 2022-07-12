@@ -1,24 +1,38 @@
+#legal options for delimeters are parentheses (), brackets {}, and square brackets [] - more will be added in the future
 
+[memory]
+gc.enabled = false #garbage collector
+
+[general] #/misc
+
+[optimizations]
+level = 3 # level can either be 1, 2, or 3
+list = [""] #a specific list of optimizations you want (available options can be found on the wiki) - leave this blank and only the level will be used
 
 [function.declaration]
-marker = "@" #could also be something like "func " - if you want the word to come before the function a space is required
+reorder = false #if enabled will compile functions through their references to each other (in the order they are used rather than declared) - this allows you to call functions without regard to their declaration order - degrades compiler performance
+marker.value = "@" #could also be something like "func"
+marker.word = false #set to true if you want to use a percursor word such as func
 args.delimeters = ["(", ")"]
 args.seperator = ","
 body.delimeters = ["{", "}"]
-
 
 [function.calling]
 args.delimeters = ["(", ")"]
 args.seperator = ","
-builltin.marker.enabled = true #if builtin marker is disabled compiler performance will degrade significantly
+builtin.marker.enabled = true #if builtin marker is disabled compiler performance will degrade significantly - disabling this is not currently supported
 builtin.marker.value = "!"
-builtin.marker.location = "end" #can also be set to beginning
-
-[if]
-declaration.delimeters = ["(", ")"] #can be set to a blank string to not use if declaration delims - degrades compiler performance
-body.delimeters = ["{", "}"] #could also be ["then", "endif"]
-test.value = "hi"
+builtin.marker.location = "end" #can also be set to "beginning"
 
 [loop.for]
 declaration.delimeters = ["(", ")"]
 body.delimeters = ["{", "}"]
+
+[if]
+declaration.delimeters = ["(", ")"] #can be set to a blank string to not use if declaration delims - degrades compiler performance
+body.delimeters = ["{", "}"] #could also be ["then", "endif"]
+
+[variable]
+declaration.keyword.constant = "const"
+declaration.keyword.mutable = "var"
+declaration.order = ["keyword", "type", "name", "assignment", "value"] #currently not customizable but will be in the future

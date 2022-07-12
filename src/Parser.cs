@@ -15,6 +15,8 @@ public static class Parser
     public static Util.TokenType[] delimiterExpectedTokens = { Util.TokenType.Keyword };
     public static AST.Node.NodeType[] binaryExpectedNodes = { AST.Node.NodeType.NumberExpression, AST.Node.NodeType.BinaryExpression, AST.Node.NodeType.VariableExpression, AST.Node.NodeType.PhiVariable };
 
+    public static Dictionary<string, AST.Function> declaredFunctionDict = new Dictionary<string, AST.Function>();
+
     public static int prevLine = 0;
     public static int prevColumn = 0;
 
