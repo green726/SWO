@@ -1,0 +1,15 @@
+D:\Coding\HISS\Installer\bin\Debug\net6.0\Installer.exe
+D:\Coding\HISS\Installer\bin\Debug\net6.0\Installer.deps.json
+D:\Coding\HISS\Installer\bin\Debug\net6.0\Installer.runtimeconfig.json
+D:\Coding\HISS\Installer\bin\Debug\net6.0\Installer.dll
+D:\Coding\HISS\Installer\bin\Debug\net6.0\Installer.pdb
+D:\Coding\HISS\Installer\obj\Debug\net6.0\Installer.csproj.AssemblyReference.cache
+D:\Coding\HISS\Installer\obj\Debug\net6.0\Installer.GeneratedMSBuildEditorConfig.editorconfig
+D:\Coding\HISS\Installer\obj\Debug\net6.0\Installer.AssemblyInfoInputs.cache
+D:\Coding\HISS\Installer\obj\Debug\net6.0\Installer.AssemblyInfo.cs
+D:\Coding\HISS\Installer\obj\Debug\net6.0\Installer.csproj.CoreCompileInputs.cache
+D:\Coding\HISS\Installer\obj\Debug\net6.0\Installer.dll
+D:\Coding\HISS\Installer\obj\Debug\net6.0\refint\Installer.dll
+D:\Coding\HISS\Installer\obj\Debug\net6.0\Installer.pdb
+D:\Coding\HISS\Installer\obj\Debug\net6.0\Installer.genruntimeconfig.cache
+D:\Coding\HISS\Installer\obj\Debug\net6.0\ref\Installer.dll

@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "dgSpecHash": "BIjzEf5NXil34e9ydpqFQcy7ifdG3S+T6afWG7YZdmqpmoriclkQHXoOWuAv9gwjX0k5bw3TSewmNmXJR1aTpg==",
+  "success": true,
+  "projectFilePath": "D:\\Coding\\HISS\\Installer\\Installer.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\mguin\\.nuget\\packages\\microsoft.netcore.app.runtime.win-x64\\6.0.5\\microsoft.netcore.app.runtime.win-x64.6.0.5.nupkg.sha512",
+    "C:\\Users\\mguin\\.nuget\\packages\\microsoft.windowsdesktop.app.runtime.win-x64\\6.0.5\\microsoft.windowsdesktop.app.runtime.win-x64.6.0.5.nupkg.sha512",
+    "C:\\Users\\mguin\\.nuget\\packages\\microsoft.aspnetcore.app.runtime.win-x64\\6.0.5\\microsoft.aspnetcore.app.runtime.win-x64.6.0.5.nupkg.sha512",
+    "C:\\Users\\mguin\\.nuget\\packages\\microsoft.netcore.app.crossgen2.win-x64\\6.0.5\\microsoft.netcore.app.crossgen2.win-x64.6.0.5.nupkg.sha512"
+  ],
+  "logs": []
+}
