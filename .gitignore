@@ -1,5 +1,5 @@
 /Language/bin/
-/Language/obj
+/Language/obj/
 /Installer/bin/
-/Installer/obj
+/Installer/obj/
 *.zip
