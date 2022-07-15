@@ -12,7 +12,7 @@ public static class Installations
     {
         client.DownloadFileAsync(HIPUri, path + @"/HIP.zip");
         //other HIP install stuff comes before the language install
-        ZipFile.ExtractToDirectory(path )
+        ZipFile.ExtractToDirectory(path + @"/HIP.zip", path + @"/HIP/");
 
 
         installLanguage(path);
@@ -21,6 +21,7 @@ public static class Installations
     public static void installLanguage(string path)
     {
         client.DownloadFileAsync(languageUri, path + @"/Language.zip");
+        ZipFile.ExtractToDirectory(path + @"/Language.zip", path + @"/Language/");
 
     }
 }
