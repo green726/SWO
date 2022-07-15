@@ -16,22 +16,71 @@ public static class Installations
 
     public static void installHIP(string path)
     {
-        System.IO.Directory.CreateDirectory(path + @"\HIP\");
+        // System.IO.Directory.CreateDirectory(path + @"\HIP\");
         Console.WriteLine("pulling file from: " + HIPUri);
         client.DownloadFile(HIPUri, path + @$"\HIP-{rid}.zip");
-        //other HIP install stuff comes before the language install
-        ZipFile.ExtractToDirectory(path + @$"\HIP-{rid}.zip", path + @"\HIP\");
-        Environment.SetEnvironmentVariable("HIP", path + @"\HIP\");
 
+
+        FileStream fs = new FileStream(path + @$"\HIP-{rid}.zip", FileMode.Open);
+        ZipArchive archive = new ZipArchive(fs);
+        ExtractToDirectory(archive, path + @"\HIP", true);
+
+
+        string envName = "PATH";
+        var scope = EnvironmentVariableTarget.Machine; // or User
+        var oldValue = Environment.GetEnvironmentVariable(envName, scope);
+        var newValue = oldValue + @$"{path}\HIP\;";
+        Environment.SetEnvironmentVariable(envName, newValue, scope);
+
+        fs.Dispose();
         installLanguage(path);
     }
 
     public static void installLanguage(string path)
     {
-        System.IO.Directory.CreateDirectory(path + @"\Language\");
+        // System.IO.Directory.CreateDirectory(path + @"\Language\");
         client.DownloadFile(languageUri, path + @$"\Language-{rid}.zip");
-        ZipFile.ExtractToDirectory(path + $@"\Language-{rid}.zip", path + @"\Language\");
-        Environment.SetEnvironmentVariable("HISS", path + @"\Language\");
 
+
+        FileStream fs = new FileStream(path + $@"\Language-{rid}.zip", FileMode.Open);
+        ZipArchive archive = new ZipArchive(fs);
+        ExtractToDirectory(archive, path + @"\Language", true);
+
+        string envName = "PATH";
+        var scope = EnvironmentVariableTarget.Machine; // or User
+        var oldValue = Environment.GetEnvironmentVariable(envName, scope);
+        var newValue = oldValue + @$"{path}\Language\;";
+        Environment.SetEnvironmentVariable(envName, newValue, scope);
+
+        fs.Dispose();
+    }
+
+    public static void ExtractToDirectory(ZipArchive archive, string destinationDirectoryName, bool overwrite)
+    {
+        if (!overwrite)
+        {
+            archive.ExtractToDirectory(destinationDirectoryName);
+            return;
+        }
+
+        DirectoryInfo di = Directory.CreateDirectory(destinationDirectoryName);
+        string destinationDirectoryFullPath = di.FullName;
+
+        foreach (ZipArchiveEntry file in archive.Entries)
+        {
+            string completeFileName = Path.GetFullPath(Path.Combine(destinationDirectoryFullPath, file.FullName));
+
+            if (!completeFileName.StartsWith(destinationDirectoryFullPath, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new IOException("Trying to extract file outside of destination directory. See this link for more info: https://snyk.io/research/zip-slip-vulnerability");
+            }
+
+            if (file.Name == "")
+            {// Assuming Empty for Directory
+                Directory.CreateDirectory(Path.GetDirectoryName(completeFileName));
+                continue;
+            }
+            file.ExtractToFile(completeFileName, true);
+        }
     }
 }
