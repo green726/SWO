@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "/home/green726/coding/HISS/Language/HISS.csproj": {}
+    "D:\\Coding\\HISS\\Language\\HISS.csproj": {}
   },
   "projects": {
-    "/home/green726/coding/HISS/Language/HISS.csproj": {
+    "D:\\Coding\\HISS\\Language\\HISS.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/green726/coding/HISS/Language/HISS.csproj",
+        "projectUniqueName": "D:\\Coding\\HISS\\Language\\HISS.csproj",
         "projectName": "HISS",
-        "projectPath": "/home/green726/coding/HISS/Language/HISS.csproj",
-        "packagesPath": "/home/green726/.nuget/packages/",
-        "outputPath": "/home/green726/coding/HISS/Language/obj/",
+        "projectPath": "D:\\Coding\\HISS\\Language\\HISS.csproj",
+        "packagesPath": "C:\\Users\\mguin\\.nuget\\packages\\",
+        "outputPath": "D:\\Coding\\HISS\\Language\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/home/green726/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\mguin\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net6.0"
@@ -67,16 +67,16 @@
           "warn": true,
           "downloadDependencies": [
             {
-              "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[6.0.2, 6.0.2]"
+              "name": "Microsoft.AspNetCore.App.Runtime.win-x64",
+              "version": "[6.0.5, 6.0.5]"
             },
             {
-              "name": "Microsoft.AspNetCore.App.Runtime.linux-x64",
-              "version": "[6.0.2, 6.0.2]"
+              "name": "Microsoft.NETCore.App.Runtime.win-x64",
+              "version": "[6.0.5, 6.0.5]"
             },
             {
-              "name": "Microsoft.NETCore.App.Runtime.linux-x64",
-              "version": "[6.0.2, 6.0.2]"
+              "name": "Microsoft.WindowsDesktop.App.Runtime.win-x64",
+              "version": "[6.0.5, 6.0.5]"
             }
           ],
           "frameworkReferences": {
@@ -84,11 +84,11 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/6.0.102/RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.203\\RuntimeIdentifierGraph.json"
         }
       },
       "runtimes": {
-        "arch-x64": {
+        "win10-x64": {
           "#import": []
         }
       }
