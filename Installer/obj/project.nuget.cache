@@ -1,13 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "d351G91L4trmSIWCwcdaCBetZXjKM3S8e9isu2D2DVdFi40TPc0D9xOpI1xa0pnnLWbTVBGzwIDhfwvbw1YkFg==",
+  "dgSpecHash": "4xqYvsYvGrb6cuuL080xLw+mnC8lBsxtq05yt4cTcfQgx0cEcnvqJv6iT8kiDkumY8ACW8yx0UW7FGz69A+POg==",
   "success": true,
-  "projectFilePath": "/home/green726/coding/HISS/Installer/Installer.csproj",
+  "projectFilePath": "D:\\Coding\\HISS\\Installer\\Installer.csproj",
   "expectedPackageFiles": [
-    "/home/green726/.nuget/packages/microsoft.netcore.app.runtime.linux-x64/6.0.2/microsoft.netcore.app.runtime.linux-x64.6.0.2.nupkg.sha512",
-    "/home/green726/.nuget/packages/microsoft.aspnetcore.app.ref/6.0.2/microsoft.aspnetcore.app.ref.6.0.2.nupkg.sha512",
-    "/home/green726/.nuget/packages/microsoft.aspnetcore.app.runtime.linux-x64/6.0.2/microsoft.aspnetcore.app.runtime.linux-x64.6.0.2.nupkg.sha512",
-    "/home/green726/.nuget/packages/microsoft.netcore.app.crossgen2.linux-x64/6.0.2/microsoft.netcore.app.crossgen2.linux-x64.6.0.2.nupkg.sha512"
+    "C:\\Users\\mguin\\.nuget\\packages\\microsoft.netcore.app.runtime.win-x64\\6.0.5\\microsoft.netcore.app.runtime.win-x64.6.0.5.nupkg.sha512",
+    "C:\\Users\\mguin\\.nuget\\packages\\microsoft.windowsdesktop.app.runtime.win-x64\\6.0.5\\microsoft.windowsdesktop.app.runtime.win-x64.6.0.5.nupkg.sha512",
+    "C:\\Users\\mguin\\.nuget\\packages\\microsoft.aspnetcore.app.runtime.win-x64\\6.0.5\\microsoft.aspnetcore.app.runtime.win-x64.6.0.5.nupkg.sha512",
+    "C:\\Users\\mguin\\.nuget\\packages\\microsoft.netcore.app.crossgen2.win-x64\\6.0.5\\microsoft.netcore.app.crossgen2.win-x64.6.0.5.nupkg.sha512"
   ],
   "logs": []
 }

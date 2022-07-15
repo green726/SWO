@@ -23,7 +23,8 @@ public static class CLI
                 inputIsBool = true;
                 inputBool = false;
             }
-            else {
+            else
+            {
                 inputIsBool = false;
             }
             if (currentOption != "")
@@ -69,7 +70,6 @@ public static class CLI
             Console.WriteLine($"compiler option: {name} with a value of {value}");
         }
 
-        throw new Exception();
         return installerOptions;
     }
 }
@@ -92,13 +92,13 @@ public class InstallerOptions
 
     public InstallerOptions()
     {
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             installPath = Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\.HISS");
         }
         else
         {
-            installPath = @"~/.HISS";
+            installPath = @"~\.HISS";
         }
     }
 

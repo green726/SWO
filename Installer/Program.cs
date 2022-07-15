@@ -9,6 +9,8 @@ public class Program
     {
         InstallerOptions opts = CLI.parseOptions(args);
 
+
+        System.IO.Directory.CreateDirectory(opts.installPath);
         if (opts.installHIP)
         {
             Installations.installHIP(opts.installPath);
