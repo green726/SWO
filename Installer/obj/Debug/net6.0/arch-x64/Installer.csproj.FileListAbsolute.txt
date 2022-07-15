@@ -1,5 +1,0 @@
-/home/green726/coding/HISS/Installer/obj/Debug/net6.0/arch-x64/Installer.csproj.AssemblyReference.cache
-/home/green726/coding/HISS/Installer/obj/Debug/net6.0/arch-x64/Installer.GeneratedMSBuildEditorConfig.editorconfig
-/home/green726/coding/HISS/Installer/obj/Debug/net6.0/arch-x64/Installer.AssemblyInfoInputs.cache
-/home/green726/coding/HISS/Installer/obj/Debug/net6.0/arch-x64/Installer.AssemblyInfo.cs
-/home/green726/coding/HISS/Installer/obj/Debug/net6.0/arch-x64/Installer.csproj.CoreCompileInputs.cache
