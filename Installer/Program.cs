@@ -8,7 +8,7 @@ public class Program
     static void Main(string[] args)
     {
         InstallerOptions opts = CLI.parseOptions(args);
-
+        Console.WriteLine($"Chosen install path: {opts.installPath}");
 
         System.IO.Directory.CreateDirectory(opts.installPath);
         if (opts.installHIP)

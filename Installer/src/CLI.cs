@@ -98,7 +98,7 @@ public class InstallerOptions
         }
         else
         {
-            installPath = @"~\.HISS";
+            installPath = $@"{Environment.GetEnvironmentVariable("HOME")}/.HISS";
         }
     }
 

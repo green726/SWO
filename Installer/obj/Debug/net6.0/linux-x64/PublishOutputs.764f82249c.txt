@@ -1,0 +1,2 @@
+/home/green726/coding/HISS/Installer/bin/Debug/net6.0/linux-x64/publish/Installer.pdb
+/home/green726/coding/HISS/Installer/bin/Debug/net6.0/linux-x64/publish/Installer
