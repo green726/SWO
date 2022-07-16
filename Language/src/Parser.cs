@@ -298,12 +298,12 @@ public static class Parser
         int nextTokenIndex = tokenIndex + 1;
 
 
-        if (token.value == Config.options.variable.declaration.keyword.mutable)
+        if (token.value == Config.settings.variable.declaration.keyword.mutable)
         {
             AST.VariableAssignment varAss = new AST.VariableAssignment(token, true);
             return new List<dynamic>() { varAss, delimLevel };
         }
-        else if (token.value == Config.options.variable.declaration.keyword.constant)
+        else if (token.value == Config.settings.variable.declaration.keyword.constant)
         {
             AST.VariableAssignment constAss = new AST.VariableAssignment(token, false);
             return new List<dynamic>() { constAss, delimLevel };
@@ -323,29 +323,29 @@ public static class Parser
             AST.ForLoop forLoop = new AST.ForLoop(token, parent);
             return new List<dynamic>() { forLoop, delimLevel };
         }
-        else if (Config.options.function.declaration.marker.word && token.value == Config.options.function.declaration.marker.value)
+        else if (Config.settings.function.declaration.marker.word && token.value == Config.settings.function.declaration.marker.value)
         {
             AST.Prototype proto = new AST.Prototype(token);
             return new List<dynamic>() { proto, delimLevel };
         }
-        else if (!Config.options.function.declaration.marker.word && token.value[0].ToString() == Config.options.function.declaration.marker.value)
+        else if (!Config.settings.function.declaration.marker.word && token.value[0].ToString() == Config.settings.function.declaration.marker.value)
         {
             AST.Prototype proto = new AST.Prototype(token);
             return new List<dynamic>() { proto, delimLevel };
         }
-        else if (Config.options.function.calling.builtin.marker.location == "end" && token.value.EndsWith(Config.options.function.calling.builtin.marker.value))
+        else if (Config.settings.function.calling.builtin.marker.location == "end" && token.value.EndsWith(Config.settings.function.calling.builtin.marker.value))
         {
             //treat it as a builtin call
             AST.FunctionCall builtinCall = new AST.FunctionCall(token, null, true, parent, false);
             return new List<dynamic>() { builtinCall, delimLevel };
         }
-        else if (Config.options.function.calling.builtin.marker.location == "beginning" && token.value.StartsWith(Config.options.function.calling.builtin.marker.value))
+        else if (Config.settings.function.calling.builtin.marker.location == "beginning" && token.value.StartsWith(Config.settings.function.calling.builtin.marker.value))
         {
             //treat it as a builtin call
             AST.FunctionCall builtinCall = new AST.FunctionCall(token, null, true, parent, false);
             return new List<dynamic>() { builtinCall, delimLevel };
         }
-        else if (nextToken.value == Config.options.function.calling.args.delimeters[0])
+        else if (nextToken.value == Config.settings.function.calling.args.delimeters[0])
         {
             AST.FunctionCall funcCall = new AST.FunctionCall(token, null, false, parent);
             return new List<dynamic>() { funcCall, delimLevel };

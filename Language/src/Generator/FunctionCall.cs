@@ -23,7 +23,7 @@ public class FunctionCall : Base
 
         if (funcRef.Pointer == IntPtr.Zero)
         {
-            if (Config.options.function.declaration.reorder && Parser.declaredFunctionDict.ContainsKey(funcCall.functionName))
+            if (Config.settings.function.declaration.reorder && Parser.declaredFunctionDict.ContainsKey(funcCall.functionName))
             {
                 LLVMBasicBlockRef currentBlock = LLVM.GetInsertBlock(builder);
                 AST.Function calledFunc = Parser.declaredFunctionDict[funcCall.functionName];
@@ -140,7 +140,7 @@ public class FunctionCall : Base
                     AST.Type printType = LLVMTypeToASTType(namedValuesLLVM[varExpr.varName].TypeOf(), funcCall);
                     return evaluatePrintFormat(printType);
                 }
-                else if (Config.options.variable.declaration.reorder && Parser.declaredGlobalsDict.ContainsKey(varExpr.varName))
+                else if (Config.settings.variable.declaration.reorder && Parser.declaredGlobalsDict.ContainsKey(varExpr.varName))
                 {
                     return evaluatePrintFormat(Parser.declaredGlobalsDict[varExpr.varName].type);
                 }

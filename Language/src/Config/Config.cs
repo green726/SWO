@@ -2,15 +2,15 @@ using Tomlyn;
 
 public static class Config
 {
-    public static ConfigModel.ConfigModel options;
+    public static ConfigModel.ConfigModel settings;
 
-    public static void initialize()
+    public static void initialize(string configFile)
     {
-        string configInput = File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + "../../../../src/Config/Test.toml");
+        string configInput = File.ReadAllText(configFile);
 
-        options = Toml.ToModel<ConfigModel.ConfigModel>(configInput);
+        settings = Toml.ToModel<ConfigModel.ConfigModel>(configInput);
 
-        Console.WriteLine($"Function calling builtin marker enabled {options.function.calling.builtin.marker.enabled}");
+        Console.WriteLine($"Function calling builtin marker enabled {settings.function.calling.builtin.marker.enabled}");
     }
 
 }

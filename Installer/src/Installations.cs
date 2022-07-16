@@ -11,6 +11,7 @@ public static class Installations
 
     public static Uri HIPUri = new Uri(@$"https://github.com/green726/HISS/releases/latest/download/HIP-{os}.zip");
     public static Uri languageUri = new Uri(@$"https://github.com/green726/HISS/releases/latest/download/Language-{os}.zip");
+    public static Uri resourcesUri = new Uri(@$"https://github.com/green726/HISS/releases/latest/download/Resources.zip");
 
     public static bool windows = OperatingSystem.IsWindows();
 
@@ -25,7 +26,7 @@ public static class Installations
 
         FileStream fs = new FileStream(path + @$"{ps}HIP-{os}.zip", FileMode.Open);
         ZipArchive archive = new ZipArchive(fs);
-        ExtractToDirectory(archive, path + @$"{ps}HIP", true);
+        extractToDirectory(archive, path + @$"{ps}HIP", true);
 
         if (windows)
         {
@@ -52,7 +53,7 @@ public static class Installations
 
         FileStream fs = new FileStream(path + $@"{ps}Language-{os}.zip", FileMode.Open);
         ZipArchive archive = new ZipArchive(fs);
-        ExtractToDirectory(archive, path + @$"{ps}Language", true);
+        extractToDirectory(archive, path + @$"{ps}Language", true);
 
         if (windows)
         {
@@ -68,8 +69,19 @@ public static class Installations
         }
 
 
-
         fs.Dispose();
+
+        installResources(path);
+
+    }
+
+    public static void installResources(string path)
+    {
+        client.DownloadFile(resourcesUri, path + @$"{ps}Resources.zip");
+
+        FileStream fs = new FileStream(path + @$"{ps}Resources.zip", FileMode.Open);
+        ZipArchive archive = new ZipArchive(fs);
+        extractToDirectory(archive, path + @$"{ps}Resources", true);
     }
 
     public static string checkOs()
@@ -88,7 +100,7 @@ public static class Installations
         return "";
     }
 
-    public static void ExtractToDirectory(ZipArchive archive, string destinationDirectoryName, bool overwrite)
+    public static void extractToDirectory(ZipArchive archive, string destinationDirectoryName, bool overwrite)
     {
         Console.WriteLine($"input dest direc name: {destinationDirectoryName}");
         if (!overwrite)

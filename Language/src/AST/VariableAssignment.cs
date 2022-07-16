@@ -76,7 +76,10 @@ public class VariableAssignment : AST.Node
                     break;
                 case 1:
                     this.name = child.value;
-                    Typo.addToLittle(this);
+                    if (Config.settings.general.typo.enabled)
+                    {
+                        Typo.addToLittle(this);
+                    }
                     Parser.declaredGlobalsDict.Add(this.name, this);
                     break;
                 case 2:

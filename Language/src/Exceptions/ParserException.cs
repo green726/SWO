@@ -22,7 +22,7 @@ public class ParserException : Exception
     public static ParserException FactoryMethod(string whatHappened, string recommendedFix, Util.Token token, bool typoSuspected = false)
     {
         string input = "";
-        if (typoSuspected)
+        if (typoSuspected && Config.settings.general.typo.enabled)
         {
             string codeBlock = getCodeBlock(token);
             List<string> typoFixes = Typo.spellCheck(token.value);
@@ -40,7 +40,7 @@ public class ParserException : Exception
     public static ParserException FactoryMethod(string whatHappened, string recommendedFix, AST.Node node, bool typoSuspected = false, string typoString = "")
     {
         string input = "";
-        if (typoSuspected)
+        if (typoSuspected && Config.settings.general.typo.enabled)
         {
             string codeBlock = getCodeBlock(node);
             List<string> typoFixes = Typo.spellCheck(typoString);

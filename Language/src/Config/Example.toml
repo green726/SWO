@@ -4,6 +4,7 @@
 gc.enabled = false #garbage collector
 
 [general] #/misc
+typo.enabled = true
 
 [optimizations]
 level = 3 # level can either be 1, 2, or 3

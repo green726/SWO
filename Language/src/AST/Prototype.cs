@@ -14,7 +14,7 @@ public class Prototype : AST.Node
         this.nodeType = NodeType.Prototype;
         this.generator = new Generator.Prototype(this);
 
-        if (!Config.options.function.declaration.marker.word)
+        if (!Config.settings.function.declaration.marker.word)
         {
             this.name = token.value.Substring(1);
         }

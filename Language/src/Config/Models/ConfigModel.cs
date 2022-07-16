@@ -13,4 +13,6 @@ public class ConfigModel
     public IfModel? ifModel { get; set; }
 
     public VariableModel? variable { get; set; }
+
+    public GeneralModel? general { get; set; }
 }

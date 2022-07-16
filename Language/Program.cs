@@ -9,10 +9,15 @@ public class HISS
 
     static void Main(string[] args)
     {
-        Typo.initialize();
-        Config.initialize();
+        CompilerOptions opts = Setup.parseOptions(args);
 
-        CLI.parseOptions(args);
+
+        Config.initialize(opts.configFile);
+
+        if (Config.settings.general.typo.enabled)
+        {
+            Typo.initialize();
+        }
 
         string fileToRead = /* args.Length != 0 ? args[0] : */ "/coding/HISS/src/test.hiss";
 

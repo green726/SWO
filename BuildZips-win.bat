@@ -9,3 +9,4 @@ dotnet publish -r win10-x64
 dotnet publish -r linux-x64
 7z a -tzip ../Language-linux-x64.zip ./bin/Debug/net6.0/linux-x64/publish/*
 cd ..
+7z a -tzip ./Resources.zip ./Resources

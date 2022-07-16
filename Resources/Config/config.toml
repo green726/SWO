@@ -1,5 +1,7 @@
 #legal options for delimeters are parentheses (), brackets {}, and square brackets [] - more will be added in the future
 
+[general]
+typo.enabled  = true
 
 [function.declaration]
 marker.value = "@" #could also be something like "func"
