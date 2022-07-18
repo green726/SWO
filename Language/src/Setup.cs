@@ -5,12 +5,12 @@ using Tomlyn;
 
 public static class Setup
 {
-    public static List<string> templates = new List<string>() { "" };
-    public static string runPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+    public static List<string> templates = new List<string>() { "" }; public static string runPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
     public static CompilerOptions parseOptions(string[] inputs)
     {
         CompilerOptions compilerOptions = new CompilerOptions();
+
 
         if (inputs.Length > 0 && inputs[0] == "new")
         {
@@ -21,28 +21,70 @@ public static class Setup
             Environment.Exit(0);
         }
 
-        string currentOption = "";
+        System.Reflection.PropertyInfo currentProp = null;
         int index = 0;
+        bool inputIsBool = false;
+        bool inputBool = false;
+
         foreach (string input in inputs)
         {
-            if (currentOption != "")
+
+            if (input == "true")
             {
-                compilerOptions.GetType().GetProperty(currentOption).SetValue(compilerOptions, input);
-                currentOption = "";
+                inputIsBool = true;
+                inputBool = true;
+            }
+            else if (input == "false")
+            {
+                inputIsBool = true;
+                inputBool = false;
+            }
+            else
+            {
+                inputIsBool = false;
+            }
+            if (currentProp != null)
+            {
+                if (inputIsBool)
+                {
+                    currentProp.SetValue(compilerOptions, inputBool);
+                }
+                else
+                {
+                    currentProp.SetValue(compilerOptions, input);
+                }
+                currentProp = null;
             }
             else if (input.StartsWith("--"))
             {
-                currentOption = input.Substring(2);
-                Console.WriteLine("current option changed to " + currentOption);
+                string option = input.Substring(2);
+
+                currentProp = compilerOptions.GetType().GetProperty(option);
+
+
+                if (currentProp.PropertyType == typeof(bool))
+                {
+                    currentProp.SetValue(compilerOptions, true);
+                    currentProp = null;
+                }
+
+                Console.WriteLine("current option changed to " + currentProp);
             }
             else
             {
                 if (index > 1)
                 {
-                    throw new Exception("illegal compiler option");
+                    throw new Exception("Unknown or illegal installer argument");
                 }
-                Console.WriteLine("set compiler options options with index of " + index + " to input of " + input);
-                compilerOptions.GetType().GetProperty(compilerOptions.options[index]).SetValue(compilerOptions, input);
+                Console.WriteLine("set installer options options with index of " + index + " to input of " + input);
+                if (inputIsBool)
+                {
+                    compilerOptions.GetType().GetProperty(compilerOptions.options[index]).SetValue(compilerOptions, inputBool);
+                }
+                else
+                {
+                    compilerOptions.GetType().GetProperty(compilerOptions.options[index]).SetValue(compilerOptions, input);
+                }
             }
             index++;
         }
@@ -167,18 +209,7 @@ public class ProjectInfo
 
     }
 
-    // public void setPath(string path)
-    // {
-    //     this.path = path;
-    //     string[] fileNames = Directory.GetFiles(path, "*.*");
-    //     string[] folderNames = Directory.GetDirectories(path, "*.*");
-    //
-    //     foreach (string fileName in fileNames)
-    //     {
-    //         Console.WriteLine($"fileName: {fileName}"); InputFile file = new InputFile(fileName, fileName);
-    //     }
-    // }
-    //
+
     public void addLibrary(Library library)
     {
         libraries.Add(library);

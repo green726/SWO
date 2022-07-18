@@ -6,7 +6,7 @@ public static class CLI
     public static InstallerOptions parseOptions(string[] inputs)
     {
         InstallerOptions installerOptions = new InstallerOptions();
-        object currentOption = null;
+        System.Reflection.PropertyInfo currentProp = null;
         int index = 0;
         bool inputIsBool = false;
         bool inputBool = false;
@@ -27,30 +27,32 @@ public static class CLI
             {
                 inputIsBool = false;
             }
-            if (currentOption != null)
+            if (currentProp != null)
             {
                 if (inputIsBool)
                 {
-                    currentOption = inputBool;
+                    currentProp.SetValue(installerOptions, inputBool);
                 }
                 else
                 {
-                    currentOption = input;
+                    currentProp.SetValue(installerOptions, input);
                 }
-                currentOption = "";
+                currentProp = null;
             }
             else if (input.StartsWith("--"))
             {
                 string option = input.Substring(2);
 
-                currentOption = installerOptions.GetType().GetProperty(option);
+                currentProp = installerOptions.GetType().GetProperty(option);
 
-                if (typeof(currentOption) == typeof(bool))
+
+                if (currentProp.PropertyType == typeof(bool))
                 {
-
+                    currentProp.SetValue(installerOptions, true);
+                    currentProp = null;
                 }
 
-                Console.WriteLine("current option changed to " + currentOption);
+                Console.WriteLine("current option changed to " + currentProp);
             }
             else
             {
@@ -93,9 +95,9 @@ public static class CLI
 
 public class InstallerOptions
 {
-    public bool installHIP = true;
-    public string installPath = "";
-    public bool uninstall = false;
+    public bool installHIP { get; set; } = true;
+    public string installPath { get; set; } = "";
+    public bool uninstall { get; set; } = false;
 
     public string[] options = new string[] { "installPath", "installHIP", "uninstall" };
 

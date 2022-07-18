@@ -14,8 +14,12 @@ public static class Installations
     public static Uri resourcesUri = new Uri(@$"https://github.com/green726/HISS/releases/latest/download/Resources.zip");
 
     public static bool windows = OperatingSystem.IsWindows();
+    public static bool linux = OperatingSystem.IsLinux();
 
     public static string ps = windows ? @"\" : "/"; //path seperator
+
+    public static string bashrc = @$"{Environment.GetEnvironmentVariable("HOME")}/.bashrc";
+
 
     public static void installHIP(string path)
     {
@@ -36,9 +40,9 @@ public static class Installations
             var newValue = oldValue + @$"{path}\HIP\;";
             Environment.SetEnvironmentVariable(envName, newValue, scope);
         }
-        else if (OperatingSystem.IsLinux())
+        else if (linux)
         {
-            File.AppendAllText(@$"{Environment.GetEnvironmentVariable("HOME")}/.bashrc", "export PATH=$PATH:~/.HISS/HIP/");
+            File.AppendAllText(bashrc, "export PATH=$PATH:~/.HISS/HIP/");
         }
 
         fs.Dispose();
@@ -60,12 +64,13 @@ public static class Installations
             string envName = "PATH";
             var scope = EnvironmentVariableTarget.Machine; // or User
             var oldValue = Environment.GetEnvironmentVariable(envName, scope);
+            Console.WriteLine($"OLD PATH: {oldValue}");
             var newValue = oldValue + @$"{path}\Language\;";
             Environment.SetEnvironmentVariable(envName, newValue, scope);
         }
-        else if (OperatingSystem.IsLinux())
+        else if (linux)
         {
-            File.AppendAllText(@$"{Environment.GetEnvironmentVariable("HOME")}/.bashrc", "export PATH=$PATH:~/.HISS/Language/");
+            File.AppendAllText(bashrc, "export PATH=$PATH:~/.HISS/Language/");
         }
 
 
@@ -77,7 +82,26 @@ public static class Installations
 
     public static void uninstall(string path)
     {
-        Directory.Delete(path);
+        Directory.Delete(path, true);
+
+        if (windows)
+        {
+            string envName = "PATH";
+            var scope = EnvironmentVariableTarget.Machine; // or User
+            var oldValue = Environment.GetEnvironmentVariable(envName, scope);
+            var newValue = oldValue.Replace(@$"{path}\Language\", "").Replace(@$"{path}\HIP\", "");
+            Environment.SetEnvironmentVariable(envName, newValue, scope);
+        }
+        else if (linux)
+        {
+            var tempFile = Path.GetTempFileName();
+            var linesToKeep = File.ReadLines(bashrc).Where(l => l != "export PATH=$PATH:~/.HISS/Language/" && l != "export PATH=$PATH:~/.HISS/HIP/");
+
+            File.WriteAllLines(tempFile, linesToKeep);
+
+            File.Delete(bashrc);
+            File.Move(tempFile, bashrc);
+        }
     }
 
     public static void installResources(string path)
@@ -91,14 +115,14 @@ public static class Installations
 
     public static string checkOs()
     {
-        if (OperatingSystem.IsLinux())
+        if (linux)
         {
             if (RuntimeInformation.OSArchitecture.ToString() == "X64")
             {
                 return "linux-x64";
             }
         }
-        else if (OperatingSystem.IsWindows())
+        else if (windows)
         {
             return RuntimeInformation.RuntimeIdentifier;
         }
