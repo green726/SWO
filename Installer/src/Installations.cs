@@ -75,6 +75,11 @@ public static class Installations
 
     }
 
+    public static void uninstall(string path)
+    {
+        Directory.Delete(path);
+    }
+
     public static void installResources(string path)
     {
         client.DownloadFile(resourcesUri, path + @$"{ps}Resources.zip");

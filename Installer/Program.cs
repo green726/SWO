@@ -8,6 +8,13 @@ public class Program
     static void Main(string[] args)
     {
         InstallerOptions opts = CLI.parseOptions(args);
+
+        if (opts.uninstall)
+        {
+            Installations.uninstall(opts.installPath);
+            return;
+        }
+
         Console.WriteLine($"Chosen install path: {opts.installPath}");
 
         System.IO.Directory.CreateDirectory(opts.installPath);

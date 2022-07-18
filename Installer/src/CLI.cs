@@ -6,7 +6,7 @@ public static class CLI
     public static InstallerOptions parseOptions(string[] inputs)
     {
         InstallerOptions installerOptions = new InstallerOptions();
-        string currentOption = "";
+        object currentOption = null;
         int index = 0;
         bool inputIsBool = false;
         bool inputBool = false;
@@ -27,21 +27,29 @@ public static class CLI
             {
                 inputIsBool = false;
             }
-            if (currentOption != "")
+            if (currentOption != null)
             {
                 if (inputIsBool)
                 {
-                    installerOptions.GetType().GetProperty(currentOption).SetValue(installerOptions, inputBool);
+                    currentOption = inputBool;
                 }
                 else
                 {
-                    installerOptions.GetType().GetProperty(currentOption).SetValue(installerOptions, input);
+                    currentOption = input;
                 }
                 currentOption = "";
             }
             else if (input.StartsWith("--"))
             {
-                currentOption = input.Substring(2);
+                string option = input.Substring(2);
+
+                currentOption = installerOptions.GetType().GetProperty(option);
+
+                if (typeof(currentOption) == typeof(bool))
+                {
+
+                }
+
                 Console.WriteLine("current option changed to " + currentOption);
             }
             else
@@ -87,8 +95,9 @@ public class InstallerOptions
 {
     public bool installHIP = true;
     public string installPath = "";
+    public bool uninstall = false;
 
-    public string[] options = new string[] { "installPath", "installHIP" };
+    public string[] options = new string[] { "installPath", "installHIP", "uninstall" };
 
     public InstallerOptions()
     {
