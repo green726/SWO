@@ -1,7 +1,9 @@
 using System.Runtime.InteropServices;
 using System.ComponentModel;
 using System.Reflection;
+using System.Runtime.Serialization;
 using Tomlyn;
+
 
 public static class Setup
 {
@@ -168,7 +170,28 @@ public static class Setup
 public class ProjectInfo
 {
     public Template template { get; set; } = new Template(TemplateType.Blank);
+
+    public InputFile[] filesArr
+    {
+        get
+        {
+            return files.ToArray();
+        }
+        set { }
+    }
+
+    public Library[] librariesArr
+    {
+        get
+        {
+            return libraries.ToArray();
+        }
+        set { }
+    }
+
+    [IgnoreDataMember]
     public List<InputFile> files { get; set; } = new List<InputFile>();
+    [IgnoreDataMember]
     public List<Library> libraries { get; set; } = new List<Library>();
     public string name { get; set; } = "unknown";
 
@@ -206,7 +229,6 @@ public class ProjectInfo
 
     public ProjectInfo()
     {
-
     }
 
 

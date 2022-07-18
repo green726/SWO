@@ -73,25 +73,9 @@ public static class CLI
             index++;
         }
 
-        foreach (PropertyDescriptor descriptor in TypeDescriptor.GetProperties(installerOptions))
-        {
-            string name = descriptor.Name;
-            object value = descriptor.GetValue(installerOptions);
-            Console.WriteLine($"compiler option: {name} with a value of {value}");
-        }
-
         return installerOptions;
     }
 }
-
-// public enum FileType
-// {
-//     Assembly,
-//     Object,
-//     Binary,
-//     LLVMIR,
-//     NativeExecutable,
-// }
 
 public class InstallerOptions
 {
