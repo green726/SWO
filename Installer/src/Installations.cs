@@ -1,13 +1,23 @@
 using System.Net;
 using System.IO.Compression;
 using System.Runtime.InteropServices;
+using Spectre.Console;
 
 public static class Installations
 {
 
+    private static bool installingHIP = false;
 
     public static string os;
 
+    private static int maxHIPFiles = 0;
+    private static int currentHIPFile = 0;
+
+    private static int maxLanguageFiles = 0;
+    private static int currentLanguageFile = 0;
+
+    private static int maxResourcesFiles = 0;
+    private static int currentResourceFile = 0;
 
     public static Uri? HIPUri;
     public static Uri? languageUri;
@@ -20,49 +30,138 @@ public static class Installations
 
     public static string bashrc = @$"{Environment.GetEnvironmentVariable("HOME")}/.bashrc";
 
-    public static ProgressBar HIPBar;
-    public static ProgressBar langBar;
-    public static ProgressBar resourcesBar;
+    public static bool resources = true;
 
+    private static int prevHIP = 0;
+    private static int currentHIP = 0;
     public static void HIPProgressChanged(object sender, DownloadProgressChangedEventArgs arg)
     {
-        HIPBar.Report(arg.ProgressPercentage / 100);
-
+        prevHIP = currentHIP;
+        currentHIP = arg.ProgressPercentage;
     }
+
+    private static int prevLang = 0;
+    private static int currentLang = 0;
     public static void languageProgressChanged(object sender, DownloadProgressChangedEventArgs arg)
     {
-        langBar.Report(arg.ProgressPercentage / 100);
-
+        prevLang = currentLang;
+        currentLang = arg.ProgressPercentage;
     }
+
+    private static int prevResources = 0;
+    private static int currentResources = 0;
     public static void resourcesProgressChanged(object sender, DownloadProgressChangedEventArgs arg)
     {
-        resourcesBar.Report(arg.ProgressPercentage / 100);
+        prevResources = currentResources;
+        currentResources = arg.ProgressPercentage;
+    }
 
+    public static void init()
+    {
+        linux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+        windows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+        os = checkOs();
+
+
+        resourcesUri = new Uri(@$"https://github.com/green726/HISS/releases/latest/download/Resources.zip");
+        languageUri = new Uri(@$"https://github.com/green726/HISS/releases/latest/download/Language-{os}.zip");
+        HIPUri = new Uri(@$"https://github.com/green726/HISS/releases/latest/download/HIP-{os}.zip");
+
+        ps = windows ? @"\" : "/";
     }
 
 
-    public static async void installHIP(string path)
+    public static async void downloadHIP(string path)
     {
-        // System.IO.Directory.CreateDirectory(path + @"\HIP\");
-        // Console.WriteLine("pulling file from: " + HIPUri);
-
-
+        installingHIP = true;
         WebClient client = new WebClient();
 
-        HIPBar = new ProgressBar();
         client.DownloadProgressChanged += new DownloadProgressChangedEventHandler(HIPProgressChanged);
 
         Task HIPTask = client.DownloadFileTaskAsync(HIPUri, path + @$"{ps}HIP-{os}.zip");
 
-        installLanguage(path);
+        downloadLanguage(path);
 
-        HIPTask.Wait();
+        if (!resources)
+        {
+            // Asynchronous
+            await AnsiConsole.Progress()
+                .StartAsync(async ctx =>
+                {
+                    // Define tasks
+                    var task1 = ctx.AddTask("[green]Downloading HIP[/]");
+                    task1.MaxValue = 100;
 
-        Console.WriteLine("HIP Install complete");
+                    var task2 = ctx.AddTask("[blue]Downloading HISS Language[/]");
+                    task2.MaxValue = 100;
 
+                    // installLanguage(path);
+
+                    while (!ctx.IsFinished)
+                    {
+                        task1.Increment(currentHIP - prevHIP);
+                        task2.Increment(currentLang - prevLang);
+                    }
+                });
+
+        }
+        else
+        {
+            // Asynchronous
+            await AnsiConsole.Progress()
+                .StartAsync(async ctx =>
+                {
+                    // Define tasks
+                    var task1 = ctx.AddTask("[green]Downloading HIP[/]");
+                    task1.MaxValue = 100;
+
+                    var task2 = ctx.AddTask("[blue]Downloading HISS Language[/]");
+                    task2.MaxValue = 100;
+
+                    var task3 = ctx.AddTask("[purple]Downloading HISS Resources[/]");
+
+                    // installLanguage(path);
+
+                    while (!ctx.IsFinished)
+                    {
+                        task1.Increment(currentHIP - prevHIP);
+                        task2.Increment(currentLang - prevLang);
+                        task3.Increment(currentResources - prevResources);
+                    }
+                });
+        }
+
+        installHIP(path);
+
+    }
+
+    public static async void installHIP(string path)
+    {
         FileStream fs = new FileStream(path + @$"{ps}HIP-{os}.zip", FileMode.Open);
         ZipArchive archive = new ZipArchive(fs);
         extractToDirectory(archive, path + @$"{ps}HIP", true);
+
+        installLanguage(path);
+
+        await AnsiConsole.Progress().StartAsync(async ctx =>
+        {
+            var task1 = ctx.AddTask("[green]Installing HIP[/]");
+            task1.MaxValue = 100;
+
+            var task2 = ctx.AddTask("[blue]Installing HISS Language[/]");
+            task2.MaxValue = 100;
+
+            var task3 = ctx.AddTask("[purple]Installing HISS Resources[/]");
+            task3.MaxValue = 100;
+
+            while (!ctx.IsFinished)
+            {
+                task1.Increment();
+                task2.Increment();
+                task3.Increment();
+            }
+        });
+
 
         if (windows)
         {
@@ -78,35 +177,77 @@ public static class Installations
         }
 
         fs.Dispose();
-        // installLanguage(path);
+
     }
 
-    public static async void installLanguage(string path)
+    public static async void downloadLanguage(string path)
     {
-        // System.IO.Directory.CreateDirectory(path + @"\Language\");
-
-        langBar = new ProgressBar();
         WebClient client = new WebClient();
 
         client.DownloadProgressChanged += new DownloadProgressChangedEventHandler(languageProgressChanged);
         Task langTask = client.DownloadFileTaskAsync(languageUri, path + @$"{ps}Language-{os}.zip");
 
-        installResources(path);
+        if (resources)
+        {
+            downloadResources(path);
+        }
 
-        langTask.Wait();
+        if (!installingHIP && resources)
+        {
+            // Asynchronous
+            await AnsiConsole.Progress()
+                .StartAsync(async ctx =>
+                {
+                    var task1 = ctx.AddTask("[blue]Downloading HISS Language[/]");
+                    task1.MaxValue = 100;
 
-        Console.WriteLine("HISS Language install complete");
+                    var task2 = ctx.AddTask("[purple]Downloading HISS Resources[/]");
+                    task2.MaxValue = 100;
 
+
+                    while (!ctx.IsFinished)
+                    {
+                        task1.Increment(currentLang - prevLang);
+                        task2.Increment(currentResources - prevResources);
+                    }
+                });
+            installLanguage(path);
+            installResources(path);
+        }
+        else if (!installingHIP && !resources)
+        {
+            // Asynchronous
+            await AnsiConsole.Progress()
+                .StartAsync(async ctx =>
+                {
+                    var task1 = ctx.AddTask("[blue]Downloading HISS Language[/]");
+                    task1.MaxValue = 100;
+
+                    while (!ctx.IsFinished)
+                    {
+                        task1.Increment(currentLang - prevLang);
+                    }
+                });
+            installLanguage(path);
+        }
+
+    }
+
+    public static async void installLanguage(string path)
+    {
         FileStream fs = new FileStream(path + $@"{ps}Language-{os}.zip", FileMode.Open);
         ZipArchive archive = new ZipArchive(fs);
         extractToDirectory(archive, path + @$"{ps}Language", true);
+
+        if (resources) {
+        installResources(path);
+        }
 
         if (windows)
         {
             string envName = "PATH";
             var scope = EnvironmentVariableTarget.Machine; // or User
             var oldValue = Environment.GetEnvironmentVariable(envName, scope);
-            Console.WriteLine($"OLD PATH: {oldValue}");
             var newValue = oldValue + @$"{path}\Language\;";
             Environment.SetEnvironmentVariable(envName, newValue, scope);
         }
@@ -115,27 +256,24 @@ public static class Installations
             File.AppendAllText(bashrc, "export PATH=$PATH:~/.HISS/Language/ \n");
         }
 
-
         fs.Dispose();
-
-        // installResources(path);
 
     }
 
-    public static async void installResources(string path)
+    public static async void downloadResources(string path)
     {
 
-        resourcesBar = new ProgressBar();
         WebClient client = new WebClient();
 
         client.DownloadProgressChanged += new DownloadProgressChangedEventHandler(resourcesProgressChanged);
 
         Task resourcesTask = client.DownloadFileTaskAsync(resourcesUri, path + @$"{ps}Resources.zip");
 
-        resourcesTask.Wait();
+        // resourcesTask.Wait();
+    }
 
-        Console.WriteLine("HISS resources install complete");
-
+    public static async void installResources(string path)
+    {
         FileStream fs = new FileStream(path + @$"{ps}Resources.zip", FileMode.Open);
         ZipArchive archive = new ZipArchive(fs);
         extractToDirectory(archive, path + @$"{ps}Resources", true);
@@ -180,10 +318,8 @@ public static class Installations
 
     public static string checkOs()
     {
-        Console.WriteLine($"linux: {linux}");
         if (linux)
         {
-            Console.WriteLine("linux detected with arch of " + RuntimeInformation.OSArchitecture.ToString());
             if (RuntimeInformation.OSArchitecture.ToString() == "X64")
             {
                 return "linux-x64";
@@ -196,8 +332,24 @@ public static class Installations
         return "unknown";
     }
 
-    public static void extractToDirectory(ZipArchive archive, string destinationDirectoryName, bool overwrite)
+    public static async Task extractToDirectory(ZipArchive archive, string destinationDirectoryName, bool overwrite, Step step)
     {
+        object fileNum;
+        switch (step)
+        {
+            case Step.HIP:
+                maxHIPFiles = archive.Entries.Count();
+                fileNum = currentHIPFile;
+                break;
+            case Step.Language:
+                maxLanguageFiles = archive.Entries.Count();
+                fileNum = currentLanguageFile;
+                break;
+            case Step.Resources:
+                maxResourcesFiles = archive.Entries.Count();
+                fileNum = currentResourceFile;
+                break;
+        }
         if (!overwrite)
         {
             archive.ExtractToDirectory(destinationDirectoryName);
@@ -224,4 +376,11 @@ public static class Installations
             file.ExtractToFile(completeFileName, true);
         }
     }
+}
+
+public enum Step
+{
+    HIP,
+    Language,
+    Resources
 }

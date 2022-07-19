@@ -1,100 +1,23 @@
-using System.Runtime.InteropServices;
-using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using Spectre.Console.Cli;
 
-public static class CLI
+public class CLI
 {
-    public static InstallerOptions parseOptions(string[] inputs)
+    CommandApp<InstallCommand> app;
+    public CLI()
     {
-        InstallerOptions installerOptions = new InstallerOptions();
-        System.Reflection.PropertyInfo currentProp = null;
-        int index = 0;
-        bool inputIsBool = false;
-        bool inputBool = false;
-
-        foreach (string input in inputs)
-        {
-            if (input == "true")
-            {
-                inputIsBool = true;
-                inputBool = true;
-            }
-            else if (input == "false")
-            {
-                inputIsBool = true;
-                inputBool = false;
-            }
-            else
-            {
-                inputIsBool = false;
-            }
-            if (currentProp != null)
-            {
-                if (inputIsBool)
-                {
-                    currentProp.SetValue(installerOptions, inputBool);
-                }
-                else
-                {
-                    currentProp.SetValue(installerOptions, input);
-                }
-                currentProp = null;
-            }
-            else if (input.StartsWith("--"))
-            {
-                string option = input.Substring(2);
-
-                currentProp = installerOptions.GetType().GetProperty(option);
-
-
-                if (currentProp.PropertyType == typeof(bool))
-                {
-                    currentProp.SetValue(installerOptions, true);
-                    currentProp = null;
-                }
-
-                Console.WriteLine("current option changed to " + currentProp);
-            }
-            else
-            {
-                if (index > 1)
-                {
-                    throw new Exception("Unknown or illegal installer argument");
-                }
-                Console.WriteLine("set installer options options with index of " + index + " to input of " + input);
-                if (inputIsBool)
-                {
-                    installerOptions.GetType().GetProperty(installerOptions.options[index]).SetValue(installerOptions, inputBool);
-                }
-                else
-                {
-                    installerOptions.GetType().GetProperty(installerOptions.options[index]).SetValue(installerOptions, input);
-                }
-            }
-            index++;
-        }
-
-        return installerOptions;
-    }
-}
-
-public class InstallerOptions
-{
-    public bool installHIP { get; set; } = true;
-    public string installPath { get; set; } = "";
-    public bool uninstall { get; set; } = false;
-
-    public string[] options = new string[] { "installPath", "installHIP", "uninstall" };
-
-    public InstallerOptions()
-    {
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            installPath = Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\.HISS");
-        }
-        else
-        {
-            installPath = $@"{Environment.GetEnvironmentVariable("HOME")}/.HISS";
-        }
+        app = new CommandApp<InstallCommand>();
     }
 
 }
+
+public class InstallCommand : Command<Settings>
+{
+    public override int Execute([NotNull] CommandContext context, [NotNull] Settings settings)
+    {
+        Util.figureOutSettings(settings);
+
+        return 0;
+    }
+}
+
