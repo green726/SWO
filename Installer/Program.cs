@@ -7,7 +7,6 @@ public class Program
 {
     static void Main(string[] args)
     {
-        Installations.init();
 
         CLI cli = new CLI();
         if (args.Length > 0 && args[0] == "ui")

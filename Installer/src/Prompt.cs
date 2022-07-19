@@ -2,7 +2,6 @@ using Spectre.Console;
 
 public static class Prompt
 {
-
     public static void getOptions()
     {
 
@@ -24,10 +23,10 @@ public static class Prompt
             path = defaultPath;
         }
 
-        bool installHIP = AnsiConsole.Confirm("Install HIP (Highly Inefficient Packages) - The HISS Package Manager");
+        bool installHIP = AnsiConsole.Confirm("Install HIP (Highly Inefficient Packages) - The HISS package manager");
+        bool installResources = AnsiConsole.Confirm("Install the HISS Resources (Templates, etc) - This is required for many HISS features but can be ignored for a greater degree of customization");
 
-        settings = new Settings { uninstall = uninstall, installPath = path, installHIP = installHIP };
+        settings = new Settings { uninstall = uninstall, installPath = path, installHIP = installHIP, installResources = installResources };
         Util.figureOutSettings(settings);
-
     }
 }
