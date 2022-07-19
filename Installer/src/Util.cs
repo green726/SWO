@@ -1,12 +1,12 @@
 using System.Runtime.InteropServices;
 using System.IO.Compression;
+using Spectre.Console;
 
 public static class Util
 {
 
-    public static async void figureOutSettings(Settings settings)
+    public static void figureOutSettings(Settings settings)
     {
-        Console.WriteLine("Util figure out settings");
         (string os, string ps) = checkOs();
 
         string path = settings.installPath;
@@ -21,18 +21,19 @@ public static class Util
 
         Directory.CreateDirectory(settings.installPath);
 
-        if (settings.installResources)
+        if (!settings.dontInstallResources)
         {
             components.Add(new HISSComponent("https://github.com/green726/HISS/releases/latest/download/Resources.zip", $"{path}{ps}Resources", $"{path}{ps}Resources.zip", "Installing HISS Resources", "Downloading HISS Resources"));
         }
-        if (settings.installHIP)
+        if (!settings.dontInstallHIP)
         {
             components.Add(new HISSComponent($"https://github.com/green726/HISS/releases/latest/download/HIP-{os}.zip", $"{path}{ps}HIP", $"{path}{ps}HIP.zip", "Install HIP (Highly Inefficient Packages) - The HISS Package Manager", "Downloading HIP (Highly Inefficient Packages) - the HISS Package Manager"));
         }
         components.Add(new HISSComponent($"https://github.com/green726/HISS/releases/latest/download/Language-{os}.zip", $"{path}{ps}Language", $"{path}{ps}Language.zip", "Installing the HISS Language", "Downloading the HISS Language"));
 
-        await Installations.download(components);
-        await Installations.install(components);
+        Installations.download(components).Wait();
+        Installations.install(components).Wait();
+        Installations.addToPath(settings);
     }
 
 
@@ -69,7 +70,6 @@ public static class Util
             text = text.Replace(langEnv, "");
             File.WriteAllText(bashrc, text);
         }
-
         Console.WriteLine("HISS Uninstalled Successfully");
     }
 
@@ -90,6 +90,7 @@ public static class Util
     {
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
+            Installations.linux = true;
             if (RuntimeInformation.OSArchitecture.ToString() == "X64")
             {
                 return ("linux-x64", "/");
@@ -97,14 +98,17 @@ public static class Util
         }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
+            Installations.windows = true;
             return (RuntimeInformation.RuntimeIdentifier, @"\");
         }
         return ("unknown", "unknown");
     }
 
 
-    public static Task extractToDirectory(ZipArchive archive, string destinationDirectoryName, bool overwrite, ref int currentInstallFile)
+    public static Task extractToDirectory(ZipArchive archive, string destinationDirectoryName, bool overwrite, ref ProgressTask task)
     {
+        int maxFiles = archive.Entries.Count();
+        task.MaxValue = maxFiles;
         if (!overwrite)
         {
             archive.ExtractToDirectory(destinationDirectoryName);
@@ -116,7 +120,7 @@ public static class Util
 
         foreach (ZipArchiveEntry file in archive.Entries)
         {
-            currentInstallFile++;
+            task.Increment(1);
             string completeFileName = Path.GetFullPath(Path.Combine(destinationDirectoryFullPath, file.FullName));
 
             if (!completeFileName.StartsWith(destinationDirectoryFullPath, StringComparison.OrdinalIgnoreCase))

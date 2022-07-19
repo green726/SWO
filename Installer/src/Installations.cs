@@ -1,70 +1,79 @@
 using System.Net;
 using System.IO.Compression;
-using System.Runtime.InteropServices;
 using Spectre.Console;
 
 public static class Installations
 {
-    public static Task download(List<HISSComponent> downloadComponents)
+    public static bool windows = false;
+    public static bool linux = false;
+
+    public static async Task download(List<HISSComponent> downloadComponents)
     {
-
-        foreach (HISSComponent component in downloadComponents)
+        await AnsiConsole.Progress()
+        .Columns(new ProgressColumn[]
         {
-            component.download();
-        }
-
-        AnsiConsole.Progress().StartAsync(async ctx =>
+            new TaskDescriptionColumn(),
+            new ProgressBarColumn(),
+            new PercentageColumn(),
+            new RemainingTimeColumn(),
+            new SpinnerColumn(),
+        }).
+        StartAsync(async ctx =>
         {
-            List<ProgressTask> tasks = new List<ProgressTask>();
-
-            foreach (HISSComponent component in downloadComponents)
+            List<Task> tasks = new List<Task>();
+            foreach (HISSComponent comp in downloadComponents)
             {
-                tasks.Add(ctx.AddTask(component.downloadTaskName));
+                var task = ctx.AddTask(comp.downloadTaskName);
+                tasks.Add(comp.download(task));
             }
-
-            while (!ctx.IsFinished)
-            {
-                for (int i = 0; i < downloadComponents.Count(); i++)
-                {
-                    tasks[i].Increment(downloadComponents[i].currentDownloadPercent - downloadComponents[i].previousDownloadPercent);
-                }
-            }
+            await Task.WhenAll(tasks);
         });
-
-        return Task.CompletedTask;
-
     }
 
 
-
-    public static Task install(List<HISSComponent> installComponents)
+    public static async Task install(List<HISSComponent> installComponents)
     {
 
-        foreach (HISSComponent component in installComponents)
+        await AnsiConsole.Progress().StartAsync(async ctx =>
         {
-            component.install();
+            List<Task> tasks = new List<Task>();
+            foreach (HISSComponent comp in installComponents)
+            {
+                var task = ctx.AddTask(comp.installTaskName);
+                tasks.Add(comp.install(task));
+            }
+
+            await Task.WhenAll(tasks);
+        });
+
+
+    }
+
+    public static void addToPath(Settings settings)
+    {
+        string bashrc = @$"{Environment.GetEnvironmentVariable("HOME")}/.bashrc";
+        if (windows)
+        {
+
+            string envName = "PATH";
+            var scope = EnvironmentVariableTarget.Machine; // or User
+            var oldValue = Environment.GetEnvironmentVariable(envName, scope);
+            var newValue = oldValue + @$"{settings.installPath}\Language\;";
+            if (!settings.dontInstallHIP)
+            {
+                newValue += @$"{settings.installPath}\HIP\;";
+            }
+            Environment.SetEnvironmentVariable(envName, newValue, scope);
         }
-
-        AnsiConsole.Progress().Start((Func<ProgressContext, Task>)(async ctx =>
+        else if (linux)
         {
-            List<ProgressTask> tasks = new List<ProgressTask>();
-
-            foreach (HISSComponent component in installComponents)
+            if (!settings.dontInstallHIP)
             {
-                tasks.Add(ctx.AddTask(component.installTaskName, maxValue: component.maxInstallFiles));
+                File.AppendAllText(bashrc, "export PATH=$PATH:~/.HISS/HIP/ \n");
             }
+            File.AppendAllText(bashrc, "export PATH=$PATH:~/.HISS/Language/ \n");
 
-            while (!ctx.IsFinished)
-            {
-                for (int i = 0; i < installComponents.Count(); i++)
-                {
-                    tasks[i].Value = installComponents[i].currentInstallFile;
-                }
-            }
-        }));
-
-
-        return Task.CompletedTask;
+        }
 
     }
 }
@@ -76,14 +85,10 @@ public class HISSComponent
     public string downloadPath;
     public string installTaskName;
     public string downloadTaskName;
-    public double installTaskMaxValue = 0;
     public double currentDownloadPercent = 0;
     public double previousDownloadPercent = 0;
 
-    public int currentInstallFile = 0;
-    public int maxInstallFiles = 0;
-
-    public Task downloadTask;
+    public ProgressTask downloadProgressTask;
 
     public HISSComponent(string webPath, string installPath, string downloadPath, string installTaskName, string downloadTaskName)
     {
@@ -94,28 +99,28 @@ public class HISSComponent
         this.downloadTaskName = downloadTaskName;
     }
 
-    public async void install()
+    public Task install(ProgressTask task)
     {
         FileStream fs = new FileStream(downloadPath, FileMode.Open);
         ZipArchive archive = new ZipArchive(fs);
-        Console.WriteLine($"extracting file with install task of name {installTaskName}");
-        this.maxInstallFiles = archive.Entries.Count();
-        // Util.extractToDirectory(archive, installPath, true, ref currentInstallFile);
-        fs.DisposeAsync();
+        return Util.extractToDirectory(archive, installPath, true, ref task);
+        // fs.DisposeAsync();
     }
 
-    public void download()
+    public Task download(ProgressTask task)
     {
+        this.downloadProgressTask = task;
         WebClient client = new WebClient();
         client.DownloadProgressChanged += new DownloadProgressChangedEventHandler(downloadProgressChanged);
-        this.downloadTask = client.DownloadFileTaskAsync(this.uri, this.downloadPath);
-
+        return client.DownloadFileTaskAsync(this.uri, this.downloadPath);
     }
 
     public void downloadProgressChanged(object sender, DownloadProgressChangedEventArgs arg)
     {
         this.previousDownloadPercent = this.currentDownloadPercent;
         this.currentDownloadPercent = arg.ProgressPercentage;
+
+        this.downloadProgressTask.Increment(this.currentDownloadPercent - this.previousDownloadPercent);
     }
 }
 

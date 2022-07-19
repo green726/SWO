@@ -4,9 +4,10 @@ using Spectre.Console.Cli;
 public class CLI
 {
     CommandApp<InstallCommand> app;
-    public CLI()
+    public CLI(string[] args)
     {
         app = new CommandApp<InstallCommand>();
+        app.Run(args);
     }
 
 }

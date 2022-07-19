@@ -26,7 +26,7 @@ public static class Prompt
         bool installHIP = AnsiConsole.Confirm("Install HIP (Highly Inefficient Packages) - The HISS package manager");
         bool installResources = AnsiConsole.Confirm("Install the HISS Resources (Templates, etc) - This is required for many HISS features but can be ignored for a greater degree of customization");
 
-        settings = new Settings { uninstall = uninstall, installPath = path, installHIP = installHIP, installResources = installResources };
+        settings = new Settings { uninstall = uninstall, installPath = path, dontInstallHIP = installHIP, dontInstallResources = installResources };
         Util.figureOutSettings(settings);
     }
 }

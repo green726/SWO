@@ -8,19 +8,19 @@ public class Settings : CommandSettings
     public string? installPath { get; init; }
 
     [Description("Uninstall HISS")]
-    [CommandOption("--u|--uninstall")]
+    [CommandOption("-u|--uninstall")]
     [DefaultValue(false)]
     public bool uninstall { get; init; }
 
-    [Description("Install HIP (Highly Inefficient Packages) - The HISS Package Manager")]
-    [CommandOption("--hip|--installhip")]
-    [DefaultValue(true)]
-    public bool installHIP { get; init; }
+    [Description("Dont Install HIP (Highly Inefficient Packages) - The HISS Package Manager")]
+    [CommandOption("--nohip|--installhip")]
+    [DefaultValue(false)]
+    public bool dontInstallHIP { get; init; }
 
-    [Description("Install the HISS Resources - this is required for many HISS features however you can go without installing it for a greater degree of customization.")]
-    [CommandOption("--resources|--r")]
-    [DefaultValue(true)]
-    public bool installResources { get; init; }
+    [Description("Dont the HISS Resources - this is required for many HISS features however you can go without installing it for a greater degree of customization.")]
+    [CommandOption("--nor|--noresources")]
+    [DefaultValue(false)]
+    public bool dontInstallResources { get; init; }
 
     public Settings()
     {
