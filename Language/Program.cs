@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using Tomlyn;
 
-public class HISS
+public static class HISS
 {
     private static string fileContents;
     private static bool windows = false;
+    public static ProjectInfo projectInfo;
 
     static void Main(string[] args)
     {
@@ -21,31 +23,12 @@ public class HISS
 
     public static void testFunc()
     {
-        string pathToSrc = "";
-
-
-
-
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-        {
-            pathToSrc = "/home/green726/coding/HISS/src/";
-            Config.initialize("~/.HISS/Resources/Config/config.toml");
-        }
-
-        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            pathToSrc = @"D:\coding\HISS\src\";
-            windows = true;
-            Config.initialize(Environment.ExpandEnvironmentVariables(@"%UserProfile%\.HISS\Resources\Config\config.toml"));
-        }
-
-
         if (Config.settings.general.typo.enabled)
         {
             Typo.initialize();
         }
 
-        string fileToRead = pathToSrc + "/test.hiss";
+        string fileToRead = Util.pathToSrc + "/test.hiss";
 
         string debugLoggingStr = "true";
         bool debugLogging = debugLoggingStr == "true" ? true : false;
@@ -66,21 +49,26 @@ public class HISS
         EXE.compileEXE(windows);
     }
 
-    public static void compileProject(CompileCommandSettings settings, ProjectInfo info)
+    public static void compileProject(CompileCommandSettings settings)
     {
-        Config.initialize(info.configFilePath);
+
+        string[] files = System.IO.Directory.GetFiles(settings.path, "*.hproj");
+        string tomlText = System.IO.File.ReadAllText(files[0]);
+        projectInfo = Toml.ToModel<ProjectInfo>(tomlText);
+
+        Console.WriteLine("TOML re-converted from string to model than back to string below");
+        Console.WriteLine(Toml.FromModel(projectInfo));
+
+        Config.initialize(projectInfo.configFilePath);
+
+        settings.resultFileName = projectInfo.projectName;
 
         if (Config.settings.general.typo.enabled)
         {
             Typo.initialize();
         }
 
-        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            windows = true;
-        }
-
-        fileContents = System.IO.File.ReadAllText(info.entryFile.path);
+        fileContents = System.IO.File.ReadAllText(projectInfo.entryFile.path);
 
         List<Util.Token> lexedContent = Lexer.lex(fileContents);
 
@@ -93,6 +81,6 @@ public class HISS
         //TODO: write some code in the parser that will (when it hits a using statement) read the text from that file (or package) - lex it, and parse it all inserted into the current point in the ASTNodes list then continue on parsing the main file and eventually codegen that
         ModuleGen.GenerateModule(nodes);
 
-        EXE.compileEXE(windows);
+        EXE.compileEXE(settings, true);
     }
 }

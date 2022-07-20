@@ -6,6 +6,25 @@ public static class Util
     public static string[] delimeters = { "(", ")", "{", "}", "[", "]" };
     public static string[] builtinFuncs = { "print", "println" };
     // public static TokenType[] delimTypes = { TokenType.ParenDelimiterOpen, TokenType.ParenDelimiterClose, TokenType.BrackDelimiterOpen, TokenType.BrackDelimiterClose, TokenType.SquareDelimiterOpen, TokenType.SquareDelimiterClose };
+    //
+    //BUG: remove this in release builds or figure out a better way for HISS path
+    public static string installPath = "";
+    public static string pathToSrc = "";
+
+    public static void getHISSInstallPath()
+    {
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            pathToSrc = "/home/green726/coding/HISS/src/";
+            installPath = Environment.ExpandEnvironmentVariables($"%HOME%/.HISS");
+        }
+
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            pathToSrc = @"D:\coding\HISS\src\";
+            installPath = Environment.ExpandEnvironmentVariables(@$"%USERPROFILE%\.HISS");
+        }
+    }
 
     public enum TokenType
     {

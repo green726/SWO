@@ -27,7 +27,7 @@ public class ProjectInfo
     public List<HISSFile> files { get; set; } = new List<HISSFile>();
     [IgnoreDataMember]
     public List<Library> libraries { get; set; } = new List<Library>();
-    public string name { get; set; } = "unknown";
+    public string projectName { get; set; } = "unknown";
 
     public string configFilePath { get; set; } = "";
 
@@ -62,12 +62,20 @@ public class ProjectInfo
     {
         var tomlString = Toml.FromModel(this);
         Console.WriteLine("Toml string: \n" + tomlString);
-        File.WriteAllText(@$"{path}{name}.hproj", tomlString);
+        File.WriteAllText(@$"{path}{projectName}.hproj", tomlString);
     }
 
     public ProjectInfo()
     {
-        configFilePath = Environment.CurrentDirectory + "/config.toml";
+        DirectoryInfo proj = new DirectoryInfo(path);
+        if (proj.GetFiles().Contains(new FileInfo("config.toml")))
+        {
+            configFilePath = path + "/config.toml";
+        }
+        else
+        {
+            configFilePath = Util.installPath + "/Resources/Config/config.toml";
+        }
     }
 
     public void addLibrary(Library library)
@@ -109,7 +117,8 @@ public class ProjectInfo
 
 public class Library
 {
-
+    public string name { get; set; } = "";
+    public bool foreign { get; set; } = false;
 }
 
 public class HISSFile

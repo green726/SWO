@@ -22,7 +22,7 @@ public class CompileCommandSettings : CommandSettings
 
     [Description("The name of the resulting file")]
     [CommandArgument(0, "[resultFileName]")]
-    public string resultFileName { get; init; } = "my-hiss-file";
+    public string resultFileName { get; set; } = "";
 
     public FileType resultFileType = FileType.NativeExecutable;
 
