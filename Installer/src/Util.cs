@@ -27,7 +27,7 @@ public static class Util
         }
         if (!settings.dontInstallHIP)
         {
-            components.Add(new HISSComponent($"https://github.com/green726/HISS/releases/latest/download/HIP-{os}.zip", $"{path}{ps}HIP", $"{path}{ps}HIP.zip", "Install HIP (Highly Inefficient Packages) - The HISS Package Manager", "Downloading HIP (Highly Inefficient Packages) - the HISS Package Manager"));
+            components.Add(new HISSComponent($"https://github.com/green726/HISS/releases/latest/download/HIP-{os}.zip", $"{path}{ps}HIP", $"{path}{ps}HIP.zip", "Installing","Downloading HIP"));
         }
         components.Add(new HISSComponent($"https://github.com/green726/HISS/releases/latest/download/Language-{os}.zip", $"{path}{ps}Language", $"{path}{ps}Language.zip", "Installing the HISS Language", "Downloading the HISS Language"));
 
@@ -58,7 +58,7 @@ public static class Util
             string envName = "PATH";
             var scope = EnvironmentVariableTarget.Machine; // or User
             var oldValue = Environment.GetEnvironmentVariable(envName, scope);
-            var newValue = oldValue.Replace(@$"{path}\Language\", "").Replace(@$"{path}\HIP\", "");
+            var newValue = oldValue.Replace(@$"{path}\Language\;", "").Replace(@$"{path}\HIP\;", "");
             Environment.SetEnvironmentVariable(envName, newValue, scope);
         }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))

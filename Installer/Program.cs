@@ -11,7 +11,9 @@ public class Program
         {
             Prompt.getOptions();
         }
+        else {
         CLI cli = new CLI(args);
+        }
 
 
 

@@ -1,6 +1,7 @@
 using System.Net;
 using System.IO.Compression;
 using Spectre.Console;
+using System.Runtime.InteropServices;
 
 public static class Installations
 {
@@ -52,20 +53,20 @@ public static class Installations
     public static void addToPath(Settings settings)
     {
         string bashrc = @$"{Environment.GetEnvironmentVariable("HOME")}/.bashrc";
-        if (windows)
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-
             string envName = "PATH";
             var scope = EnvironmentVariableTarget.Machine; // or User
             var oldValue = Environment.GetEnvironmentVariable(envName, scope);
             var newValue = oldValue + @$"{settings.installPath}\Language\;";
             if (!settings.dontInstallHIP)
             {
+                Console.WriteLine("adding HIP to path");
                 newValue += @$"{settings.installPath}\HIP\;";
             }
             Environment.SetEnvironmentVariable(envName, newValue, scope);
         }
-        else if (linux)
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
             if (!settings.dontInstallHIP)
             {

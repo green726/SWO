@@ -1,3 +1,6 @@
+using System.Runtime.InteropServices;
+
+
 public static class Util
 {
     public static string[] delimeters = { "(", ")", "{", "}", "[", "]" };
@@ -128,6 +131,22 @@ public static class Util
                 copyDirectory(subDir.FullName, newDestinationDir, true, overwrite);
             }
         }
+    }
+
+    public static string checkOs()
+    {
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            if (RuntimeInformation.OSArchitecture.ToString() == "X64")
+            {
+                return "linux-x64";
+            }
+        }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            return RuntimeInformation.RuntimeIdentifier;
+        }
+        return "unknown";
     }
 
 
