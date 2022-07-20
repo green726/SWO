@@ -33,7 +33,7 @@ public class ProjectInfo
 
     public HISSFile entryFile;
 
-    private string _path = "empty";
+    private string _path = "";
     public string path
     {
         get
@@ -61,11 +61,16 @@ public class ProjectInfo
     public void write()
     {
         var tomlString = Toml.FromModel(this);
-        Console.WriteLine("Toml string: \n" + tomlString);
-        File.WriteAllText(@$"{path}{projectName}.hproj", tomlString);
+        // Console.WriteLine("Toml string: \n" + tomlString);
+        Console.WriteLine("writing toml string to " + @$"{path}{projectName}.hproj");
+        File.WriteAllText(@$"{path}/{projectName}.hproj", tomlString);
     }
 
     public ProjectInfo()
+    {
+    }
+
+    public void setConfig()
     {
         DirectoryInfo proj = new DirectoryInfo(path);
         if (proj.GetFiles().Contains(new FileInfo("config.toml")))

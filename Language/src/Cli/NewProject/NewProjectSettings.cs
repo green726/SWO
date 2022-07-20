@@ -20,11 +20,9 @@ public class NewProjectSettings : CommandSettings
 
     public NewProjectSettings()
     {
-        Console.WriteLine("start of new project settings constructor");
         this.template = new Template(templateStr);
         this.projectName = "my HISS project";
         this.projectPath = Environment.CurrentDirectory;
-        Console.WriteLine("end of new project settings constructor");
     }
 
     public static explicit operator ProjectInfo(NewProjectSettings settings)

@@ -8,7 +8,7 @@ public class CLI
     {
         app = new CommandApp();
         app.Configure(config =>
-        {
+        {    config.PropagateExceptions();
             config.AddCommand<NewProjectCommand>("new");
             config.AddCommand<CompileCommand>("compile");
             config.AddCommand<RunCommand>("run");

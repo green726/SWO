@@ -55,6 +55,7 @@ public static class HISS
         string[] files = System.IO.Directory.GetFiles(settings.path, "*.hproj");
         string tomlText = System.IO.File.ReadAllText(files[0]);
         projectInfo = Toml.ToModel<ProjectInfo>(tomlText);
+        projectInfo.setConfig();
 
         Console.WriteLine("TOML re-converted from string to model than back to string below");
         Console.WriteLine(Toml.FromModel(projectInfo));
