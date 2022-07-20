@@ -6,7 +6,9 @@ public class NewProjectSettings : CommandSettings
 {
     [Description("The HISS template to use for this project")]
     [CommandArgument(0, "[template]")]
-    public Template template { get; init; }
+    public string templateStr { get; init; } = "Blank";
+
+    public Template template;
 
     [Description("The name of the HISS project you wish to create")]
     [CommandArgument(1, "[name]")]
@@ -18,9 +20,11 @@ public class NewProjectSettings : CommandSettings
 
     public NewProjectSettings()
     {
-        this.template = new Template("Blank");
+        Console.WriteLine("start of new project settings constructor");
+        this.template = new Template(templateStr);
         this.projectName = "my HISS project";
         this.projectPath = Environment.CurrentDirectory;
+        Console.WriteLine("end of new project settings constructor");
     }
 
     public static explicit operator ProjectInfo(NewProjectSettings settings)
