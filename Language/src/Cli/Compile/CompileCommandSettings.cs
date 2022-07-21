@@ -30,6 +30,10 @@ public class CompileCommandSettings : CommandSettings
     {
         this.targetOSName = Util.checkOs();
         Enum.TryParse(resultFileTypeStr, out FileType resultFileType);
+
+        if (path == "") {
+            this.path = Environment.CurrentDirectory;
+        }
     }
 }
 

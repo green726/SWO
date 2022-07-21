@@ -11,6 +11,7 @@ public static class HISS
 
     static void Main(string[] args)
     {
+        Util.getHISSInstallPath();
         if (args.Length > 0 && args[0] == "test")
         {
             testFunc();
@@ -55,6 +56,7 @@ public static class HISS
         string[] files = System.IO.Directory.GetFiles(settings.path, "*.hproj");
         string tomlText = System.IO.File.ReadAllText(files[0]);
         projectInfo = Toml.ToModel<ProjectInfo>(tomlText);
+        // projectInfo.checkPath();
         projectInfo.setConfig();
 
         Console.WriteLine("TOML re-converted from string to model than back to string below");

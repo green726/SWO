@@ -3,60 +3,34 @@ using Tomlyn;
 
 public class ProjectInfo
 {
-    public Template template { get; set; } = new Template("blank");
-
-    public HISSFile[] filesArr
-    {
-        get
-        {
-            return files.ToArray();
-        }
-        set { }
-    }
-
-    public Library[] librariesArr
-    {
-        get
-        {
-            return libraries.ToArray();
-        }
-        set { }
-    }
-
     [IgnoreDataMember]
+    private Template _template = new Template("blank");
+    [IgnoreDataMember]
+    public Template template
+    {
+        get
+        {
+            return _template;
+        }
+        set
+        {
+            Util.copyDirectory(value.path, this.path, true, true);
+            Console.WriteLine("calling check path from template setter");
+            checkPath();
+            _template = value;
+        }
+    }
+
     public List<HISSFile> files { get; set; } = new List<HISSFile>();
-    [IgnoreDataMember]
+
     public List<Library> libraries { get; set; } = new List<Library>();
     public string projectName { get; set; } = "unknown";
 
     public string configFilePath { get; set; } = "";
 
-    public HISSFile entryFile;
+    public HISSFile entryFile { get; set; }
 
-    private string _path = "";
-    public string path
-    {
-        get
-        {
-            return _path;
-        }
-        set
-        {
-            _path = value;
-            Console.WriteLine("path setter called with val of: " + path);
-            string[] fileNames = Directory.GetFiles(path, "*.*", SearchOption.AllDirectories);
-            string[] folderNames = Directory.GetDirectories(path, "*.*", SearchOption.AllDirectories);
-            Console.WriteLine("path filenames: " + fileNames.ToString());
-
-            foreach (string fileName in fileNames)
-            {
-                Console.WriteLine($"fileName: {fileName}");
-                HISSFile file = new HISSFile(fileName, fileName);
-                files.Add(file);
-            }
-        }
-
-    }
+    public string path { get; set; } = "";
 
     public void write()
     {
@@ -93,18 +67,35 @@ public class ProjectInfo
         files.Add(new HISSFile(name, path));
     }
 
-    public void recheckPath()
+    //NOTE: call this in the program main when an existing project info is read to check for any new files that were created
+    public void checkPath()
     {
-        string[] fileNames = Directory.GetFiles(path, "*.*", SearchOption.AllDirectories);
+        string[] files = Directory.GetFiles(path, "*.*", SearchOption.AllDirectories);
         string[] folderNames = Directory.GetDirectories(path, "*.*", SearchOption.AllDirectories);
-        Console.WriteLine("path filenames: " + fileNames.ToString());
+        Console.WriteLine("path filenames: " + files.ToString());
 
-        foreach (string fileName in fileNames)
+        foreach (string file in files)
         {
-            Console.WriteLine($"fileName: {fileName}");
-            HISSFile file = new HISSFile(fileName, fileName);
-            files.Add(file);
+            HISSFile HISSfile = new HISSFile(Path.GetFileName(file), file);
+            if (!this.files.Contains(HISSfile) && HISSfile.name.EndsWith("hiss"))
+            {
+                Console.WriteLine($"fileName: {file}");
+                this.files.Add(HISSfile);
+            }
         }
+        Console.WriteLine("file count:" + this.files.Count());
+    }
+
+    public void findEntryFileFromTemplate()
+    {
+        string templateEntryName = this.template.entryFile.name;
+
+        string relativeTemplateEntryPath = template.entryFile.path.Replace(template.path, "");
+        string entryPath = this.path + relativeTemplateEntryPath;
+
+        Console.WriteLine(entryPath);
+
+        this.entryFile = files.Where(file => file.path == entryPath).ToArray()[0];
     }
 
     public void addFilesFromDir(string dirPath)
@@ -131,9 +122,23 @@ public class HISSFile
     public string name { get; set; }
     public string path { get; set; }
 
+    [IgnoreDataMember]
+    public string value
+    {
+        get
+        {
+            return File.ReadAllText(path);
+        }
+    }
+
     public HISSFile(string name, string path)
     {
         this.name = name;
         this.path = path;
+    }
+
+    public HISSFile()
+    {
+
     }
 }

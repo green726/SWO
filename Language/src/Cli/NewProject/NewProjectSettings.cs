@@ -29,9 +29,9 @@ public class NewProjectSettings : CommandSettings
     {
         ProjectInfo projectInfo = new ProjectInfo();
         projectInfo.path = settings.projectPath;
-        projectInfo.projectName = settings.projectName;
         projectInfo.template = settings.template;
-        projectInfo.entryFile = settings.template.entryFile;
+        projectInfo.projectName = settings.projectName;
+        projectInfo.findEntryFileFromTemplate();
 
         return projectInfo;
     }
