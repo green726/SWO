@@ -11,6 +11,7 @@ public static class Util
     public static string installPath = "";
     public static string pathToSrc = "";
 
+
     public static void getHISSInstallPath()
     {
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
@@ -21,8 +22,8 @@ public static class Util
 
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            pathToSrc = @"D:\coding\HISS\src\";
-            installPath = Environment.ExpandEnvironmentVariables(@$"%USERPROFILE%\.HISS");
+            pathToSrc = @"D:/coding/HISS/src/";
+            installPath = Environment.ExpandEnvironmentVariables(@$"%USERPROFILE%/.HISS");
         }
     }
 

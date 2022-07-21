@@ -310,7 +310,6 @@ public static class Parser
         }
         else if (token.value == Config.settings.general.import.keyword)
         {
-            Console.WriteLine("import detected");
             AST.ImportStatement importStatement = new AST.ImportStatement(token);
             return new List<dynamic>() { importStatement, delimLevel };
         }
@@ -448,7 +447,7 @@ public static class Parser
         prevLine = token.line;
         prevColumn = token.column;
 
-        Console.WriteLine($"token of value: {token.value} and parent of {parent?.nodeType}");
+        // Console.WriteLine($"token of value: {token.value} and parent of {parent?.nodeType}");
         AST.Node? previousNode = nodes.Count > 0 && tokenIndex > 0 ? nodes.Last() : null;
 
         if (token.type == Util.TokenType.EOF)

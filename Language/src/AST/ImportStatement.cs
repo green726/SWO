@@ -8,7 +8,8 @@ public class ImportStatement : Node
 
     public ImportStatement(Util.Token token) : base(token)
     {
-
+        this.nodeType = NodeType.ImportStatement;
+        this.newLineReset = true;
     }
 
     public override void addChild(Node child)
@@ -18,8 +19,7 @@ public class ImportStatement : Node
 
     public override void addChild(Util.Token child)
     {
-        Console.WriteLine("adding token child to import");
-        List<Library> matchingLib = (List<Library>)HISS.projectInfo.libraries.Where(library => library.name == child.value);
+        List<Library> matchingLib = HISS.projectInfo.libraries.Where(library => library.name == child.value).ToList();
         if (matchingLib.Count() == 1)
         {
             this.library = matchingLib[0];
@@ -44,6 +44,16 @@ public class ImportStatement : Node
             this.file = new HISSFile(child.value, filePaths[0]);
         }
 
+
+        string importFileValue = this.file.value;
+        List<Util.Token> tokens = Lexer.lex(importFileValue);
+
+        List<Util.Token> previousTokenList = Parser.tokenList;
+        Parser.tokenList = tokens;
+        Parser.parseTokenRecursive(tokens[0], 0);
+        Parser.tokenList = previousTokenList;
+
         base.addChild(child);
+
     }
 }

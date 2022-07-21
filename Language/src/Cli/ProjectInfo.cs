@@ -88,8 +88,7 @@ public class ProjectInfo
         string relativeTemplateEntryPath = template.entryFile.path.Replace(template.path, "");
         string entryPath = this.path + relativeTemplateEntryPath;
 
-
-        this.entryFile = files.Where(file => file.path == entryPath).ToArray()[0];
+        this.entryFile = files.Where(file => Path.GetFullPath(file.path) == Path.GetFullPath(entryPath)).ToArray()[0];
     }
 
     public void addFilesFromDir(string dirPath)

@@ -12,7 +12,7 @@ public class NewProjectSettings : CommandSettings
 
     [Description("The name of the HISS project you wish to create")]
     [CommandArgument(1, "[name]")]
-    public string projectName { get; init; }
+    public string projectName { get; init; } = "Blank";
 
     [Description("The path of the HISS project")]
     [CommandOption("-p|--path")]
@@ -21,7 +21,6 @@ public class NewProjectSettings : CommandSettings
     public NewProjectSettings()
     {
         this.template = new Template(templateStr);
-        this.projectName = "my HISS project";
         this.projectPath = Environment.CurrentDirectory;
     }
 
