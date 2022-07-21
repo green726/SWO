@@ -15,7 +15,6 @@ public class ProjectInfo
         set
         {
             Util.copyDirectory(value.path, this.path, true, true);
-            Console.WriteLine("calling check path from template setter");
             checkPath();
             _template = value;
         }
@@ -36,7 +35,6 @@ public class ProjectInfo
     {
         var tomlString = Toml.FromModel(this);
         // Console.WriteLine("Toml string: \n" + tomlString);
-        Console.WriteLine("writing toml string to " + @$"{path}{projectName}.hproj");
         File.WriteAllText(@$"{path}/{projectName}.hproj", tomlString);
     }
 
@@ -72,18 +70,15 @@ public class ProjectInfo
     {
         string[] files = Directory.GetFiles(path, "*.*", SearchOption.AllDirectories);
         string[] folderNames = Directory.GetDirectories(path, "*.*", SearchOption.AllDirectories);
-        Console.WriteLine("path filenames: " + files.ToString());
 
         foreach (string file in files)
         {
             HISSFile HISSfile = new HISSFile(Path.GetFileName(file), file);
             if (!this.files.Contains(HISSfile) && HISSfile.name.EndsWith("hiss"))
             {
-                Console.WriteLine($"fileName: {file}");
                 this.files.Add(HISSfile);
             }
         }
-        Console.WriteLine("file count:" + this.files.Count());
     }
 
     public void findEntryFileFromTemplate()
@@ -93,7 +88,6 @@ public class ProjectInfo
         string relativeTemplateEntryPath = template.entryFile.path.Replace(template.path, "");
         string entryPath = this.path + relativeTemplateEntryPath;
 
-        Console.WriteLine(entryPath);
 
         this.entryFile = files.Where(file => file.path == entryPath).ToArray()[0];
     }

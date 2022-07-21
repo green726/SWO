@@ -59,10 +59,11 @@ public static class HISS
         // projectInfo.checkPath();
         projectInfo.setConfig();
 
-        Console.WriteLine("TOML re-converted from string to model than back to string below");
-        Console.WriteLine(Toml.FromModel(projectInfo));
+        // Console.WriteLine("TOML re-converted from string to model than back to string below");
+        // Console.WriteLine(Toml.FromModel(projectInfo));
 
         Config.initialize(projectInfo.configFilePath);
+        Console.WriteLine(Config.settings.general.import.keyword);
 
         settings.resultFileName = projectInfo.projectName;
 

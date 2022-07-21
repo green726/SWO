@@ -308,6 +308,12 @@ public static class Parser
             AST.VariableAssignment constAss = new AST.VariableAssignment(token, false);
             return new List<dynamic>() { constAss, delimLevel };
         }
+        else if (token.value == Config.settings.general.import.keyword)
+        {
+            Console.WriteLine("import detected");
+            AST.ImportStatement importStatement = new AST.ImportStatement(token);
+            return new List<dynamic>() { importStatement, delimLevel };
+        }
         else if (token.value == "if")
         {
             AST.IfStatement ifStat = new AST.IfStatement(token, parent);
@@ -351,7 +357,7 @@ public static class Parser
             return new List<dynamic>() { funcCall, delimLevel };
         }
 
-        else if (parent.nodeType == AST.Node.NodeType.ForLoop)
+        else if (parent?.nodeType == AST.Node.NodeType.ForLoop)
         {
             AST.ForLoop forLoop = (AST.ForLoop)parent;
             if (!forLoop.isBody)
@@ -375,6 +381,9 @@ public static class Parser
                 }
                 parent.addChild(token);
                 return new List<dynamic>() { parent, delimLevel };
+            case AST.Node.NodeType.ImportStatement:
+                parent.addChild(token);
+                return new List<dynamic>() { parent.parent, delimLevel };
         }
 
 
@@ -432,92 +441,6 @@ public static class Parser
 
         return new List<dynamic>() { parent, delimLevel };
 
-        // // Console.WriteLine($"parsing delim {token.value} with parent of {parent}");
-        // switch (token.value)
-        // {
-        //     case "(":
-        //         switch (parent?.nodeType)
-        //         {
-        //             case AST.Node.NodeType.ForLoop:
-        //                 parent.addChild(token);
-        //                 break;
-        //         }
-        //         delimLevel++;
-        //         break;
-        //     case "{":
-        //         switch (parent?.nodeType)
-        //         {
-        //             // case AST.Node.NodeType.Prototype:
-        //             //     parent = new FunctionAST((PrototypeAST)parent);
-        //             //     break;
-        //             case AST.Node.NodeType.IfStatement:
-        //                 parent.addChild(token);
-        //                 break;
-        //             case AST.Node.NodeType.ForLoop:
-        //                 parent.addChild(token);
-        //                 break;
-        //         }
-        //
-        //         delimLevel++;
-        //         break;
-        //     case "[":
-        //         switch (parent?.nodeType)
-        //         {
-        //             case AST.Node.NodeType.FunctionCall:
-        //                 break;
-        //         }
-        //         delimLevel++;
-        //         break;
-        //     case "]":
-        //         delimLevel--;
-        //         if (delimLevel == 0)
-        //         {
-        //             parent = null;
-        //         }
-        //         else if (parent != null)
-        //         {
-        //             parent = parent.parent;
-        //         }
-        //         break;
-        //     case ")":
-        //         delimLevel--;
-        //         if (parent.nodeType == AST.Node.NodeType.Prototype)
-        //         {
-        //             parent = new FunctionAST((PrototypeAST)parent, new List<AST.Node>());
-        //             break;
-        //         }
-        //         else if (parent.nodeType == AST.Node.NodeType.ForLoop)
-        //         {
-        //             break;
-        //         }
-        //         if (delimLevel == 0)
-        //         {
-        //             switch (parent.nodeType)
-        //             {
-        //                 case AST.Node.NodeType.IfStatement:
-        //                     break;
-        //             }
-        //             parent = null;
-        //         }
-        //         else if (parent != null)
-        //         {
-        //             parent = parent.parent;
-        //             Console.WriteLine($"set parent delim ({token.value}) at {token.line}:{token.column} to parent.parent (parent.parent is type {parent?.nodeType})");
-        //         }
-        //         break;
-        //     case "}":
-        //         // if (delimLevel == 0)
-        //         // {
-        //         //     parent = null;
-        //         // }
-        //         // if (parent != null)
-        //         // {
-        //         //     parent = parent.parent;
-        //         // }
-        //         delimLevel--;
-        //         break;
-        // }
-        // return new List<dynamic>() { parent, delimLevel };
     }
 
     public static bool parseTokenRecursive(Util.Token token, int tokenIndex, AST.Node? parent = null, Util.TokenType[]? expectedTypes = null, int delimLevel = 0)

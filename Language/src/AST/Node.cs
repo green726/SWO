@@ -51,7 +51,8 @@ public abstract class Node
         IfStatement,
         ElseStatement,
         ForLoop,
-        PhiVariable
+        PhiVariable,
+        ImportStatement
     }
 
     public virtual void addParent(Node parent)

@@ -1,12 +1,12 @@
 namespace AST;
 using System.Linq;
 
-public class UsingStatement : Node
+public class ImportStatement : Node
 {
     public HISSFile file;
     public Library library;
 
-    public UsingStatement(Util.Token token) : base(token)
+    public ImportStatement(Util.Token token) : base(token)
     {
 
     }
@@ -18,6 +18,7 @@ public class UsingStatement : Node
 
     public override void addChild(Util.Token child)
     {
+        Console.WriteLine("adding token child to import");
         List<Library> matchingLib = (List<Library>)HISS.projectInfo.libraries.Where(library => library.name == child.value);
         if (matchingLib.Count() == 1)
         {
