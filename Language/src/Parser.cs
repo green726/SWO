@@ -313,6 +313,11 @@ public static class Parser
             AST.ImportStatement importStatement = new AST.ImportStatement(token);
             return new List<dynamic>() { importStatement, delimLevel };
         }
+        else if (token.value == Config.settings.general.import.ignore.keyword)
+        {
+            //TODO: add code here to implement "private"
+            //NOTE: I can do this by throwing errors if a private thing is called outside of its file? I will have to store the origin files of stuff
+        }
         else if (token.value == "if")
         {
             AST.IfStatement ifStat = new AST.IfStatement(token, parent);
