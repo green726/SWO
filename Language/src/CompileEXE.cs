@@ -120,10 +120,6 @@ public static class EXE
             fileNameFinal = Marshal.PtrToStringAuto(fileNamePtr);
         }
 
-
-
-
-
         targetBool = LLVM.GetTargetFromTriple(targetTriple, out target, out targetErrorMsg);
         targetMachine = LLVM.CreateTargetMachine(target, targetTriple, "generic", "", LLVMCodeGenOptLevel.LLVMCodeGenLevelDefault, LLVMRelocMode.LLVMRelocDefault, LLVMCodeModel.LLVMCodeModelDefault);
 
@@ -133,41 +129,18 @@ public static class EXE
         // string? dataRefString = Marshal.PtrToStringAuto(LLVM.CopyStringRepOfTargetData(dataRef));
         // LLVM.SetDataLayout(IRGen.module, dataRefString);
 
-        if (debugLogging)
+        if (settings.resultFileType == FileType.LLVMIR)
         {
-            Console.WriteLine("beggining of object file debug info");
-
-            Console.WriteLine("fileNamePostPtr " + fileNameFinal);
-            Console.WriteLine("TargetTriple:" + targetTriple);
-            Console.WriteLine("targetBool: " + targetBool.Value);
-            Console.WriteLine("targetRef: " + target.ToString());
-            Console.WriteLine("targetMachine: " + targetMachine.ToString());
-
-            if (targetErrorMsg != null && targetErrorMsg != "")
-            {
-                Console.WriteLine("targetErrorMsg: " + targetErrorMsg);
-            }
-            if (windows)
-            {
-                Console.WriteLine("IR writing for windows (doesn't work so doesn't do it)");
-                /* moduleStr =  */
-                // LLVM.PrintModuleToFile(IRGen.module, $"{fileName}-IR", out string errorMsg);
-            }
-            else
-            {
-                string moduleStr = Marshal.PtrToStringAuto(LLVM.PrintModuleToString(IRGen.module));
-                File.WriteAllText($"{settings.resultFileName}-IR", moduleStr);
-            }
+            LLVM.PrintModuleToFile(IRGen.module, $"{settings.resultFileName}.ir", out string errorMsg);
         }
 
-        /*         LLVM.TargetMachineEmitToMemoryBuffer(targetMachine, IRGen.module, LLVMCodeGenFileType.LLVMObjectFile, out writeErrorMsg, out memBuffer); */
-        if (windows)
+        else if (settings.resultFileType == FileType.NativeExecutable || settings.resultFileType == FileType.Object || settings.resultFileType == FileType.Binary)
         {
             LLVM.TargetMachineEmitToFile(targetMachine, IRGen.module, fileNamePtr, LLVMCodeGenFileType.LLVMObjectFile, out writeErrorMsg);
         }
-        else
+        else if (settings.resultFileType == FileType.Assembly)
         {
-            LLVM.TargetMachineEmitToFile(targetMachine, IRGen.module, fileNamePtr, LLVMCodeGenFileType.LLVMObjectFile, out writeErrorMsg);
+            LLVM.TargetMachineEmitToFile(targetMachine, IRGen.module, fileNamePtr, LLVMCodeGenFileType.LLVMAssemblyFile, out writeErrorMsg);
         }
         if (writeErrorMsg != null && writeErrorMsg != "" && debugLogging)
         {
