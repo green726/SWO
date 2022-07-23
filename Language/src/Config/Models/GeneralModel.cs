@@ -12,8 +12,9 @@ public class LinkerModel
     public string type { get; set; } = "gcc";
     public bool auto { get; set; } = true;
 
-
     public string path { get; set; } = "";
+
+    public string args { get; set; } = "";
 
     public LinkerModel()
     {
@@ -31,7 +32,9 @@ public class LinkerModel
                             path = @"/usr/bin/gcc";
                             break;
                     }
+                    args = "-O -no-pie ";
                     break;
+
             }
         }
     }

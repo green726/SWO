@@ -160,7 +160,7 @@ public static class EXE
             }
         }
 
-        // LLVM.TargetMachineEmitToMemoryBuffer(targetMachine, IRGen.module, LLVMCodeGenFileType.LLVMObjectFile, out writeErrorMsg, out memBuffer);
+        /*         LLVM.TargetMachineEmitToMemoryBuffer(targetMachine, IRGen.module, LLVMCodeGenFileType.LLVMObjectFile, out writeErrorMsg, out memBuffer); */
         if (windows)
         {
             LLVM.TargetMachineEmitToFile(targetMachine, IRGen.module, fileNamePtr, LLVMCodeGenFileType.LLVMObjectFile, out writeErrorMsg);
@@ -174,12 +174,24 @@ public static class EXE
             Console.WriteLine("writeErrorMsg: " + writeErrorMsg);
         }
 
-        link();
+        if (settings.resultFileType == FileType.NativeExecutable)
+        {
+            link(settings);
+        }
 
     }
 
-    public static void link()
+    public static void link(CompileCommandSettings settings)
     {
-        
+        string fullObjectPath = Path.GetFullPath(@$"{settings.path}/{settings.resultFileName}.o");
+
+        System.Diagnostics.Process process = System.Diagnostics.Process.Start(Config.settings.general.linker.path, Config.settings.general.linker.args + fullObjectPath);
+
+        process.WaitForExit();
+
+        string executableEnding = settings.targetOSName == "win10-x64" ? ".exe" : ".out";
+        string exeFile = Path.GetFullPath(settings.path + "/a" + executableEnding);
+
+        File.Delete(fullObjectPath);
     }
 }
