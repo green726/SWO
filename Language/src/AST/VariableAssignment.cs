@@ -16,6 +16,8 @@ public class VariableAssignment : AST.Node
 
     public bool generated = false;
 
+    public bool keyword = true;
+
     public VariableAssignment(Util.Token token, bool mutable, AST.Node? parent = null) : base(token)
     {
         this.nodeType = NodeType.VariableAssignment;
@@ -27,7 +29,8 @@ public class VariableAssignment : AST.Node
         this.mutable = mutable;
         Parser.globalVarAss.Add(this);
 
-        if (token.value != "const" && token.value != "var")
+
+        if (token.value != Config.settings.variable.declaration.keyword.constant && token.value != Config.settings.variable.declaration.keyword.mutable)
         {
             reassignment = true;
             if (parent != null)
@@ -65,33 +68,87 @@ public class VariableAssignment : AST.Node
 
     }
 
+    public VariableAssignment(Util.Token typeTok, Node parent = null) : base(typeTok)
+    {
+        this.nodeType = NodeType.VariableAssignment;
+        this.generator = new Generator.VariableAssignment(this);
+        this.newLineReset = true;
+
+        this.type = new Type(typeTok);
+
+        if (Config.settings.variable.declaration.keyword.forced)
+        {
+            throw ParserException.FactoryMethod("A variable declaration with no keyword was found while this options was disabled", $"Enable the option or declare the variable with your keywords (mutable: {Config.settings.variable.declaration.keyword.mutable}, constant: {Config.settings.variable.declaration.keyword.constant})", typeTok);
+        }
+
+        this.mutable = true;
+        this.keyword = false;
+
+
+
+        this.childLoop = 0;
+
+        Parser.nodes.Add(this);
+    }
+
+
     public override void addChild(Util.Token child)
     {
         if (!reassignment)
         {
-            switch (childLoop)
+            if (keyword)
             {
-                case 0:
-                    this.type = new Type(child);
-                    break;
-                case 1:
-                    this.name = child.value;
-                    if (Config.settings.general.typo.enabled)
-                    {
-                        Typo.addToLittle(this);
-                    }
-                    Parser.declaredGlobalsDict.Add(this.name, this);
-                    break;
-                case 2:
-                    if (child.type != Util.TokenType.AssignmentOp) throw new ParserException($"expected assignment op but got {child.type} in a variable assignment", child);
-                    this.assignmentOp = child.value;
-                    break;
-                case 3:
-                    this.strValue = child.value;
-                    break;
-                default:
-                    throw new ParserException($"Illegal extra items after variable assignment", this);
+                switch (childLoop)
+                {
+                    case 0:
+                        this.type = new Type(child);
+                        break;
+                    case 1:
+                        this.name = child.value;
+                        if (Config.settings.general.typo.enabled)
+                        {
+                            Typo.addToLittle(this);
+                        }
+                        Parser.declaredGlobalsDict.Add(this.name, this);
+                        break;
+                    case 2:
+                        if (child.type != Util.TokenType.AssignmentOp) throw new ParserException($"expected assignment op but got {child.type} in a variable assignment", child);
+                        this.assignmentOp = child.value;
+                        break;
+                    case 3:
+                        this.strValue = child.value;
+                        break;
+                    default:
+                        throw new ParserException($"Illegal extra items after variable assignment", this);
 
+                }
+            }
+            else
+            {
+                switch (childLoop)
+                {
+                    case 0:
+                        this.name = child.value;
+                        break;
+                    case 1:
+                        if (Config.settings.variable.declaration.keyword.mutableIsSymbol)
+                        {
+                            if (child.value == Config.settings.variable.declaration.keyword.mutable)
+                            {
+                                this.mutable = true;
+                            }
+                            else
+                            {
+                                this.mutable = false;
+                            }
+                        }
+                        break;
+                    case 2:
+                        this.strValue = child.value;
+                        break;
+                    default:
+                        throw new ParserException($"Illegal extra items after variable assignment", this);
+                }
             }
         }
         else

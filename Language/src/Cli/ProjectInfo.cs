@@ -44,8 +44,7 @@ public class ProjectInfo
 
     public void setConfig()
     {
-        DirectoryInfo proj = new DirectoryInfo(path);
-        if (proj.GetFiles().Contains(new FileInfo("config.toml")))
+        if (File.Exists(Path.GetFullPath(@$"{path}/config.toml")))
         {
             configFilePath = path + "/config.toml";
         }

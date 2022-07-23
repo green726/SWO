@@ -390,7 +390,14 @@ public static class Parser
                 return new List<dynamic>() { parent.parent, delimLevel };
         }
 
-
+        if (!Config.settings.variable.declaration.keyword.forced)
+        {
+            if (tokenList[tokenIndex + 2].value == "=" || tokenList[tokenIndex + 2].value == Config.settings.variable.declaration.keyword.mutable)
+            {
+                AST.VariableAssignment varAss = new AST.VariableAssignment(token, parent);
+                return new List<dynamic>() {varAss, delimLevel};
+            }
+        }
 
         new AST.VariableExpression(token, parent);
         return new List<dynamic>() { parent, delimLevel };
@@ -517,6 +524,8 @@ public static class Parser
                     // VariableReAssignment varReAss = new VariableReAssignment(token);
                     // return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, varReAss, delimLevel: delimLevel);
                 }
+
+
                 break;
             case Util.TokenType.String:
                 new AST.StringExpression(token, parent);
