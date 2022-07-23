@@ -1,7 +1,10 @@
 using System;
 
+[Serializable]
 public class GenException : Exception
 {
+
+    public override string? StackTrace { get; }/* => base.StackTrace; */
     public GenException(string msg, AST.Node node) : base($"{msg} at {node.line}:{node.column}")
     {
     }
@@ -19,12 +22,12 @@ public class GenException : Exception
         {
             string codeBlock = getCodeBlock(node);
             List<string> typoFixes = Typo.spellCheck(typoString);
-            input = $"{whatHappened} - ```\n{codeBlock}```, \n How You Can Fix This: \n {recommendedFix} \n Possible typo solutions: {string.Join(", ", typoFixes)}\n Error Was Thrown At {node.line}:{node.column}";
+            input = $"{whatHappened}: \n```\n{codeBlock}\n```\nHow You Can Fix This: \n{recommendedFix} \nPossible typo solutions: {string.Join(", ", typoFixes)}\nError Was Thrown At {node.line}:{node.column}";
         }
         else
         {
             string codeBlock = getCodeBlock(node);
-            input = $"{whatHappened} - ```\n{codeBlock}```, \n How You Can Fix This: \n {recommendedFix} \n Error Was Thrown At {node.line}:{node.column}";
+            input = $"{whatHappened}: \n```\n{codeBlock}\n```\nHow You Can Fix This: \n{recommendedFix} \nError Was Thrown At {node.line}:{node.column}";
         }
 
         return new GenException(input);
@@ -32,8 +35,6 @@ public class GenException : Exception
 
     public static string getCodeBlock(AST.Node node)
     {
-        return "";
+        return node.codeExcerpt;
     }
-
-    // public override string? StackTrace => "";
 }

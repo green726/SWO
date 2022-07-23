@@ -5,14 +5,14 @@ using System.Runtime.Serialization;
 public class ConfigModel
 {
     [DataMember(Name = "function")]
-    public FunctionModel? function { get; set; }
+    public FunctionModel function { get; set; } = new FunctionModel();
 
-    public LoopModel? loop { get; set; }
+    public LoopModel loop { get; set; } = new LoopModel();
 
     [DataMember(Name = "if")]
-    public IfModel? ifModel { get; set; }
+    public IfModel ifModel { get; set; } = new IfModel();
 
-    public VariableModel? variable { get; set; }
+    public VariableModel variable { get; set; } = new VariableModel();
 
-    public GeneralModel? general { get; set; }
+    public GeneralModel general { get; set; } = new GeneralModel();
 }

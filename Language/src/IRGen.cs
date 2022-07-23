@@ -19,6 +19,8 @@ public static class IRGen
 
     public static readonly Stack<LLVMValueRef> valueStack = new Stack<LLVMValueRef>();
 
+    public static readonly Stack<LLVMTypeRef> typeStack = new Stack<LLVMTypeRef>();
+
     public static Dictionary<string, LLVMValueRef> namedValuesLLVM = new Dictionary<string, LLVMValueRef>();
 
     public static Dictionary<string, AST.VariableAssignment> namedGlobalsAST = new Dictionary<string, AST.VariableAssignment>();
@@ -31,14 +33,15 @@ public static class IRGen
 
     public static AST.Type LLVMTypeToASTType(LLVMTypeRef type, AST.Node parent)
     {
-        Console.WriteLine($"Converting llvm type with kind of {type.TypeKind}");
         switch (type.TypeKind)
         {
             case LLVMTypeKind.LLVMDoubleTypeKind:
                 return new AST.Type(new Util.Token(Util.TokenType.Keyword, "double", parent.line, parent.column));
+            case LLVMTypeKind.LLVMIntegerTypeKind:
+                return new AST.Type(new Util.Token(Util.TokenType.Keyword, "int", parent.line, parent.column));
         }
 
-        return null;
+        throw GenException.FactoryMethod($"An unknown or unsupported type ({type.TypeKind.ToString()}) was used", "You used an undefined or illegal type | Likely a typo", parent, true, type.TypeKind.ToString());
     }
 
 
@@ -54,7 +57,7 @@ public static class IRGen
         foreach (AST.Node node in nodes)
         {
             node.generator.generate();
-            Console.WriteLine("successfully evaluated node of type " + node.nodeType);
+            // Console.WriteLine("successfully evaluated node of type " + node.nodeType);
 
             // foreach (ASTNode child in node.children)
             // {

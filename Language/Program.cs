@@ -6,7 +6,7 @@ using Tomlyn;
 public static class HISS
 {
     private static string fileContents;
-    private static bool windows = false;
+    public static bool windows = false;
     public static ProjectInfo projectInfo;
 
     static void Main(string[] args)
@@ -63,7 +63,6 @@ public static class HISS
         // Console.WriteLine(Toml.FromModel(projectInfo));
 
         Config.initialize(projectInfo.configFilePath);
-        Console.WriteLine(Config.settings.general.import.keyword);
 
         settings.resultFileName = projectInfo.projectName;
 

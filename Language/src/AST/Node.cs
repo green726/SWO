@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public abstract class Node
 {
-    public Generator.Base? generator;
+    public Generator.Base generator;
 
     public List<Node> children = new List<Node>();
     public Node? parent = null;

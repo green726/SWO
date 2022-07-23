@@ -40,10 +40,6 @@ public static class EXE
             fileNameFinal = Marshal.PtrToStringAuto(fileNamePtr);
         }
 
-
-
-
-
         targetBool = LLVM.GetTargetFromTriple(targetTriple, out target, out targetErrorMsg);
         targetMachine = LLVM.CreateTargetMachine(target, targetTriple, "generic", "", LLVMCodeGenOptLevel.LLVMCodeGenLevelDefault, LLVMRelocMode.LLVMRelocDefault, LLVMCodeModel.LLVMCodeModelDefault);
 
@@ -177,5 +173,13 @@ public static class EXE
         {
             Console.WriteLine("writeErrorMsg: " + writeErrorMsg);
         }
+
+        link();
+
+    }
+
+    public static void link()
+    {
+        
     }
 }

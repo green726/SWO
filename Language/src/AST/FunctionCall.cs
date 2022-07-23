@@ -23,7 +23,8 @@ public class FunctionCall : AST.Node
         }
         if (builtInExpected == true && this.builtIn == false)
         {
-            throw ParserException.FactoryMethod($"Builtin function call expected but no builtin function with a matching name was found", $"Fix a possible typo? \n Remove the \"{Config.settings.function.calling.builtin.marker.value}\" at the end of the function call to unmark it as builting", token);
+            // Console.WriteLine("parent (debugging): " + parent);
+            throw ParserException.FactoryMethod($"Builtin function call expected but no builtin function with a matching name was found", $"Fix a possible typo? \nRemove the \"{Config.settings.function.calling.builtin.marker.value}\" at the end of the function call to unmark it as builtin", token, parent);
         }
 
         this.functionName = this.builtIn ? builtinName : token.value;

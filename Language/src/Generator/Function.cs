@@ -36,6 +36,7 @@ public class Function : Base
             mainBuilt = true;
             foreach (AST.Node node in nodesToBuild)
             {
+                Console.WriteLine("genning nodes necessary before main func");
                 node.generator.generate();
             }
         }

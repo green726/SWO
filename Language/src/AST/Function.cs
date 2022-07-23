@@ -25,7 +25,7 @@ public class Function : AST.Node
             Parser.nodes.Add(this);
         }
 
-        if (Config.settings.function.declaration.reorder)
+        if (Config.settings.function.declaration.reorder && !Parser.declaredFunctionDict.ContainsKey(prototype.name))
         {
             Parser.declaredFunctionDict.Add(prototype.name, this);
         }

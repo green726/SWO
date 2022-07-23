@@ -39,19 +39,8 @@ public class Prototype : Base
 
             foreach (KeyValuePair<AST.Type, string> arg in proto.arguments)
             {
-                switch (arg.Key.value)
-                {
-                    case "double":
-                        arguments.Add(LLVM.DoubleType());
-                        break;
-                    case "int":
-                        arguments.Add(LLVM.IntType(64));
-                        break;
-                    case "string":
-                        arguments.Add(LLVM.ArrayType(LLVM.Int8Type(), 3));
-                        break;
-                }
-
+                arg.Key.generator.generate();
+                arguments.Add(typeStack.Pop());
             }
 
             function = LLVM.AddFunction(module, proto.name, LLVM.FunctionType(LLVM.DoubleType(), arguments.ToArray(), false));
@@ -62,12 +51,14 @@ public class Prototype : Base
         int argLoopIndex = 0;
         foreach (KeyValuePair<AST.Type, string> arg in proto.arguments)
         {
+            Console.WriteLine("2nd arg loop");
             string argumentName = arg.Value;
 
             LLVMValueRef param = LLVM.GetParam(function, (uint)argLoopIndex);
             LLVM.SetValueName(param, argumentName);
 
             namedValuesLLVM[argumentName] = param;
+            argLoopIndex++;
         }
 
         valueStack.Push(function);

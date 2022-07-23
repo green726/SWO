@@ -23,7 +23,7 @@ public class FunctionCall : Base
 
         if (funcRef.Pointer == IntPtr.Zero)
         {
-            if (Config.settings.function.declaration.reorder && Parser.declaredFunctionDict.ContainsKey(funcCall.functionName))
+            if (Config.settings.function.declaration.reorder && Parser.declaredFunctionDict.ContainsKey(funcCall.functionName) && LLVM.GetNamedFunction(module, funcCall.functionName).Pointer == IntPtr.Zero)
             {
                 LLVMBasicBlockRef currentBlock = LLVM.GetInsertBlock(builder);
                 AST.Function calledFunc = Parser.declaredFunctionDict[funcCall.functionName];
@@ -74,7 +74,6 @@ public class FunctionCall : Base
                 funcCall.functionName = "printf";
 
                 printFormat = evaluatePrintFormat();
-                Console.WriteLine("successfully evaluated print format");
 
                 funcCall.addChildAtStart(printFormat);
 
@@ -154,7 +153,6 @@ public class FunctionCall : Base
 
     public AST.StringExpression evaluatePrintFormat(AST.Type type)
     {
-        Console.WriteLine($"got to second print call evaluation with a type of " + type.value);
         switch (type.value)
         {
             case "double":

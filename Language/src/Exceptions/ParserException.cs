@@ -1,7 +1,20 @@
 using System;
+using System.Collections;
+using System.Runtime.Serialization;
 
+[Serializable]
 public class ParserException : Exception
 {
+    public override IDictionary Data => base.Data;
+
+    public override string? HelpLink { get => base.HelpLink; set => base.HelpLink = value; }
+
+    public override string Message => base.Message;
+
+    public override string? Source { get => base.Source; set => base.Source = value; }
+
+    public override string? StackTrace {get;}/* => base.StackTrace; */
+
     public ParserException(string msg, AST.Node node) : base($"{msg} at {node?.line}:{node?.column}")
     {
     }
@@ -19,19 +32,26 @@ public class ParserException : Exception
 
     }
 
-    public static ParserException FactoryMethod(string whatHappened, string recommendedFix, Util.Token token, bool typoSuspected = false)
+    public static ParserException FactoryMethod(string whatHappened, string recommendedFix, Util.Token token, AST.Node? parent = null, bool typoSuspected = false)
     {
         string input = "";
-        if (typoSuspected && Config.settings.general.typo.enabled)
+        string codeBlock = "";
+        if (parent != null)
         {
-            string codeBlock = getCodeBlock(token);
-            List<string> typoFixes = Typo.spellCheck(token.value);
-            input = $"{whatHappened} - ```\n{codeBlock}```, \n How You Can Fix This: \n {recommendedFix} \n Possible typo solutions: {typoFixes.ToString()}\n Error Was Thrown At {token.line}:{token.column}";
+            codeBlock = $"{getCodeBlock(parent)} \n--------\n{getCodeBlock(token)}";
         }
         else
         {
-            string codeBlock = getCodeBlock(token);
-            input = $"{whatHappened} - ```\n{codeBlock}```, \n How You Can Fix This: \n {recommendedFix} \n Error Was Thrown At {token.line}:{token.column}";
+            codeBlock = getCodeBlock(token);
+        }
+        if (typoSuspected && Config.settings.general.typo.enabled)
+        {
+            List<string> typoFixes = Typo.spellCheck(token.value);
+            input = $"{whatHappened}: \n```\n{codeBlock}\n```\nHow You Can Fix This: \n{recommendedFix} \nPossible typo solutions: {typoFixes.ToString()}\nError Was Thrown At {token.line}:{token.column}";
+        }
+        else
+        {
+            input = $"{whatHappened}: \n```\n{codeBlock}\n```\nHow You Can Fix This: \n{recommendedFix} \nError Was Thrown At {token.line}:{token.column}";
         }
 
         return new ParserException(input);
@@ -44,12 +64,12 @@ public class ParserException : Exception
         {
             string codeBlock = getCodeBlock(node);
             List<string> typoFixes = Typo.spellCheck(typoString);
-            input = $"{whatHappened} - ```\n{codeBlock}```, \n How You Can Fix This: \n {recommendedFix} \n Possible typo solutions: {typoFixes.ToString()}\n Error Was Thrown At {node.line}:{node.column}";
+            input = $"{whatHappened}: \n```\n{codeBlock}\n```\nHow You Can Fix This: \n{recommendedFix} \nPossible typo solutions: {typoFixes.ToString()}\nError Was Thrown At {node.line}:{node.column}";
         }
         else
         {
             string codeBlock = getCodeBlock(node);
-            input = $"{whatHappened} - ```\n{codeBlock}```, \n How You Can Fix This: \n {recommendedFix} \n Error Was Thrown At {node.line}:{node.column}";
+            input = $"{whatHappened}\n```\n{codeBlock}\n```\nHow You Can Fix This: \n{recommendedFix} \nError Was Thrown At {node.line}:{node.column}";
         }
 
         return new ParserException(input);
@@ -64,7 +84,5 @@ public class ParserException : Exception
     {
         return token.value;
     }
-
-    // public override string? StackTrace => "";
 
 }
