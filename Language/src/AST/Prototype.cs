@@ -4,23 +4,35 @@ using System.Collections.Generic;
 
 public class Prototype : AST.Node
 {
-    public string name;
+    public string name = "";
     public Dictionary<Type, string> arguments = new Dictionary<Type, string>();
     private bool typePredicted = true;
     private Type prevType;
 
-    public Prototype(Util.Token token, List<Util.Token> arguments = null) : base(token)
+    public Type returnType;
+
+    public Prototype(Util.Token token, List<Util.Token> arguments = null, bool startWithRet = false) : base(token)
     {
         this.nodeType = NodeType.Prototype;
         this.generator = new Generator.Prototype(this);
 
-        if (!Config.settings.function.declaration.marker.word)
+        if (startWithRet == false)
         {
-            this.name = token.value.Substring(1);
+            if (!Config.settings.function.declaration.marker.word)
+            {
+                this.name = token.value.Substring(1);
+            }
+            else
+            {
+                this.name = "";
+            }
+            Console.WriteLine("setting return type of proto named " + this.name + " to null");
+            this.returnType = new Type("null", this);
         }
         else
         {
-            this.name = "";
+            Console.WriteLine($"set return type of proto({this.line}:{this.column}) to: " + token.value);
+            this.returnType = new Type(token);
         }
 
         if (arguments != null)
@@ -102,14 +114,25 @@ public class Prototype : AST.Node
         }
     }
 
-    public void addItem(Util.Token item)
+    public override void addChild(Util.Token item)
     {
         if (this.name == "")
         {
-            this.name = item.value;
+            if (!Config.settings.function.declaration.marker.word)
+            {
+                this.name = item.value.Substring(1);
+            }
+            else
+            {
+                this.name = item.value;
+            }
             return;
         }
 
-        addArgs(new List<Util.Token>() { item });
+        if (item.type != Util.TokenType.DelimiterOpen && item.type != Util.TokenType.DelimiterClose)
+        {
+            addArgs(new List<Util.Token>() { item });
+        }
+
     }
 }

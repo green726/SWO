@@ -6,6 +6,7 @@ public static class Lexer
     private static List<Util.Token> tokenList;
     private static string[] binOps = { "+", "-", "*", "/", "==", "<" };
     private static string[] assignmentOps = { "=", "+=", "-=", "*=", "/=", ":=" };
+    private static string[] specialChars = { ":" };
 
     public static string inputStr;
 
@@ -59,6 +60,9 @@ public static class Lexer
                     else if (stringBuilder.ToString() != " " && stringBuilder.ToString() != "" && stringBuilder.ToString() != "\n")
                     {
                         tokenList.Add(new Util.Token(Util.TokenType.Keyword, stringBuilder.ToString(), line, column, charNum));
+                    }
+                    else if (specialChars.Contains(stringBuilder.ToString())) {
+                        tokenList.Add(new Util.Token(Util.TokenType.Special, stringBuilder.ToString(), line, column));
                     }
                     stringBuilder = new StringBuilder();
                     lastChar = ch;

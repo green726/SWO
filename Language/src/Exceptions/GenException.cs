@@ -1,4 +1,4 @@
-using System;
+using Spectre.Console;
 
 [Serializable]
 public class GenException : Exception
@@ -30,6 +30,8 @@ public class GenException : Exception
             input = $"{whatHappened}: \n```\n{codeBlock}\n```\nHow You Can Fix This: \n{recommendedFix} \nError Was Thrown At {node.line}:{node.column}";
         }
 
+        // AnsiConsole.WriteException(new GenException(input));
+        // throw new Exception();
         return new GenException(input);
     }
 

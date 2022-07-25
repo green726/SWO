@@ -24,6 +24,9 @@ public class Type : Base
             case "string":
                 typeStack.Push(LLVM.ArrayType(LLVM.Int8Type(), 3));
                 break;
+            case "null":
+                typeStack.Push(LLVM.VoidType());
+                break;
 
         }
     }

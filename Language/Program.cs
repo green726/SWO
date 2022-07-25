@@ -52,7 +52,7 @@ public static class HISS
 
     public static void compileProject(CompileCommandSettings settings)
     {
-
+        Console.WriteLine("EEE");
         string[] files = System.IO.Directory.GetFiles(settings.path, "*.hproj");
         string tomlText = System.IO.File.ReadAllText(files[0]);
         projectInfo = Toml.ToModel<ProjectInfo>(tomlText);
@@ -63,6 +63,8 @@ public static class HISS
         // Console.WriteLine(Toml.FromModel(projectInfo));
 
         Config.initialize(projectInfo.configFilePath);
+
+        Console.WriteLine($"builtin marker location end: {Config.settings.function.calling.builtin.marker.location == "end"} value: {Config.settings.function.calling.builtin.marker.value}");
 
         settings.resultFileName = projectInfo.projectName;
 

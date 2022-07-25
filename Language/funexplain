@@ -1,0 +1,3 @@
+function printThing : void
+
+void printThing

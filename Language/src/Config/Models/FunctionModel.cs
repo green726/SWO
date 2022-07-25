@@ -17,8 +17,28 @@ public class FunctionModel
 
 public class FunctionReturnModel
 {
-    public string keyword {get; set;} = "return";
+    public string keyword { get; set; } = "return";
+
+    public ReturnKeywordLocation location { get; set; } = ReturnKeywordLocation.Start;
+
+    public FunctionReturnDynamicModel dynamic { get; set; } = new FunctionReturnDynamicModel();
 }
+
+public enum ReturnKeywordLocation
+{
+    Start,
+    End
+}
+
+public class FunctionReturnDynamicModel
+{
+    public bool enable { get; set; } = false;
+
+    public string keyword { get; set; } = "dynamic";
+
+    public bool keywordRequired { get; set; } = true;
+}
+
 
 public class FunctionDeclarationModel
 {
@@ -26,6 +46,13 @@ public class FunctionDeclarationModel
     public FunctionDeclarationArgs args { get; set; } = new FunctionDeclarationArgs();
     public FunctionDeclarationBody body { get; set; } = new FunctionDeclarationBody();
     public bool reorder { get; set; } = false;
+    public ReturnTypeLocation returnTypeLocation { get; set; } = ReturnTypeLocation.Start;
+}
+
+public enum ReturnTypeLocation
+{
+    Start,
+    End
 }
 
 public class FunctionDeclarationMarker

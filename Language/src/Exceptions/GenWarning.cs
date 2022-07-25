@@ -4,11 +4,11 @@ public static class GenWarning
 {
     public static void write(string message, AST.Node? node = null)
     {
-        message = @$"[yellow]{message}[\]";
+        message = @$"[yellow]{message}[/]";
         if (node != null)
         {
-            message = $"{message} at [blue]{node.line}:{node.column}[\\]:\n {node.codeExcerpt}";
+            message = $"{message} at [blue]{node.line}:{node.column}[/]:\n```\n[purple]{node.codeExcerpt}[/]\n```";
         }
-        Spectre.Console.AnsiConsole.WriteLine(message);
+        AnsiConsole.MarkupLine(message);
     }
 }

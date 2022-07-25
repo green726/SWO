@@ -38,6 +38,7 @@ public static class Util
         AssignmentOp,
         String,
         Text,
+        Special,
         EOL, //end of line,
         EOF //end of file
     }

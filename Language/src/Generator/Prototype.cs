@@ -43,7 +43,9 @@ public class Prototype : Base
                 arguments.Add(typeStack.Pop());
             }
 
-            function = LLVM.AddFunction(module, proto.name, LLVM.FunctionType(LLVM.DoubleType(), arguments.ToArray(), false));
+            Console.WriteLine("\n proto named: " + proto.name + " return value:" + proto.returnType.value + "\n");
+            proto.returnType.generator.generate();
+            function = LLVM.AddFunction(module, proto.name, LLVM.FunctionType(typeStack.Pop(), arguments.ToArray(), false));
             LLVM.SetLinkage(function, LLVMLinkage.LLVMExternalLinkage);
 
         }

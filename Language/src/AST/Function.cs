@@ -9,8 +9,6 @@ public class Function : AST.Node
 
     public bool generated = false;
 
-    public Type returnType;
-
     public bool multiLine = false;
 
 
@@ -79,6 +77,10 @@ public class Function : AST.Node
                 this.multiLine = true;
                 this.newLineReset = false;
             }
+        }
+        else
+        {
+            throw ParserException.FactoryMethod("Illegal token added to function", "Delete the token", child, this, true);
         }
         base.addChild(child);
     }

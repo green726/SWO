@@ -1,5 +1,7 @@
 using LLVMSharp;
 
+using Spectre.Console;
+
 /*below is gep generation (prob useless)
  //below zero next to ulong is the index of the element you want to grab a pointer to
         LLVMValueRef[] arrIndices = { LLVM.ConstInt(LLVM.Int64Type(), (ulong)0, false) };
