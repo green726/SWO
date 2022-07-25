@@ -308,6 +308,18 @@ public static class Parser
             AST.VariableAssignment constAss = new AST.VariableAssignment(token, false);
             return new List<dynamic>() { constAss, delimLevel };
         }
+        else if (token.value == Config.settings.function.ret.keyword)
+        {
+            if (parent.nodeType == AST.Node.NodeType.Function)
+            {
+                AST.Return retNode = new AST.Return(token, parent);
+                return new List<dynamic>() {retNode, delimLevel};
+            }
+            else
+            {
+                throw ParserException.FactoryMethod($"Illegal usage of function return keyword ({Config.settings.function.ret.keyword})", "Delete the keyword | Fix a typo", token, typoSuspected: true);
+            }
+        }
         else if (token.value == Config.settings.general.import.keyword)
         {
             AST.ImportStatement importStatement = new AST.ImportStatement(token);
@@ -395,7 +407,7 @@ public static class Parser
             if (tokenList[tokenIndex + 2].value == "=" || tokenList[tokenIndex + 2].value == Config.settings.variable.declaration.keyword.mutable)
             {
                 AST.VariableAssignment varAss = new AST.VariableAssignment(token, parent);
-                return new List<dynamic>() {varAss, delimLevel};
+                return new List<dynamic>() { varAss, delimLevel };
             }
         }
 
@@ -429,9 +441,12 @@ public static class Parser
                 case AST.Node.NodeType.Function:
                     break;
                 case AST.Node.NodeType.Prototype:
-                    parent = new AST.Function((AST.Prototype)parent);
-                    delimLevel--;
-                    return new List<dynamic>() { parent, delimLevel };
+                    if (token.value == ")")
+                    {
+                        parent = new AST.Function((AST.Prototype)parent);
+                        delimLevel--;
+                        return new List<dynamic>() { parent, delimLevel };
+                    }
                     break;
                 case AST.Node.NodeType.FunctionCall:
                     break;

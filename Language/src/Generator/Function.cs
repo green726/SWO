@@ -8,6 +8,8 @@ public class Function : Base
 {
     AST.Function func;
 
+    private bool topLevelRet = false; //has a return been created as a direct child of the function?
+
     public Function(AST.Node node)
     {
         this.func = (AST.Function)node;
@@ -15,7 +17,7 @@ public class Function : Base
 
     public override void generate()
     {
-        if (func.generated) {return;}
+        if (func.generated) { return; }
         //TODO: change this in the future once more variables are added
         namedValuesLLVM.Clear();
 
@@ -41,9 +43,17 @@ public class Function : Base
             }
         }
 
-        for (var i = 0; i < func.body.Count(); i++)
+        foreach (AST.Node node in func.body)
         {
-            func.body[i].generator.generate();
+            if (node.nodeType == AST.Node.NodeType.Return)
+            {
+                if (this.topLevelRet == true)
+                {
+                    GenWarning.write("Multiple top level function returns detected - this will create unreachable code", node);
+                }
+                this.topLevelRet = true;
+            }
+            node.generator.generate();
         }
         // }
         // catch (Exception)
@@ -51,8 +61,8 @@ public class Function : Base
         //     LLVM.DeleteFunction(function);
         //     throw;
         // }
-
-        LLVM.BuildRet(builder, valueStack.Pop());
+        
+        LLVM.BuildRetVoid(builder);
 
         LLVM.VerifyFunction(function, LLVMVerifierFailureAction.LLVMPrintMessageAction);
 

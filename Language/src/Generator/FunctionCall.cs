@@ -130,21 +130,21 @@ public class FunctionCall : Base
                 return new AST.StringExpression(new Util.Token(Util.TokenType.String, "\"%s\"", 0, 0), funcCall, true);
             case AST.Node.NodeType.VariableExpression:
                 AST.VariableExpression varExpr = (AST.VariableExpression)funcCall.args[0];
-                if (namedGlobalsAST.ContainsKey(varExpr.varName))
+                if (namedGlobalsAST.ContainsKey(varExpr.value))
                 {
-                    return evaluatePrintFormat(namedGlobalsAST[varExpr.varName].type);
+                    return evaluatePrintFormat(namedGlobalsAST[varExpr.value].type);
                 }
-                else if (namedValuesLLVM.ContainsKey(varExpr.varName))
+                else if (namedValuesLLVM.ContainsKey(varExpr.value))
                 {
-                    AST.Type printType = LLVMTypeToASTType(namedValuesLLVM[varExpr.varName].TypeOf(), funcCall);
+                    AST.Type printType = LLVMTypeToASTType(namedValuesLLVM[varExpr.value].TypeOf(), funcCall);
                     return evaluatePrintFormat(printType);
                 }
-                else if (Config.settings.variable.declaration.reorder && Parser.declaredGlobalsDict.ContainsKey(varExpr.varName))
+                else if (Config.settings.variable.declaration.reorder && Parser.declaredGlobalsDict.ContainsKey(varExpr.value))
                 {
-                    return evaluatePrintFormat(Parser.declaredGlobalsDict[varExpr.varName].type);
+                    return evaluatePrintFormat(Parser.declaredGlobalsDict[varExpr.value].type);
                 }
 
-                throw GenException.FactoryMethod("An unknown variable was printed", "Likely a typo", varExpr, true, varExpr.varName);
+                throw GenException.FactoryMethod("An unknown variable was printed", "Likely a typo", varExpr, true, varExpr.value);
                 break;
         }
 

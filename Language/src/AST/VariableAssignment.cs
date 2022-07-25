@@ -40,7 +40,7 @@ public class VariableAssignment : AST.Node
                 if (prevNode.nodeType == NodeType.VariableExpression)
                 {
                     VariableExpression prevVarExpr = (VariableExpression)prevNode;
-                    this.name = prevVarExpr.varName;
+                    this.name = prevVarExpr.value;
                     prevVarExpr.addParent(this);
                     this.children.Add(prevVarExpr);
                 }

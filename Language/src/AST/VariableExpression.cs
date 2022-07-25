@@ -1,8 +1,8 @@
 namespace AST;
 
-public class VariableExpression : AST.Node
+public class VariableExpression : Expression
 {
-    public string varName = "";
+    new public string value = "";
 
     public VariableExpression(Util.Token token, AST.Node? parent = null, bool parentRequired = true) : base(token)
     {
@@ -10,7 +10,7 @@ public class VariableExpression : AST.Node
         this.generator = new Generator.VariableExpression(this);
 
 
-        varName = token.value;
+        value = token.value;
         bool exists = false;
         this.parent = parent;
 
@@ -34,7 +34,7 @@ public class VariableExpression : AST.Node
         }
         else if (parentRequired)
         {
-            throw new ParserException($"Illegal variable expression {this.varName}", token);
+            throw new ParserException($"Illegal variable expression {this.value}", token);
         }
 
     }

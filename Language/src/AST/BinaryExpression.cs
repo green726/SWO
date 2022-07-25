@@ -2,7 +2,7 @@ namespace AST;
 
 using System.Linq;
 
-public class BinaryExpression : AST.Node
+public class BinaryExpression : Expression
 {
     public AST.Node leftHand;
     public AST.Node? rightHand;

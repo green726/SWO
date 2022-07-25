@@ -1,8 +1,8 @@
 namespace AST;
 
-public class StringExpression : AST.Node
+public class StringExpression : Expression
 {
-    public string value;
+    new public string value;
     public bool builtInString;
 
     public StringExpression(Util.Token token, AST.Node? parent = null, bool dontAdd = false, bool builtInString = false) : base(token)

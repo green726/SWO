@@ -22,7 +22,7 @@ public class BinaryExpression : Base
         {
             case AST.Node.NodeType.VariableExpression:
                 AST.VariableExpression leftHandVarExpr = (AST.VariableExpression)binExpr.leftHand;
-                Console.WriteLine("generating bin expr with lhs of var expr that has name of " + leftHandVarExpr.varName);
+                Console.WriteLine("generating bin expr with lhs of var expr that has name of " + leftHandVarExpr.value);
                 binExpr.leftHand.generator.generate();
                 leftHand = valueStack.Pop();
                 break;
@@ -45,7 +45,7 @@ public class BinaryExpression : Base
         {
             case AST.Node.NodeType.VariableExpression:
                 AST.VariableExpression rightHandVarExpr = (AST.VariableExpression)binExpr.rightHand;
-                Console.WriteLine("generating bin expr with rhs of var expr that has name of " + rightHandVarExpr.varName);
+                Console.WriteLine("generating bin expr with rhs of var expr that has name of " + rightHandVarExpr.value);
                 binExpr.rightHand.generator.generate();
                 rightHand = valueStack.Pop();
                 break;

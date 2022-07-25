@@ -13,6 +13,8 @@ public abstract class Node
     public int column = 0;
     public int charNum = 0;
 
+    public bool expression = false;
+
     public string codeExcerpt = "";
 
     public NodeType nodeType = NodeType.Unknown;
@@ -52,7 +54,8 @@ public abstract class Node
         ElseStatement,
         ForLoop,
         PhiVariable,
-        ImportStatement
+        ImportStatement,
+        Return
     }
 
     public virtual void addParent(Node parent)

@@ -2,9 +2,9 @@ namespace AST;
 
 using System;
 
-public class NumberExpression : AST.Node
+public class NumberExpression : Expression
 {
-    public double value;
+    new public double value;
     public Type type;
 
     public NumberExpression(Util.Token token, AST.Node? parent) : base(token)

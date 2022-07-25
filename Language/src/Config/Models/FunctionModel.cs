@@ -11,6 +11,13 @@ public class FunctionModel
 
     [DataMember(Name = "calling")]
     public FunctionCallingModel calling { get; set; } = new FunctionCallingModel();
+
+    public FunctionReturnModel ret { get; set; } = new FunctionReturnModel();
+}
+
+public class FunctionReturnModel
+{
+    public string keyword {get; set;} = "return";
 }
 
 public class FunctionDeclarationModel

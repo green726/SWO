@@ -14,30 +14,30 @@ public class VariableExpression : Base
 
     public override void generate()
     {
-        LLVMValueRef varRef = LLVM.GetNamedGlobal(module, varExpr.varName);
+        LLVMValueRef varRef = LLVM.GetNamedGlobal(module, varExpr.value);
         if (varRef.Pointer == IntPtr.Zero)
         {
-            Console.WriteLine("var ref was pointer zero");
-            if (namedMutablesLLVM.ContainsKey(varExpr.varName))
+            // Console.WriteLine("var ref was pointer zero");
+            if (namedMutablesLLVM.ContainsKey(varExpr.value))
             {
                 //code to load a stack mut
-                valueStack.Push(LLVM.BuildLoad(builder, namedMutablesLLVM[varExpr.varName], varExpr.varName));
+                valueStack.Push(LLVM.BuildLoad(builder, namedMutablesLLVM[varExpr.value], varExpr.value));
                 return;
             }
             else
             {
-                if (namedValuesLLVM.ContainsKey(varExpr.varName)) {
-                varRef = namedValuesLLVM[varExpr.varName];
+                if (namedValuesLLVM.ContainsKey(varExpr.value)) {
+                varRef = namedValuesLLVM[varExpr.value];
                 if (varRef.Pointer != IntPtr.Zero)
                 {
                     valueStack.Push(varRef);
                     return;
                 }
                 }
-                else if (Config.settings.variable.declaration.reorder && Parser.declaredGlobalsDict.ContainsKey(varExpr.varName))
+                else if (Config.settings.variable.declaration.reorder && Parser.declaredGlobalsDict.ContainsKey(varExpr.value))
                 {
                     LLVMBasicBlockRef currentBlock = LLVM.GetInsertBlock(builder);
-                    AST.VariableAssignment varAss = Parser.declaredGlobalsDict[varExpr.varName];
+                    AST.VariableAssignment varAss = Parser.declaredGlobalsDict[varExpr.value];
                     varAss.generator.generate();
                     varAss.generated = true;
                     LLVM.PositionBuilderAtEnd(builder, currentBlock);
@@ -46,11 +46,11 @@ public class VariableExpression : Base
                 }
             }
 
-            throw GenException.FactoryMethod("An unknown variable was referenced", "Likely a typo", varExpr, true, varExpr.varName);
+            throw GenException.FactoryMethod("An unknown variable was referenced", "Likely a typo", varExpr, true, varExpr.value);
         }
         else
         {
-            LLVMValueRef load = LLVM.BuildLoad(builder, varRef, varExpr.varName);
+            LLVMValueRef load = LLVM.BuildLoad(builder, varRef, varExpr.value);
             valueStack.Push(load);
             return;
         }

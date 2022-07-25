@@ -9,9 +9,14 @@ public class Function : AST.Node
 
     public bool generated = false;
 
+    public Type returnType;
+
+    public bool multiLine = false;
+
 
     public Function(Prototype prototype, List<AST.Node>? body = null, bool topLevel = true) : base(prototype)
     {
+        this.newLineReset = true;
         this.nodeType = NodeType.Function;
         this.generator = new Generator.Function(this);
 
@@ -34,6 +39,7 @@ public class Function : AST.Node
     public Function(Prototype prototype, AST.Node body, bool topLevel = true) : base(prototype)
 
     {
+        this.newLineReset = true;
         this.nodeType = NodeType.Function;
         this.generator = new Generator.Function(this);
 
@@ -63,5 +69,19 @@ public class Function : AST.Node
         base.addChild(child);
         this.body.Add(child);
     }
+
+    public override void addChild(Util.Token child)
+    {
+        if (children.Count() == 0)
+        {
+            if (child.value == "{")
+            {
+                this.multiLine = true;
+                this.newLineReset = false;
+            }
+        }
+        base.addChild(child);
+    }
+
 
 }
