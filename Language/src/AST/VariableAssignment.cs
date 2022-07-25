@@ -5,14 +5,14 @@ public class VariableAssignment : AST.Node
     public string name = "";
     public Type type;
     public string assignmentOp = "";
-    public string strValue = "";
+    public Expression defaultValue;
     public bool mutable = false;
     private int childLoop = 0;
 
     public bool reassignment = false;
     public bool binReassignment = false;
     public BinaryExpression? bin = null;
-    public AST.Node targetValue = null;
+    public AST.Node? targetValue = null;
 
     public bool generated = false;
 
@@ -46,6 +46,7 @@ public class VariableAssignment : AST.Node
                 }
                 this.parent = parent;
                 this.parent.addChild(this);
+                this.childLoop = 1;
             }
             else
             {
@@ -115,9 +116,9 @@ public class VariableAssignment : AST.Node
                         if (child.type != Util.TokenType.AssignmentOp) throw new ParserException($"expected assignment op but got {child.type} in a variable assignment", child);
                         this.assignmentOp = child.value;
                         break;
-                    case 3:
-                        this.strValue = child.value;
-                        break;
+                    // case 3:
+                    //     this.defaultValue = child;
+                    //     break;
                     default:
                         throw new ParserException($"Illegal extra items after variable assignment", this);
 
@@ -143,9 +144,9 @@ public class VariableAssignment : AST.Node
                             }
                         }
                         break;
-                    case 2:
-                        this.strValue = child.value;
-                        break;
+                    // case 2:
+                    //     this.strValue = child.value;
+                    //     break;
                     default:
                         throw new ParserException($"Illegal extra items after variable assignment", this);
                 }
@@ -170,17 +171,51 @@ public class VariableAssignment : AST.Node
         Console.WriteLine("adding child of node type " + node.nodeType + "to varass");
         if (!reassignment)
         {
-            switch (node.nodeType)
+            // switch (node.nodeType)
+            // {
+            //     case NodeType.StringExpression:
+            //         if (childLoop == 3)
+            //         {
+            //             StringExpression strExp = (StringExpression)node;
+            //             this.defaultValue = strExp;
+            //         }
+            //         else
+            //         {
+            //             throw new ParserException($"Illegal value (type {node.nodeType}) of variable {this.name}", node);
+            //         }
+            //         break;
+            //     case NodeType.NumberExpression:
+            //         NumberExpression numExpr = (NumberExpression)node;
+            //         if (keyword && childLoop == 3)
+            //         {
+            //             this.defaultValue = numExpr;
+            //         }
+            //         break;
+            // }
+            if (!node.isExpression)
             {
-                case NodeType.StringExpression:
-                    if (childLoop == 3)
+                throw ParserException.FactoryMethod("Value that was not an expression was added to variable assignment", "remove the non-expression", node);
+            }
+            switch (childLoop)
+            {
+                case 2:
+                    if (!keyword)
                     {
-                        StringExpression strExp = (StringExpression)node;
-                        this.strValue = strExp.value;
+                        this.defaultValue = (Expression)node;
                     }
                     else
                     {
-                        throw new ParserException($"Illegal value (type {node.nodeType}) of variable {this.name}", node);
+                        throw ParserException.FactoryMethod("An illegal expression was added as the second word of a keywordless variable assignment", "Remove the illegal expression | you may have forgetten an equal sign", node);
+                    }
+                    break;
+                case 3:
+                    if (keyword)
+                    {
+                        this.defaultValue = (Expression)node;
+                    }
+                    else
+                    {
+                        throw ParserException.FactoryMethod("An illegal expression was added as the third word of a keyword variable assignment", "Remove the illegal expression | you may have forgetten an equal sign", node);
                     }
                     break;
             }
@@ -200,11 +235,11 @@ public class VariableAssignment : AST.Node
                     else
                     {
                         this.binReassignment = false;
-                        this.targetValue = this.children.Last();
+                        this.targetValue = node;
                     }
                     break;
             }
-            this.targetValue = node;
+            // this.targetValue = node;
             childLoop++;
         }
     }

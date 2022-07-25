@@ -127,7 +127,7 @@ public static class Parser
     {
         if (!varAss.reassignment)
         {
-            return $"{varAss.nodeType} with type of {varAss?.type.value} and assignmentop of {varAss?.assignmentOp} and name of {varAss?.name} and mutability of {varAss.mutable} and value of {varAss.strValue}";
+            return $"{varAss.nodeType} with type of {varAss?.type.value} and assignmentop of {varAss?.assignmentOp} and name of {varAss?.name} and mutability of {varAss.mutable} and value of {varAss.defaultValue}";
         }
         else
         {
@@ -372,7 +372,6 @@ public static class Parser
         }
         if (Config.settings.function.calling.builtin.marker.location == "end" && token.value.EndsWith(Config.settings.function.calling.builtin.marker.value))
         {
-            Console.WriteLine("builtin call detected");
             //treat it as a builtin call
             AST.FunctionCall builtinCall = new AST.FunctionCall(token, null, true, parent, false);
             return new List<dynamic>() { builtinCall, delimLevel };
@@ -435,7 +434,6 @@ public static class Parser
             }
         }
 
-        Console.WriteLine($"returning token: {token.value} with var expr");
         new AST.VariableExpression(token, parent);
         return new List<dynamic>() { parent, delimLevel };
     }
@@ -499,7 +497,7 @@ public static class Parser
         prevLine = token.line;
         prevColumn = token.column;
 
-        // Console.WriteLine($"token of value: {token.value} and parent of {parent?.nodeType}");
+        Console.WriteLine($"token of value: {token.value} and parent of {parent?.nodeType}");
         AST.Node? previousNode = nodes.Count > 0 && tokenIndex > 0 ? nodes.Last() : null;
 
         if (token.type == Util.TokenType.EOF)
@@ -535,11 +533,14 @@ public static class Parser
         {
             case Util.TokenType.Int:
 
-                if (parent.nodeType == AST.Node.NodeType.VariableAssignment)
-                {
-                    parent.addChild(token);
-                    break;
-                }
+                // if (parent.nodeType == AST.Node.NodeType.VariableAssignment)
+                // {
+                //     parent.addChild(token);
+                //     break;
+                // }
+                new AST.NumberExpression(token, parent);
+                break;
+            case Util.TokenType.Double:
                 new AST.NumberExpression(token, parent);
                 break;
 
@@ -607,7 +608,7 @@ public static class Parser
         newLineAss.addChild(new Util.Token(Util.TokenType.Keyword, "string", 0, 0));
         newLineAss.addChild(new Util.Token(Util.TokenType.Keyword, "nl", 0, 0));
         newLineAss.addChild(new Util.Token(Util.TokenType.AssignmentOp, "=", 0, 0));
-        newLineAss.addChild(new Util.Token(Util.TokenType.String, "\"\n\"", 0, 0));
+        newLineAss.addChild(new AST.StringExpression(new Util.Token(Util.TokenType.String, "\"\n\"", 0, 0), newLineAss));
 
         List<Util.Token> printProtoArgs = new List<Util.Token>();
 

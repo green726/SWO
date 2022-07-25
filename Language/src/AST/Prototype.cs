@@ -26,12 +26,10 @@ public class Prototype : AST.Node
             {
                 this.name = "";
             }
-            Console.WriteLine("setting return type of proto named " + this.name + " to null");
             this.returnType = new Type("null", this);
         }
         else
         {
-            Console.WriteLine($"set return type of proto({this.line}:{this.column}) to: " + token.value);
             this.returnType = new Type(token);
         }
 
@@ -45,20 +43,7 @@ public class Prototype : AST.Node
 
                     Parser.checkToken(item, expectedType: Util.TokenType.Keyword);
                     prevType = new Type(new Util.Token(Util.TokenType.Keyword, item.value, this.line, this.column));
-                    // switch (item.value)
-                    // {
-                    //     case "double":
-                    //         prevType = new TypeAST(new Util.Token(Util.TokenType.Keyword, "double", this.line, this.column));
-                    //         break;
-                    //     case "int":
-                    //         prevType = new TypeAST(new Util.Token(Util.TokenType.Keyword, "int", this.line, this.column));
-                    //         break;
-                    //     case "string":
-                    //         prevType = new TypeAST(new Util.Token(Util.TokenType.Keyword, "string", this.line, this.column));
-                    //         break;
-                    //     default:
-                    //         throw new ArgumentException($"expected type declaration but got something else at {item.line}:{item.column}");
-                    // }
+
                 }
                 else
                 {

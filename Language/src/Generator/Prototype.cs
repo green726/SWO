@@ -43,7 +43,6 @@ public class Prototype : Base
                 arguments.Add(typeStack.Pop());
             }
 
-            Console.WriteLine("\n proto named: " + proto.name + " return value:" + proto.returnType.value + "\n");
             proto.returnType.generator.generate();
             function = LLVM.AddFunction(module, proto.name, LLVM.FunctionType(typeStack.Pop(), arguments.ToArray(), false));
             LLVM.SetLinkage(function, LLVMLinkage.LLVMExternalLinkage);
@@ -53,7 +52,6 @@ public class Prototype : Base
         int argLoopIndex = 0;
         foreach (KeyValuePair<AST.Type, string> arg in proto.arguments)
         {
-            Console.WriteLine("2nd arg loop");
             string argumentName = arg.Value;
 
             LLVMValueRef param = LLVM.GetParam(function, (uint)argLoopIndex);

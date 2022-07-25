@@ -14,12 +14,14 @@ public class VariableAssignment : Base
 
     public void buildGlobalString()
     {
+        AST.StringExpression strExpr = (AST.StringExpression)this.varAss.defaultValue;
         if (varAss.generated) { return; }
 
         List<LLVMValueRef> asciiList = new List<LLVMValueRef>();
 
         bool escaped = false;
-        foreach (char ch in this.varAss.strValue)
+        Console.WriteLine(this.varAss.defaultValue.nodeType);
+        foreach (char ch in strExpr.value)
         {
             if (ch == '\\')
             {
@@ -53,24 +55,6 @@ public class VariableAssignment : Base
 
     }
 
-    public (LLVMValueRef, LLVMTypeRef) generateVariableValue()
-    {
-        LLVMTypeRef typeLLVM = LLVMTypeRef.DoubleType();
-        LLVMValueRef valRef = LLVM.ConstReal(LLVMTypeRef.DoubleType(), 0.0);
-        switch (varAss.type.value)
-        {
-            case "double":
-                typeLLVM = LLVMTypeRef.DoubleType();
-                valRef = LLVM.ConstReal(LLVMTypeRef.DoubleType(), Double.Parse(varAss.strValue));
-                break;
-            case "int":
-                typeLLVM = LLVMTypeRef.Int64Type();
-                valRef = LLVM.ConstInt(LLVMTypeRef.Int64Type(), (ulong)int.Parse(varAss.strValue), true);
-                break;
-        }
-        return (valRef, typeLLVM);
-    }
-
     public override void generate()
     {
         if (varAss.generated) { return; }
@@ -82,7 +66,10 @@ public class VariableAssignment : Base
                 return;
             }
 
-            (LLVMValueRef valRef, LLVMTypeRef typeLLVM) = generateVariableValue();
+            this.varAss.defaultValue.generator.generate();
+            LLVMValueRef valRef = valueStack.Pop();
+            this.varAss.type.generator.generate();
+            LLVMTypeRef typeLLVM = typeStack.Pop();
 
             if (!varAss.mutable)
             {
@@ -110,7 +97,7 @@ public class VariableAssignment : Base
 
                 namedMutablesLLVM.Add(varAss.name, allocaRef);
             }
-        
+
             Console.WriteLine("adding var to named globals with name of" + varAss.name);
             namedGlobalsAST.Add(varAss.name, varAss);
         }
@@ -123,7 +110,7 @@ public class VariableAssignment : Base
                 throw new GenException("mutable strings not yet supported", varAss);
             }
 
-            (LLVMValueRef valRef, LLVMTypeRef typeLLVM) = generateVariableValue();
+            // (LLVMValueRef valRef, LLVMTypeRef typeLLVM) = generateVariableValue();
 
 
             // LLVMValueRef loadRef = LLVM.BuildLoad(builder, namedMutablesLLVM[binVarName], binVarName);
@@ -137,6 +124,7 @@ public class VariableAssignment : Base
             }
             else
             {
+                Console.WriteLine(varAss?.targetValue?.nodeType);
                 varAss.targetValue.generator.generate();
                 LLVMValueRef targetValRef = valueStack.Pop();
                 LLVMValueRef storeRef = LLVM.BuildStore(builder, targetValRef, namedMutablesLLVM[varAss.name]);

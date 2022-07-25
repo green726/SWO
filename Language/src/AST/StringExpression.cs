@@ -2,7 +2,7 @@ namespace AST;
 
 public class StringExpression : Expression
 {
-    new public string value;
+    // public new string value;
     public bool builtInString;
 
     public StringExpression(Util.Token token, AST.Node? parent = null, bool dontAdd = false, bool builtInString = false) : base(token)
@@ -20,6 +20,7 @@ public class StringExpression : Expression
             return;
         }
 
+        Spectre.Console.AnsiConsole.MarkupLine($"[red]string expr with value of: {this.value}[/]");
         if (parent != null)
         {
             parent.addChild(this);

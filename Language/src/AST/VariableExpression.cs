@@ -2,7 +2,7 @@ namespace AST;
 
 public class VariableExpression : Expression
 {
-    new public string value = "";
+    // new public string value = "";
 
     public VariableExpression(Util.Token token, AST.Node? parent = null, bool parentRequired = true) : base(token)
     {

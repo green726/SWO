@@ -59,7 +59,7 @@ public static class IRGen
         foreach (AST.Node node in nodes)
         {
             node.generator.generate();
-            // Console.WriteLine("successfully evaluated node of type " + node.nodeType);
+            Console.WriteLine("successfully evaluated node of type " + node.nodeType);
 
             // foreach (ASTNode child in node.children)
             // {

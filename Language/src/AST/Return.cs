@@ -21,7 +21,7 @@ public class Return : Node
 
     public override void addChild(Node child)
     {
-        if (!child.expression)
+        if (!child.isExpression)
         {
             throw ParserException.FactoryMethod("A non-expression was passed to a return function", "Delete it or replace it with an expression (number, variable, string, etc)", child);
         }

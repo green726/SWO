@@ -13,7 +13,7 @@ public abstract class Node
     public int column = 0;
     public int charNum = 0;
 
-    public bool expression = false;
+    public bool isExpression = false;
 
     public string codeExcerpt = "";
 

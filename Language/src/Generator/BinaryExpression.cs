@@ -22,13 +22,11 @@ public class BinaryExpression : Base
         {
             case AST.Node.NodeType.VariableExpression:
                 AST.VariableExpression leftHandVarExpr = (AST.VariableExpression)binExpr.leftHand;
-                Console.WriteLine("generating bin expr with lhs of var expr that has name of " + leftHandVarExpr.value);
                 binExpr.leftHand.generator.generate();
                 leftHand = valueStack.Pop();
                 break;
             case AST.Node.NodeType.NumberExpression:
                 AST.NumberExpression leftHandExpr = (AST.NumberExpression)binExpr.leftHand;
-                Console.WriteLine("bin expr left hand num expr with value of " + leftHandExpr.value);
                 leftHand = LLVM.ConstReal(LLVM.DoubleType(), leftHandExpr.value);
                 LLVM.DumpValue(leftHand);
                 break;
@@ -45,7 +43,6 @@ public class BinaryExpression : Base
         {
             case AST.Node.NodeType.VariableExpression:
                 AST.VariableExpression rightHandVarExpr = (AST.VariableExpression)binExpr.rightHand;
-                Console.WriteLine("generating bin expr with rhs of var expr that has name of " + rightHandVarExpr.value);
                 binExpr.rightHand.generator.generate();
                 rightHand = valueStack.Pop();
                 break;
@@ -68,9 +65,7 @@ public class BinaryExpression : Base
                 ir = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealUEQ, leftHand, rightHand, "comparetmp");
                 break;
             case AST.BinaryExpression.OperatorType.LessThan:
-                Console.WriteLine("left hand value dump below");
                 LLVM.DumpValue(leftHand);
-                Console.WriteLine();
                 LLVMValueRef cmpRef = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealULT, leftHand, rightHand, "comparetmp");
                 ir = LLVM.BuildUIToFP(builder, cmpRef, LLVMTypeRef.DoubleType(), "booltmp");
                 break;
@@ -83,9 +78,9 @@ public class BinaryExpression : Base
         //     evaluateNode(child);
         // }
 
-        Console.WriteLine($"Value stack peek after bin below");
-        LLVM.DumpValue(valueStack.Peek());
-        Console.WriteLine("");
+        // Console.WriteLine($"Value stack peek after bin below");
+        // LLVM.DumpValue(valueStack.Peek());
+        // Console.WriteLine("");
 
     }
 }
