@@ -11,10 +11,9 @@ public class Function : AST.Node
 
     public bool multiLine = false;
 
-
+    //NOTE: Constructor 1:
     public Function(Prototype prototype, List<AST.Node>? body = null, bool topLevel = true) : base(prototype)
     {
-        this.newLineReset = true;
         this.nodeType = NodeType.Function;
         this.generator = new Generator.Function(this);
 
@@ -34,10 +33,12 @@ public class Function : AST.Node
         }
     }
 
+    //NOTE: Constructor 2:
     public Function(Prototype prototype, AST.Node body, bool topLevel = true) : base(prototype)
 
     {
         this.newLineReset = true;
+        this.multiLine = false;
         this.nodeType = NodeType.Function;
         this.generator = new Generator.Function(this);
 

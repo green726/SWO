@@ -5,6 +5,7 @@ public class Type : AST.Node
     public string value;
     public Util.ClassType defaultType;
 
+
     public Type(Util.Token token) : base(token)
     {
         this.nodeType = NodeType.Type;

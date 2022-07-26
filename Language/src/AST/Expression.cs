@@ -2,7 +2,7 @@ namespace AST;
 
 public abstract class Expression : Node
 {
-    public dynamic? value {get; set;}
+    public dynamic? value { get; set; }
 
     public Expression(Util.Token token, Node? parent = null) : base(token)
     {
