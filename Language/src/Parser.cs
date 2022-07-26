@@ -100,8 +100,8 @@ public static class Parser
     public static string printBinary(AST.BinaryExpression bin)
     {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.Append($"{bin.nodeType} op: {bin.operatorType} lhs type: {bin.leftHand.nodeType} rhs type: {bin.rightHand.nodeType} binop children below:");
-        stringBuilder.Append(printASTRet(bin.children));
+        stringBuilder.Append($"{bin.nodeType} op: {bin.operatorType} lhs type: {bin.leftHand.nodeType} rhs type: {bin?.rightHand?.nodeType} binop children below:");
+        stringBuilder.Append(printASTRet(bin?.children));
 
         return stringBuilder.ToString();
     }
