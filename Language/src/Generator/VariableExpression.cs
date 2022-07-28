@@ -69,10 +69,16 @@ public class VariableExpression : Base
         // LLVMValueRef valueRef =
         List<LLVMValueRef> childValueList = new List<LLVMValueRef>();
         childValueList.Add(LLVM.ConstInt(LLVMTypeRef.Int64Type(), 0, false));
+        int arraySize = (int)LLVM.GetArrayLength(LLVM.GetElementType(varPtr.TypeOf()));
+        Console.WriteLine("array size: " + arraySize);
         foreach (AST.Node node in varExpr.children)
         {
             AST.NumberExpression numExpr = (AST.NumberExpression)node;
             numExpr.value += Config.settings.variable.arrays.startIndex;
+            if (numExpr.value > arraySize)
+            {
+                throw ParserException.FactoryMethod("Index out of range", "Make the index in range", varExpr);
+            }
             numExpr.generator.generate();
             childValueList.Add(valueStack.Pop());
         }

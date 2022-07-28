@@ -56,11 +56,13 @@ public class VariableExpression : Expression
         {
             this.isArrayIndexRef = true;
             this.parsingArray = true;
+            this.codeExcerpt += child.value;
             return;
         }
         else if (child.value == "]" && parsingArray)
         {
             this.parsingArray = false;
+            this.codeExcerpt += child.value;
             return;
         }
         else if (!this.parsingArray)
