@@ -3,6 +3,9 @@ namespace AST;
 public class VariableExpression : Expression
 {
 
+    private bool parsingArray = false;
+    public bool isArrayIndexRef = false;
+
     public VariableExpression(Util.Token token, AST.Node? parent = null, bool parentRequired = true) : base(token)
     {
         this.nodeType = NodeType.VariableExpression;
@@ -15,13 +18,13 @@ public class VariableExpression : Expression
             this.value = splitStr[0];
             this.addChild(new NumberExpression(new Util.Token(Util.TokenType.Int, splitStr[1], token.line, token.column + 1), this));
         }
-
         value = token.value;
-        bool exists = false;
         this.parent = parent;
 
+
+        // bool exists = false;
         //NOTE: below is commented out b/c i think that LLVm IR will do it for me
-        // foreach (VariableAssignment varAss in Parser.globalVarAss)
+        //foreach (VariableAssignment varAss in Parser.globalVarAss)
         // {
         //     if (this.varName == varAss.name)
         //     {
@@ -46,11 +49,32 @@ public class VariableExpression : Expression
         }
 
     }
+
+    public override void addChild(Util.Token child)
+    {
+        if (child.value == "[" && !parsingArray)
+        {
+            this.isArrayIndexRef = true;
+            this.parsingArray = true;
+            return;
+        }
+        else if (child.value == "]" && parsingArray)
+        {
+            this.parsingArray = false;
+            return;
+        }
+        else if (!this.parsingArray)
+        {
+            return;
+        }
+        base.addChild(child);
+    }
+
     public override void addChild(AST.Node child)
     {
-        if (child.nodeType != NodeType.NumberExpression)
+        if (!this.parsingArray)
         {
-            // throw ParserException.FactoryMethod();
+            throw ParserException.FactoryMethod("An illegal child was added to a variable expression", "remove it", child);
         }
         base.addChild(child);
     }

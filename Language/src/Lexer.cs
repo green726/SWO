@@ -30,40 +30,42 @@ public static class Lexer
             {
                 if (lastChar != ' ')
                 {
-                    char firstChar = ' ';
-                    try
-                    {
-                        firstChar = stringBuilder.ToString()[0];
-                    }
-                    catch
-                    { }
-                    if (int.TryParse(stringBuilder.ToString(), out int result))
-                    {
-                        tokenList.Add(new Util.Token(Util.TokenType.Int, stringBuilder.ToString(), line, column, charNum));
-                    }
-                    else if (double.TryParse(stringBuilder.ToString(), out double dubResult))
-                    {
-                        tokenList.Add(new Util.Token(Util.TokenType.Double, stringBuilder.ToString(), line, column, charNum));
-                    }
-                    else if (binOps.Contains(stringBuilder.ToString()))
-                    {
-                        tokenList.Add(new Util.Token(Util.TokenType.Operator, stringBuilder.ToString(), line, column, charNum));
-                    }
-                    else if (assignmentOps.Contains(stringBuilder.ToString()))
-                    {
-                        tokenList.Add(new Util.Token(Util.TokenType.AssignmentOp, stringBuilder.ToString(), line, column, charNum, false));
-                    }
-                    else if (firstChar == '"' && stringBuilder.ToString().EndsWith('"'))
-                    {
-                        tokenList.Add(new Util.Token(Util.TokenType.String, stringBuilder.ToString(), line, column, charNum));
-                    }
-                    else if (stringBuilder.ToString() != " " && stringBuilder.ToString() != "" && stringBuilder.ToString() != "\n")
-                    {
-                        tokenList.Add(new Util.Token(Util.TokenType.Keyword, stringBuilder.ToString(), line, column, charNum));
-                    }
-                    else if (specialChars.Contains(stringBuilder.ToString())) {
-                        tokenList.Add(new Util.Token(Util.TokenType.Special, stringBuilder.ToString(), line, column));
-                    }
+                    checkStringBuilder(stringBuilder, line, column, charNum);
+                    // char firstChar = ' ';
+                    // try
+                    // {
+                    //     firstChar = stringBuilder.ToString()[0];
+                    // }
+                    // catch
+                    // { }
+                    // if (int.TryParse(stringBuilder.ToString(), out int result))
+                    // {
+                    //     tokenList.Add(new Util.Token(Util.TokenType.Int, stringBuilder.ToString(), line, column, charNum));
+                    // }
+                    // else if (double.TryParse(stringBuilder.ToString(), out double dubResult))
+                    // {
+                    //     tokenList.Add(new Util.Token(Util.TokenType.Double, stringBuilder.ToString(), line, column, charNum));
+                    // }
+                    // else if (binOps.Contains(stringBuilder.ToString()))
+                    // {
+                    //     tokenList.Add(new Util.Token(Util.TokenType.Operator, stringBuilder.ToString(), line, column, charNum));
+                    // }
+                    // else if (assignmentOps.Contains(stringBuilder.ToString()))
+                    // {
+                    //     tokenList.Add(new Util.Token(Util.TokenType.AssignmentOp, stringBuilder.ToString(), line, column, charNum, false));
+                    // }
+                    // else if (firstChar == '"' && stringBuilder.ToString().EndsWith('"'))
+                    // {
+                    //     tokenList.Add(new Util.Token(Util.TokenType.String, stringBuilder.ToString(), line, column, charNum));
+                    // }
+                    // else if (stringBuilder.ToString() != " " && stringBuilder.ToString() != "" && stringBuilder.ToString() != "\n")
+                    // {
+                    //     tokenList.Add(new Util.Token(Util.TokenType.Keyword, stringBuilder.ToString(), line, column, charNum));
+                    // }
+                    // else if (specialChars.Contains(stringBuilder.ToString()))
+                    // {
+                    //     tokenList.Add(new Util.Token(Util.TokenType.Special, stringBuilder.ToString(), line, column));
+                    // }
                     stringBuilder = new StringBuilder();
                     lastChar = ch;
                 }
@@ -131,9 +133,50 @@ public static class Lexer
         // }
         if (builder.ToString() != "" && builder.ToString() != " ")
         {
-            tokenList.Add(new Util.Token(Util.TokenType.Keyword, builder.ToString(), line, column, charNum));
+            checkStringBuilder(builder, line, column, charNum);
+            // tokenList.Add(new Util.Token(Util.TokenType.Keyword, builder.ToString(), line, column, charNum));
         }
         tokenList.Add(new Util.Token(type, ch.ToString(), line, column, charNum, true));
+    }
+
+    public static void checkStringBuilder(StringBuilder stringBuilder, int line, int column, int charNum)
+    {
+        char firstChar = ' ';
+        try
+        {
+            firstChar = stringBuilder.ToString()[0];
+        }
+        catch
+        { }
+        if (int.TryParse(stringBuilder.ToString(), out int result))
+        {
+            tokenList.Add(new Util.Token(Util.TokenType.Int, stringBuilder.ToString(), line, column, charNum));
+        }
+        else if (double.TryParse(stringBuilder.ToString(), out double dubResult))
+        {
+            tokenList.Add(new Util.Token(Util.TokenType.Double, stringBuilder.ToString(), line, column, charNum));
+        }
+        else if (binOps.Contains(stringBuilder.ToString()))
+        {
+            tokenList.Add(new Util.Token(Util.TokenType.Operator, stringBuilder.ToString(), line, column, charNum));
+        }
+        else if (assignmentOps.Contains(stringBuilder.ToString()))
+        {
+            tokenList.Add(new Util.Token(Util.TokenType.AssignmentOp, stringBuilder.ToString(), line, column, charNum, false));
+        }
+        else if (firstChar == '"' && stringBuilder.ToString().EndsWith('"'))
+        {
+            tokenList.Add(new Util.Token(Util.TokenType.String, stringBuilder.ToString(), line, column, charNum));
+        }
+        else if (stringBuilder.ToString() != " " && stringBuilder.ToString() != "" && stringBuilder.ToString() != "\n")
+        {
+            tokenList.Add(new Util.Token(Util.TokenType.Keyword, stringBuilder.ToString(), line, column, charNum));
+        }
+        else if (specialChars.Contains(stringBuilder.ToString()))
+        {
+            tokenList.Add(new Util.Token(Util.TokenType.Special, stringBuilder.ToString(), line, column));
+        }
+
     }
 
 

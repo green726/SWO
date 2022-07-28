@@ -434,8 +434,8 @@ public static class Parser
             }
         }
 
-        new AST.VariableExpression(token, parent);
-        return new List<dynamic>() { parent, delimLevel };
+        AST.VariableExpression varExpr = new AST.VariableExpression(token, parent);
+        return new List<dynamic>() { varExpr, delimLevel };
     }
 
     public static List<dynamic> parseDelim(Util.Token token, int tokenIndex, AST.Node? parent = null, int delimLevel = 0)
@@ -509,7 +509,7 @@ public static class Parser
         prevLine = token.line;
         prevColumn = token.column;
 
-        Console.WriteLine($"token of value: {token.value} and parent of {parent?.nodeType}");
+        Console.WriteLine($"token of value: {token.value} and type of {token.type} and parent of {parent?.nodeType}");
         AST.Node? previousNode = nodes.Count > 0 && tokenIndex > 0 ? nodes.Last() : null;
 
         if (token.type == Util.TokenType.EOF)

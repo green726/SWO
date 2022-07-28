@@ -12,6 +12,13 @@ public class VariableModelDeclaration
     public bool reorder { get; set; } = false;
 
     public VariableDeclarationKeyword keyword { get; set; } = new VariableDeclarationKeyword();
+
+    public ArrayModel arrays { get; set; } = new ArrayModel();
+}
+
+public class ArrayModel
+{
+    public int startIndex { get; set; } = 0;
 }
 
 public class VariableDeclarationKeyword
