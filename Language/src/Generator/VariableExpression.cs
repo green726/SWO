@@ -75,7 +75,7 @@ public class VariableExpression : Base
         {
             AST.NumberExpression numExpr = (AST.NumberExpression)node;
             numExpr.value += Config.settings.variable.arrays.startIndex;
-            if (numExpr.value > arraySize)
+            if (Config.settings.variable.arrays.outOfBoundsErrorEnabled && numExpr.value > arraySize)
             {
                 throw ParserException.FactoryMethod("Index out of range", "Make the index in range", varExpr);
             }

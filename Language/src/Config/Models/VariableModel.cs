@@ -18,6 +18,7 @@ public class VariableModelDeclaration
 
 public class ArrayModel
 {
+    public bool outOfBoundsErrorEnabled { get; set; } = true;
     public int startIndex { get; set; } = 0;
 }
 
