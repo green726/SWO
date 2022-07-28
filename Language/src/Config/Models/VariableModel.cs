@@ -3,6 +3,7 @@ namespace ConfigModel;
 public class VariableModel
 {
     public VariableModelDeclaration declaration { get; set; } = new VariableModelDeclaration();
+    public ArrayModel arrays { get; set; } = new ArrayModel();
 }
 
 public class VariableModelDeclaration
@@ -13,7 +14,6 @@ public class VariableModelDeclaration
 
     public VariableDeclarationKeyword keyword { get; set; } = new VariableDeclarationKeyword();
 
-    public ArrayModel arrays { get; set; } = new ArrayModel();
 }
 
 public class ArrayModel
