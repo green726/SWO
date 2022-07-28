@@ -40,10 +40,8 @@ public class Prototype : AST.Node
                 // Console.WriteLine("funcArgs " + item.value);
                 if (typePredicted)
                 {
-
                     Parser.checkToken(item, expectedType: Util.TokenType.Keyword);
                     prevType = new Type(new Util.Token(Util.TokenType.Keyword, item.value, this.line, this.column));
-
                 }
                 else
                 {
@@ -71,7 +69,6 @@ public class Prototype : AST.Node
             // Console.WriteLine("funcArgs " + item.value);
             if (typePredicted)
             {
-
                 Parser.checkToken(item, expectedType: Util.TokenType.Keyword);
                 prevType = new Type(new Util.Token(Util.TokenType.Keyword, item.value, this.line, this.column));
                 // switch (item.value)
@@ -91,10 +88,19 @@ public class Prototype : AST.Node
             }
             else
             {
+                Console.WriteLine("hi" + item.value);
+                //TODO: replace with config delim
+                if (item.value == "[" || item.value == "]")
+                {
+                    Console.WriteLine("EE");
+                    prevType.addChild(item);
+                    return;
+                }
                 this.arguments.Add(prevType, item.value);
             }
 
             //swap typePredicted
+            Console.WriteLine("swapping type predicted");
             typePredicted = !typePredicted;
         }
     }
@@ -114,7 +120,8 @@ public class Prototype : AST.Node
             return;
         }
 
-        if (item.type != Util.TokenType.DelimiterOpen && item.type != Util.TokenType.DelimiterClose)
+        //TODO: replace this with config delims
+        else if (item.value != "(" && item.value != ")")
         {
             addArgs(new List<Util.Token>() { item });
         }
