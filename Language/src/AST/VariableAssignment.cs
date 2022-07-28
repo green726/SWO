@@ -14,6 +14,9 @@ public class VariableAssignment : AST.Node
     public BinaryExpression? bin = null;
     public AST.Node? targetValue = null;
 
+    public bool isArray = false;
+    private bool parsingArraySize = false;
+
     public bool generated = false;
 
     public bool keyword = true;
@@ -95,6 +98,15 @@ public class VariableAssignment : AST.Node
 
     public override void addChild(Util.Token child)
     {
+        if (parsingArraySize)
+        {
+            if (child.value == "]")
+            {
+                this.parsingArraySize = false;
+                return;
+            }
+        }
+
         if (!reassignment)
         {
             if (keyword)
@@ -105,6 +117,15 @@ public class VariableAssignment : AST.Node
                         this.type = new Type(child);
                         break;
                     case 1:
+                        //TODO: replace this with config delimiter
+                        if (child.value == "[")
+                        {
+                            Console.WriteLine("array detected");
+                            this.isArray = true;
+                            this.parsingArraySize = true;
+                            this.type.isArray = true;
+                            return;
+                        }
                         this.name = child.value;
                         if (Config.settings.general.typo.enabled)
                         {
@@ -162,36 +183,29 @@ public class VariableAssignment : AST.Node
         }
         childLoop++;
 
-
     }
 
     public override void addChild(AST.Node node)
     {
         base.addChild(node);
         Console.WriteLine("adding child of node type " + node.nodeType + "to varass");
+
+        if (parsingArraySize)
+        {
+            if (node.nodeType != AST.Node.NodeType.NumberExpression)
+            {
+                throw ParserException.FactoryMethod($"Expected a number for array size but got {node.nodeType}", $"Replace the {node.nodeType} with a number", node);
+            }
+            NumberExpression numExpr = (NumberExpression)node;
+            if (numExpr.type.value != "int")
+            {
+                throw ParserException.FactoryMethod($"Expected an int but got {numExpr.type.value} in an array declaration", $"Replace the {numExpr.type.value} with \"int\"", node);
+            }
+            this.type.size = numExpr.value;
+        }
+
         if (!reassignment)
         {
-            // switch (node.nodeType)
-            // {
-            //     case NodeType.StringExpression:
-            //         if (childLoop == 3)
-            //         {
-            //             StringExpression strExp = (StringExpression)node;
-            //             this.defaultValue = strExp;
-            //         }
-            //         else
-            //         {
-            //             throw new ParserException($"Illegal value (type {node.nodeType}) of variable {this.name}", node);
-            //         }
-            //         break;
-            //     case NodeType.NumberExpression:
-            //         NumberExpression numExpr = (NumberExpression)node;
-            //         if (keyword && childLoop == 3)
-            //         {
-            //             this.defaultValue = numExpr;
-            //         }
-            //         break;
-            // }
             if (!node.isExpression)
             {
                 throw ParserException.FactoryMethod("Value that was not an expression was added to variable assignment", "remove the non-expression", node);
@@ -201,6 +215,16 @@ public class VariableAssignment : AST.Node
                 case 2:
                     if (!keyword)
                     {
+                        if (isArray)
+                        {
+                            ArrayExpression expr = (ArrayExpression)node;
+                            if (this.type.size != null && expr.length != this.type.size)
+                            {
+                                throw ParserException.FactoryMethod("An array declaration received a default value that did not correspond with its declared size", "Make the initial expression size the same as in the assignment", node);
+                            }
+                            this.type.size = expr.length;
+                            Spectre.Console.AnsiConsole.MarkupLine($"[green]array size of {expr.length} and type size of {this.type.size} [/]");
+                        }
                         this.defaultValue = (Expression)node;
                     }
                     else
@@ -211,6 +235,16 @@ public class VariableAssignment : AST.Node
                 case 3:
                     if (keyword)
                     {
+                        if (isArray)
+                        {
+                            ArrayExpression expr = (ArrayExpression)node;
+                            if (this.type.size != null && expr.length != this.type.size)
+                            {
+                                throw ParserException.FactoryMethod("An array declaration received a default value that did not correspond with its declared size", "Make the initial expression size the same as in the assignment", node);
+                            }
+                            this.type.size = expr.length;
+                            Spectre.Console.AnsiConsole.MarkupLine($"[purple]array size of {expr.length} and type size of {this.type.size} [/]");
+                        }
                         this.defaultValue = (Expression)node;
                     }
                     else

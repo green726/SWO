@@ -445,6 +445,14 @@ public static class Parser
         {
             switch (parent?.nodeType)
             {
+                case AST.Node.NodeType.VariableAssignment:
+                    //TODO: replace this with the config delimiter
+                    if (token.value == "{")
+                    {
+                        return new List<dynamic>() { new AST.ArrayExpression(token, parent), delimLevel + 1 };
+                    }
+                    parent?.addChild(token);
+                    break;
                 default:
                     parent?.addChild(token);
                     break;
@@ -473,6 +481,10 @@ public static class Parser
                     break;
                 case AST.Node.NodeType.FunctionCall:
                     break;
+                case AST.Node.NodeType.VariableAssignment:
+                    parent?.addChild(token);
+                    delimLevel--;
+                    return new List<dynamic>() { parent, delimLevel };
                 default:
                     parent?.addChild(token);
                     break;

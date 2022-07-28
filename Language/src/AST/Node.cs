@@ -55,7 +55,8 @@ public abstract class Node
         ForLoop,
         PhiVariable,
         ImportStatement,
-        Return
+        Return,
+        ArrayExpression
     }
 
     public virtual void addParent(Node parent)

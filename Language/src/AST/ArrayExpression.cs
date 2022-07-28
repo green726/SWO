@@ -5,10 +5,13 @@ public class ArrayExpression : Expression
     public Type containedType;
     public int length;
 
-    public List<Node> values = new List<Node>();
 
     public ArrayExpression(Util.Token token, AST.Node? parent = null) : base(token)
     {
+        this.value = new List<AST.Node>();
+        this.nodeType = NodeType.ArrayExpression;
+        this.generator = new Generator.ArrayExpression(this);
+
         //TODO: replace this with array delim from config
         if (token.value != "{")
         {
@@ -16,10 +19,12 @@ public class ArrayExpression : Expression
         }
         if (parent != null)
         {
+            this.parent = parent;
             if (this.parent.nodeType == NodeType.VariableAssignment)
             {
                 VariableAssignment varAss = (VariableAssignment)parent;
                 this.containedType = varAss.type;
+                this.containedType.isArray = true;
             }
             else
             {
@@ -34,12 +39,13 @@ public class ArrayExpression : Expression
     {
         if (!child.isExpression)
         {
-            throw ParserException.FactoryMethod("A non expression wa sillegaly added to an array", "Replace it with an exception", child);
+            throw ParserException.FactoryMethod("A non expression was illegaly added to an array", "Replace it with an exception", child);
         }
         else
         {
-            values.Add(child);
+            value.Add(child);
         }
+        this.length++;
         base.addChild(child);
     }
 

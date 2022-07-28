@@ -5,6 +5,10 @@ public class Type : AST.Node
     public string value;
     public Util.ClassType defaultType;
 
+    //NOTE: this is the size of an array or similar type
+    public int? size = null;
+    public bool isArray = false;
+
 
     public Type(Util.Token token) : base(token)
     {

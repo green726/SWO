@@ -13,21 +13,42 @@ public class Type : Base
 
     public override void generate()
     {
-        switch (type.value)
+        if (!type.isArray)
         {
-            case "double":
-                typeStack.Push(LLVM.DoubleType());
-                break;
-            case "int":
-                typeStack.Push(LLVM.IntType(64));
-                break;
-            case "string":
-                typeStack.Push(LLVM.ArrayType(LLVM.Int8Type(), 3));
-                break;
-            case "null":
-                typeStack.Push(LLVM.VoidType());
-                break;
-
+            switch (type.value)
+            {
+                case "double":
+                    typeStack.Push(LLVM.DoubleType());
+                    break;
+                case "int":
+                    typeStack.Push(LLVM.IntType(64));
+                    break;
+                case "string":
+                    typeStack.Push(LLVM.ArrayType(LLVM.Int8Type(), 3));
+                    break;
+                case "null":
+                    typeStack.Push(LLVM.VoidType());
+                    break;
+            }
+        }
+        else
+        {
+            uint count = (uint)type.size;
+            switch (type.value)
+            {
+                case "double":
+                    typeStack.Push(LLVM.ArrayType(LLVM.DoubleType(), count));
+                    break;
+                case "int":
+                    typeStack.Push(LLVM.ArrayType(LLVM.IntType(64), count));
+                    break;
+                case "string":
+                    typeStack.Push(LLVM.ArrayType(LLVM.ArrayType(LLVM.Int8Type(), 3), count));
+                    break;
+                    // case "null":
+                    //     typeStack.Push(LLVM.VoidType());
+                    //     break;
+            }
         }
     }
 }
