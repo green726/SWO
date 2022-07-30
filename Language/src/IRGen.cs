@@ -25,7 +25,7 @@ public static class IRGen
 
     public static Dictionary<string, LLVMValueRef> namedValuesLLVM = new Dictionary<string, LLVMValueRef>();
 
-    public static Dictionary<string, AST.VariableAssignment> namedGlobalsAST = new Dictionary<string, AST.VariableAssignment>();
+    public static Dictionary<string, AST.VariableDeclaration> namedGlobalsAST = new Dictionary<string, AST.VariableDeclaration>();
 
     public static LLVMBasicBlockRef mainEntryBlock;
     public static bool mainBuilt = false;

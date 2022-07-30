@@ -44,6 +44,7 @@ public abstract class Node
         NumberExpression,
         BinaryExpression,
         VariableAssignment,
+        VariableDeclaration,
         Prototype,
         Function,
         FunctionCall,

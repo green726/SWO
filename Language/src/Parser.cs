@@ -9,14 +9,14 @@ public static class Parser
     public static List<AST.Node> nodes = new List<AST.Node>();
     public static List<Util.Token> tokenList;
 
-    public static List<AST.VariableAssignment> globalVarAss = new List<AST.VariableAssignment>();
+    public static List<AST.VariableDeclaration> globalVarAss = new List<AST.VariableDeclaration>();
 
     public static Util.TokenType[] binaryExpectedTokens = { Util.TokenType.Int, Util.TokenType.Keyword };
     public static Util.TokenType[] delimiterExpectedTokens = { Util.TokenType.Keyword };
     public static AST.Node.NodeType[] binaryExpectedNodes = { AST.Node.NodeType.NumberExpression, AST.Node.NodeType.BinaryExpression, AST.Node.NodeType.VariableExpression, AST.Node.NodeType.PhiVariable };
 
     public static Dictionary<string, AST.Function> declaredFunctionDict = new Dictionary<string, AST.Function>();
-    public static Dictionary<string, AST.VariableAssignment> declaredGlobalsDict = new Dictionary<string, AST.VariableAssignment>();
+    public static Dictionary<string, AST.VariableDeclaration> declaredGlobalsDict = new Dictionary<string, AST.VariableDeclaration>();
 
     public static int prevLine = 0;
     public static int prevColumn = 0;
@@ -125,14 +125,7 @@ public static class Parser
 
     public static string printVarAss(AST.VariableAssignment varAss)
     {
-        if (!varAss.reassignment)
-        {
-            return $"{varAss.nodeType} with type of {varAss?.type.value} and assignmentop of {varAss?.assignmentOp} and name of {varAss?.name} and mutability of {varAss.mutable} and value of {varAss.defaultValue}";
-        }
-        else
-        {
-            return $"{varAss.nodeType} with name of {varAss.name} and children of [{printASTRet(varAss.children)}]";
-        }
+        return $"{varAss.nodeType} with name of {varAss.name} and children of [{printASTRet(varAss.children)}]";
     }
 
     public static string printProto(AST.Prototype proto)
@@ -299,13 +292,13 @@ public static class Parser
 
         if (token.value == Config.settings.variable.declaration.keyword.mutable)
         {
-            AST.VariableAssignment varAss = new AST.VariableAssignment(token, true);
-            return new List<dynamic>() { varAss, delimLevel };
+            AST.VariableDeclaration varDec = new AST.VariableDeclaration(token, true);
+            return new List<dynamic>() { varDec, delimLevel };
         }
         else if (token.value == Config.settings.variable.declaration.keyword.constant)
         {
-            AST.VariableAssignment constAss = new AST.VariableAssignment(token, false);
-            return new List<dynamic>() { constAss, delimLevel };
+            AST.VariableDeclaration constDec = new AST.VariableDeclaration(token, false);
+            return new List<dynamic>() { constDec, delimLevel };
         }
         else if (token.value == Config.settings.function.ret.keyword)
         {
@@ -413,12 +406,10 @@ public static class Parser
                 proto.addChild(token);
                 return new List<dynamic>() { parent, delimLevel };
             case AST.Node.NodeType.VariableAssignment:
-                AST.VariableAssignment varAss = (AST.VariableAssignment)parent;
-                if (varAss.reassignment)
-                {
-                    break;
-                }
-                parent.addChild(token);
+                // AST.VariableAssignment varAss = (AST.VariableAssignment)parent;
+                break;
+            case AST.Node.NodeType.VariableDeclaration:
+                parent?.addChild(token);
                 return new List<dynamic>() { parent, delimLevel };
             case AST.Node.NodeType.ImportStatement:
                 parent.addChild(token);
@@ -429,8 +420,8 @@ public static class Parser
         {
             if (tokenList[tokenIndex + 2].value == "=" || tokenList[tokenIndex + 2].value == Config.settings.variable.declaration.keyword.mutable)
             {
-                AST.VariableAssignment varAss = new AST.VariableAssignment(token, parent);
-                return new List<dynamic>() { varAss, delimLevel };
+                AST.VariableDeclaration varDec = new AST.VariableDeclaration(token, parent);
+                return new List<dynamic>() { varDec, delimLevel };
             }
         }
 
@@ -445,7 +436,7 @@ public static class Parser
         {
             switch (parent?.nodeType)
             {
-                case AST.Node.NodeType.VariableAssignment:
+                case AST.Node.NodeType.VariableDeclaration:
                     //TODO: replace this with the config delimiter
                     if (token.value == "{")
                     {
@@ -481,6 +472,10 @@ public static class Parser
                     break;
                 case AST.Node.NodeType.FunctionCall:
                     break;
+                case AST.Node.NodeType.VariableDeclaration:
+                    parent?.addChild(token);
+                    delimLevel--;
+                    return new List<dynamic>() { parent, delimLevel };
                 case AST.Node.NodeType.VariableAssignment:
                     parent?.addChild(token);
                     delimLevel--;
@@ -566,13 +561,13 @@ public static class Parser
                 return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, keywordRet[0], delimLevel: keywordRet[1]);
 
             case Util.TokenType.AssignmentOp:
-                if (parent?.nodeType == AST.Node.NodeType.VariableAssignment)
+                if (parent?.nodeType == AST.Node.NodeType.VariableDeclaration)
                 {
                     parent.addChild(token);
                 }
                 else
                 {
-                    AST.VariableAssignment varAss = new AST.VariableAssignment(token, true, parent);
+                    AST.VariableAssignment varAss = new AST.VariableAssignment(token, parent);
                     return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, varAss, delimLevel: delimLevel);
                     // VariableReAssignment varReAss = new VariableReAssignment(token);
                     // return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, varReAss, delimLevel: delimLevel);
@@ -616,7 +611,7 @@ public static class Parser
     public static void addLanguageBuiltins()
     {
         Util.Token newLineAssToken = new Util.Token(Util.TokenType.Keyword, "const", 0, 0);
-        AST.VariableAssignment newLineAss = new AST.VariableAssignment(newLineAssToken, false);
+        AST.VariableDeclaration newLineAss = new AST.VariableDeclaration(newLineAssToken, false);
         newLineAss.addChild(new Util.Token(Util.TokenType.Keyword, "string", 0, 0));
         newLineAss.addChild(new Util.Token(Util.TokenType.Keyword, "nl", 0, 0));
         newLineAss.addChild(new Util.Token(Util.TokenType.AssignmentOp, "=", 0, 0));

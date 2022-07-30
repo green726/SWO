@@ -20,10 +20,10 @@ public class ArrayExpression : Expression
         if (parent != null)
         {
             this.parent = parent;
-            if (this.parent.nodeType == NodeType.VariableAssignment)
+            if (this.parent.nodeType == NodeType.VariableDeclaration)
             {
-                VariableAssignment varAss = (VariableAssignment)parent;
-                this.containedType = varAss.type;
+                VariableDeclaration varDec = (VariableDeclaration)parent;
+                this.containedType = varDec.type;
                 this.containedType.isArray = true;
             }
             else

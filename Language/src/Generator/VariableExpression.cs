@@ -47,9 +47,9 @@ public class VariableExpression : Base
                 else if (Config.settings.variable.declaration.reorder && Parser.declaredGlobalsDict.ContainsKey(varExpr.value))
                 {
                     LLVMBasicBlockRef currentBlock = LLVM.GetInsertBlock(builder);
-                    AST.VariableAssignment varAss = Parser.declaredGlobalsDict[varExpr.value];
-                    varAss.generator.generate();
-                    varAss.generated = true;
+                    AST.VariableDeclaration varDec = Parser.declaredGlobalsDict[varExpr.value];
+                    varDec.generator.generate();
+                    varDec.generated = true;
                     LLVM.PositionBuilderAtEnd(builder, currentBlock);
                     return generateVarRef();
                 }
