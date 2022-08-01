@@ -7,6 +7,7 @@ public class VariableExpression : Expression
     public bool isArrayIndexRef = false;
 
     public bool isPointer = false;
+    public bool isDereference = false;
 
     public VariableExpression(Util.Token token, AST.Node? parent = null, bool parentRequired = true) : base(token)
     {
@@ -26,11 +27,17 @@ public class VariableExpression : Expression
         this.value = token.value;
         this.parent = parent;
 
-        if (token.value.EndsWith("*"))
+        if (token.value.StartsWith("&"))
         {
             Console.WriteLine("pointer var ref detected");
             this.isPointer = true;
             this.value = token.value.Remove(this.value.Length - 1, 1);
+        }
+        else if (token.value.StartsWith("*"))
+        {
+            Console.WriteLine("dereference detected");
+            this.isDereference = true;
+            this.value= token.value.Remove(0, 1);
         }
 
         // bool exists = false;

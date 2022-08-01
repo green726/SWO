@@ -462,6 +462,8 @@ public static class Parser
                     }
                     parent?.addChild(token);
                     break;
+                case AST.Node.NodeType.Prototype:
+                    break;
                 default:
                     parent?.addChild(token);
                     break;
@@ -483,9 +485,17 @@ public static class Parser
                 case AST.Node.NodeType.Prototype:
                     if (token.value == ")")
                     {
-                        parent = new AST.Function((AST.Prototype)parent);
-                        delimLevel--;
-                        return (parent, delimLevel);
+                        if (tokenList[tokenIndex + 1].value == "{")
+                        {
+                            parent = new AST.Function((AST.Prototype)parent);
+                            delimLevel--;
+                            return (parent, delimLevel);
+                        }
+                        else
+                        {
+                            nodes.Add(parent);
+                            break;
+                        }
                     }
                     else if (token.value == "]")
                     {

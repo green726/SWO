@@ -78,6 +78,11 @@ public class BinaryExpression : Expression
                 varAss.addChild(this);
                 return;
             }
+            else if (this.parent.nodeType == NodeType.VariableExpression)
+            {
+                this.leftHand = parent;
+                this.parent = parent.parent;
+            }
             else
             {
                 Parser.checkNode(previousNode, Parser.binaryExpectedNodes);

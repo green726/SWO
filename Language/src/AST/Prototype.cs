@@ -57,13 +57,12 @@ public class Prototype : AST.Node
             this.arguments = new Dictionary<Type, string>();
         }
 
-
+        Parser.nodes.Add(this);
     }
 
 
     public void addArgs(List<Util.Token> arguments)
     {
-
         foreach (Util.Token item in arguments)
         {
             // Console.WriteLine("funcArgs " + item.value);
@@ -110,6 +109,5 @@ public class Prototype : AST.Node
         {
             addArgs(new List<Util.Token>() { item });
         }
-
     }
 }

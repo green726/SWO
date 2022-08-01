@@ -24,14 +24,23 @@ public class CompileCommandSettings : CommandSettings
     [CommandArgument(0, "[resultFileName]")]
     public string resultFileName { get; set; } = "";
 
-    public FileType resultFileType = FileType.NativeExecutable;
+    public FileType resultFileType
+    {
+        get
+        {
+            return (FileType)Enum.Parse(typeof(FileType), resultFileTypeStr, true);
+        }
+        set
+        {
+        }
+    }
 
     public CompileCommandSettings()
     {
         this.targetOSName = Util.checkOs();
-        Enum.TryParse(resultFileTypeStr, out FileType resultFileType);
 
-        if (path == "") {
+        if (path == "")
+        {
             this.path = Environment.CurrentDirectory;
         }
     }
