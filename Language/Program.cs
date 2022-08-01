@@ -43,7 +43,7 @@ public static class HISS
             Console.WriteLine(token.type + " " + token.value);
         }
 
-        List<AST.Node> nodes = Parser.beginParse(lexedContent);
+        List<AST.Node> nodes = Parser.parseForLoop(lexedContent);
         ModuleGen.GenerateModule(nodes);
 
 
@@ -80,7 +80,7 @@ public static class HISS
         //     Console.WriteLine(token.type + " " + token.value);
         // }
 
-        List<AST.Node> nodes = Parser.beginParse(lexedContent);
+        List<AST.Node> nodes = Parser.parseForLoop(lexedContent);
         //TODO: write some code in the parser that will (when it hits a using statement) read the text from that file (or package) - lex it, and parse it all inserted into the current point in the ASTNodes list then continue on parsing the main file and eventually codegen that
         ModuleGen.GenerateModule(nodes);
 

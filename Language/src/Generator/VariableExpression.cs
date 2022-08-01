@@ -18,11 +18,20 @@ public class VariableExpression : Base
         {
             LLVMValueRef varRef = generateVarRef();
             LLVMValueRef gepRef = generateGEP(varRef);
+            Console.WriteLine("genned GEP");
             LLVMValueRef gepLoadRef = LLVM.BuildLoad(builder, gepRef, varExpr.value);
             valueStack.Push(gepLoadRef);
+            Console.WriteLine(gepLoadRef);
             return;
         }
+        else if (this.varExpr.isPointer)
+        {
+            valueStack.Push(generateVarRef());
+            return;
+        }
+        Console.WriteLine("generating load ref");
         LLVMValueRef loadRef = generateVarLoad();
+        Console.WriteLine("genned load ref");
         valueStack.Push(loadRef);
     }
 
@@ -39,8 +48,10 @@ public class VariableExpression : Base
             {
                 if (namedValuesLLVM.ContainsKey(varExpr.value))
                 {
-                    varRef = namedValuesLLVM[varExpr.value]; if (varRef.Pointer != IntPtr.Zero)
+                    varRef = namedValuesLLVM[varExpr.value];
+                    if (varRef.Pointer != IntPtr.Zero)
                     {
+                        Console.WriteLine("hello 1");
                         return varRef;
                     }
                 }
@@ -66,29 +77,53 @@ public class VariableExpression : Base
 
     public LLVMValueRef generateGEP(LLVMValueRef varPtr)
     {
-        // LLVMValueRef valueRef =
+        Console.WriteLine("varPtr: " + varPtr);
+
         List<LLVMValueRef> childValueList = new List<LLVMValueRef>();
-        childValueList.Add(LLVM.ConstInt(LLVMTypeRef.Int64Type(), 0, false));
-        int arraySize = (int)LLVM.GetArrayLength(LLVM.GetElementType(varPtr.TypeOf()));
-        Console.WriteLine("array size: " + arraySize);
-        foreach (AST.Node node in varExpr.children)
+
+        LLVMTypeRef varType = varPtr.TypeOf();
+        if (LLVM.GetTypeKind(varType) == LLVMTypeKind.LLVMPointerTypeKind)
         {
-            AST.NumberExpression numExpr = (AST.NumberExpression)node;
-            numExpr.value += Config.settings.variable.arrays.startIndex;
-            if (Config.settings.variable.arrays.outOfBoundsErrorEnabled && numExpr.value > arraySize)
+            Console.WriteLine("pointer detected");
+            Console.WriteLine(varPtr);
+            foreach (AST.Node node in varExpr.children)
             {
-                throw ParserException.FactoryMethod("Index out of range", "Make the index in range", varExpr);
+                AST.NumberExpression numExpr = (AST.NumberExpression)node;
+                numExpr.value += Config.settings.variable.arrays.startIndex;
+                numExpr.generator.generate();
+                childValueList.Add(valueStack.Pop());
             }
-            numExpr.generator.generate();
-            childValueList.Add(valueStack.Pop());
+            if (childValueList.Count() < 1)
+            {
+                throw ParserException.FactoryMethod("No index references were found in array reference", "Add in index reference (\"[1]\")", varExpr);
+            }
         }
-
-
-        if (childValueList.Count() <= 1)
+        else
         {
-            throw ParserException.FactoryMethod("No index references were found in array reference", "Add in index reference (\"[1]\")", varExpr);
+            childValueList.Add(LLVM.ConstInt(LLVMTypeRef.Int64Type(), 0, false));
+            int arraySize = (int)LLVM.GetArrayLength(varType);
+            Console.WriteLine("array size: " + arraySize);
+            foreach (AST.Node node in varExpr.children)
+            {
+                AST.NumberExpression numExpr = (AST.NumberExpression)node;
+                numExpr.value += Config.settings.variable.arrays.startIndex;
+                if (Config.settings.variable.arrays.outOfBoundsErrorEnabled && numExpr.value > arraySize)
+                {
+                    throw ParserException.FactoryMethod("Index out of range", "Make the index in range", varExpr);
+                }
+                numExpr.generator.generate();
+                childValueList.Add(valueStack.Pop());
+            }
+            if (childValueList.Count() <= 1)
+            {
+                throw ParserException.FactoryMethod("No index references were found in array reference", "Add in index reference (\"[1]\")", varExpr);
+            }
         }
-        return LLVM.BuildInBoundsGEP(builder, varPtr, childValueList.ToArray(), varExpr.value);
+
+
+
+        Console.WriteLine("building GEP with var ptr of: " + varPtr);
+        return LLVM.BuildGEP(builder, varPtr, childValueList.ToArray(), varExpr.value);
 
         // throw ParserException.FactoryMethod("Too many index references were found in array reference", "Remove some index references (\"[1]\")", varExpr);
     }
@@ -96,7 +131,15 @@ public class VariableExpression : Base
     public LLVMValueRef generateVarLoad()
     {
         LLVMValueRef varRef = generateVarRef();
-        return LLVM.BuildLoad(builder, varRef, varExpr.value);
+        Console.WriteLine(varRef);
+        if (namedGlobalsAST.ContainsKey(varExpr.value))
+        {
+            return LLVM.BuildLoad(builder, varRef, varExpr.value);
+        }
+        else
+        {
+            return varRef;
+        }
     }
 
 

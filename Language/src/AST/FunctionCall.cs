@@ -12,6 +12,7 @@ public class FunctionCall : AST.Node
     public FunctionCall(Util.Token token, List<AST.Node>? args, bool? builtInExpected = false, AST.Node? parent = null, bool topLevel = false) : base(token)
 
     {
+        this.newLineReset = true;
         this.nodeType = NodeType.FunctionCall;
         this.generator = new Generator.FunctionCall(this);
 

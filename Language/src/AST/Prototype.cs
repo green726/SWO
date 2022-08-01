@@ -71,28 +71,13 @@ public class Prototype : AST.Node
             {
                 Parser.checkToken(item, expectedType: Util.TokenType.Keyword);
                 prevType = new Type(new Util.Token(Util.TokenType.Keyword, item.value, this.line, this.column));
-                // switch (item.value)
-                // {
-                //     case "double":
-                //         prevType = new TypeAST("double");
-                //         break;
-                //     case "int":
-                //         prevType = new TypeAST("int");
-                //         break;
-                //     case "string":
-                //         prevType = new TypeAST("string");
-                //         break;
-                //     default:
-                //         throw new ArgumentException($"expected type declaration but got something else at {item.line}:{item.column}");
-                // }
             }
             else
             {
-                Console.WriteLine("hi" + item.value);
                 //TODO: replace with config delim
                 if (item.value == "[" || item.value == "]")
                 {
-                    Console.WriteLine("EE");
+                    Console.WriteLine("array param detected");
                     prevType.addChild(item);
                     return;
                 }

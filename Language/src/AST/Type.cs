@@ -9,11 +9,19 @@ public class Type : AST.Node
     public int? size = null;
     public bool isArray = false;
 
+    public bool isPointer;
+    private bool parsingArray = false;
 
     public Type(Util.Token token) : base(token)
     {
         this.nodeType = NodeType.Type;
         this.generator = new Generator.Type(this);
+
+        if (token.value.EndsWith("*"))
+        {
+            this.isPointer = true;
+            token.value.Remove(token.value.Length - 1);
+        }
 
         this.value = token.value;
     }
@@ -23,7 +31,38 @@ public class Type : AST.Node
         this.nodeType = NodeType.Type;
         this.generator = new Generator.Type(this);
 
+        if (value.EndsWith("*"))
+        {
+            this.isPointer = true;
+            value.Remove(value.Length - 1);
+        }
+
         this.value = value;
+    }
+
+    public override void addChild(Util.Token child)
+    {
+        if (child.value == "[")
+        {
+            this.isArray = true;
+            this.parsingArray = true;
+        }
+        else if (parsingArray)
+        {
+            if (child.value == "]")
+            {
+                this.parsingArray = false;
+            }
+            else if (child.type == Util.TokenType.Double || child.type == Util.TokenType.Int)
+            {
+                this.size = int.Parse(child.value);
+            }
+            else
+            {
+                throw new ParserException("Illegal array size declaration in type", child);
+            }
+        }
+        base.addChild(child);
     }
 
     private void checkTypes(string value)

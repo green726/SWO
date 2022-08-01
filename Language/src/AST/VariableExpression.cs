@@ -6,6 +6,8 @@ public class VariableExpression : Expression
     private bool parsingArray = false;
     public bool isArrayIndexRef = false;
 
+    public bool isPointer = false;
+
     public VariableExpression(Util.Token token, AST.Node? parent = null, bool parentRequired = true) : base(token)
     {
         this.nodeType = NodeType.VariableExpression;
@@ -18,9 +20,18 @@ public class VariableExpression : Expression
             this.value = splitStr[0];
             this.addChild(new NumberExpression(new Util.Token(Util.TokenType.Int, splitStr[1], token.line, token.column + 1), this));
         }
-        value = token.value;
+
+
+
+        this.value = token.value;
         this.parent = parent;
 
+        if (token.value.EndsWith("*"))
+        {
+            Console.WriteLine("pointer var ref detected");
+            this.isPointer = true;
+            this.value = token.value.Remove(this.value.Length - 1, 1);
+        }
 
         // bool exists = false;
         //NOTE: below is commented out b/c i think that LLVm IR will do it for me

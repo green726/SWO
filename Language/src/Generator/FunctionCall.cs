@@ -58,6 +58,7 @@ public class FunctionCall : Base
     public void generateBuiltinCall()
     {
         AST.StringExpression printFormat;
+
         switch (funcCall.functionName)
         {
             case "print":
@@ -80,18 +81,12 @@ public class FunctionCall : Base
                 AST.FunctionCall printNLCall = new AST.FunctionCall(new Util.Token(Util.TokenType.Keyword, "print!", funcCall.line, funcCall.column), new List<AST.Node>() { new AST.VariableExpression(new Util.Token(Util.TokenType.Keyword, "nl", funcCall.line, funcCall.column), parentRequired: false) }, true, funcCall.parent, false);
                 break;
         }
-
-
         LLVMValueRef funcRef = LLVM.GetNamedFunction(module, funcCall.functionName);
-
 
         if (funcRef.Pointer == IntPtr.Zero)
         {
             throw new GenException($"Unknown function ({funcCall.functionName}) referenced", funcCall);
         }
-
-
-
         if (LLVM.CountParams(funcRef) != funcCall.args.Count)
         {
             throw new GenException($"Incorrect # arguments passed ({funcCall.args.Count} passed but {LLVM.CountParams(funcRef)} required)", funcCall);

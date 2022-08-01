@@ -41,6 +41,10 @@ public static class IRGen
                 return new AST.Type(new Util.Token(Util.TokenType.Keyword, "double", parent.line, parent.column));
             case LLVMTypeKind.LLVMIntegerTypeKind:
                 return new AST.Type(new Util.Token(Util.TokenType.Keyword, "int", parent.line, parent.column));
+            case LLVMTypeKind.LLVMPointerTypeKind:
+                return new AST.Type(new Util.Token(Util.TokenType.Keyword, "int", parent.line, parent.column));
+
+
         }
 
         throw GenException.FactoryMethod($"An unknown or unsupported type ({type.TypeKind.ToString()}) was used", "You used an undefined or illegal type | Likely a typo", parent, true, type.TypeKind.ToString());

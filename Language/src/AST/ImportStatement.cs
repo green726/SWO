@@ -49,8 +49,10 @@ public class ImportStatement : Node
         List<Util.Token> tokens = Lexer.lex(importFileValue);
 
         List<Util.Token> previousTokenList = Parser.tokenList;
-        Parser.tokenList = tokens;
-        Parser.parseTokenRecursive(tokens[0], 0);
+        Parser.tokenList.InsertRange(Parser.currentTokenNum, tokens);
+        // Parser.tokenList = tokens;
+        // Parser.parseTokenRecursive(tokens[0], 0);
+
         Parser.tokenList = previousTokenList;
 
         base.addChild(child);
