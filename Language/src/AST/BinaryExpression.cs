@@ -83,6 +83,12 @@ public class BinaryExpression : Expression
                 this.leftHand = parent;
                 this.parent = parent.parent;
             }
+            else if (this.parent.nodeType == NodeType.Return)
+            {
+                Return ret = (Return)parent;
+                this.leftHand = ret.expr;
+                ret.expr = this;
+            }
             else
             {
                 Parser.checkNode(previousNode, Parser.binaryExpectedNodes);

@@ -11,7 +11,9 @@ public class Prototype : AST.Node
 
     public Type returnType;
 
-    public Prototype(Util.Token token, List<Util.Token> arguments = null, bool startWithRet = false) : base(token)
+    public bool external = false;
+
+    public Prototype(Util.Token token, List<Util.Token> arguments = null, bool startWithRet = false, bool external = false) : base(token)
     {
         this.nodeType = NodeType.Prototype;
         this.generator = new Generator.Prototype(this);
@@ -57,7 +59,14 @@ public class Prototype : AST.Node
             this.arguments = new Dictionary<Type, string>();
         }
 
-        Parser.nodes.Add(this);
+        //TODO: replace this node type with external section
+        if (external/*  || parent.nodeType == NodeType.BinaryExpression */)
+        {
+
+            // Parser.nodes.Add(this);
+        }
+        this.external = external;
+
     }
 
 

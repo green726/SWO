@@ -3,6 +3,21 @@ namespace Generator;
 using LLVMSharp;
 using static IRGen;
 
+public class IfStatementDeclaration : Base
+{
+    AST.IfStatementDeclaration dec;
+
+    public IfStatementDeclaration(AST.Node node)
+    {
+        this.dec = (AST.IfStatementDeclaration)node;
+    }
+
+    public override void generate()
+    {
+        dec.expression.generator.generate();
+    }
+}
+
 public class IfStatement : Base
 {
     AST.IfStatement ifStat;
@@ -15,7 +30,7 @@ public class IfStatement : Base
     public override void generate()
     {
         //evaluates the condition as a bool
-        ifStat.expression.generator.generate();
+        ifStat.declaration.generator.generate();
         LLVMValueRef condValue = valueStack.Pop();
 
         // Console.WriteLine("llvm module dump post condValue below");

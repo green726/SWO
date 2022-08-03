@@ -52,6 +52,7 @@ public abstract class Node
         StringExpression,
         Type,
         IfStatement,
+        IfStatementDeclaration,
         ElseStatement,
         ForLoop,
         PhiVariable,

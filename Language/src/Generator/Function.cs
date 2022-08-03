@@ -61,8 +61,10 @@ public class Function : Base
         //     LLVM.DeleteFunction(function);
         //     throw;
         // }
-        
-        LLVM.BuildRetVoid(builder);
+
+        if (!this.topLevelRet) {
+            LLVM.BuildRetVoid(builder);
+        }
 
         LLVM.VerifyFunction(function, LLVMVerifierFailureAction.LLVMPrintMessageAction);
 

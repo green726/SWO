@@ -30,6 +30,7 @@ public static class Parser
     public static int finalTokenNum = 0;
     public static int currentTokenNum = 0;
     public static bool isFinishedParsing = false;
+    public static Stack<AST.Node> parentStack = new Stack<AST.Node>();
 
     public static void checkNode(AST.Node? node, AST.Node.NodeType[] expectedTypes)
     {
@@ -144,7 +145,7 @@ public static class Parser
 
     public static string printIfStat(AST.IfStatement ifStat)
     {
-        return $"if statement with expression of {printBinary(ifStat.expression)} and body of ( {printASTRet(ifStat.thenFunc.body)} ) body end | else statement: {printElseStat(ifStat.elseStat)}";
+        return $"if statement with expression of {printBinary(ifStat.declaration.expression)} and body of ( {printASTRet(ifStat.thenFunc.body)} ) body end | else statement: {printElseStat(ifStat.elseStat)}";
     }
 
     public static string printElseStat(AST.ElseStatement elseStat)
@@ -318,16 +319,16 @@ public static class Parser
         }
         else if (token.value == Config.settings.function.ret.keyword)
         {
-            if (parent?.nodeType == AST.Node.NodeType.Function)
-            {
-                AST.Return retNode = new AST.Return(token, parent);
-                return (retNode, delimLevel);
-                // return new List<dynamic>() { retNode, delimLevel };
-            }
-            else
-            {
-                throw ParserException.FactoryMethod($"Illegal usage of function return keyword ({Config.settings.function.ret.keyword})", "Delete the keyword | Fix a typo", token, typoSuspected: true);
-            }
+            // if (parent?.nodeType == AST.Node.NodeType.Function)
+            // {
+            AST.Return retNode = new AST.Return(token, parent);
+            return (retNode, delimLevel);
+            // return new List<dynamic>() { retNode, delimLevel };
+            // }
+            // else
+            // {
+            //     throw ParserException.FactoryMethod($"Illegal usage of function return keyword ({Config.settings.function.ret.keyword})", "Delete the keyword | Fix a typo", token, typoSuspected: true);
+            // }
         }
         else if (token.value == Config.settings.general.import.keyword)
         {
@@ -342,7 +343,7 @@ public static class Parser
         }
         else if (token.value == "if")
         {
-            AST.IfStatement ifStat = new AST.IfStatement(token, parent);
+            AST.IfStatementDeclaration ifStat = new AST.IfStatementDeclaration(token, parent);
             return (ifStat, delimLevel);
         }
         else if (token.value == "else")
@@ -354,6 +355,11 @@ public static class Parser
         {
             AST.ForLoop forLoop = new AST.ForLoop(token, parent);
             return (forLoop, delimLevel);
+        }
+        else if (token.value == Config.settings.function.declaration.externKeyword)
+        {
+            AST.Prototype proto = new AST.Prototype(token, external: true);
+            return (proto, delimLevel);
         }
         else if (Config.settings.function.declaration.marker.word && token.value == Config.settings.function.declaration.marker.value)
         {
@@ -458,7 +464,9 @@ public static class Parser
                     //TODO: replace this with the config delimiter
                     if (token.value == "{")
                     {
-                        return (new AST.ArrayExpression(token, parent), delimLevel + 1);
+                        AST.ArrayExpression arrExpr = new AST.ArrayExpression(token, parent);
+                        parentStack.Push(arrExpr);
+                        return (arrExpr, delimLevel + 1);
                     }
                     parent?.addChild(token);
                     break;
@@ -468,16 +476,18 @@ public static class Parser
                     parent?.addChild(token);
                     break;
             }
+            Console.WriteLine("pushing parent with node type of " + parent.nodeType + " to parent stack and parent parent of node type " + parent?.parent?.nodeType);
+            parentStack.Push(parent);
             delimLevel++;
         }
         else if (token.type == Util.TokenType.DelimiterClose)
         {
+            AST.Node delimParent = parentStack.Pop();
             switch (parent?.nodeType)
             {
                 case AST.Node.NodeType.ForLoop:
                     delimLevel--;
                     return (parent, delimLevel);
-                // return new List<dynamic>() { parent, delimLevel };
                 case AST.Node.NodeType.IfStatement:
                     break;
                 case AST.Node.NodeType.Function:
@@ -523,7 +533,8 @@ public static class Parser
             }
             else
             {
-                parent = parent?.parent;
+                Console.WriteLine("setting parent to delim parent of node type " + delimParent?.parent?.nodeType);
+                parent = delimParent.parent;
             }
         }
 
@@ -546,12 +557,15 @@ public static class Parser
 
         finalTokenNum = tokenList.Count();
 
+        bool singleLineComment = false;
+        bool multiLineComment = false;
+
         while (!isFinishedParsing)
         {
+
             isFinishedParsing = currentTokenNum == finalTokenNum;
 
             Util.Token token = tokenList[currentTokenNum];
-
 
             prevLine = token.line;
             prevColumn = token.column;
@@ -565,11 +579,19 @@ public static class Parser
             }
             else if (token.type == Util.TokenType.EOL)
             {
+                if (singleLineComment)
+                {
+                    singleLineComment = false;
+                    currentTokenNum++;
+                    continue;
+                }
+
                 if (delimLevel > 0)
                 {
                     while (parent?.newLineReset == true)
                     {
                         parent = parent.parent;
+                currentTokenNum++;
                         continue;
                     }
                 }
@@ -585,6 +607,31 @@ public static class Parser
                     currentTokenNum++;
                     continue;
                 }
+            }
+
+            if (token.value == Config.settings.general.comment.singleLine)
+            {
+                singleLineComment = true;
+                currentTokenNum++;
+                continue;
+            }
+            else if (token.value == Config.settings.general.comment.multiLineOpen)
+            {
+                multiLineComment = true;
+                currentTokenNum++;
+                continue;
+            }
+            else if (token.value == Config.settings.general.comment.multiLineClose)
+            {
+                multiLineComment = false;
+                currentTokenNum++;
+                continue;
+            }
+
+            if (singleLineComment || multiLineComment)
+            {
+                currentTokenNum++;
+                continue;
             }
 
             if (expectedTypes != null)
@@ -646,9 +693,10 @@ public static class Parser
 
             if (token.isDelim)
             {
-                (AST.Node delimParent, int delimReturnLevel) = parseDelim(token, currentTokenNum, parent, delimLevel);
+                (AST.Node delimParentRet, int delimReturnLevel) = parseDelim(token, currentTokenNum, parent, delimLevel);
                 currentTokenNum++;
-                parent = delimParent;
+                Console.WriteLine("delim returned parent of " + delimParentRet?.nodeType);
+                parent = delimParentRet;
                 delimLevel = delimReturnLevel;
                 continue;
                 // return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, delimParent, delimLevel: delimRet[1]);

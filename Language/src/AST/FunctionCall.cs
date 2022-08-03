@@ -3,7 +3,7 @@ namespace AST;
 using System.Collections.Generic;
 using System.Linq;
 
-public class FunctionCall : AST.Node
+public class FunctionCall : Expression
 {
     public string? functionName;
     public bool builtIn = false;
@@ -30,10 +30,6 @@ public class FunctionCall : AST.Node
 
         this.functionName = this.builtIn ? builtinName : token.value;
         this.args = args ??= new List<AST.Node>();
-
-        //NOTE: commented out below is to throw in an anonymous function
-        // PrototypeAST proto = new PrototypeAST();
-        // FunctionAST func = new FunctionAST(proto, this);
 
         if (parent != null)
         {

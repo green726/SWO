@@ -47,6 +47,8 @@ public class FunctionDeclarationModel
     public FunctionDeclarationBody body { get; set; } = new FunctionDeclarationBody();
     public bool reorder { get; set; } = false;
     public ReturnTypeLocation returnTypeLocation { get; set; } = ReturnTypeLocation.Start;
+
+    public string externKeyword {get; set;} = "extern";
 }
 
 public enum ReturnTypeLocation

@@ -4,7 +4,16 @@ public class GeneralModel
     public ImportModel import { get; set; } = new ImportModel();
     public TopLevelModel topLevel { get; set; } = new TopLevelModel();
 
+    public CommentModel comment { get; set; } = new CommentModel();
+
     public LinkerModel linker { get; set; } = new LinkerModel();
+}
+
+public class CommentModel
+{
+    public string singleLine {get; set;}= "//";
+    public string multiLineOpen {get; set; } = "/*";
+    public string multiLineClose {get; set;} = "*/";
 }
 
 public class LinkerModel

@@ -25,15 +25,6 @@ public class BinaryExpression : Base
             case AST.Node.NodeType.BinaryExpression:
                 leftHand = valueStack.Pop();
                 break;
-            case AST.Node.NodeType.NumberExpression:
-                AST.NumberExpression numExpr = (AST.NumberExpression)binExpr.leftHand;
-                binExpr.leftHand.generator.generate();
-                leftHand = valueStack.Pop();
-                if (numExpr.type.value == "int")
-                {
-                    intMath = true;
-                }
-                break;
             default:
                 binExpr.leftHand.generator.generate();
                 leftHand = valueStack.Pop();
@@ -42,42 +33,63 @@ public class BinaryExpression : Base
 
         switch (binExpr.rightHand.nodeType)
         {
-            case AST.Node.NodeType.NumberExpression:
-                AST.NumberExpression numExpr = (AST.NumberExpression)binExpr.rightHand;
-                binExpr.rightHand.generator.generate();
-                rightHand = valueStack.Pop();
-                if (numExpr.type.value == "int")
-                {
-                    intMath = true;
-                }
-                break;
             default:
                 binExpr.rightHand.generator.generate();
                 rightHand = valueStack.Pop();
                 break;
         }
 
-        switch (binExpr.operatorType)
+        if (LLVM.GetTypeKind(rightHand.TypeOf()) == LLVMTypeKind.LLVMIntegerTypeKind)
         {
-            case AST.BinaryExpression.OperatorType.Add:
-                if (intMath)
-                {
-                    ir = LLVM.BuildAdd(builder, leftHand, rightHand, "addtmp");
-                }
-                else
-                {
-                    ir = LLVM.BuildFAdd(builder, leftHand, rightHand, "addtmp");
-                }
-                break;
-            case AST.BinaryExpression.OperatorType.Equals:
-                ir = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealUEQ, leftHand, rightHand, "comparetmp");
-                break;
-            case AST.BinaryExpression.OperatorType.LessThan:
-                LLVM.DumpValue(leftHand);
-                LLVMValueRef cmpRef = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealULT, leftHand, rightHand, "comparetmp");
-                ir = LLVM.BuildUIToFP(builder, cmpRef, LLVMTypeRef.DoubleType(), "booltmp");
-                break;
+            intMath = true;
         }
+
+        if (intMath)
+        {
+            switch (binExpr.operatorType)
+            {
+                case AST.BinaryExpression.OperatorType.Add:
+                    ir = LLVM.BuildAdd(builder, leftHand, rightHand, "addtmp");
+                    break;
+                case AST.BinaryExpression.OperatorType.Subtract:
+                    ir = LLVM.BuildSub(builder, leftHand, rightHand, "subtmp");
+                    break;
+                case AST.BinaryExpression.OperatorType.Equals:
+                    ir = LLVM.BuildICmp(builder, LLVMIntPredicate.LLVMIntEQ, leftHand, rightHand, "comparetmp");
+                    break;
+                case AST.BinaryExpression.OperatorType.LessThan:
+                    LLVM.DumpValue(leftHand);
+                    LLVMValueRef cmpRef = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealULT, leftHand, rightHand, "comparetmp");
+                    ir = LLVM.BuildUIToFP(builder, cmpRef, LLVMTypeRef.DoubleType(), "booltmp");
+                    break;
+            }
+        }
+
+        else
+        {
+
+            switch (binExpr.operatorType)
+            {
+                case AST.BinaryExpression.OperatorType.Add:
+                    ir = LLVM.BuildFAdd(builder, leftHand, rightHand, "addtmp");
+                    break;
+                case AST.BinaryExpression.OperatorType.Subtract:
+                    ir = LLVM.BuildFSub(builder, leftHand, rightHand, "subtmp");
+                    break;
+                case AST.BinaryExpression.OperatorType.Equals:
+                    ir = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealUEQ, leftHand, rightHand, "comparetmp");
+                    break;
+                case AST.BinaryExpression.OperatorType.LessThan:
+                    LLVM.DumpValue(leftHand);
+                    LLVMValueRef cmpRef = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealULT, leftHand, rightHand, "comparetmp");
+                    ir = LLVM.BuildUIToFP(builder, cmpRef, LLVMTypeRef.DoubleType(), "booltmp");
+                    break;
+            }
+        }
+
+        Spectre.Console.AnsiConsole.MarkupLine("[red]binExpr dump below:[/] ");
+
+        LLVM.DumpValue(ir);
 
         valueStack.Push(ir);
 

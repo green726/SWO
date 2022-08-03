@@ -10,7 +10,6 @@ public class Return : Node
         this.newLineReset = true;
         this.generator = new Generator.Return(this);
 
-
         if (parent == null)
         {
             throw ParserException.FactoryMethod("Parentless (functionless) return keyword", "Delete the return or fix a typo", token, typoSuspected: true);
