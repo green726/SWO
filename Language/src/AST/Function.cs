@@ -11,6 +11,9 @@ public class Function : AST.Node
 
     public bool multiLine = false;
 
+    // public bool utilFunc = false;
+
+
     //NOTE: Constructor 1:
     public Function(Prototype prototype, List<AST.Node>? body = null, bool topLevel = true) : base(prototype)
     {

@@ -145,12 +145,12 @@ public static class Parser
 
     public static string printIfStat(AST.IfStatement ifStat)
     {
-        return $"if statement with expression of {printBinary(ifStat.declaration.expression)} and body of ( {printASTRet(ifStat.thenFunc.body)} ) body end | else statement: {printElseStat(ifStat.elseStat)}";
+        return $"if statement with expression of {printBinary(ifStat.declaration.expression)} and body of ( {printASTRet(ifStat.thenBody)} ) body end | else statement: {printElseStat(ifStat.elseStat)}";
     }
 
     public static string printElseStat(AST.ElseStatement elseStat)
     {
-        return $"else statement with body of ( {printASTRet(elseStat.elseFunc.body)} )";
+        return $"else statement with body of ( {printASTRet(elseStat.elseBody)} )";
     }
 
     public static string printForLoop(AST.ForLoop forLoop)
@@ -348,7 +348,7 @@ public static class Parser
         }
         else if (token.value == "else")
         {
-            AST.IfStatement ifParent = (AST.IfStatement)parent;
+            AST.IfStatement ifParent = (AST.IfStatement)parent.children.Last();
             return (ifParent.elseStat, delimLevel);
         }
         else if (token.value == "for")
@@ -476,7 +476,7 @@ public static class Parser
                     parent?.addChild(token);
                     break;
             }
-            Console.WriteLine("pushing parent with node type of " + parent.nodeType + " to parent stack and parent parent of node type " + parent?.parent?.nodeType);
+            // Console.WriteLine("pushing parent with node type of " + parent.nodeType + " to parent stack and parent parent of node type " + parent?.parent?.nodeType);
             parentStack.Push(parent);
             delimLevel++;
         }
@@ -523,7 +523,7 @@ public static class Parser
                     delimLevel--;
                     return (parent, delimLevel);
                 default:
-                    parent?.addChild(token);
+                    delimParent?.addChild(token);
                     break;
             }
             delimLevel--;
@@ -533,7 +533,7 @@ public static class Parser
             }
             else
             {
-                Console.WriteLine("setting parent to delim parent of node type " + delimParent?.parent?.nodeType);
+                // Console.WriteLine("setting parent to delim parent of node type " + delimParent?.nodeType + " with parent of node type " + delimParent?.parent?.nodeType);
                 parent = delimParent.parent;
             }
         }
@@ -547,6 +547,13 @@ public static class Parser
         addLanguageBuiltins();
 
         tokenList = _tokenList;
+
+        // AnsiConsole.MarkupLine("[red]tokens[/]");
+        // foreach (Util.Token token in tokenList)
+        // {
+        //     Console.WriteLine(token.value + " " + token.type);
+        // }
+        // AnsiConsole.MarkupLine("[red]end tokens[/]");
 
         AST.Node? parent = null;
         int delimLevel = 0;
@@ -570,7 +577,7 @@ public static class Parser
             prevLine = token.line;
             prevColumn = token.column;
 
-            Console.WriteLine($"token of value: {token.value} and type of {token.type} and parent of {parent?.nodeType}");
+            Console.WriteLine($"token of value: {token.value} and type of {token.type} and parent of {parent?.nodeType} and num of {currentTokenNum}");
             AST.Node? previousNode = nodes.Count > 0 && currentTokenNum > 0 ? nodes.Last() : null;
 
             if (token.type == Util.TokenType.EOF)
@@ -591,9 +598,10 @@ public static class Parser
                     while (parent?.newLineReset == true)
                     {
                         parent = parent.parent;
-                currentTokenNum++;
-                        continue;
+
                     }
+                    currentTokenNum++;
+                    continue;
                 }
 
                 if (parent?.nodeType != AST.Node.NodeType.Function && parent?.nodeType != AST.Node.NodeType.IfStatement && parent?.nodeType != AST.Node.NodeType.ElseStatement && parent?.nodeType != AST.Node.NodeType.ForLoop /* && tokenList[tokenIndex - 1].value != "{" */ && delimLevel == 0)

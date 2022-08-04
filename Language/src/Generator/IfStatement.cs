@@ -43,20 +43,28 @@ public class IfStatement : Base
 
         LLVMBasicBlockRef elseBlock = LLVM.AppendBasicBlock(parentBlock, "else");
 
-        LLVMBasicBlockRef mergeBlock = LLVM.AppendBasicBlock(parentBlock, "ifCont");
+        LLVMBasicBlockRef mergeBlock = LLVM.AppendBasicBlock(parentBlock, "ifMerge");
 
         LLVM.BuildCondBr(builder, condValue, thenBlock, elseBlock);
 
-        ifStat.thenFunc.generator.generate();
-        ifStat.elseStat.elseFunc.generator.generate();
+        // ifStat.thenFunc.generator.generate();
+        // ifStat.elseStat.elseFunc.generator.generate();
 
         //puts builder at the end of the then block to write code for it
         LLVM.PositionBuilderAtEnd(builder, thenBlock);
 
+        List<LLVMValueRef> thenBodyValues = new List<LLVMValueRef>();
+        foreach (AST.Node node in ifStat.thenBody)
+        {
+            Console.WriteLine("generating if then body node with type of " + node.nodeType);
+            node.generator.generate();
+            thenBodyValues.Add(valueStack.Pop());
+        }
 
-        ifStat.thenCall.generator.generate();
-        LLVMValueRef thenValRef = valueStack.Pop();
+        Console.WriteLine("finished genning if then body");
 
+        // ifStat.thenCall.generator.generate();
+        // LLVMValueRef thenValRef = valueStack.Pop();
 
         //phi node stuff
         LLVM.BuildBr(builder, mergeBlock);
@@ -64,13 +72,21 @@ public class IfStatement : Base
         //reset the then block in case builder was moved while populating it
         thenBlock = LLVM.GetInsertBlock(builder);
 
-
         //position the builder for the else
         LLVM.PositionBuilderAtEnd(builder, elseBlock);
 
-        ifStat.elseStat.elseCall.generator.generate();
-        LLVMValueRef elseValRef = valueStack.Pop();
+        List<LLVMValueRef> elseBodyValues = new List<LLVMValueRef>();
+        foreach (AST.Node node in ifStat.elseStat.elseBody)
+        {
+            Console.WriteLine("generating if else body node with type of " + node.nodeType);
+            node.generator.generate();
+            thenBodyValues.Add(valueStack.Pop());
+        }
 
+        Console.WriteLine("finished genning if else body");
+
+        // ifStat.elseStat.elseCall.generator.generate();
+        // LLVMValueRef elseValRef = valueStack.Pop();
 
         LLVM.BuildBr(builder, mergeBlock);
 
@@ -79,16 +95,14 @@ public class IfStatement : Base
 
         // LLVM.PositionBuilderAtEnd(builder, mergeBlock);
 
-
-
         LLVM.PositionBuilderAtEnd(builder, mergeBlock);
 
-        LLVM.PositionBuilderAtEnd(builder, mergeBlock);
+        // LLVM.PositionBuilderAtEnd(builder, mergeBlock);
 
-        LLVMValueRef phiRef = LLVM.BuildPhi(builder, LLVM.DoubleType(), "iftmp");
-        LLVM.AddIncoming(phiRef, new LLVMValueRef[] { thenValRef, elseValRef }, new LLVMBasicBlockRef[] { thenBlock, elseBlock }, 2);
+        // LLVMValueRef phiRef = LLVM.BuildPhi(builder, LLVM.DoubleType(), "iftmp");
+        // LLVM.AddIncoming(phiRef, new LLVMValueRef[] { thenValRef, elseValRef }, new LLVMBasicBlockRef[] { thenBlock, elseBlock }, 2);
 
-        valueStack.Push(phiRef);
+        // valueStack.Push(phiRef);
 
         // LLVM.BuildRet(builder, phiRef);
 

@@ -16,6 +16,9 @@ public class Return : Base
     {
         ret.expr.generator.generate();
         LLVMValueRef retValue = valueStack.Pop();
-        valueStack.Push(LLVM.BuildRet(builder, retValue));
+        // valueStack.Push(LLVM.BuildRet(builder, retValue));
+        LLVMValueRef storeRef = LLVM.BuildStore(builder, retValue, namedMutablesLLVM["retvalue"]);
+        LLVMValueRef brRef = LLVM.BuildBr(builder, funcReturnBlock);
+        valueStack.Push(brRef);
     }
 }

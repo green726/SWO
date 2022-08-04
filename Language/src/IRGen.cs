@@ -28,6 +28,8 @@ public static class IRGen
     public static Dictionary<string, AST.VariableDeclaration> namedGlobalsAST = new Dictionary<string, AST.VariableDeclaration>();
 
     public static LLVMBasicBlockRef mainEntryBlock;
+    public static LLVMBasicBlockRef funcReturnBlock;
+
     public static bool mainBuilt = false;
     public static List<AST.Node> nodesToBuild = new List<AST.Node>();
 
@@ -62,6 +64,7 @@ public static class IRGen
 
         foreach (AST.Node node in nodes)
         {
+            Console.WriteLine("generating node of type " + node.nodeType);
             node.generator.generate();
             Console.WriteLine("successfully evaluated node of type " + node.nodeType);
 

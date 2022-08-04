@@ -58,6 +58,7 @@ public class Prototype : Base
             LLVM.SetValueName(param, argumentName);
 
             namedValuesLLVM[argumentName] = param;
+            Console.WriteLine("created argument with name of " + argumentName);
             argLoopIndex++;
         }
 

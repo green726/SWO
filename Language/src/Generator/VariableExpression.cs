@@ -40,6 +40,8 @@ public class VariableExpression : Base
         LLVMValueRef varRef = LLVM.GetNamedGlobal(module, varExpr.value);
         if (varRef.Pointer == IntPtr.Zero)
         {
+            Console.WriteLine(String.Join(",", namedValuesLLVM.Keys.ToArray()));
+            Console.WriteLine("named values LLVM count " + namedValuesLLVM.Count);
             if (namedMutablesLLVM.ContainsKey(varExpr.value))
             {
                 return namedMutablesLLVM[varExpr.value];
@@ -77,15 +79,12 @@ public class VariableExpression : Base
 
     public LLVMValueRef generateGEP(LLVMValueRef varPtr)
     {
-        Console.WriteLine("varPtr: " + varPtr);
 
         List<LLVMValueRef> childValueList = new List<LLVMValueRef>();
 
         LLVMTypeRef varType = varPtr.TypeOf();
         if (LLVM.GetTypeKind(varType) == LLVMTypeKind.LLVMPointerTypeKind)
         {
-            Console.WriteLine("pointer detected");
-            Console.WriteLine(varPtr);
             foreach (AST.Node node in varExpr.children)
             {
                 AST.NumberExpression numExpr = (AST.NumberExpression)node;
@@ -102,7 +101,6 @@ public class VariableExpression : Base
         {
             childValueList.Add(LLVM.ConstInt(LLVMTypeRef.Int64Type(), 0, false));
             int arraySize = (int)LLVM.GetArrayLength(varType);
-            Console.WriteLine("array size: " + arraySize);
             foreach (AST.Node node in varExpr.children)
             {
                 AST.NumberExpression numExpr = (AST.NumberExpression)node;
@@ -122,7 +120,6 @@ public class VariableExpression : Base
 
 
 
-        Console.WriteLine("building GEP with var ptr of: " + varPtr);
         return LLVM.BuildGEP(builder, varPtr, childValueList.ToArray(), varExpr.value);
 
         // throw ParserException.FactoryMethod("Too many index references were found in array reference", "Remove some index references (\"[1]\")", varExpr);
@@ -131,7 +128,6 @@ public class VariableExpression : Base
     public LLVMValueRef generateVarLoad()
     {
         LLVMValueRef varRef = generateVarRef();
-        Console.WriteLine(varRef);
         if (namedGlobalsAST.ContainsKey(varExpr.value))
         {
             return LLVM.BuildLoad(builder, varRef, varExpr.value);

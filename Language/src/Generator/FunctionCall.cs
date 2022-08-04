@@ -65,7 +65,9 @@ public class FunctionCall : Base
                 // Console.WriteLine("print call detected");
                 funcCall.functionName = "printf";
 
-                printFormat = evaluatePrintFormat();
+                // printFormat = evaluatePrintFormat();
+                printFormat = new AST.StringExpression(new Util.Token(Util.TokenType.String, "\"%d\"", 0, 0), funcCall, true);
+;
                 // Console.WriteLine("successfully evaluated print format");
 
                 funcCall.addChildAtStart(printFormat);
