@@ -21,6 +21,8 @@ public class IfStatementDeclaration : Base
 public class IfStatement : Base
 {
     AST.IfStatement ifStat;
+    public bool thenTopLevelRet = false;
+    public bool elseTopLevelRet = false;
 
     public IfStatement(AST.Node node)
     {
@@ -56,18 +58,21 @@ public class IfStatement : Base
         List<LLVMValueRef> thenBodyValues = new List<LLVMValueRef>();
         foreach (AST.Node node in ifStat.thenBody)
         {
-            Console.WriteLine("generating if then body node with type of " + node.nodeType);
+            if (node.nodeType == AST.Node.NodeType.Return)
+            {
+                this.thenTopLevelRet = true;
+            }
             node.generator.generate();
             thenBodyValues.Add(valueStack.Pop());
         }
 
-        Console.WriteLine("finished genning if then body");
-
         // ifStat.thenCall.generator.generate();
         // LLVMValueRef thenValRef = valueStack.Pop();
 
-        //phi node stuff
-        LLVM.BuildBr(builder, mergeBlock);
+        if (!this.thenTopLevelRet)
+        {
+            LLVM.BuildBr(builder, mergeBlock);
+        }
 
         //reset the then block in case builder was moved while populating it
         thenBlock = LLVM.GetInsertBlock(builder);
@@ -78,17 +83,22 @@ public class IfStatement : Base
         List<LLVMValueRef> elseBodyValues = new List<LLVMValueRef>();
         foreach (AST.Node node in ifStat.elseStat.elseBody)
         {
-            Console.WriteLine("generating if else body node with type of " + node.nodeType);
+            if (node.nodeType == AST.Node.NodeType.Return)
+            {
+                this.elseTopLevelRet = true;
+            }
             node.generator.generate();
             thenBodyValues.Add(valueStack.Pop());
         }
 
-        Console.WriteLine("finished genning if else body");
-
         // ifStat.elseStat.elseCall.generator.generate();
         // LLVMValueRef elseValRef = valueStack.Pop();
 
-        LLVM.BuildBr(builder, mergeBlock);
+        if (!this.elseTopLevelRet)
+        {
+            LLVM.BuildBr(builder, mergeBlock);
+        }
+
 
         //resets else block
         elseBlock = LLVM.GetInsertBlock(builder);

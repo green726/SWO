@@ -31,10 +31,8 @@ public static class ModuleGen
         // Provide basic AliasAnalysis support for GVN.
         LLVM.AddBasicAliasAnalysisPass(passManager);
 
-
         // Promote allocas to registers.
         LLVM.AddPromoteMemoryToRegisterPass(passManager);
-
 
         // Do simple "peephole" optimizations and bit-twiddling optzns.
         LLVM.AddInstructionCombiningPass(passManager);

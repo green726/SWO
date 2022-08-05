@@ -28,7 +28,6 @@ public static class IRGen
     public static Dictionary<string, AST.VariableDeclaration> namedGlobalsAST = new Dictionary<string, AST.VariableDeclaration>();
 
     public static LLVMBasicBlockRef mainEntryBlock;
-    public static LLVMBasicBlockRef funcReturnBlock;
 
     public static bool mainBuilt = false;
     public static List<AST.Node> nodesToBuild = new List<AST.Node>();
@@ -76,7 +75,8 @@ public static class IRGen
             // LLVM.DumpValue(valueStack.Peek());
         }
 
-        // LLVM.RunPassManager(passManager, module);
+        LLVM.VerifyModule(module, LLVMVerifierFailureAction.LLVMPrintMessageAction, out string verifyMessage);
+        LLVM.RunPassManager(passManager, module);
 
         Console.WriteLine("LLVM module dump below");
         LLVM.DumpModule(module);
