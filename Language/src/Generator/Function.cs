@@ -29,10 +29,6 @@ public class Function : Base
 
         LLVM.PositionBuilderAtEnd(builder, entryBlock);
 
-
-
-        LLVM.PositionBuilderAtEnd(builder, entryBlock);
-
         // try
         // {
 

@@ -7,26 +7,9 @@ public static class ModuleGen
         // Make the module, which holds all the code.
         LLVMModuleRef module = LLVM.ModuleCreateWithName("HISS");
         LLVMBuilderRef builder = LLVM.CreateBuilder();
-        // LLVM.LinkInMCJIT();
-        // LLVM.InitializeX86TargetMC();
-        // LLVM.InitializeX86Target();
-        // LLVM.InitializeX86TargetInfo();
-        // LLVM.InitializeX86AsmParser();
-        // LLVM.InitializeX86AsmPrinter();
-        // //
-        // if (LLVM.CreateExecutionEngineForModule(out var engine, module, out var errorMessage).Value == 1)
-        // {
-        //     Console.WriteLine(errorMessage);
-        //     // LLVM.DisposeMessage(errorMessage);
-        //     return;
-        // }
-        //
+
         // Create a function pass manager for this engine
         LLVMPassManagerRef passManager = LLVM.CreatePassManager();
-        //
-        // // Set up the optimizer pipeline.  Start with registering info about how the
-        // // target lays out data structures.
-        // LLVM.DisposeTargetData(LLVM.GetExecutionEngineTargetData(engine));
 
         // Provide basic AliasAnalysis support for GVN.
         LLVM.AddBasicAliasAnalysisPass(passManager);
