@@ -1,5 +1,6 @@
 using LLVMSharp;
 using System.Runtime.InteropServices;
+using System.Diagnostics;
 
 public static class EXE
 {
@@ -158,7 +159,12 @@ public static class EXE
     {
         string fullObjectPath = Path.GetFullPath(@$"{settings.path}/{settings.resultFileName}.o");
 
-        System.Diagnostics.Process process = System.Diagnostics.Process.Start(Config.settings.general.linker.path, Config.settings.general.linker.args + fullObjectPath);
+        Process process = new Process();
+
+        process.StartInfo.FileName = Config.settings.general.linker.path;
+        process.StartInfo.Arguments = Config.settings.general.linker.args + fullObjectPath;
+
+        process.Start();
 
         process.WaitForExit();
 

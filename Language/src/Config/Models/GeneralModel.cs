@@ -38,7 +38,7 @@ public class LinkerModel
                             path = @"C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin\gcc.exe";
                             break;
                         case "linux-x64":
-                            path = @"/usr/bin/";
+                            path = @"/usr/bin/gcc";
                             break;
                     }
                     args = "-O -no-pie ";
