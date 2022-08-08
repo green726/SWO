@@ -6,6 +6,11 @@ public class RunCommand : Command<RunCommandSettings>
 {
     public override int Execute([NotNull] CommandContext context, [NotNull] RunCommandSettings settings)
     {
-        throw new NotImplementedException();
+        CompileCommand compileCommand = new CompileCommand();
+        compileCommand.Execute(context, settings.compileCommandSettings);
+
+        HISS.runProject(settings);
+
+        return 0;
     }
 }

@@ -41,7 +41,7 @@ public class LinkerModel
                             path = @"/usr/bin/gcc";
                             break;
                     }
-                    args = "-O -no-pie ";
+                    args = "-O -no-pie -o";
                     break;
 
             }

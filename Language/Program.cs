@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Diagnostics;
 using Tomlyn;
+using Spectre.Console;
 
 public static class HISS
 {
@@ -59,11 +61,7 @@ public static class HISS
         // projectInfo.checkPath();
         projectInfo.setConfig();
 
-        // Console.WriteLine("TOML re-converted from string to model than back to string below");
-        // Console.WriteLine(Toml.FromModel(projectInfo));
-
         Config.initialize(projectInfo.configFilePath);
-
 
         settings.resultFileName = projectInfo.projectName;
 
@@ -76,15 +74,45 @@ public static class HISS
 
         List<Util.Token> lexedContent = Lexer.lex(fileContents);
 
-        // foreach (Util.Token token in lexedContent)
-        // {
-        //     Console.WriteLine(token.type + " " + token.value);
-        // }
-
         List<AST.Node> nodes = Parser.parseForLoop(lexedContent);
-        //TODO: write some code in the parser that will (when it hits a using statement) read the text from that file (or package) - lex it, and parse it all inserted into the current point in the ASTNodes list then continue on parsing the main file and eventually codegen that
+
         ModuleGen.GenerateModule(nodes);
 
         EXE.compileEXE(settings, true);
+
+        AnsiConsole.MarkupLine("[green]SWO project successfully compiled[/]");
+    }
+
+    public static void runProject(RunCommandSettings settings)
+    {
+        AnsiConsole.MarkupLine("[purple]SWO project running...[/]");
+
+        DirectoryInfo dirInfo = new DirectoryInfo(settings.compileCommandSettings.path);
+
+        FileInfo[] files = dirInfo.GetFiles();
+
+        bool fileFound = false;
+
+        foreach (FileInfo file in files)
+        {
+            if (file.Name == settings.compileCommandSettings.resultFileName)
+            {
+                fileFound = true;
+                break;
+            }
+        }
+
+        if (!fileFound)
+        {
+            throw new ArgumentException("SWO result file not found in project path | It is possible that compilation failed");
+        }
+
+        Process process = new Process();
+        process.StartInfo.FileName = settings.compileCommandSettings.resultFileName;
+        process.StartInfo.Arguments = settings.arguments;
+        process.StartInfo.UseShellExecute = true;
+
+        process.Start();
+
     }
 }

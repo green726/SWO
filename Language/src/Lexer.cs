@@ -31,41 +31,6 @@ public static class Lexer
                 if (lastChar != ' ')
                 {
                     checkStringBuilder(stringBuilder, line, column, charNum);
-                    // char firstChar = ' ';
-                    // try
-                    // {
-                    //     firstChar = stringBuilder.ToString()[0];
-                    // }
-                    // catch
-                    // { }
-                    // if (int.TryParse(stringBuilder.ToString(), out int result))
-                    // {
-                    //     tokenList.Add(new Util.Token(Util.TokenType.Int, stringBuilder.ToString(), line, column, charNum));
-                    // }
-                    // else if (double.TryParse(stringBuilder.ToString(), out double dubResult))
-                    // {
-                    //     tokenList.Add(new Util.Token(Util.TokenType.Double, stringBuilder.ToString(), line, column, charNum));
-                    // }
-                    // else if (binOps.Contains(stringBuilder.ToString()))
-                    // {
-                    //     tokenList.Add(new Util.Token(Util.TokenType.Operator, stringBuilder.ToString(), line, column, charNum));
-                    // }
-                    // else if (assignmentOps.Contains(stringBuilder.ToString()))
-                    // {
-                    //     tokenList.Add(new Util.Token(Util.TokenType.AssignmentOp, stringBuilder.ToString(), line, column, charNum, false));
-                    // }
-                    // else if (firstChar == '"' && stringBuilder.ToString().EndsWith('"'))
-                    // {
-                    //     tokenList.Add(new Util.Token(Util.TokenType.String, stringBuilder.ToString(), line, column, charNum));
-                    // }
-                    // else if (stringBuilder.ToString() != " " && stringBuilder.ToString() != "" && stringBuilder.ToString() != "\n")
-                    // {
-                    //     tokenList.Add(new Util.Token(Util.TokenType.Keyword, stringBuilder.ToString(), line, column, charNum));
-                    // }
-                    // else if (specialChars.Contains(stringBuilder.ToString()))
-                    // {
-                    //     tokenList.Add(new Util.Token(Util.TokenType.Special, stringBuilder.ToString(), line, column));
-                    // }
                     stringBuilder = new StringBuilder();
                     lastChar = ch;
                 }

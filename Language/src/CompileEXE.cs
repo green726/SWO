@@ -162,7 +162,7 @@ public static class EXE
         Process process = new Process();
 
         process.StartInfo.FileName = Config.settings.general.linker.path;
-        process.StartInfo.Arguments = Config.settings.general.linker.args + fullObjectPath;
+        process.StartInfo.Arguments = $"{Config.settings.general.linker.args} {settings.resultFileName} {fullObjectPath}";
 
         process.Start();
 
