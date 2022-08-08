@@ -101,12 +101,12 @@ public static class EXE
         LLVM.InitializeX86TargetMC();
         LLVM.InitializeX86AsmParser();
         LLVM.InitializeX86AsmPrinter();
-
         IntPtr fileNamePtr;
         // Marshal.FreeHGlobal(fileNamePtr); //BUG: this line breaks the code, maybe we are supposed to do it after we use the fileNamePtr?
 
 
         string? fileNameFinal;
+
         if (windows)
         {
             targetTriple = Marshal.PtrToStringUTF8(LLVM.GetDefaultTargetTriple());

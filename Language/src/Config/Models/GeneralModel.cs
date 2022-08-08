@@ -11,9 +11,9 @@ public class GeneralModel
 
 public class CommentModel
 {
-    public string singleLine {get; set;}= "//";
-    public string multiLineOpen {get; set; } = "/*";
-    public string multiLineClose {get; set;} = "*/";
+    public string singleLine { get; set; } = "//";
+    public string multiLineOpen { get; set; } = "/*";
+    public string multiLineClose { get; set; } = "*/";
 }
 
 public class LinkerModel
@@ -38,7 +38,7 @@ public class LinkerModel
                             path = @"C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin\gcc.exe";
                             break;
                         case "linux-x64":
-                            path = @"/usr/bin/gcc";
+                            path = @"/usr/bin/";
                             break;
                     }
                     args = "-O -no-pie ";

@@ -16,6 +16,20 @@ public class Return : Base
     {
         ret.expr.generator.generate();
         LLVMValueRef retValue = valueStack.Pop();
+        checkType(retValue.TypeOf());
         valueStack.Push(LLVM.BuildRet(builder, retValue));
+    }
+
+    private void checkType(LLVMTypeRef retType)
+    {
+        LLVMValueRef funcRef = LLVM.GetLastFunction(module);
+
+        LLVMTypeKind funcRetTypeKind = funcRef.TypeOf().GetReturnType().GetElementType().TypeKind;
+        LLVMTypeKind retTypeKind = retType.TypeKind;
+
+        if (funcRetTypeKind != retTypeKind)
+        {
+            throw GenException.FactoryMethod($"Return type({retType.ToString()}) does not match declared function type ({funcRef.TypeOf().GetReturnType().ToString()})", "Remove the return statement | Change the function return type", this.ret);
+        }
     }
 }
