@@ -6,7 +6,7 @@ public static class Prompt
     {
 
         Settings settings;
-        bool uninstall = AnsiConsole.Confirm("Would you like to uninstall HISS?", false);
+        bool uninstall = AnsiConsole.Confirm("Would you like to uninstall SWO?", false);
 
         if (uninstall)
         {
@@ -16,17 +16,17 @@ public static class Prompt
         }
 
         string defaultPath = Util.evaluatePath();
-        string path = AnsiConsole.Ask<string>("What [blue]path[/] would you like to install [green]HISS[/] to? (Leave blank for default path)", defaultPath);
+        string path = AnsiConsole.Ask<string>("What [blue]path[/] would you like to install [green]SWO[/] to? (Leave blank for default path)", defaultPath);
 
         if (path == "")
         {
             path = defaultPath;
         }
 
-        bool installHIP = AnsiConsole.Confirm("Install HIP (Highly Inefficient Packages) - The HISS package manager");
-        bool installResources = AnsiConsole.Confirm("Install the HISS Resources (Templates, etc) - This is required for many HISS features but can be ignored for a greater degree of customization");
+        bool installSAP = AnsiConsole.Confirm("Install SAP (Highly Inefficient Packages) - The SWO package manager");
+        bool installResources = AnsiConsole.Confirm("Install the SWO Resources (Templates, etc) - This is required for many SWO features but can be ignored for a greater degree of customization");
 
-        settings = new Settings { uninstall = uninstall, installPath = path, dontInstallHIP = !installHIP, dontInstallResources = !installResources };
+        settings = new Settings { uninstall = uninstall, installPath = path, dontInstallSAP = !installSAP, dontInstallResources = !installResources };
         Util.figureOutSettings(settings);
     }
 }

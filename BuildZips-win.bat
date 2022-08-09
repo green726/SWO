@@ -1,5 +1,5 @@
-7z a -tzip ./HIP-win10-x64.zip ./HIP/*
-7z a -tzip ./HIP-linux-x64.zip ./HIP/*
+7z a -tzip ./SAP-win10-x64.zip ./SAP/*
+7z a -tzip ./SAP-linux-x64.zip ./SAP/*
 cd ./Language
 dotnet publish -r win10-x64
 7z a -tzip ../Language-win10-x64.zip ./bin/Debug/net6.0/win10-x64/publish/*

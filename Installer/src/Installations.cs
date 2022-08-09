@@ -8,7 +8,7 @@ public static class Installations
     public static bool windows = false;
     public static bool linux = false;
 
-    public static async Task download(List<HISSComponent> downloadComponents)
+    public static async Task download(List<SWOComponent> downloadComponents)
     {
         await AnsiConsole.Progress()
         .Columns(new ProgressColumn[]
@@ -22,7 +22,7 @@ public static class Installations
         StartAsync(async ctx =>
         {
             List<Task> tasks = new List<Task>();
-            foreach (HISSComponent comp in downloadComponents)
+            foreach (SWOComponent comp in downloadComponents)
             {
                 var task = ctx.AddTask(comp.downloadTaskName);
                 tasks.Add(comp.download(task));
@@ -32,13 +32,13 @@ public static class Installations
     }
 
 
-    public static async Task install(List<HISSComponent> installComponents)
+    public static async Task install(List<SWOComponent> installComponents)
     {
 
         await AnsiConsole.Progress().StartAsync(async ctx =>
         {
             List<Task> tasks = new List<Task>();
-            foreach (HISSComponent comp in installComponents)
+            foreach (SWOComponent comp in installComponents)
             {
                 var task = ctx.AddTask(comp.installTaskName);
                 tasks.Add(comp.install(task));
@@ -59,27 +59,27 @@ public static class Installations
             var scope = EnvironmentVariableTarget.Machine; // or User
             var oldValue = Environment.GetEnvironmentVariable(envName, scope);
             var newValue = oldValue + @$"{settings.installPath}\Language\;";
-            if (!settings.dontInstallHIP)
+            if (!settings.dontInstallSAP)
             {
-                Console.WriteLine("adding HIP to path");
-                newValue += @$"{settings.installPath}\HIP\;";
+                Console.WriteLine("adding SAP to path");
+                newValue += @$"{settings.installPath}\SAP\;";
             }
             Environment.SetEnvironmentVariable(envName, newValue, scope);
         }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
-            if (!settings.dontInstallHIP)
+            if (!settings.dontInstallSAP)
             {
-                File.AppendAllText(bashrc, "export PATH=$PATH:~/.HISS/HIP/ \n");
+                File.AppendAllText(bashrc, "export PATH=$PATH:~/.SWO/SAP/ \n");
             }
-            File.AppendAllText(bashrc, "export PATH=$PATH:~/.HISS/Language/ \n");
+            File.AppendAllText(bashrc, "export PATH=$PATH:~/.SWO/Language/ \n");
 
         }
 
     }
 }
 
-public class HISSComponent
+public class SWOComponent
 {
     public Uri uri;
     public string installPath;
@@ -91,7 +91,7 @@ public class HISSComponent
 
     public ProgressTask downloadProgressTask;
 
-    public HISSComponent(string webPath, string installPath, string downloadPath, string installTaskName, string downloadTaskName)
+    public SWOComponent(string webPath, string installPath, string downloadPath, string installTaskName, string downloadTaskName)
     {
         this.uri = new Uri(webPath);
         this.installPath = installPath;

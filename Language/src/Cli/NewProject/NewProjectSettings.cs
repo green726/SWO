@@ -4,17 +4,17 @@ using System.ComponentModel;
 
 public class NewProjectSettings : CommandSettings
 {
-    [Description("The HISS template to use for this project")]
+    [Description("The SWO template to use for this project")]
     [CommandArgument(0, "[template]")]
     public string templateStr { get; init; } = "Blank";
 
     public Template template;
 
-    [Description("The name of the HISS project you wish to create")]
+    [Description("The name of the SWO project you wish to create")]
     [CommandArgument(1, "[name]")]
     public string projectName { get; init; } = "Blank";
 
-    [Description("The path of the HISS project")]
+    [Description("The path of the SWO project")]
     [CommandOption("-p|--path")]
     public string projectPath { get; init; }
 

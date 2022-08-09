@@ -9,7 +9,7 @@ functions:
     ```
     foo(arg1, arg2)
     ```
-    HISS builtin functions are called like this:
+    SWO builtin functions are called like this:
     ```
     print!(1)
     ```

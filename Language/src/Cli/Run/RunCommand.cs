@@ -9,7 +9,7 @@ public class RunCommand : Command<RunCommandSettings>
         CompileCommand compileCommand = new CompileCommand();
         compileCommand.Execute(context, settings.compileCommandSettings);
 
-        HISS.runProject(settings);
+        Swo.runProject(settings);
 
         return 0;
     }

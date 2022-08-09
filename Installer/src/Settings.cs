@@ -3,21 +3,21 @@ using System.ComponentModel;
 
 public class Settings : CommandSettings
 {
-    [Description(@"Path to install HISS. Defaults to %UserProfile%\.HISS on windows and ~/.HISS on Linux")]
+    [Description(@"Path to install SWO. Defaults to %UserProfile%\.SWO on windows and ~/.SWO on Linux")]
     [CommandArgument(0, "[installPath]")]
     public string? installPath { get; init; }
 
-    [Description("Uninstall HISS")]
+    [Description("Uninstall SWO")]
     [CommandOption("-u|--uninstall")]
     [DefaultValue(false)]
     public bool uninstall { get; init; }
 
-    [Description("Dont Install HIP (Highly Inefficient Packages) - The HISS Package Manager")]
+    [Description("Dont Install SAP (Highly Inefficient Packages) - The SWO Package Manager")]
     [CommandOption("--nohip|--installhip")]
     [DefaultValue(false)]
-    public bool dontInstallHIP { get; init; }
+    public bool dontInstallSAP { get; init; }
 
-    [Description("Dont the HISS Resources - this is required for many HISS features however you can go without installing it for a greater degree of customization.")]
+    [Description("Dont the SWO Resources - this is required for many SWO features however you can go without installing it for a greater degree of customization.")]
     [CommandOption("--nor|--noresources")]
     [DefaultValue(false)]
     public bool dontInstallResources { get; init; }

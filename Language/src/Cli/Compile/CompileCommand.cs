@@ -7,7 +7,7 @@ public class CompileCommand : Command<CompileCommandSettings>
 {
     public override int Execute([NotNull] CommandContext context, [NotNull] CompileCommandSettings settings)
     {
-        HISS.compileProject(settings);
+        Swo.compileProject(settings);
         return 0;
     }
 }

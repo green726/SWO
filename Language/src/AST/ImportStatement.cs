@@ -3,7 +3,7 @@ using System.Linq;
 
 public class ImportStatement : Node
 {
-    public HISSFile file;
+    public SWOFile file;
     public Library library;
 
     public ImportStatement(Util.Token token) : base(token)
@@ -19,18 +19,18 @@ public class ImportStatement : Node
 
     public override void addChild(Util.Token child)
     {
-        List<Library> matchingLib = HISS.projectInfo.libraries.Where(library => library.name == child.value).ToList();
+        List<Library> matchingLib = Swo.projectInfo.libraries.Where(library => library.name == child.value).ToList();
         if (matchingLib.Count() == 1)
         {
             this.library = matchingLib[0];
         }
         else if (matchingLib.Count() > 1)
         {
-            throw new ParserException("Multiple libraries found matching the same name - possible HIP bug or incorrect using statement", this);
+            throw new ParserException("Multiple libraries found matching the same name - possible SAP bug or incorrect using statement", this);
         }
         else
         {
-            string[] filePaths = Directory.GetFiles(HISS.projectInfo.path, child.value + ".hiss");
+            string[] filePaths = Directory.GetFiles(Swo.projectInfo.path, child.value + ".hiss");
 
             if (filePaths.Length > 1)
             {
@@ -41,7 +41,7 @@ public class ImportStatement : Node
                 throw ParserException.FactoryMethod("No file or library found that matches using statement", "Remove incorrect using statement - fix a possible typo", this, true);
             }
 
-            this.file = new HISSFile(child.value, filePaths[0]);
+            this.file = new SWOFile(child.value, filePaths[0]);
         }
 
 

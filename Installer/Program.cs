@@ -11,13 +11,14 @@ public class Program
         {
             Prompt.getOptions();
         }
-        else {
-        CLI cli = new CLI(args);
+        else
+        {
+            CLI cli = new CLI(args);
         }
 
 
 
-        // Console.WriteLine("Installation of HISS was successful - restart your terminal to use it | if you experience any issues restart your PC or make an issue on the HISS github repository");
+        // Console.WriteLine("Installation of SWO was successful - restart your terminal to use it | if you experience any issues restart your PC or make an issue on the SWO github repository");
     }
 
 }

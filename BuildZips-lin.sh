@@ -1,5 +1,5 @@
-zip -r ./HIP-win10-x64.zip ./HIP
-zip -r ./HIP-linux-x64.zip ./HIP
+zip -r ./SAP-win10-x64.zip ./SAP
+zip -r ./SAP-linux-x64.zip ./SAP
 cd ./Language
 dotnet publish -r win10-x64
 zip -r ../Language-win10-x64.zip ./bin/Debug/net6.0/win10-x64/publish

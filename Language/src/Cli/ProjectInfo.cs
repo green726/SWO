@@ -20,14 +20,14 @@ public class ProjectInfo
         }
     }
 
-    public List<HISSFile> files { get; set; } = new List<HISSFile>();
+    public List<SWOFile> files { get; set; } = new List<SWOFile>();
 
     public List<Library> libraries { get; set; } = new List<Library>();
     public string projectName { get; set; } = "unknown";
 
     public string configFilePath { get; set; } = "";
 
-    public HISSFile entryFile { get; set; }
+    public SWOFile entryFile { get; set; }
 
     public string path { get; set; } = "";
 
@@ -61,7 +61,7 @@ public class ProjectInfo
 
     public void addFile(string name, string path)
     {
-        files.Add(new HISSFile(name, path));
+        files.Add(new SWOFile(name, path));
     }
 
     //NOTE: call this in the program main when an existing project info is read to check for any new files that were created
@@ -72,10 +72,10 @@ public class ProjectInfo
 
         foreach (string file in files)
         {
-            HISSFile HISSfile = new HISSFile(Path.GetFileName(file), file);
-            if (!this.files.Contains(HISSfile) && HISSfile.name.EndsWith("hiss"))
+            SWOFile SWOfile = new SWOFile(Path.GetFileName(file), file);
+            if (!this.files.Contains(SWOfile) && SWOfile.name.EndsWith("hiss"))
             {
-                this.files.Add(HISSfile);
+                this.files.Add(SWOfile);
             }
         }
     }
@@ -109,7 +109,7 @@ public class Library
     public bool foreign { get; set; } = false;
 }
 
-public class HISSFile
+public class SWOFile
 {
     public string name { get; set; }
     public string path { get; set; }
@@ -123,13 +123,13 @@ public class HISSFile
         }
     }
 
-    public HISSFile(string name, string path)
+    public SWOFile(string name, string path)
     {
         this.name = name;
         this.path = path;
     }
 
-    public HISSFile()
+    public SWOFile()
     {
 
     }

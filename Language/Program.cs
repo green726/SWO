@@ -5,7 +5,7 @@ using System.Diagnostics;
 using Tomlyn;
 using Spectre.Console;
 
-public static class HISS
+public static class Swo
 {
     private static string fileContents;
     public static bool windows = false;
@@ -13,43 +13,9 @@ public static class HISS
 
     static void Main(string[] args)
     {
-        Util.getHISSInstallPath();
-        if (args.Length > 0 && args[0] == "test")
-        {
-            testFunc();
-            return;
-        }
+        Util.getSWOInstallPath();
+
         CLI cli = new CLI(args);
-
-
-    }
-
-    public static void testFunc()
-    {
-        if (Config.settings.general.typo.enabled)
-        {
-            Typo.initialize();
-        }
-
-        string fileToRead = Util.pathToSrc + "/test.hiss";
-
-        string debugLoggingStr = "true";
-        bool debugLogging = debugLoggingStr == "true" ? true : false;
-
-        fileContents = System.IO.File.ReadAllText(@$"{fileToRead}");
-
-        List<Util.Token> lexedContent = Lexer.lex(fileContents);
-
-        foreach (Util.Token token in lexedContent)
-        {
-            Console.WriteLine(token.type + " " + token.value);
-        }
-
-        List<AST.Node> nodes = Parser.parseForLoop(lexedContent);
-        ModuleGen.GenerateModule(nodes);
-
-
-        EXE.compileEXE(windows);
     }
 
     public static void compileProject(CompileCommandSettings settings)
@@ -61,24 +27,48 @@ public static class HISS
         // projectInfo.checkPath();
         projectInfo.setConfig();
 
-        Config.initialize(projectInfo.configFilePath);
+        AnsiConsole.Progress()
+            .Columns(new ProgressColumn[] {
+            new TaskDescriptionColumn(),
+            new ProgressBarColumn(),
+            new PercentageColumn(),
+            new RemainingTimeColumn(),
+            new SpinnerColumn(),
+            }).Start(ctx =>
+            {
+                var configTask = ctx.AddTask("Initializing config");
+                Config.initialize(projectInfo.configFilePath);
+                configTask.StopTask();
+                //TODO: check if its default or leave it alone
+                settings.resultFileName = projectInfo.projectName;
 
-        settings.resultFileName = projectInfo.projectName;
+                if (Config.settings.general.typo.enabled)
+                {
+                    var typoTask = ctx.AddTask("Initializing typo checker");
+                    Typo.initialize(typoTask);
+                    typoTask.StopTask();
+                }
 
-        if (Config.settings.general.typo.enabled)
-        {
-            Typo.initialize();
-        }
+                fileContents = System.IO.File.ReadAllText(projectInfo.entryFile.path);
+                var lexTask = ctx.AddTask("Lexing (tokenizing) the SWO code");
+                List<Util.Token> lexedContent = Lexer.lex(fileContents, lexTask);
 
-        fileContents = System.IO.File.ReadAllText(projectInfo.entryFile.path);
+                var parseTask = ctx.AddTask("Parsing the SWO code");
+                List<AST.Node> nodes = Parser.parseForLoop(lexedContent, parseTask);
 
-        List<Util.Token> lexedContent = Lexer.lex(fileContents);
+                var moduleTask = ctx.AddTask("Initializing LLVM");
+                ModuleGen.GenerateModule(moduleTask);
 
-        List<AST.Node> nodes = Parser.parseForLoop(lexedContent);
+                var llvmTask = ctx.AddTask("Compiling to LLVM IR");
+                IRGen.generateIR(nodes, llvmTask);
 
-        ModuleGen.GenerateModule(nodes);
+                var passTask = ctx.AddTask("Optimizing the LLVM IR");
+                IRGen.optimizeIR(passTask);
 
-        EXE.compileEXE(settings, true);
+                var exeCompileTask = ctx.AddTask("Compiling the LLVM IR to your desired output");
+                EXE.compileEXE(settings, exeCompileTask, true);
+
+            });
 
         AnsiConsole.MarkupLine("[green]SWO project successfully compiled[/]");
     }

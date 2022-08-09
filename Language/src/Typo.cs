@@ -1,5 +1,5 @@
 //NOTE: big refers to the default symSpell that checks a good portion of the english language 
-//NOTE: little refers to the HISS symSpell that checks HISS keywords + currently declared vars and funcs etc
+//NOTE: little refers to the SWO symSpell that checks SWO keywords + currently declared vars and funcs etc
 
 public static class Typo
 {
@@ -40,10 +40,12 @@ in 1
 
     private static Stream fileStream;
 
-    public static void initialize()
+    public static void initialize(Spectre.Console.ProgressTask task)
     {
         loadDict(Checker.Little);
+        task.Increment(40);
         loadDict(Checker.Big);
+        task.Increment(40);
         // foreach (string line in littleDictDefaults)
         // {
         //     littleWriter.Write(line);

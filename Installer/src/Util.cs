@@ -17,19 +17,19 @@ public static class Util
             Environment.Exit(0);
         }
 
-        List<HISSComponent> components = new List<HISSComponent>();
+        List<SWOComponent> components = new List<SWOComponent>();
 
         Directory.CreateDirectory(settings.installPath);
 
         if (!settings.dontInstallResources)
         {
-            components.Add(new HISSComponent("https://github.com/green726/HISS/releases/latest/download/Resources.zip", $"{path}{ps}Resources", $"{path}{ps}Resources.zip", "Installing HISS Resources", "Downloading HISS Resources"));
+            components.Add(new SWOComponent("https://github.com/green726/SWO/releases/latest/download/Resources.zip", $"{path}{ps}Resources", $"{path}{ps}Resources.zip", "Installing SWO Resources", "Downloading SWO Resources"));
         }
-        if (!settings.dontInstallHIP)
+        if (!settings.dontInstallSAP)
         {
-            components.Add(new HISSComponent($"https://github.com/green726/HISS/releases/latest/download/HIP-{os}.zip", $"{path}{ps}HIP", $"{path}{ps}HIP.zip", "Installing","Downloading HIP"));
+            components.Add(new SWOComponent($"https://github.com/green726/SWO/releases/latest/download/SAP-{os}.zip", $"{path}{ps}SAP", $"{path}{ps}SAP.zip", "Installing", "Downloading SAP"));
         }
-        components.Add(new HISSComponent($"https://github.com/green726/HISS/releases/latest/download/Language-{os}.zip", $"{path}{ps}Language", $"{path}{ps}Language.zip", "Installing the HISS Language", "Downloading the HISS Language"));
+        components.Add(new SWOComponent($"https://github.com/green726/SWO/releases/latest/download/Language-{os}.zip", $"{path}{ps}Language", $"{path}{ps}Language.zip", "Installing the SWO Language", "Downloading the SWO Language"));
 
         Installations.download(components).Wait();
         Installations.install(components).Wait();
@@ -45,7 +45,7 @@ public static class Util
         }
         catch (DirectoryNotFoundException)
         {
-            Console.WriteLine("HISS install not found - continuing on to PATH variable removal");
+            Console.WriteLine("SWO install not found - continuing on to PATH variable removal");
         }
         catch (UnauthorizedAccessException)
         {
@@ -58,30 +58,30 @@ public static class Util
             string envName = "PATH";
             var scope = EnvironmentVariableTarget.Machine; // or User
             var oldValue = Environment.GetEnvironmentVariable(envName, scope);
-            var newValue = oldValue.Replace(@$"{path}\Language\;", "").Replace(@$"{path}\HIP\;", "");
+            var newValue = oldValue.Replace(@$"{path}\Language\;", "").Replace(@$"{path}\SAP\;", "");
             Environment.SetEnvironmentVariable(envName, newValue, scope);
         }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
-            string hipEnv = "export PATH=$PATH:~/.HISS/HIP/";
-            string langEnv = "export PATH=$PATH:~/.HISS/Language/";
+            string hipEnv = "export PATH=$PATH:~/.SWO/SAP/";
+            string langEnv = "export PATH=$PATH:~/.SWO/Language/";
             string text = File.ReadAllText(bashrc);
             text = text.Replace(hipEnv, "");
             text = text.Replace(langEnv, "");
             File.WriteAllText(bashrc, text);
         }
-        Console.WriteLine("HISS Uninstalled Successfully");
+        Console.WriteLine("SWO Uninstalled Successfully");
     }
 
     public static string evaluatePath()
     {
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            return Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\.HISS");
+            return Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\.SWO");
         }
         else
         {
-            return $@"{Environment.GetEnvironmentVariable("HOME")}/.HISS";
+            return $@"{Environment.GetEnvironmentVariable("HOME")}/.SWO";
         }
 
     }

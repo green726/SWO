@@ -11,7 +11,7 @@ public static class Lexer
     public static string inputStr;
 
 
-    public static List<Util.Token> lex(string input)
+    public static List<Util.Token> lex(string input, Spectre.Console.ProgressTask task = null)
     {
         inputStr = input;
         int line = 1;
@@ -21,8 +21,17 @@ public static class Lexer
         char lastChar = new char();
         StringBuilder stringBuilder = new StringBuilder();
 
+        if (task != null)
+        {
+            task.MaxValue = input.Length;
+        }
+
         foreach (char ch in input)
         {
+            if (task != null)
+            {
+                task.Increment(1);
+            }
             charNum++;
             column++;
             bool isFinalChar = input.IndexOf(ch) == input.Length - 1;

@@ -222,7 +222,6 @@ public static class Parser
                     break;
             }
 
-
         }
         return stringBuilder.ToString();
     }
@@ -542,9 +541,11 @@ public static class Parser
     }
 
 
-    public static List<AST.Node> parseForLoop(List<Util.Token> _tokenList)
+    public static List<AST.Node> parseForLoop(List<Util.Token> _tokenList, Spectre.Console.ProgressTask task = null)
     {
         addLanguageBuiltins();
+
+
 
         tokenList = _tokenList;
 
@@ -554,6 +555,12 @@ public static class Parser
         //     Console.WriteLine(token.value + " " + token.type);
         // }
         // AnsiConsole.MarkupLine("[red]end tokens[/]");
+
+        if (task != null)
+        {
+            task.MaxValue = tokenList.Count();
+        }
+
 
         AST.Node? parent = null;
         int delimLevel = 0;
@@ -569,6 +576,10 @@ public static class Parser
 
         while (!isFinishedParsing)
         {
+            if (task != null)
+            {
+                task.Increment(1);
+            }
 
             isFinishedParsing = currentTokenNum == finalTokenNum;
 

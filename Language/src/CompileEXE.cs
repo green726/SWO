@@ -93,8 +93,10 @@ public static class EXE
     }
 
 
-    public static void compileEXE(CompileCommandSettings settings, bool debugLogging = false)
+    public static void compileEXE(CompileCommandSettings settings, Spectre.Console.ProgressTask task, bool debugLogging = false)
     {
+        task.MaxValue = 10;
+
         bool windows = settings.targetOSName == "win10-x64";
 
         LLVM.InitializeX86TargetInfo();
@@ -102,6 +104,9 @@ public static class EXE
         LLVM.InitializeX86TargetMC();
         LLVM.InitializeX86AsmParser();
         LLVM.InitializeX86AsmPrinter();
+
+        task.Increment(3);
+
         IntPtr fileNamePtr;
         // Marshal.FreeHGlobal(fileNamePtr); //BUG: this line breaks the code, maybe we are supposed to do it after we use the fileNamePtr?
 
@@ -143,6 +148,7 @@ public static class EXE
         {
             LLVM.TargetMachineEmitToFile(targetMachine, IRGen.module, fileNamePtr, LLVMCodeGenFileType.LLVMAssemblyFile, out writeErrorMsg);
         }
+        task.Increment(4);
         if (writeErrorMsg != null && writeErrorMsg != "" && debugLogging)
         {
             Console.WriteLine("writeErrorMsg: " + writeErrorMsg);
@@ -152,7 +158,7 @@ public static class EXE
         {
             link(settings);
         }
-
+        task.StopTask();
     }
 
     public static void link(CompileCommandSettings settings)

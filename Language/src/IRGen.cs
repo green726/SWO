@@ -53,19 +53,23 @@ public static class IRGen
 
 
 
-
-    public static void generateIR(List<AST.Node> nodes, LLVMBuilderRef _builder, LLVMModuleRef _module, LLVMPassManagerRef _passManager)
+    public static void initialize(LLVMBuilderRef _builder, LLVMModuleRef _module, LLVMPassManagerRef _passManager)
     {
         builder = _builder;
         module = _module;
         passManager = _passManager;
+    }
 
+    public static void generateIR(List<AST.Node> nodes, Spectre.Console.ProgressTask task)
+    {
+        task.MaxValue = nodes.Count;
 
         foreach (AST.Node node in nodes)
         {
             Console.WriteLine("generating node of type " + node.nodeType);
             node.generator.generate();
             Console.WriteLine("successfully evaluated node of type " + node.nodeType);
+            task.Increment(1);
 
             // foreach (ASTNode child in node.children)
             // {
@@ -76,11 +80,16 @@ public static class IRGen
         }
 
         LLVM.VerifyModule(module, LLVMVerifierFailureAction.LLVMPrintMessageAction, out string verifyMessage);
-        LLVM.RunPassManager(passManager, module);
 
-        Console.WriteLine("LLVM module dump below");
-        LLVM.DumpModule(module);
-        Console.WriteLine("");
+        // Console.WriteLine("LLVM module dump below");
+        // LLVM.DumpModule(module);
+        // Console.WriteLine("");
+    }
+
+    public static void optimizeIR(Spectre.Console.ProgressTask task)
+    {
+        LLVM.RunPassManager(passManager, module);
+        task.StopTask();
     }
 
 }

@@ -7,23 +7,23 @@ public static class Util
     public static string[] builtinFuncs = { "print", "println" };
     // public static TokenType[] delimTypes = { TokenType.ParenDelimiterOpen, TokenType.ParenDelimiterClose, TokenType.BrackDelimiterOpen, TokenType.BrackDelimiterClose, TokenType.SquareDelimiterOpen, TokenType.SquareDelimiterClose };
     //
-    //BUG: remove this in release builds or figure out a better way for HISS path
+    //BUG: remove this in release builds or figure out a better way for SWO path
     public static string installPath = "";
     public static string pathToSrc = "";
 
 
-    public static void getHISSInstallPath()
+    public static void getSWOInstallPath()
     {
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
-            pathToSrc = "/home/green726/coding/HISS/src/";
-            installPath = Environment.ExpandEnvironmentVariables($"%HOME%/.HISS");
+            pathToSrc = "/home/green726/coding/SWO/src/";
+            installPath = Environment.ExpandEnvironmentVariables($"%HOME%/.SWO");
         }
 
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            pathToSrc = @"D:/coding/HISS/src/";
-            installPath = Environment.ExpandEnvironmentVariables(@$"%USERPROFILE%/.HISS");
+            pathToSrc = @"D:/coding/SWO/src/";
+            installPath = Environment.ExpandEnvironmentVariables(@$"%USERPROFILE%/.SWO");
         }
     }
 

@@ -4,11 +4,11 @@ using System.ComponentModel;
 public class CompileCommandSettings : CommandSettings
 {
 
-    [Description("The path to the HISS project you wish to compile - leave blank to use current directory")]
+    [Description("The path to the SWO project you wish to compile - leave blank to use current directory")]
     [CommandOption("-p|--path")]
     public string path { get; init; } = "";
 
-    [Description("Name of the entry HISS file you wish to compile - leave blank to search for \"Main.hiss\" in the current directory")]
+    [Description("Name of the entry SWO file you wish to compile - leave blank to search for \"Main.hiss\" in the current directory")]
     [CommandOption("-f|--file")]
     public string file { get; init; } = "";
 
