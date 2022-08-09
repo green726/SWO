@@ -21,7 +21,13 @@ public static class Swo
     public static void compileProject(CompileCommandSettings settings)
     {
         Console.WriteLine(settings.resultFileType);
-        string[] files = System.IO.Directory.GetFiles(settings.path, "*.hproj");
+        string[] files = System.IO.Directory.GetFiles(settings.path, "*.sproj");
+
+        if (files.Length == 0)
+        {
+            throw new ArgumentException("No SWO project files found in current directory");
+        }
+
         string tomlText = System.IO.File.ReadAllText(files[0]);
         projectInfo = Toml.ToModel<ProjectInfo>(tomlText);
         // projectInfo.checkPath();

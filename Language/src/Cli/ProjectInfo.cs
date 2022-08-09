@@ -35,7 +35,7 @@ public class ProjectInfo
     {
         var tomlString = Toml.FromModel(this);
         // Console.WriteLine("Toml string: \n" + tomlString);
-        File.WriteAllText(@$"{path}/{projectName}.hproj", tomlString);
+        File.WriteAllText(@$"{path}/{projectName}.sproj", tomlString);
     }
 
     public ProjectInfo()
