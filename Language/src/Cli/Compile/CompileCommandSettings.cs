@@ -8,7 +8,7 @@ public class CompileCommandSettings : CommandSettings
     [CommandOption("-p|--path")]
     public string path { get; init; } = "";
 
-    [Description("Name of the entry SWO file you wish to compile - leave blank to search for \"Main.hiss\" in the current directory")]
+    [Description("Name of the entry SWO file you wish to compile - leave blank to search for \"Main.swo\" in the current directory")]
     [CommandOption("-f|--file")]
     public string file { get; init; } = "";
 

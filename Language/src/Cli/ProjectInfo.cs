@@ -73,7 +73,7 @@ public class ProjectInfo
         foreach (string file in files)
         {
             SWOFile SWOfile = new SWOFile(Path.GetFileName(file), file);
-            if (!this.files.Contains(SWOfile) && SWOfile.name.EndsWith("hiss"))
+            if (!this.files.Contains(SWOfile) && SWOfile.name.EndsWith("swo"))
             {
                 this.files.Add(SWOfile);
             }

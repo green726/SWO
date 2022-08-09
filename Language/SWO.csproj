@@ -19,8 +19,4 @@
 <ItemGroup>
     <None Include="./src/Dictionaries/*.*" LinkBase="Dictionaries/" CopyToOutputDirectory="PreserveNewest" />
 </ItemGroup>
-
-
-
-
 </Project>

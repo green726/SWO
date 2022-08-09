@@ -30,7 +30,7 @@ public class ImportStatement : Node
         }
         else
         {
-            string[] filePaths = Directory.GetFiles(Swo.projectInfo.path, child.value + ".hiss");
+            string[] filePaths = Directory.GetFiles(Swo.projectInfo.path, child.value + ".swo");
 
             if (filePaths.Length > 1)
             {

@@ -15,7 +15,7 @@ public static class Typo
     private static SymSpell littleSym = new SymSpell(littleInitialCapacity, littleMaxEditDistance, littlePrefixLength);
 
     private static string bigPath = AppDomain.CurrentDomain.BaseDirectory + "./src/Dictionaries/typo-dictionary.txt";
-    private static string littlePath = AppDomain.CurrentDomain.BaseDirectory + "./src/Dictionaries/hiss-dictionary.txt";
+    private static string littlePath = AppDomain.CurrentDomain.BaseDirectory + "./src/Dictionaries/swo-dictionary.txt";
     private static int termIndex = 0; //column of the term in the dictionary text file
     private static int countIndex = 1; //column of the term frequency in the dictionary text file
 
