@@ -27,7 +27,7 @@ public static class Util
         }
         if (!settings.dontInstallSAP)
         {
-            components.Add(new SWOComponent($"https://github.com/green726/SWO/releases/latest/download/SAP-{os}.zip", $"{path}{ps}SAP", $"{path}{ps}SAP.zip", "Installing", "Downloading SAP"));
+            components.Add(new SWOComponent($"https://github.com/green726/SAP/releases/latest/download/SAP-{os}.zip", $"{path}{ps}SAP", $"{path}{ps}SAP.zip", "Installing", "Downloading SAP"));
         }
         components.Add(new SWOComponent($"https://github.com/green726/SWO/releases/latest/download/Language-{os}.zip", $"{path}{ps}Language", $"{path}{ps}Language.zip", "Installing the SWO Language", "Downloading the SWO Language"));
 
