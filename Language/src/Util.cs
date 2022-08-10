@@ -39,6 +39,7 @@ public static class Util
         String,
         Text,
         Special,
+        Space,
         EOL, //end of line,
         EOF //end of file
     }

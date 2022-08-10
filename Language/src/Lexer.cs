@@ -56,6 +56,11 @@ public static class Lexer
                     line++;
                     column = 0;
                     continue;
+                case ' ':
+                    tokenList.Add(new Util.Token(Util.TokenType.Space, ch.ToString(), line, column, charNum: charNum));
+                    lastChar = ch;
+                    stringBuilder = new StringBuilder();
+                    continue;
                 case '(':
                     lexDelimiter(Util.TokenType.DelimiterOpen, stringBuilder, ch, line, column, charNum);
                     lastChar = ch;

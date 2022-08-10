@@ -672,6 +672,10 @@ public static class Parser
 
             switch (token.type)
             {
+                case Util.TokenType.Space:
+                    parent?.addSpace(token);
+                    break;
+                    break;
                 case Util.TokenType.Int:
 
                     // if (parent.nodeType == AST.Node.NodeType.VariableAssignment)

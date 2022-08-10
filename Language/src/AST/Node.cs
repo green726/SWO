@@ -63,6 +63,11 @@ public abstract class Node
         NullExpression,
     }
 
+    public virtual void addSpace(Util.Token space)
+    {
+        this.codeExcerpt += space.value;
+    }
+
     public virtual void addParent(Node parent)
     {
         if (this.parent != null)
