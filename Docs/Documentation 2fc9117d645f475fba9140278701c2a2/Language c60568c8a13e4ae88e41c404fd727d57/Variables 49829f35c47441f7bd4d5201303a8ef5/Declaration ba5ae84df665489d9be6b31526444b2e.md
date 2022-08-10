@@ -22,8 +22,6 @@ const int[3] fooArr
 const int* foo
 ```
 
----
-
 # Explanation:
 
 SWO variable declarations are very straightforward and similar to all other C based languages.

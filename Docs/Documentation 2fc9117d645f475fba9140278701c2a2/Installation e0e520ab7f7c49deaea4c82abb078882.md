@@ -12,8 +12,6 @@
 3. Wait for the installer to finish
 4. Done!
 
----
-
 # Build From Source:
 
 1. Clone the [SWO Github](https://github.com/green726/SWO)
@@ -24,8 +22,6 @@
 6. Go back into the base directory
 7. Move the Resources folder into the same directory that you placed the SWO language
 8. (Optional) If you want SAP, you can repeat steps 1-5 but replace the SWO Github and folders with the [SAP](https://github.com/green726/SAP) respective items. 
-
----
 
 # About:
 

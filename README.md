@@ -45,17 +45,11 @@ int @fibRec(int n) {
 }
 ```
 
----
-
 # Pages:
 
 [Documentation](Docs/Documentation%202fc9117d645f475fba9140278701c2a2.md)
 
----
-
 # Roadmap:
-
----
 
 # Links:
 
