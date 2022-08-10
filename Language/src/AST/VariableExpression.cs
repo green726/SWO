@@ -37,7 +37,7 @@ public class VariableExpression : Expression
         {
             Console.WriteLine("dereference detected");
             this.isDereference = true;
-            this.value= token.value.Remove(0, 1);
+            this.value = token.value.Remove(0, 1);
         }
 
         // bool exists = false;
