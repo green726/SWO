@@ -59,7 +59,8 @@ public abstract class Node
         PhiVariable,
         ImportStatement,
         Return,
-        ArrayExpression
+        ArrayExpression,
+        NullExpression,
     }
 
     public virtual void addParent(Node parent)

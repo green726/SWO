@@ -316,6 +316,11 @@ public static class Parser
             return (constDec, delimLevel);
             // return new List<dynamic>() { constDec, delimLevel };
         }
+        else if (Config.settings.general.nulls.enabled && token.value == Config.settings.general.nulls.keyword)
+        {
+            AST.NullExpression nullExpr = new AST.NullExpression(token, parent);
+            return (parent, delimLevel);
+        }
         else if (token.value == Config.settings.structs.declaration.keyword)
         {
             AST.Struct str = new AST.Struct(token, parent);
@@ -471,8 +476,7 @@ public static class Parser
                     //TODO: replace this with the config delimiter
                     if (token.value == "{")
                     {
-                        AST.ArrayExpression arrExpr = new AST.ArrayExpression(token, parent);
-                        parentStack.Push(arrExpr);
+                        AST.ArrayExpression arrExpr = new AST.ArrayExpression(token, parent); parentStack.Push(arrExpr);
                         return (arrExpr, delimLevel + 1);
                     }
                     parent?.addChild(token);
