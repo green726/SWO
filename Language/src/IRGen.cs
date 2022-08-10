@@ -13,6 +13,8 @@ public static class IRGen
 {
     public static int maxStringIntLength = 64;
 
+    public static LLVMContextRef context;
+
     public static LLVMModuleRef module;
 
     public static LLVMBuilderRef builder;
@@ -53,11 +55,12 @@ public static class IRGen
 
 
 
-    public static void initialize(LLVMBuilderRef _builder, LLVMModuleRef _module, LLVMPassManagerRef _passManager)
+    public static void initialize(LLVMBuilderRef _builder, LLVMModuleRef _module, LLVMPassManagerRef _passManager, LLVMContextRef _context)
     {
         builder = _builder;
         module = _module;
         passManager = _passManager;
+        context = _context;
     }
 
     public static void generateIR(List<AST.Node> nodes, Spectre.Console.ProgressTask task)
@@ -81,9 +84,9 @@ public static class IRGen
 
         LLVM.VerifyModule(module, LLVMVerifierFailureAction.LLVMPrintMessageAction, out string verifyMessage);
 
-        // Console.WriteLine("LLVM module dump below");
-        // LLVM.DumpModule(module);
-        // Console.WriteLine("");
+        Console.WriteLine("LLVM module dump below");
+        LLVM.DumpModule(module);
+        Console.WriteLine("");
     }
 
     public static void optimizeIR(Spectre.Console.ProgressTask task)

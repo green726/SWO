@@ -12,8 +12,6 @@ public class VariableAssignment : Base
         this.varAss = (AST.VariableAssignment)node;
     }
 
-
-
     public override void generate()
     {
         AST.VariableDeclaration originalVarDec = namedGlobalsAST[varAss.name];

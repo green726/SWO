@@ -5,6 +5,7 @@ using static IRGen;
 public class VariableDeclaration : Base
 {
     public AST.VariableDeclaration varDec;
+    public LLVMTypeRef typeLLVM;
 
     public VariableDeclaration(AST.Node node)
     {
@@ -23,7 +24,7 @@ public class VariableDeclaration : Base
         this.varDec.defaultValue.generator.generate();
         LLVMValueRef valRef = valueStack.Pop();
         this.varDec.type.generator.generate();
-        LLVMTypeRef typeLLVM = typeStack.Pop();
+        typeLLVM = typeStack.Pop();
 
         if (!varDec.mutable)
         {

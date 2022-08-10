@@ -6,6 +6,8 @@ public static class ModuleGen
     {
         task.MaxValue = 10;
 
+        LLVMContextRef context = LLVM.ContextCreate();
+
         // Make the module, which holds all the code.
         LLVMModuleRef module = LLVM.ModuleCreateWithName("SWO");
         task.Increment(1);
@@ -42,7 +44,7 @@ public static class ModuleGen
 
         // LLVM.InitializeFunctionPassManager(passManager);
 
-        IRGen.initialize(builder, module, passManager);
+        IRGen.initialize(builder, module, passManager, context);
         task.Increment(1);
     }
 }

@@ -12,6 +12,8 @@ public class ConfigModel
     [DataMember(Name = "if")]
     public IfModel ifModel { get; set; } = new IfModel();
 
+    public StructModel structs { get; set; } = new StructModel();
+
     public VariableModel variable { get; set; } = new VariableModel();
 
     public GeneralModel general { get; set; } = new GeneralModel();

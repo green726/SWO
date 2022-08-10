@@ -40,6 +40,7 @@ public abstract class Node
     public enum NodeType
     {
         Unknown,
+        Struct,
         VariableExpression,
         NumberExpression,
         BinaryExpression,

@@ -306,15 +306,20 @@ public static class Parser
 
         if (token.value == Config.settings.variable.declaration.keyword.mutable)
         {
-            AST.VariableDeclaration varDec = new AST.VariableDeclaration(token, true);
+            AST.VariableDeclaration varDec = new AST.VariableDeclaration(token, true, parent);
             return (varDec, delimLevel);
             // return new List<dynamic>() { varDec, delimLevel };
         }
         else if (token.value == Config.settings.variable.declaration.keyword.constant)
         {
-            AST.VariableDeclaration constDec = new AST.VariableDeclaration(token, false);
+            AST.VariableDeclaration constDec = new AST.VariableDeclaration(token, false, parent);
             return (constDec, delimLevel);
             // return new List<dynamic>() { constDec, delimLevel };
+        }
+        else if (token.value == Config.settings.structs.declaration.keyword)
+        {
+            AST.Struct str = new AST.Struct(token, parent);
+            return (str, delimLevel);
         }
         else if (token.value == Config.settings.function.ret.keyword)
         {
@@ -437,6 +442,9 @@ public static class Parser
             case AST.Node.NodeType.ImportStatement:
                 parent.addChild(token);
                 return (parent.parent, delimLevel);
+            case AST.Node.NodeType.Struct:
+                parent.addChild(token);
+                return (parent, delimLevel);
         }
 
         if (!Config.settings.variable.declaration.keyword.forced)
