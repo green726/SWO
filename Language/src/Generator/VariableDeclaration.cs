@@ -4,8 +4,11 @@ using static IRGen;
 
 public class VariableDeclaration : Base
 {
+
     public AST.VariableDeclaration varDec;
     public LLVMTypeRef typeLLVM;
+
+    private bool init = false;
 
     public VariableDeclaration(AST.Node node)
     {
@@ -21,15 +24,25 @@ public class VariableDeclaration : Base
             return;
         }
 
-        this.varDec.defaultValue.generator.generate();
-        LLVMValueRef valRef = valueStack.Pop();
+        LLVMValueRef valRef = new LLVMValueRef();
+
+        if (this.varDec.defaultValue.nodeType != AST.Node.NodeType.NullExpression)
+        {
+            this.varDec.defaultValue.generator.generate();
+            valRef = valueStack.Pop();
+            init = true;
+        }
+
         this.varDec.type.generator.generate();
         typeLLVM = typeStack.Pop();
 
         if (!varDec.mutable)
         {
             LLVMValueRef constRef = LLVM.AddGlobal(module, typeLLVM, varDec.name);
-            LLVM.SetInitializer(constRef, valRef);
+            if (init)
+            {
+                LLVM.SetInitializer(constRef, valRef);
+            }
             valueStack.Push(constRef);
         }
         else
@@ -47,8 +60,11 @@ public class VariableDeclaration : Base
             LLVMValueRef allocaRef = LLVM.BuildAlloca(builder, typeLLVM, varDec.name);
             valueStack.Push(allocaRef);
             Console.WriteLine("built and pushed alloca");
-            LLVMValueRef storeRef = LLVM.BuildStore(builder, valRef, allocaRef);
-            valueStack.Push(storeRef);
+            if (init)
+            {
+                LLVMValueRef storeRef = LLVM.BuildStore(builder, valRef, allocaRef);
+                valueStack.Push(storeRef);
+            }
 
             namedMutablesLLVM.Add(varDec.name, allocaRef);
         }
@@ -92,9 +108,13 @@ public class VariableDeclaration : Base
 
         LLVMValueRef[] intsRef = asciiList.ToArray();
 
-        LLVMValueRef arrayRef = LLVM.ConstArray(LLVMTypeRef.Int8Type(), intsRef);
         LLVMValueRef globalArr = LLVM.AddGlobal(module, LLVMTypeRef.ArrayType(LLVMTypeRef.Int8Type(), (uint)intsRef.Length), varDec.name);
-        LLVM.SetInitializer(globalArr, arrayRef);
+
+        if (init)
+        {
+            LLVMValueRef arrayRef = LLVM.ConstArray(LLVMTypeRef.Int8Type(), intsRef);
+            LLVM.SetInitializer(globalArr, arrayRef);
+        }
 
         valueStack.Push(globalArr);
 

@@ -4,6 +4,8 @@ namespace AST;
 public class Struct : Node
 {
     public List<AST.Node> properties = new List<AST.Node>();
+    public List<string> propertiesNames = new List<string>();
+
     public string name = null;
 
     public Struct(Util.Token token, AST.Node? parent = null) : base(token)
@@ -17,12 +19,18 @@ public class Struct : Node
         Parser.nodes.Add(this);
     }
 
+    public int getPropIndex(string propName)
+    {
+        return propertiesNames.IndexOf(propName);
+    }
+
     public override void addChild(Node child)
     {
         if (child.nodeType != NodeType.VariableDeclaration)
         {
             throw new ArgumentException("non var dec added to str");
         }
+        AST.VariableDeclaration varDec = (AST.VariableDeclaration)child;
         properties.Add(child);
         base.addChild(child);
     }

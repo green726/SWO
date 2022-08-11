@@ -14,7 +14,7 @@ public class VariableAssignment : Base
 
     public override void generate()
     {
-        AST.VariableDeclaration originalVarDec = namedGlobalsAST[varAss.name];
+        AST.VariableDeclaration originalVarDec = namedGlobalsAST[varAss.varExpr.value];
 
         if (originalVarDec.type.value == "string")
         {
@@ -23,6 +23,8 @@ public class VariableAssignment : Base
 
         // (LLVMValueRef valRef, LLVMTypeRef typeLLVM) = generateVariableValue();
 
+        varAss.varExpr.generator.generate();
+        LLVMValueRef targetValRef = valueStack.Pop();
 
         // LLVMValueRef loadRef = LLVM.BuildLoad(builder, namedMutablesLLVM[binVarName], binVarName);
         // valueStack.Push(loadRef);
@@ -30,18 +32,16 @@ public class VariableAssignment : Base
         {
             this.varAss.bin.generator.generate();
             LLVMValueRef binValRef = valueStack.Pop();
-            LLVMValueRef storeRef = LLVM.BuildStore(builder, binValRef, namedMutablesLLVM[varAss.name]);
+            LLVMValueRef storeRef = LLVM.BuildStore(builder, binValRef, targetValRef);
             valueStack.Push(storeRef);
         }
         else
         {
             Console.WriteLine(varAss?.targetValue?.nodeType);
             varAss.targetValue.generator.generate();
-            LLVMValueRef targetValRef = valueStack.Pop();
-            LLVMValueRef storeRef = LLVM.BuildStore(builder, targetValRef, namedMutablesLLVM[varAss.name]);
+            LLVMValueRef resultValRef = valueStack.Pop();
+            LLVMValueRef storeRef = LLVM.BuildStore(builder, resultValRef, targetValRef);
             valueStack.Push(storeRef);
         }
     }
-
-
 }

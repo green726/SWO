@@ -29,12 +29,29 @@ public static class IRGen
 
     public static Dictionary<string, AST.VariableDeclaration> namedGlobalsAST = new Dictionary<string, AST.VariableDeclaration>();
 
+    public static Dictionary<string, AST.Struct> namedTypesAST = new Dictionary<string, AST.Struct>();
+
     public static LLVMBasicBlockRef mainEntryBlock;
 
     public static bool mainBuilt = false;
     public static List<AST.Node> nodesToBuild = new List<AST.Node>();
 
     public static Dictionary<string, LLVMValueRef> namedMutablesLLVM = new Dictionary<string, LLVMValueRef>();
+
+    public static Stack<AST.Struct> currentStruct = new Stack<AST.Struct>();
+
+    public static int getStructFieldIndex(AST.VariableExpression varExpr)
+    {
+        int index = currentStruct.Pop().getPropIndex(varExpr.value);
+        return index;
+    }
+
+    public static int getStructFieldIndex(string fieldName)
+    {
+        int index = currentStruct.Pop().getPropIndex(fieldName);
+
+        return index;
+    }
 
     public static AST.Type LLVMTypeToASTType(LLVMTypeRef type, AST.Node parent)
     {
@@ -46,8 +63,6 @@ public static class IRGen
                 return new AST.Type(new Util.Token(Util.TokenType.Keyword, "int", parent.line, parent.column));
             case LLVMTypeKind.LLVMPointerTypeKind:
                 return new AST.Type(new Util.Token(Util.TokenType.Keyword, "int", parent.line, parent.column));
-
-
         }
 
         throw GenException.FactoryMethod($"An unknown or unsupported type ({type.TypeKind.ToString()}) was used", "You used an undefined or illegal type | Likely a typo", parent, true, type.TypeKind.ToString());

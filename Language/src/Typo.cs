@@ -130,7 +130,7 @@ in 1
         {
             case AST.Node.NodeType.VariableAssignment:
                 AST.VariableAssignment varAss = (AST.VariableAssignment)node;
-                littleWriter.WriteLine($"{varAss.name} 1");
+                littleWriter.WriteLine($"{varAss.varExpr.value} 1");
                 // Console.WriteLine($"added var ass with name {varAss.name} to little dict");
                 break;
         }

@@ -22,8 +22,6 @@ public class VariableExpression : Expression
             this.addChild(new NumberExpression(new Util.Token(Util.TokenType.Int, splitStr[1], token.line, token.column + 1), this));
         }
 
-
-
         this.value = token.value;
         this.parent = parent;
 
@@ -39,23 +37,6 @@ public class VariableExpression : Expression
             this.isDereference = true;
             this.value = token.value.Remove(0, 1);
         }
-
-        // bool exists = false;
-        //NOTE: below is commented out b/c i think that LLVm IR will do it for me
-        //foreach (VariableAssignment varAss in Parser.globalVarAss)
-        // {
-        //     if (this.varName == varAss.name)
-        //     {
-        //         exists = true;
-        //         break;
-        //     }
-        // }
-        //
-        // if (exists == false)
-        // {
-        //     throw new ParserException($"Unknown variable referenced {this.varName}", token);
-        // }
-
 
         if (parent != null)
         {
@@ -85,6 +66,10 @@ public class VariableExpression : Expression
         }
         else if (!this.parsingArray)
         {
+            if (child.value == ".")
+            {
+                base.addChild(child);
+            }
             return;
         }
         base.addChild(child);
@@ -92,9 +77,14 @@ public class VariableExpression : Expression
 
     public override void addChild(AST.Node child)
     {
-        if (!this.parsingArray)
+        if (child.nodeType != NodeType.VariableExpression && child.nodeType != NodeType.NumberExpression || this.children.Count() > 1)
         {
             throw ParserException.FactoryMethod("An illegal child was added to a variable expression", "remove it", child);
+        }
+
+        if (child.nodeType == NodeType.VariableExpression)
+        {
+            this.isPointer = true;
         }
         base.addChild(child);
     }

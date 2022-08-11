@@ -7,7 +7,7 @@ public class VariableDeclaration : Node
     //NOTE: The type of the variable
     public Type type;
     //NOTE: the default value
-    public Expression defaultValue = null;
+    public Expression defaultValue;
     public bool mutable = false;
 
     //NOTE: a number used internally to tell where in the parsing we are
@@ -30,6 +30,10 @@ public class VariableDeclaration : Node
         this.mutable = mutable;
         Parser.globalVarAss.Add(this);
 
+        this.parent = parent;
+
+        this.defaultValue = new NullExpression(new Util.Token(Util.TokenType.Keyword, Config.settings.general.nulls.keyword, token.line, token.column));
+
         if (parent == null)
         {
             Console.WriteLine("adding var dec to parser nodes");
@@ -39,7 +43,6 @@ public class VariableDeclaration : Node
         {
             parent?.addChild(this);
         }
-
     }
 
     public VariableDeclaration(Util.Token typeTok, Node parent = null) : base(typeTok)
@@ -57,6 +60,10 @@ public class VariableDeclaration : Node
 
         this.mutable = true;
         this.keyword = false;
+
+        this.parent = parent;
+
+        this.defaultValue = new NullExpression(new Util.Token(Util.TokenType.Keyword, Config.settings.general.nulls.keyword, typeTok.line, typeTok.column));
 
         if (parent == null)
         {

@@ -12,8 +12,63 @@ public class VariableExpression : Base
         this.varExpr = (AST.VariableExpression)node;
     }
 
+    public LLVMValueRef generateGEPNew(LLVMValueRef varPtr)
+    {
+        return new LLVMValueRef();
+    }
+
+    public void updateCurrentStruct()
+    {
+        Console.WriteLine("called update currentStruct");
+        if (varExpr.children.Count() > 0 && !varExpr.isArrayIndexRef)
+        {
+            LLVMValueRef strValRef = generateVarRef();
+
+            string strName = strValRef.TypeOf().PrintTypeToString();
+
+            if (strName.EndsWith("*"))
+            {
+                strName = strName.Remove(strName.Length - 1);
+            }
+            if (strName.StartsWith("%"))
+            {
+                strName = strName.Remove(0, 1);
+            }
+
+            AST.Struct strType = namedTypesAST[strName];
+            currentStruct.Push(strType);
+        }
+        Console.WriteLine("updated currentStruct");
+    }
+
     public override void generate()
     {
+        Console.WriteLine("genning varExpr with parent type of " + varExpr.parent?.nodeType);
+        //NOTE: this will be hit if the parent is another var expr (this means that this varExpr is referencing a field of a struct (2nd or lower in foo.bar.cow))
+        if (varExpr?.parent?.nodeType == AST.Node.NodeType.VariableExpression)
+        {
+            int num = getStructFieldIndex(varExpr);
+            Console.WriteLine("got struct gep num: " + num);
+
+            LLVMValueRef strPtr = valueStack.Pop();
+            Console.WriteLine(strPtr);
+
+            LLVMValueRef numGEPRef = LLVM.BuildStructGEP(builder, strPtr, (uint)num, "structgeptmp");
+            valueStack.Push(numGEPRef);
+
+            LLVMValueRef numGEPRefLoad = LLVM.BuildLoad(builder, numGEPRef, "structgepload");
+            valueStack.Push(numGEPRefLoad);
+            //NOTE: incase this iteself is another struct set the current struct to this for the rest of its children
+            updateCurrentStruct();
+
+            //NOTE: gen this things children (incase it is a struct with more references) then return b/c we dont want to do other stuff below
+            genChildren();
+            return;
+        }
+
+        //NOTE:below is incase this node is a top level struct reference (ie the first in foo.bar.cow)
+        updateCurrentStruct();
+
         if (this.varExpr.isArrayIndexRef)
         {
             LLVMValueRef varRef = generateVarRef();
@@ -27,21 +82,36 @@ public class VariableExpression : Base
         else if (this.varExpr.isPointer)
         {
             valueStack.Push(generateVarRef());
+
+            genChildren();
             return;
         }
         Console.WriteLine("generating load ref");
         LLVMValueRef loadRef = generateVarLoad();
         Console.WriteLine("genned load ref");
         valueStack.Push(loadRef);
+
+        genChildren();
     }
+
+    public void genChildren()
+    {
+        foreach (AST.Node child in this.varExpr.children)
+        {
+            Console.WriteLine("genning varExpr child of type " + child.nodeType);
+            child.generator.generate();
+            Console.WriteLine("genned varExpr child of type " + child.nodeType);
+        }
+    }
+
 
     public LLVMValueRef generateVarRef()
     {
         LLVMValueRef varRef = LLVM.GetNamedGlobal(module, varExpr.value);
         if (varRef.Pointer == IntPtr.Zero)
         {
-            Console.WriteLine(String.Join(",", namedValuesLLVM.Keys.ToArray()));
-            Console.WriteLine("named values LLVM count " + namedValuesLLVM.Count);
+            // Console.WriteLine(String.Join(",", namedValuesLLVM.Keys.ToArray()));
+            // Console.WriteLine("named values LLVM count " + namedValuesLLVM.Count);
             if (namedMutablesLLVM.ContainsKey(varExpr.value))
             {
                 return namedMutablesLLVM[varExpr.value];
@@ -53,7 +123,6 @@ public class VariableExpression : Base
                     varRef = namedValuesLLVM[varExpr.value];
                     if (varRef.Pointer != IntPtr.Zero)
                     {
-                        Console.WriteLine("hello 1");
                         return varRef;
                     }
                 }

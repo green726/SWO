@@ -2,7 +2,8 @@ namespace AST;
 
 public class VariableAssignment : AST.Node
 {
-    public string name = "";
+    public VariableExpression varExpr;
+
     public Type type;
     public string assignmentOp = "";
     private int childLoop = 0;
@@ -20,17 +21,25 @@ public class VariableAssignment : AST.Node
 
         if (parent != null)
         {
-
-            AST.Node prevNode = parent.children.Last();
-            if (prevNode.nodeType == NodeType.VariableExpression)
+            if (parent.nodeType == NodeType.VariableExpression)
             {
-                VariableExpression prevVarExpr = (VariableExpression)prevNode;
-                this.name = prevVarExpr.value;
+                VariableExpression prevVarExpr = (VariableExpression)parent;
                 prevVarExpr.addParent(this);
+                this.varExpr = prevVarExpr;
+                // prevVarExpr.isPointer = true;
                 this.children.Add(prevVarExpr);
+
+                this.parent = Parser.lastMajorParentNode;
+                this.parent?.addChild(this);
             }
-            this.parent = parent;
-            this.parent.addChild(this);
+
+            else
+            {
+                this.parent = parent;
+                this.parent?.addChild(this);
+            }
+
+
             this.childLoop = 1;
         }
         else
@@ -46,8 +55,6 @@ public class VariableAssignment : AST.Node
             // }
         }
     }
-
-
 
 
     public override void addChild(Util.Token child)

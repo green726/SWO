@@ -60,7 +60,7 @@ public static class Swo
                 List<Util.Token> lexedContent = Lexer.lex(fileContents, lexTask);
 
                 var parseTask = ctx.AddTask("Parsing the SWO code");
-                List<AST.Node> nodes = Parser.parseForLoop(lexedContent, parseTask);
+                List<AST.Node> nodes = Parser.parse(lexedContent, parseTask);
 
                 var moduleTask = ctx.AddTask("Initializing LLVM");
                 ModuleGen.GenerateModule(moduleTask);

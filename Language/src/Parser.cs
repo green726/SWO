@@ -30,7 +30,10 @@ public static class Parser
     public static int finalTokenNum = 0;
     public static int currentTokenNum = 0;
     public static bool isFinishedParsing = false;
-    public static Stack<AST.Node> parentStack = new Stack<AST.Node>();
+    public static Stack<AST.Node> delimParentStack = new Stack<AST.Node>();
+
+    public static AST.Node lastMajorParentNode = null;
+
 
     public static void checkNode(AST.Node? node, AST.Node.NodeType[] expectedTypes)
     {
@@ -135,7 +138,7 @@ public static class Parser
 
     public static string printVarAss(AST.VariableAssignment varAss)
     {
-        return $"{varAss.nodeType} with name of {varAss.name} and children of [{printASTRet(varAss.children)}]";
+        return $"{varAss.nodeType} with name of {varAss.varExpr.value} and children of [{printASTRet(varAss.children)}]";
     }
 
     public static string printProto(AST.Prototype proto)
@@ -281,7 +284,6 @@ public static class Parser
         Console.WriteLine(stringBuilder);
     }
 
-
     public static List<Util.Token> getTokensUntil(int startIndex, Util.TokenType stopType)
     {
         List<Util.Token> ret = new List<Util.Token>();
@@ -296,6 +298,21 @@ public static class Parser
             currentIndex++;
         }
         return ret;
+    }
+
+
+    public static Util.Token nextNonSpace(int startIndex)
+    {
+        int currentIndex = startIndex + 1;
+        Util.Token currentTok = tokenList[currentIndex];
+
+        while (currentTok.type == Util.TokenType.Space)
+        {
+            currentIndex++;
+            currentTok = tokenList[currentIndex];
+        }
+
+        return currentTok;
     }
 
     public static (AST.Node, int) parseKeyword(Util.Token token, int tokenIndex, AST.Node? parent = null, int delimLevel = 0)
@@ -462,7 +479,11 @@ public static class Parser
         }
 
         AST.VariableExpression varExpr = new AST.VariableExpression(token, parent);
-        return (varExpr, delimLevel);
+        if (parent?.nodeType != AST.Node.NodeType.VariableExpression)
+        {
+            return (varExpr, delimLevel);
+        }
+        return (parent, delimLevel);
     }
 
     public static (AST.Node parent, int delimLevel) parseDelim(Util.Token token, int tokenIndex, AST.Node? parent = null, int delimLevel = 0)
@@ -476,7 +497,7 @@ public static class Parser
                     //TODO: replace this with the config delimiter
                     if (token.value == "{")
                     {
-                        AST.ArrayExpression arrExpr = new AST.ArrayExpression(token, parent); parentStack.Push(arrExpr);
+                        AST.ArrayExpression arrExpr = new AST.ArrayExpression(token, parent); delimParentStack.Push(arrExpr);
                         return (arrExpr, delimLevel + 1);
                     }
                     parent?.addChild(token);
@@ -488,12 +509,12 @@ public static class Parser
                     break;
             }
             // Console.WriteLine("pushing parent with node type of " + parent.nodeType + " to parent stack and parent parent of node type " + parent?.parent?.nodeType);
-            parentStack.Push(parent);
+            delimParentStack.Push(parent);
             delimLevel++;
         }
         else if (token.type == Util.TokenType.DelimiterClose)
         {
-            AST.Node delimParent = parentStack.Pop();
+            AST.Node delimParent = delimParentStack.Pop();
             switch (parent?.nodeType)
             {
                 case AST.Node.NodeType.ForLoop:
@@ -553,11 +574,9 @@ public static class Parser
     }
 
 
-    public static List<AST.Node> parseForLoop(List<Util.Token> _tokenList, Spectre.Console.ProgressTask task = null)
+    public static List<AST.Node> parse(List<Util.Token> _tokenList, Spectre.Console.ProgressTask task = null)
     {
         addLanguageBuiltins();
-
-
 
         tokenList = _tokenList;
 
@@ -588,6 +607,11 @@ public static class Parser
 
         while (!isFinishedParsing)
         {
+            if (parent?.isExpression == false)
+            {
+                lastMajorParentNode = parent;
+            }
+
             if (task != null)
             {
                 task.Increment(1);
@@ -600,7 +624,7 @@ public static class Parser
             prevLine = token.line;
             prevColumn = token.column;
 
-            Console.WriteLine($"token of value: {token.value} and type of {token.type} and parent of {parent?.nodeType} and num of {currentTokenNum}");
+            Console.WriteLine($"token of value: {token.value} and type of {token.type} and parent of {parent?.nodeType} and delim level of {delimLevel}");
             AST.Node? previousNode = nodes.Count > 0 && currentTokenNum > 0 ? nodes.Last() : null;
 
             if (token.type == Util.TokenType.EOF)
