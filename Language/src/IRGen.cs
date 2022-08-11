@@ -31,6 +31,8 @@ public static class IRGen
 
     public static Dictionary<string, AST.Struct> namedTypesAST = new Dictionary<string, AST.Struct>();
 
+    public static Dictionary<string, LLVMTypeRef> namedTypesLLVM = new Dictionary<string, LLVMTypeRef>();
+
     public static LLVMBasicBlockRef mainEntryBlock;
 
     public static bool mainBuilt = false;
@@ -99,7 +101,7 @@ public static class IRGen
 
         LLVM.VerifyModule(module, LLVMVerifierFailureAction.LLVMPrintMessageAction, out string verifyMessage);
 
-        Console.WriteLine("LLVM module dump below");
+        AnsiConsole.MarkupLine("[blue]pre optimizations LLVM IR below [/]");
         LLVM.DumpModule(module);
         Console.WriteLine("");
     }
@@ -107,6 +109,10 @@ public static class IRGen
     public static void optimizeIR(Spectre.Console.ProgressTask task)
     {
         LLVM.RunPassManager(passManager, module);
+
+        AnsiConsole.MarkupLine("[blue]post optimizations LLVM IR below [/]");
+        LLVM.DumpModule(module);
+        Console.WriteLine("");
         task.StopTask();
     }
 

@@ -20,7 +20,6 @@ public class Struct : Base
         {
             AST.VariableDeclaration varDec = (AST.VariableDeclaration)node;
             str.propertiesNames.Add(varDec.name);
-
         }
 
         List<LLVMTypeRef> elementTypes = new List<LLVMTypeRef>();
@@ -39,5 +38,6 @@ public class Struct : Base
         LLVM.DumpType(structType);
 
         typeStack.Push(structType);
+        namedTypesLLVM.Add(str.name, structType);
     }
 }

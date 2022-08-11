@@ -82,10 +82,10 @@ public class VariableExpression : Expression
             throw ParserException.FactoryMethod("An illegal child was added to a variable expression", "remove it", child);
         }
 
-        if (child.nodeType == NodeType.VariableExpression)
-        {
-            this.isPointer = true;
-        }
+        // if (child.nodeType == NodeType.VariableExpression)
+        // {
+        //     this.isPointer = true;
+        // }
         base.addChild(child);
     }
 }

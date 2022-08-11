@@ -22,7 +22,7 @@ public class VariableAssignment : Base
         }
 
         // (LLVMValueRef valRef, LLVMTypeRef typeLLVM) = generateVariableValue();
-
+        varAss.varExpr.isPointer = true;
         varAss.varExpr.generator.generate();
         LLVMValueRef targetValRef = valueStack.Pop();
 

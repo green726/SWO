@@ -76,6 +76,10 @@ public class Type : Base
 
     public void genNonArray()
     {
+        if (namedTypesLLVM.ContainsKey(type.value))
+        {
+            typeStack.Push(namedTypesLLVM[type.value]);
+        }
         switch (type.value)
         {
             case "double":

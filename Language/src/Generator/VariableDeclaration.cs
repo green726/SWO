@@ -4,7 +4,6 @@ using static IRGen;
 
 public class VariableDeclaration : Base
 {
-
     public AST.VariableDeclaration varDec;
     public LLVMTypeRef typeLLVM;
 
@@ -35,8 +34,9 @@ public class VariableDeclaration : Base
 
         this.varDec.type.generator.generate();
         typeLLVM = typeStack.Pop();
+        Spectre.Console.AnsiConsole.MarkupLine($"[red]type stack {typeLLVM}[/]");
 
-        if (!varDec.mutable)
+        if (!varDec.mutable && typeLLVM.TypeKind != LLVMTypeKind.LLVMStructTypeKind)
         {
             LLVMValueRef constRef = LLVM.AddGlobal(module, typeLLVM, varDec.name);
             if (init)

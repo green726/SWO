@@ -47,6 +47,8 @@ public class VariableExpression : Base
         //NOTE: this will be hit if the parent is another var expr (this means that this varExpr is referencing a field of a struct (2nd or lower in foo.bar.cow))
         if (varExpr?.parent?.nodeType == AST.Node.NodeType.VariableExpression)
         {
+            AST.VariableExpression varExprPar = (AST.VariableExpression)varExpr.parent;
+            varExpr.isPointer = varExprPar.isPointer;
             int num = getStructFieldIndex(varExpr);
             Console.WriteLine("got struct gep num: " + num);
 
@@ -56,8 +58,12 @@ public class VariableExpression : Base
             LLVMValueRef numGEPRef = LLVM.BuildStructGEP(builder, strPtr, (uint)num, "structgeptmp");
             valueStack.Push(numGEPRef);
 
-            LLVMValueRef numGEPRefLoad = LLVM.BuildLoad(builder, numGEPRef, "structgepload");
-            valueStack.Push(numGEPRefLoad);
+            if (!varExpr.isPointer)
+            {
+                LLVMValueRef numGEPRefLoad = LLVM.BuildLoad(builder, numGEPRef, "structgepload");
+                valueStack.Push(numGEPRefLoad);
+            }
+
             //NOTE: incase this iteself is another struct set the current struct to this for the rest of its children
             updateCurrentStruct();
 
@@ -79,8 +85,9 @@ public class VariableExpression : Base
             Console.WriteLine(gepLoadRef);
             return;
         }
-        else if (this.varExpr.isPointer)
+        else if (this.varExpr.isPointer || this.varExpr.children.Count() > 0)
         {
+            Console.WriteLine("ptr var expr detected");
             valueStack.Push(generateVarRef());
 
             genChildren();
