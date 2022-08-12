@@ -79,6 +79,7 @@ public abstract class Node
             Parser.nodes.Remove(this);
             this.parent = parent;
         }
+        
 
     }
 

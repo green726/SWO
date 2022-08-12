@@ -19,6 +19,7 @@ public class VariableExpression : Base
 
     public void updateCurrentStruct()
     {
+        //BUG: below cant handle nested structs
         Console.WriteLine("called update currentStruct");
         if (varExpr.children.Count() > 0 && !varExpr.isArrayIndexRef)
         {
@@ -41,9 +42,38 @@ public class VariableExpression : Base
         Console.WriteLine("updated currentStruct");
     }
 
+    public void updateCurrentStruct(LLVMValueRef parRef, int index)
+    {
+        if (varExpr.children.Count() > 0 && !varExpr.isArrayIndexRef)
+        {
+            Console.WriteLine("called update currentStruct with par: " + parRef);
+            string strName = LLVM.GetAllocatedType(parRef).StructGetTypeAtIndex((uint)index).PrintTypeToString();
+            Console.WriteLine("str name: " + strName);
+
+            if (strName.EndsWith("*"))
+            {
+                strName = strName.Remove(strName.Length - 1);
+            }
+            if (strName.StartsWith("%"))
+            {
+                strName = strName.Remove(0, 1);
+            }
+
+            int indexOfEquals = strName.IndexOf("=");
+            Console.WriteLine(indexOfEquals);
+            strName = strName.Remove(indexOfEquals - 1);
+
+            Console.WriteLine("str name post stuff: " + strName);
+            AST.Struct strType = namedTypesAST[strName];
+            currentStruct.Push(strType);
+            Console.WriteLine("updated currentStruct");
+        }
+    }
+
+
     public override void generate()
     {
-        Console.WriteLine("genning varExpr with parent type of " + varExpr.parent?.nodeType);
+        Console.WriteLine("genning varExpr with value of " + varExpr.value + " parent type of " + varExpr.parent?.nodeType + " and children count of " + varExpr.children.Count());
         //NOTE: this will be hit if the parent is another var expr (this means that this varExpr is referencing a field of a struct (2nd or lower in foo.bar.cow))
         if (varExpr?.parent?.nodeType == AST.Node.NodeType.VariableExpression)
         {
@@ -53,19 +83,19 @@ public class VariableExpression : Base
             Console.WriteLine("got struct gep num: " + num);
 
             LLVMValueRef strPtr = valueStack.Pop();
-            Console.WriteLine(strPtr);
+            Console.WriteLine("strptr: " + strPtr);
 
             LLVMValueRef numGEPRef = LLVM.BuildStructGEP(builder, strPtr, (uint)num, "structgeptmp");
             valueStack.Push(numGEPRef);
 
-            if (!varExpr.isPointer)
+            if (!varExpr.isPointer && varExpr.children.Count() == 0)
             {
                 LLVMValueRef numGEPRefLoad = LLVM.BuildLoad(builder, numGEPRef, "structgepload");
                 valueStack.Push(numGEPRefLoad);
             }
 
             //NOTE: incase this iteself is another struct set the current struct to this for the rest of its children
-            updateCurrentStruct();
+            updateCurrentStruct(strPtr, num);
 
             //NOTE: gen this things children (incase it is a struct with more references) then return b/c we dont want to do other stuff below
             genChildren();

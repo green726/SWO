@@ -14,6 +14,9 @@ public class VariableExpression : Expression
         this.nodeType = NodeType.VariableExpression;
         this.generator = new Generator.VariableExpression(this);
 
+        this.value = token.value;
+        this.parent = parent;
+
         if (token.value.Contains("[") && token.value.Contains("]"))
         {
             String[] splitStr = token.value.Split("[");
@@ -21,9 +24,6 @@ public class VariableExpression : Expression
             this.value = splitStr[0];
             this.addChild(new NumberExpression(new Util.Token(Util.TokenType.Int, splitStr[1], token.line, token.column + 1), this));
         }
-
-        this.value = token.value;
-        this.parent = parent;
 
         if (token.value.StartsWith("&"))
         {
@@ -77,7 +77,7 @@ public class VariableExpression : Expression
 
     public override void addChild(AST.Node child)
     {
-        if (child.nodeType != NodeType.VariableExpression && child.nodeType != NodeType.NumberExpression || this.children.Count() > 1)
+        if (child.nodeType != NodeType.VariableExpression && child.nodeType != NodeType.NumberExpression)
         {
             throw ParserException.FactoryMethod("An illegal child was added to a variable expression", "remove it", child);
         }
@@ -86,6 +86,15 @@ public class VariableExpression : Expression
         // {
         //     this.isPointer = true;
         // }
+
+        if (children.Count() > 0)
+        {
+            AST.Node lastChild = children.Last();
+            child.parent = lastChild;
+            lastChild.addChild(child);
+            return;
+        }
+
         base.addChild(child);
     }
 }
