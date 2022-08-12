@@ -29,11 +29,9 @@ public class VariableExpression : Base
 
     public void updateCurrentStruct(LLVMValueRef parRef, int index)
     {
-        if (varExpr.children.Count() > 0 && !varExpr.isArrayIndexRef)
+        if (varExpr.children.Count() > 0)
         {
             Console.WriteLine("called update currentStruct with par: " + parRef);
-
-
 
             string strName = LLVM.GetAllocatedType(parRef).StructGetTypeAtIndex((uint)index).PrintTypeToString();
             Console.WriteLine("str name: " + strName);
@@ -51,10 +49,17 @@ public class VariableExpression : Base
             Console.WriteLine(indexOfEquals);
             strName = strName.Remove(indexOfEquals - 1);
 
-            Console.WriteLine("str name post stuff: " + strName);
-            AST.Struct strType = namedTypesAST[strName];
-            currentStruct.Push(strType);
-            Console.WriteLine("updated currentStruct");
+            if (namedTypesAST.ContainsKey(strName))
+            {
+                AST.Struct strType = namedTypesAST[strName];
+                currentStruct.Push(strType);
+                Console.WriteLine("updated currentStruct");
+            }
+
+            else
+            {
+                Console.WriteLine("didnt update current struct");
+            }
         }
     }
 
@@ -62,7 +67,7 @@ public class VariableExpression : Base
     {
         //BUG: below cant handle nested structs
         Console.WriteLine("called update currentStruct");
-        if (varExpr.children.Count() > 0 && !varExpr.isArrayIndexRef)
+        if (varExpr.children.Count() > 0)
         {
             LLVMValueRef strValRef = generateVarRef();
 
@@ -77,10 +82,18 @@ public class VariableExpression : Base
                 strName = strName.Remove(0, 1);
             }
 
-            AST.Struct strType = namedTypesAST[strName];
-            currentStruct.Push(strType);
+            if (namedTypesAST.ContainsKey(strName))
+            {
+                AST.Struct strType = namedTypesAST[strName];
+                currentStruct.Push(strType);
+                Console.WriteLine("updated currentStruct");
+            }
+
+            else
+            {
+                Console.WriteLine("didnt update current struct");
+            }
         }
-        Console.WriteLine("updated currentStruct");
     }
 
     public override void generate()

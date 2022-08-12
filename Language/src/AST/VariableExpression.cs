@@ -3,8 +3,6 @@ namespace AST;
 public class VariableExpression : Expression
 {
 
-    public bool isArrayIndexRef = false;
-
     public bool isPointer = false;
     public bool isDereference = false;
 
