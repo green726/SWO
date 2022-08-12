@@ -3,7 +3,6 @@ namespace AST;
 public class VariableExpression : Expression
 {
 
-    private bool parsingArray = false;
     public bool isArrayIndexRef = false;
 
     public bool isPointer = false;
@@ -17,13 +16,13 @@ public class VariableExpression : Expression
         this.value = token.value;
         this.parent = parent;
 
-        if (token.value.Contains("[") && token.value.Contains("]"))
-        {
-            String[] splitStr = token.value.Split("[");
-
-            this.value = splitStr[0];
-            this.addChild(new NumberExpression(new Util.Token(Util.TokenType.Int, splitStr[1], token.line, token.column + 1), this));
-        }
+        // if (token.value.Contains("[") && token.value.Contains("]"))
+        // {
+        //     String[] splitStr = token.value.Split("[");
+        //
+        //     this.value = splitStr[0];
+        //     this.addChild(new NumberExpression(new Util.Token(Util.TokenType.Int, splitStr[1], token.line, token.column + 1), this));
+        // }
 
         if (token.value.StartsWith("&"))
         {
@@ -51,25 +50,9 @@ public class VariableExpression : Expression
 
     public override void addChild(Util.Token child)
     {
-        if (child.value == "[" && !parsingArray)
+        if (this.children.Count() > 0)
         {
-            this.isArrayIndexRef = true;
-            this.parsingArray = true;
-            this.codeExcerpt += child.value;
-            return;
-        }
-        else if (child.value == "]" && parsingArray)
-        {
-            this.parsingArray = false;
-            this.codeExcerpt += child.value;
-            return;
-        }
-        else if (!this.parsingArray)
-        {
-            if (child.value == ".")
-            {
-                base.addChild(child);
-            }
+            this.children.Last().addChild(child);
             return;
         }
         base.addChild(child);
@@ -77,7 +60,7 @@ public class VariableExpression : Expression
 
     public override void addChild(AST.Node child)
     {
-        if (child.nodeType != NodeType.VariableExpression && child.nodeType != NodeType.NumberExpression)
+        if (child.nodeType != NodeType.VariableExpression && child.nodeType != NodeType.IndexReference)
         {
             throw ParserException.FactoryMethod("An illegal child was added to a variable expression", "remove it", child);
         }
@@ -85,6 +68,13 @@ public class VariableExpression : Expression
         // if (child.nodeType == NodeType.VariableExpression)
         // {
         //     this.isPointer = true;
+        // }
+
+        Console.WriteLine($"adding child to varExpr with type of " + child.nodeType);
+        // if (child.nodeType == NodeType.NumberExpression)
+        // {
+        //     this.numExpr = (NumberExpression)child;
+        //     return;
         // }
 
         if (children.Count() > 0)

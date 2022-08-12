@@ -491,6 +491,13 @@ public static class Parser
 
         if (token.type == Util.TokenType.DelimiterOpen)
         {
+            if (token.value == "[")
+            {
+                parent = new AST.IndexReference(token, parent);
+                delimParentStack.Push(parent);
+                delimLevel++;
+                return (parent, delimLevel);
+            }
             switch (parent?.nodeType)
             {
                 case AST.Node.NodeType.VariableDeclaration:

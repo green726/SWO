@@ -16,11 +16,11 @@ public class NumberExpression : Expression
         switch (token.type)
         {
             case Util.TokenType.Double:
-                this.value = Double.Parse(token.value);
+                this.value = (double)Double.Parse(token.value);
                 this.type = new Type("double", this);
                 break;
             case Util.TokenType.Int:
-                this.value = Int64.Parse(token.value);
+                this.value = (int)Int64.Parse(token.value);
                 this.type = new Type("int", this);
                 break;
         }

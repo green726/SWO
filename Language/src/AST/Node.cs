@@ -41,6 +41,7 @@ public abstract class Node
     {
         Unknown,
         Struct,
+        IndexReference,
         VariableExpression,
         NumberExpression,
         BinaryExpression,
@@ -79,7 +80,7 @@ public abstract class Node
             Parser.nodes.Remove(this);
             this.parent = parent;
         }
-        
+
 
     }
 

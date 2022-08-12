@@ -12,9 +12,50 @@ public class VariableExpression : Base
         this.varExpr = (AST.VariableExpression)node;
     }
 
-    public LLVMValueRef generateGEPNew(LLVMValueRef varPtr)
+    public void checkIsPtr()
     {
-        return new LLVMValueRef();
+        switch (varExpr.parent?.nodeType)
+        {
+            case AST.Node.NodeType.VariableExpression:
+                AST.VariableExpression varExprPar = (AST.VariableExpression)varExpr.parent;
+                varExpr.isPointer = varExprPar.isPointer;
+                break;
+            case AST.Node.NodeType.IndexReference:
+                AST.IndexReference idxPar = (AST.IndexReference)varExpr.parent;
+                varExpr.isPointer = idxPar.isPointer;
+                break;
+        }
+    }
+
+    public void updateCurrentStruct(LLVMValueRef parRef, int index)
+    {
+        if (varExpr.children.Count() > 0 && !varExpr.isArrayIndexRef)
+        {
+            Console.WriteLine("called update currentStruct with par: " + parRef);
+
+
+
+            string strName = LLVM.GetAllocatedType(parRef).StructGetTypeAtIndex((uint)index).PrintTypeToString();
+            Console.WriteLine("str name: " + strName);
+
+            if (strName.EndsWith("*"))
+            {
+                strName = strName.Remove(strName.Length - 1);
+            }
+            if (strName.StartsWith("%"))
+            {
+                strName = strName.Remove(0, 1);
+            }
+
+            int indexOfEquals = strName.IndexOf("=");
+            Console.WriteLine(indexOfEquals);
+            strName = strName.Remove(indexOfEquals - 1);
+
+            Console.WriteLine("str name post stuff: " + strName);
+            AST.Struct strType = namedTypesAST[strName];
+            currentStruct.Push(strType);
+            Console.WriteLine("updated currentStruct");
+        }
     }
 
     public void updateCurrentStruct()
@@ -42,93 +83,56 @@ public class VariableExpression : Base
         Console.WriteLine("updated currentStruct");
     }
 
-    public void updateCurrentStruct(LLVMValueRef parRef, int index)
-    {
-        if (varExpr.children.Count() > 0 && !varExpr.isArrayIndexRef)
-        {
-            Console.WriteLine("called update currentStruct with par: " + parRef);
-            string strName = LLVM.GetAllocatedType(parRef).StructGetTypeAtIndex((uint)index).PrintTypeToString();
-            Console.WriteLine("str name: " + strName);
-
-            if (strName.EndsWith("*"))
-            {
-                strName = strName.Remove(strName.Length - 1);
-            }
-            if (strName.StartsWith("%"))
-            {
-                strName = strName.Remove(0, 1);
-            }
-
-            int indexOfEquals = strName.IndexOf("=");
-            Console.WriteLine(indexOfEquals);
-            strName = strName.Remove(indexOfEquals - 1);
-
-            Console.WriteLine("str name post stuff: " + strName);
-            AST.Struct strType = namedTypesAST[strName];
-            currentStruct.Push(strType);
-            Console.WriteLine("updated currentStruct");
-        }
-    }
-
-
     public override void generate()
     {
         Console.WriteLine("genning varExpr with value of " + varExpr.value + " parent type of " + varExpr.parent?.nodeType + " and children count of " + varExpr.children.Count());
-        //NOTE: this will be hit if the parent is another var expr (this means that this varExpr is referencing a field of a struct (2nd or lower in foo.bar.cow))
-        if (varExpr?.parent?.nodeType == AST.Node.NodeType.VariableExpression)
+        if (varExpr?.parent?.nodeType == AST.Node.NodeType.VariableExpression || varExpr?.parent?.nodeType == AST.Node.NodeType.IndexReference)
         {
-            AST.VariableExpression varExprPar = (AST.VariableExpression)varExpr.parent;
-            varExpr.isPointer = varExprPar.isPointer;
-            int num = getStructFieldIndex(varExpr);
+            int num = 0;
+            LLVMValueRef gepPtr = valueStack.Pop();
+            Console.WriteLine("gepPtr: " + gepPtr);
+
+            num = getStructFieldIndex(varExpr);
             Console.WriteLine("got struct gep num: " + num);
 
-            LLVMValueRef strPtr = valueStack.Pop();
-            Console.WriteLine("strptr: " + strPtr);
-
-            LLVMValueRef numGEPRef = LLVM.BuildStructGEP(builder, strPtr, (uint)num, "structgeptmp");
+            LLVMValueRef numGEPRef = LLVM.BuildStructGEP(builder, gepPtr, (uint)num, "structGEPTmp");
             valueStack.Push(numGEPRef);
+            Console.WriteLine(numGEPRef);
+
+            checkIsPtr();
 
             if (!varExpr.isPointer && varExpr.children.Count() == 0)
             {
-                LLVMValueRef numGEPRefLoad = LLVM.BuildLoad(builder, numGEPRef, "structgepload");
+                LLVMValueRef numGEPRefLoad = LLVM.BuildLoad(builder, numGEPRef, "structGEPLoad");
                 valueStack.Push(numGEPRefLoad);
             }
 
             //NOTE: incase this iteself is another struct set the current struct to this for the rest of its children
-            updateCurrentStruct(strPtr, num);
+            updateCurrentStruct(gepPtr, num);
 
             //NOTE: gen this things children (incase it is a struct with more references) then return b/c we dont want to do other stuff below
             genChildren();
             return;
         }
-
-        //NOTE:below is incase this node is a top level struct reference (ie the first in foo.bar.cow)
-        updateCurrentStruct();
-
-        if (this.varExpr.isArrayIndexRef)
+        else
         {
-            Spectre.Console.AnsiConsole.MarkupLine("[green]genning arr gep[/]");
-            LLVMValueRef varRef = generateVarRef();
-            LLVMValueRef gepRef = generateGEP(varRef);
-            LLVMValueRef gepLoadRef = LLVM.BuildLoad(builder, gepRef, varExpr.value);
-            valueStack.Push(gepLoadRef);
-            Console.WriteLine(gepLoadRef);
-            return;
-        }
-        else if (this.varExpr.isPointer || this.varExpr.children.Count() > 0)
-        {
-            Console.WriteLine("ptr var expr detected");
-            valueStack.Push(generateVarRef());
+            if (this.varExpr.isPointer || this.varExpr.children.Count() > 0)
+            {
+                Console.WriteLine("ptr var expr detected");
+                valueStack.Push(generateVarRef());
+            }
+            else
+            {
+                Console.WriteLine("generating load ref");
+                LLVMValueRef loadRef = generateVarLoad();
+                Console.WriteLine("genned load ref");
+                valueStack.Push(loadRef);
+            }
+
+            updateCurrentStruct();
 
             genChildren();
-            return;
         }
-        Console.WriteLine("generating load ref");
-        LLVMValueRef loadRef = generateVarLoad();
-        Console.WriteLine("genned load ref");
-        valueStack.Push(loadRef);
-
-        genChildren();
     }
 
     public void genChildren()
@@ -181,55 +185,6 @@ public class VariableExpression : Base
             return varRef;
         }
 
-    }
-
-    public LLVMValueRef generateGEP(LLVMValueRef varPtr)
-    {
-
-        List<LLVMValueRef> childValueList = new List<LLVMValueRef>();
-
-        LLVMTypeRef varType = varPtr.TypeOf();
-        if (LLVM.GetTypeKind(varType) == LLVMTypeKind.LLVMPointerTypeKind)
-        {
-            childValueList.Add(LLVM.ConstInt(LLVMTypeRef.Int64Type(), 0, false));
-            foreach (AST.Node node in varExpr.children)
-            {
-                AST.NumberExpression numExpr = (AST.NumberExpression)node;
-                numExpr.value += Config.settings.variable.arrays.startIndex;
-                numExpr.generator.generate();
-                childValueList.Add(valueStack.Pop());
-            }
-            if (childValueList.Count() < 1)
-            {
-                throw ParserException.FactoryMethod("No index references were found in array reference", "Add in index reference (\"[1]\")", varExpr);
-            }
-        }
-        else
-        {
-            childValueList.Add(LLVM.ConstInt(LLVMTypeRef.Int64Type(), 0, false));
-            int arraySize = (int)LLVM.GetArrayLength(varType);
-            foreach (AST.Node node in varExpr.children)
-            {
-                AST.NumberExpression numExpr = (AST.NumberExpression)node;
-                numExpr.value += Config.settings.variable.arrays.startIndex;
-                if (Config.settings.variable.arrays.outOfBoundsErrorEnabled && numExpr.value > arraySize)
-                {
-                    throw ParserException.FactoryMethod("Index out of range", "Make the index in range", varExpr);
-                }
-                numExpr.generator.generate();
-                childValueList.Add(valueStack.Pop());
-            }
-            if (childValueList.Count() <= 1)
-            {
-                throw ParserException.FactoryMethod("No index references were found in array reference", "Add in index reference (\"[1]\")", varExpr);
-            }
-        }
-
-
-
-        return LLVM.BuildGEP(builder, varPtr, childValueList.ToArray(), varExpr.value);
-
-        // throw ParserException.FactoryMethod("Too many index references were found in array reference", "Remove some index references (\"[1]\")", varExpr);
     }
 
     public LLVMValueRef generateVarLoad()
