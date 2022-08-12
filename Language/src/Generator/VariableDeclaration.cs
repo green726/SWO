@@ -34,7 +34,7 @@ public class VariableDeclaration : Base
 
         this.varDec.type.generator.generate();
         typeLLVM = typeStack.Pop();
-        Console.Write(typeLLVM);
+        // Console.Write(typeLLVM);
         Spectre.Console.AnsiConsole.MarkupLine($"[red] type stack[/]");
 
         if (!varDec.mutable && typeLLVM.TypeKind != LLVMTypeKind.LLVMStructTypeKind)
@@ -50,7 +50,7 @@ public class VariableDeclaration : Base
         {
             if (!mainBuilt)
             {
-                // Console.WriteLine("")
+                Console.WriteLine("adding to main nodes to build");
                 nodesToBuild.Add(varDec);
                 return;
             }
@@ -60,11 +60,13 @@ public class VariableDeclaration : Base
             Console.WriteLine();
             LLVMValueRef allocaRef = LLVM.BuildAlloca(builder, typeLLVM, varDec.name);
             valueStack.Push(allocaRef);
-            Console.WriteLine("built and pushed alloca");
+            Console.WriteLine("built and pushed alloca: " + allocaRef);
             if (init)
             {
+                Console.WriteLine("store ref target: " + valRef);
                 LLVMValueRef storeRef = LLVM.BuildStore(builder, valRef, allocaRef);
                 valueStack.Push(storeRef);
+                Console.WriteLine("built and pushed store ref: " + storeRef);
             }
 
             namedMutablesLLVM.Add(varDec.name, allocaRef);

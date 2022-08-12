@@ -93,7 +93,8 @@ public static class Lexer
                     continue;
             }
 
-            if (ch != ' ' && (int)ch != 13 && ch != '.')
+            //TODO: add handling of special chars (. , ; : etc)
+            if (ch != ' ' && (int)ch != 13 && ch != '.' && ch != ',')
             {
                 stringBuilder.Append(ch.ToString());
             }

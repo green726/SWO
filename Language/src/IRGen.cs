@@ -99,7 +99,9 @@ public static class IRGen
             // LLVM.DumpValue(valueStack.Peek());
         }
 
+        AnsiConsole.MarkupLine("[red]module verify below[/]");
         LLVM.VerifyModule(module, LLVMVerifierFailureAction.LLVMPrintMessageAction, out string verifyMessage);
+        AnsiConsole.MarkupLine("[red]module verify end[/]");
 
         AnsiConsole.MarkupLine("[blue]pre optimizations LLVM IR below [/]");
         LLVM.DumpModule(module);

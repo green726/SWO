@@ -787,7 +787,7 @@ public static class Parser
 
         printProtoArgs.Add(new Util.Token(Util.TokenType.Keyword, "string", 0, 0));
         printProtoArgs.Add(new Util.Token(Util.TokenType.Keyword, "format", 0, 0));
-        printProtoArgs.Add(new Util.Token(Util.TokenType.Keyword, "double", 0, 0));
+        printProtoArgs.Add(new Util.Token(Util.TokenType.Keyword, "int", 0, 0));
         printProtoArgs.Add(new Util.Token(Util.TokenType.Keyword, "x", 0, 0));
         Util.Token printToken = new Util.Token(Util.TokenType.Keyword, "@printf", 0, 0);
 

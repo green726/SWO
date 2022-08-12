@@ -107,9 +107,9 @@ public class VariableExpression : Base
 
         if (this.varExpr.isArrayIndexRef)
         {
+            Spectre.Console.AnsiConsole.MarkupLine("[green]genning arr gep[/]");
             LLVMValueRef varRef = generateVarRef();
             LLVMValueRef gepRef = generateGEP(varRef);
-            Console.WriteLine("genned GEP");
             LLVMValueRef gepLoadRef = LLVM.BuildLoad(builder, gepRef, varExpr.value);
             valueStack.Push(gepLoadRef);
             Console.WriteLine(gepLoadRef);
@@ -191,6 +191,7 @@ public class VariableExpression : Base
         LLVMTypeRef varType = varPtr.TypeOf();
         if (LLVM.GetTypeKind(varType) == LLVMTypeKind.LLVMPointerTypeKind)
         {
+            childValueList.Add(LLVM.ConstInt(LLVMTypeRef.Int64Type(), 0, false));
             foreach (AST.Node node in varExpr.children)
             {
                 AST.NumberExpression numExpr = (AST.NumberExpression)node;

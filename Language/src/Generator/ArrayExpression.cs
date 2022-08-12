@@ -19,7 +19,7 @@ public class ArrayExpression : Base
 
         LLVMTypeRef typeLLVM = typeStack.Pop();
 
-        Console.WriteLine(typeLLVM);
+        Console.WriteLine("array expr type: " + typeLLVM);
 
         LLVMValueRef[] values = new LLVMValueRef[arrExpr.length];
 
@@ -27,6 +27,7 @@ public class ArrayExpression : Base
         {
             arrExpr.value[i].generator.generate();
             values[i] = valueStack.Pop();
+            Console.WriteLine("arr expr value: " + values[i]);
         }
 
         valueStack.Push(LLVM.ConstArray(typeLLVM, values));
