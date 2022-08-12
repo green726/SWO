@@ -24,6 +24,10 @@ public class CompileCommandSettings : CommandSettings
     [CommandArgument(0, "[resultFileName]")]
     public string resultFileName { get; set; } = "";
 
+    [Description("SWO internal debug logging")]
+    [CommandOption("-d|--debug")]
+    public bool debugLogging { get; init; } = false;
+
     public FileType resultFileType
     {
         get

@@ -20,7 +20,10 @@ public static class Swo
 
     public static void compileProject(CompileCommandSettings settings)
     {
-        Console.WriteLine(settings.resultFileType);
+        DebugConsole.log = settings.debugLogging;
+
+        DebugConsole.Write("ASUDHSIAUDH");
+        // Console.WriteLine(settings.resultFileType);
         string[] files = System.IO.Directory.GetFiles(settings.path, "*.sproj");
 
         if (files.Length == 0)
@@ -83,7 +86,7 @@ public static class Swo
     {
         AnsiConsole.MarkupLine("[purple]SWO project running...[/]");
 
-        DirectoryInfo dirInfo = new DirectoryInfo(settings.compileCommandSettings.path);
+        DirectoryInfo dirInfo = new DirectoryInfo(settings.path);
 
         FileInfo[] files = dirInfo.GetFiles();
 
@@ -91,7 +94,7 @@ public static class Swo
 
         foreach (FileInfo file in files)
         {
-            if (file.Name == settings.compileCommandSettings.resultFileName)
+            if (file.Name == settings.resultFileName)
             {
                 fileFound = true;
                 break;
@@ -104,7 +107,7 @@ public static class Swo
         }
 
         Process process = new Process();
-        process.StartInfo.FileName = settings.compileCommandSettings.resultFileName;
+        process.StartInfo.FileName = settings.resultFileName;
         process.StartInfo.Arguments = settings.arguments;
         process.StartInfo.UseShellExecute = true;
 

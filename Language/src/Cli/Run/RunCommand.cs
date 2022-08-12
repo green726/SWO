@@ -7,7 +7,7 @@ public class RunCommand : Command<RunCommandSettings>
     public override int Execute([NotNull] CommandContext context, [NotNull] RunCommandSettings settings)
     {
         CompileCommand compileCommand = new CompileCommand();
-        compileCommand.Execute(context, settings.compileCommandSettings);
+        compileCommand.Execute(context, settings);
 
         Swo.runProject(settings);
 
