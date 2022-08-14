@@ -31,10 +31,10 @@ public class VariableExpression : Base
     {
         if (varExpr.children.Count() > 0)
         {
-            Console.WriteLine("called update currentStruct with par: " + parRef);
+            DebugConsole.Write("called update currentStruct with par: " + parRef);
 
             string strName = LLVM.GetAllocatedType(parRef).StructGetTypeAtIndex((uint)index).PrintTypeToString();
-            Console.WriteLine("str name: " + strName);
+            DebugConsole.Write("str name: " + strName);
 
             if (strName.EndsWith("*"))
             {
@@ -46,19 +46,19 @@ public class VariableExpression : Base
             }
 
             int indexOfEquals = strName.IndexOf("=");
-            Console.WriteLine(indexOfEquals);
+            DebugConsole.Write(indexOfEquals);
             strName = strName.Remove(indexOfEquals - 1);
 
             if (namedTypesAST.ContainsKey(strName))
             {
                 AST.Struct strType = namedTypesAST[strName];
                 currentStruct.Push(strType);
-                Console.WriteLine("updated currentStruct");
+                DebugConsole.Write("updated currentStruct");
             }
 
             else
             {
-                Console.WriteLine("didnt update current struct");
+                DebugConsole.Write("didnt update current struct");
             }
         }
     }
@@ -66,7 +66,7 @@ public class VariableExpression : Base
     public void updateCurrentStruct()
     {
         //BUG: below cant handle nested structs
-        Console.WriteLine("called update currentStruct");
+        DebugConsole.Write("called update currentStruct");
         if (varExpr.children.Count() > 0)
         {
             LLVMValueRef strValRef = generateVarRef();
@@ -86,31 +86,31 @@ public class VariableExpression : Base
             {
                 AST.Struct strType = namedTypesAST[strName];
                 currentStruct.Push(strType);
-                Console.WriteLine("updated currentStruct");
+                DebugConsole.Write("updated currentStruct");
             }
 
             else
             {
-                Console.WriteLine("didnt update current struct");
+                DebugConsole.Write("didnt update current struct");
             }
         }
     }
 
     public override void generate()
     {
-        Console.WriteLine("genning varExpr with value of " + varExpr.value + " parent type of " + varExpr.parent?.nodeType + " and children count of " + varExpr.children.Count());
+        DebugConsole.Write("genning varExpr with value of " + varExpr.value + " parent type of " + varExpr.parent?.nodeType + " and children count of " + varExpr.children.Count());
         if (varExpr?.parent?.nodeType == AST.Node.NodeType.VariableExpression || varExpr?.parent?.nodeType == AST.Node.NodeType.IndexReference)
         {
             int num = 0;
             LLVMValueRef gepPtr = valueStack.Pop();
-            Console.WriteLine("gepPtr: " + gepPtr);
+            DebugConsole.Write("gepPtr: " + gepPtr);
 
             num = getStructFieldIndex(varExpr);
-            Console.WriteLine("got struct gep num: " + num);
+            DebugConsole.Write("got struct gep num: " + num);
 
             LLVMValueRef numGEPRef = LLVM.BuildStructGEP(builder, gepPtr, (uint)num, "structGEPTmp");
             valueStack.Push(numGEPRef);
-            Console.WriteLine(numGEPRef);
+            DebugConsole.Write(numGEPRef);
 
             checkIsPtr();
 
@@ -131,14 +131,14 @@ public class VariableExpression : Base
         {
             if (this.varExpr.isPointer || this.varExpr.children.Count() > 0)
             {
-                Console.WriteLine("ptr var expr detected");
+                DebugConsole.Write("ptr var expr detected");
                 valueStack.Push(generateVarRef());
             }
             else
             {
-                Console.WriteLine("generating load ref");
+                DebugConsole.Write("generating load ref");
                 LLVMValueRef loadRef = generateVarLoad();
-                Console.WriteLine("genned load ref");
+                DebugConsole.Write("genned load ref");
                 valueStack.Push(loadRef);
             }
 
@@ -152,9 +152,9 @@ public class VariableExpression : Base
     {
         foreach (AST.Node child in this.varExpr.children)
         {
-            Console.WriteLine("genning varExpr child of type " + child.nodeType);
+            DebugConsole.Write("genning varExpr child of type " + child.nodeType);
             child.generator.generate();
-            Console.WriteLine("genned varExpr child of type " + child.nodeType);
+            DebugConsole.Write("genned varExpr child of type " + child.nodeType);
         }
     }
 
@@ -164,8 +164,8 @@ public class VariableExpression : Base
         LLVMValueRef varRef = LLVM.GetNamedGlobal(module, varExpr.value);
         if (varRef.Pointer == IntPtr.Zero)
         {
-            // Console.WriteLine(String.Join(",", namedValuesLLVM.Keys.ToArray()));
-            // Console.WriteLine("named values LLVM count " + namedValuesLLVM.Count);
+            // DebugConsole.Write(String.Join(",", namedValuesLLVM.Keys.ToArray()));
+            // DebugConsole.Write("named values LLVM count " + namedValuesLLVM.Count);
             if (namedMutablesLLVM.ContainsKey(varExpr.value))
             {
                 return namedMutablesLLVM[varExpr.value];

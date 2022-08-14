@@ -35,7 +35,7 @@ public class IfStatement : Base
         ifStat.declaration.generator.generate();
         LLVMValueRef condValue = valueStack.Pop();
 
-        // Console.WriteLine("llvm module dump post condValue below");
+        // DebugConsole.Write("llvm module dump post condValue below");
         // LLVM.DumpModule(module);
 
         //gets the parent block (function)

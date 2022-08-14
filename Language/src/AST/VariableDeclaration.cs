@@ -36,7 +36,7 @@ public class VariableDeclaration : Node
 
         if (parent == null)
         {
-            Console.WriteLine("adding var dec to parser nodes");
+            DebugConsole.Write("adding var dec to parser nodes");
             Parser.nodes.Add(this);
         }
         else
@@ -67,7 +67,7 @@ public class VariableDeclaration : Node
 
         if (parent == null)
         {
-            Console.WriteLine("adding var dec to parser nodes");
+            DebugConsole.Write("adding var dec to parser nodes");
             Parser.nodes.Add(this);
         }
         else
@@ -97,7 +97,7 @@ public class VariableDeclaration : Node
                     //TODO: replace this with config delimiter
                     if (child.value == "[")
                     {
-                        Console.WriteLine("array detected");
+                        DebugConsole.Write("array detected");
                         this.isArray = true;
                         this.parsingArraySize = true;
                         this.type.isArray = true;
@@ -156,7 +156,7 @@ public class VariableDeclaration : Node
     public override void addChild(Node child)
     {
         base.addChild(child);
-        Console.WriteLine("adding child of node type " + child.nodeType + "to varass");
+        DebugConsole.Write("adding child of node type " + child.nodeType + "to varass");
 
         if (parsingArraySize)
         {

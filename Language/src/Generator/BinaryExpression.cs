@@ -98,9 +98,9 @@ public class BinaryExpression : Base
         //     evaluateNode(child);
         // }
 
-        // Console.WriteLine($"Value stack peek after bin below");
+        // DebugConsole.Write($"Value stack peek after bin below");
         // LLVM.DumpValue(valueStack.Peek());
-        // Console.WriteLine("");
+        // DebugConsole.Write("");
 
     }
 }

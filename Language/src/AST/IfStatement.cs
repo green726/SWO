@@ -113,7 +113,7 @@ public class IfStatement : AST.Node
         }
         if (isBody == true)
         {
-            Console.WriteLine("adding node of type " + child.nodeType + " to if statement then body");
+            DebugConsole.Write("adding node of type " + child.nodeType + " to if statement then body");
             thenBody.Add(child);
         }
         else

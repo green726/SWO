@@ -50,29 +50,29 @@ public class VariableDeclaration : Base
         {
             if (!mainBuilt)
             {
-                Console.WriteLine("adding to main nodes to build");
+                DebugConsole.Write("adding to main nodes to build");
                 nodesToBuild.Add(varDec);
                 return;
             }
             LLVM.PositionBuilderAtEnd(builder, mainEntryBlock);
-            Console.WriteLine($"building for mutable var with name of {varDec.name} and type of");
+            DebugConsole.Write($"building for mutable var with name of {varDec.name} and type of");
             LLVM.DumpType(typeLLVM);
-            Console.WriteLine();
+            DebugConsole.Write();
             LLVMValueRef allocaRef = LLVM.BuildAlloca(builder, typeLLVM, varDec.name);
             valueStack.Push(allocaRef);
-            Console.WriteLine("built and pushed alloca: " + allocaRef);
+            DebugConsole.Write("built and pushed alloca: " + allocaRef);
             if (init)
             {
-                Console.WriteLine("store ref target: " + valRef);
+                DebugConsole.Write("store ref target: " + valRef);
                 LLVMValueRef storeRef = LLVM.BuildStore(builder, valRef, allocaRef);
                 valueStack.Push(storeRef);
-                Console.WriteLine("built and pushed store ref: " + storeRef);
+                DebugConsole.Write("built and pushed store ref: " + storeRef);
             }
 
             namedMutablesLLVM.Add(varDec.name, allocaRef);
         }
 
-        Console.WriteLine("adding var to named globals with name of" + varDec.name);
+        DebugConsole.Write("adding var to named globals with name of" + varDec.name);
         namedGlobalsAST.Add(varDec.name, varDec);
     }
 
@@ -84,7 +84,7 @@ public class VariableDeclaration : Base
         List<LLVMValueRef> asciiList = new List<LLVMValueRef>();
 
         bool escaped = false;
-        Console.WriteLine(this.varDec.defaultValue.nodeType);
+        DebugConsole.Write(this.varDec.defaultValue.nodeType);
         foreach (char ch in strExpr.value)
         {
             if (ch == '\\')

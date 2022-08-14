@@ -70,7 +70,7 @@ in 1
         foreach (SymSpell.SuggestItem suggestion in littleSuggestions)
         {
             retList.Add(suggestion.term);
-            // Console.WriteLine($"little suggestion: {suggestion.term}");
+            // DebugConsole.Write($"little suggestion: {suggestion.term}");
             if (retList.Count() > 3)
             {
                 break;
@@ -103,7 +103,7 @@ in 1
         {
             if (!bigSym.LoadDictionary(bigPath, termIndex, countIndex))
             {
-                Console.WriteLine("Big dictionary not found!");
+                DebugConsole.Write("Big dictionary not found!");
                 //press any key to exit program
                 Console.ReadKey();
                 return;
@@ -113,7 +113,7 @@ in 1
         {
             if (!littleSym.LoadDictionary(littlePath, termIndex, countIndex))
             {
-                Console.WriteLine("Little dictionary not found!");
+                DebugConsole.Write("Little dictionary not found!");
                 //press any key to exit program
                 Console.ReadKey();
                 return;
@@ -131,7 +131,7 @@ in 1
             case AST.Node.NodeType.VariableAssignment:
                 AST.VariableAssignment varAss = (AST.VariableAssignment)node;
                 littleWriter.WriteLine($"{varAss.varExpr.value} 1");
-                // Console.WriteLine($"added var ass with name {varAss.name} to little dict");
+                // DebugConsole.Write($"added var ass with name {varAss.name} to little dict");
                 break;
         }
         littleWriter.Close();

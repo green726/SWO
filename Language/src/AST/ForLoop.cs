@@ -99,7 +99,7 @@ public class ForLoop : AST.Node
                         switch (child.type)
                         {
                             // case Util.TokenType.Number:
-                            // Console.WriteLine($"adding iteration object with value of {child.value}");
+                            // DebugConsole.Write($"adding iteration object with value of {child.value}");
                             // iterationObject = Int32.Parse(child.value);
                             // this.index.addChild(new Util.Token(Util.TokenType.Keyword, "double", child.line, child.column));
                             // this.index.addChild(child);
@@ -204,7 +204,7 @@ public class PhiVariable : AST.Node
 
     public void setName(string name)
     {
-        Console.WriteLine($"setting phi var name to {name}");
+        DebugConsole.Write($"setting phi var name to {name}");
         this.name = name;
     }
 }

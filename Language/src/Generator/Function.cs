@@ -34,12 +34,12 @@ public class Function : Base
 
         if (func.prototype.name == "main")
         {
-            Console.WriteLine("main func identified");
+            DebugConsole.Write("main func identified");
             mainEntryBlock = entryBlock;
             mainBuilt = true;
             foreach (AST.Node node in nodesToBuild)
             {
-                Console.WriteLine("genning nodes necessary before main func");
+                DebugConsole.Write("genning nodes necessary before main func");
                 node.generator.generate();
             }
         }

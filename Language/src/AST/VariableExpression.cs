@@ -24,13 +24,13 @@ public class VariableExpression : Expression
 
         if (token.value.StartsWith("&"))
         {
-            Console.WriteLine("pointer var ref detected");
+            DebugConsole.Write("pointer var ref detected");
             this.isPointer = true;
             this.value = token.value.Remove(this.value.Length - 1, 1);
         }
         else if (token.value.StartsWith("*"))
         {
-            Console.WriteLine("dereference detected");
+            DebugConsole.Write("dereference detected");
             this.isDereference = true;
             this.value = token.value.Remove(0, 1);
         }
@@ -68,7 +68,7 @@ public class VariableExpression : Expression
         //     this.isPointer = true;
         // }
 
-        Console.WriteLine($"adding child to varExpr with type of " + child.nodeType);
+        DebugConsole.Write($"adding child to varExpr with type of " + child.nodeType);
         // if (child.nodeType == NodeType.NumberExpression)
         // {
         //     this.numExpr = (NumberExpression)child;

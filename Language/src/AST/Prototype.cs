@@ -39,7 +39,7 @@ public class Prototype : AST.Node
         {
             foreach (Util.Token item in arguments)
             {
-                // Console.WriteLine("funcArgs " + item.value);
+                // DebugConsole.Write("funcArgs " + item.value);
                 if (typePredicted)
                 {
                     Parser.checkToken(item, expectedType: Util.TokenType.Keyword);
@@ -74,7 +74,7 @@ public class Prototype : AST.Node
     {
         foreach (Util.Token item in arguments)
         {
-            // Console.WriteLine("funcArgs " + item.value);
+            // DebugConsole.Write("funcArgs " + item.value);
             if (typePredicted)
             {
                 Parser.checkToken(item, expectedType: Util.TokenType.Keyword);
@@ -85,7 +85,7 @@ public class Prototype : AST.Node
                 //TODO: replace with config delim
                 if (item.value == "[" || item.value == "]")
                 {
-                    Console.WriteLine("array param detected");
+                    DebugConsole.Write("array param detected");
                     prevType.addChild(item);
                     return;
                 }
@@ -93,7 +93,7 @@ public class Prototype : AST.Node
             }
 
             //swap typePredicted
-            Console.WriteLine("swapping type predicted");
+            DebugConsole.Write("swapping type predicted");
             typePredicted = !typePredicted;
         }
     }

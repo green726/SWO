@@ -86,16 +86,16 @@ public static class IRGen
 
         foreach (AST.Node node in nodes)
         {
-            Console.WriteLine("generating node of type " + node.nodeType);
+            DebugConsole.Write("generating node of type " + node.nodeType);
             node.generator.generate();
-            Console.WriteLine("successfully evaluated node of type " + node.nodeType);
+            DebugConsole.Write("successfully evaluated node of type " + node.nodeType);
             task.Increment(1);
 
             // foreach (ASTNode child in node.children)
             // {
             //     evaluateNode(child);
             // }
-            // Console.WriteLine("stack dump");
+            // DebugConsole.Write("stack dump");
             // LLVM.DumpValue(valueStack.Peek());
         }
 
@@ -105,7 +105,7 @@ public static class IRGen
 
         AnsiConsole.MarkupLine("[blue]pre optimizations LLVM IR below [/]");
         LLVM.DumpModule(module);
-        Console.WriteLine("");
+        DebugConsole.Write("");
     }
 
     public static void optimizeIR(Spectre.Console.ProgressTask task)
@@ -114,7 +114,7 @@ public static class IRGen
 
         AnsiConsole.MarkupLine("[blue]post optimizations LLVM IR below [/]");
         LLVM.DumpModule(module);
-        Console.WriteLine("");
+        DebugConsole.Write("");
         task.StopTask();
     }
 

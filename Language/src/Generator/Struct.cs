@@ -13,7 +13,7 @@ public class Struct : Base
 
     public override void generate()
     {
-        Console.WriteLine("adding str with name of " + str.name + " to dict");
+        DebugConsole.Write("adding str with name of " + str.name + " to dict");
         namedTypesAST.Add(str.name, this.str);
 
         foreach (AST.Node node in str.properties)
@@ -34,7 +34,7 @@ public class Struct : Base
         LLVMTypeRef structType = LLVM.StructCreateNamed(context, this.str.name);
         LLVM.StructSetBody(structType, elementTypes.ToArray(), false);
 
-        Console.WriteLine("struct type dump");
+        DebugConsole.Write("struct type dump");
         LLVM.DumpType(structType);
 
         typeStack.Push(structType);

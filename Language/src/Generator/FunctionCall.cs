@@ -62,16 +62,16 @@ public class FunctionCall : Base
         switch (funcCall.functionName)
         {
             case "print":
-                // Console.WriteLine("print call detected");
+                // DebugConsole.Write("print call detected");
                 funcCall.functionName = "printf";
 
                 // printFormat = evaluatePrintFormat();
                 printFormat = new AST.StringExpression(new Util.Token(Util.TokenType.String, "\"%d\"", 0, 0), funcCall, true);
-;
-                // Console.WriteLine("successfully evaluated print format");
+                ;
+                // DebugConsole.Write("successfully evaluated print format");
 
                 funcCall.addChildAtStart(printFormat);
-                // Console.WriteLine("appended child to start of print call");
+                // DebugConsole.Write("appended child to start of print call");
                 break;
             case "println":
                 funcCall.functionName = "printf";

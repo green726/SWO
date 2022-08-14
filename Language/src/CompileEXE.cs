@@ -52,21 +52,21 @@ public static class EXE
 
         if (debugLogging)
         {
-            Console.WriteLine("beggining of object file debug info");
+            DebugConsole.Write("beggining of object file debug info");
 
-            Console.WriteLine("fileNamePostPtr " + fileNameFinal);
-            Console.WriteLine("TargetTriple:" + targetTriple);
-            Console.WriteLine("targetBool: " + targetBool.Value);
-            Console.WriteLine("targetRef: " + target.ToString());
-            Console.WriteLine("targetMachine: " + targetMachine.ToString());
+            DebugConsole.Write("fileNamePostPtr " + fileNameFinal);
+            DebugConsole.Write("TargetTriple:" + targetTriple);
+            DebugConsole.Write("targetBool: " + targetBool.Value);
+            DebugConsole.Write("targetRef: " + target.ToString());
+            DebugConsole.Write("targetMachine: " + targetMachine.ToString());
 
             if (targetErrorMsg != null && targetErrorMsg != "")
             {
-                Console.WriteLine("targetErrorMsg: " + targetErrorMsg);
+                DebugConsole.Write("targetErrorMsg: " + targetErrorMsg);
             }
             if (windows)
             {
-                Console.WriteLine("IR writing for windows (doesn't work so doesn't do it)");
+                DebugConsole.Write("IR writing for windows (doesn't work so doesn't do it)");
                 /* moduleStr =  */
                 // LLVM.PrintModuleToFile(IRGen.module, $"{fileName}-IR", out string errorMsg);
             }
@@ -88,7 +88,7 @@ public static class EXE
         }
         if (writeErrorMsg != null && writeErrorMsg != "" && debugLogging)
         {
-            Console.WriteLine("writeErrorMsg: " + writeErrorMsg);
+            DebugConsole.Write("writeErrorMsg: " + writeErrorMsg);
         }
     }
 
@@ -151,7 +151,7 @@ public static class EXE
         task.Increment(4);
         if (writeErrorMsg != null && writeErrorMsg != "" && debugLogging)
         {
-            Console.WriteLine("writeErrorMsg: " + writeErrorMsg);
+            DebugConsole.Write("writeErrorMsg: " + writeErrorMsg);
         }
 
         if (settings.resultFileType == FileType.NativeExecutable)

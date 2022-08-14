@@ -52,7 +52,7 @@ public class ForLoop : Base
         }
         else
         {
-            Console.WriteLine($"adding phiVarRef with name of {forLoop.index.name} to named values");
+            DebugConsole.Write($"adding phiVarRef with name of {forLoop.index.name} to named values");
             namedValuesLLVM.Add(forLoop.index.name, phiVarRef);
         }
 
@@ -62,7 +62,7 @@ public class ForLoop : Base
             node.generator.generate();
         }
 
-        Console.WriteLine("successfully evaluated for loop body");
+        DebugConsole.Write("successfully evaluated for loop body");
 
         //evaluate the step variable - might need to change this idk
         forLoop.stepValue.generator.generate();
@@ -109,7 +109,7 @@ public class ForLoop : Base
         }
         else
         {
-            Console.WriteLine("removing phi var ref from named values");
+            DebugConsole.Write("removing phi var ref from named values");
             namedValuesLLVM.Remove(forLoop.index.name);
         }
 

@@ -22,8 +22,7 @@ public static class Swo
     {
         DebugConsole.log = settings.debugLogging;
 
-        DebugConsole.Write("ASUDHSIAUDH");
-        // Console.WriteLine(settings.resultFileType);
+        // DebugConsole.Write(settings.resultFileType);
         string[] files = System.IO.Directory.GetFiles(settings.path, "*.sproj");
 
         if (files.Length == 0)

@@ -281,7 +281,7 @@ public static class Parser
 
         }
 
-        Console.WriteLine(stringBuilder);
+        DebugConsole.Write(stringBuilder);
     }
 
     public static List<Util.Token> getTokensUntil(int startIndex, Util.TokenType stopType)
@@ -515,7 +515,7 @@ public static class Parser
                     parent?.addChild(token);
                     break;
             }
-            // Console.WriteLine("pushing parent with node type of " + parent.nodeType + " to parent stack and parent parent of node type " + parent?.parent?.nodeType);
+            // DebugConsole.Write("pushing parent with node type of " + parent.nodeType + " to parent stack and parent parent of node type " + parent?.parent?.nodeType);
             delimParentStack.Push(parent);
             delimLevel++;
         }
@@ -572,7 +572,7 @@ public static class Parser
             }
             else
             {
-                // Console.WriteLine("setting parent to delim parent of node type " + delimParent?.nodeType + " with parent of node type " + delimParent?.parent?.nodeType);
+                // DebugConsole.Write("setting parent to delim parent of node type " + delimParent?.nodeType + " with parent of node type " + delimParent?.parent?.nodeType);
                 parent = delimParent.parent;
             }
         }
@@ -590,7 +590,7 @@ public static class Parser
         // AnsiConsole.MarkupLine("[red]tokens[/]");
         // foreach (Util.Token token in tokenList)
         // {
-        //     Console.WriteLine(token.value + " " + token.type);
+        //     DebugConsole.Write(token.value + " " + token.type);
         // }
         // AnsiConsole.MarkupLine("[red]end tokens[/]");
 
@@ -631,7 +631,7 @@ public static class Parser
             prevLine = token.line;
             prevColumn = token.column;
 
-            Console.WriteLine($"token of value: {token.value} and type of {token.type} and parent of {parent?.nodeType} and delim level of {delimLevel}");
+            DebugConsole.Write($"token of value: {token.value} and type of {token.type} and parent of {parent?.nodeType} and delim level of {delimLevel}");
             AST.Node? previousNode = nodes.Count > 0 && currentTokenNum > 0 ? nodes.Last() : null;
 
             if (token.type == Util.TokenType.EOF)
@@ -761,7 +761,7 @@ public static class Parser
             {
                 (AST.Node delimParentRet, int delimReturnLevel) = parseDelim(token, currentTokenNum, parent, delimLevel);
                 currentTokenNum++;
-                Console.WriteLine("delim returned parent of " + delimParentRet?.nodeType);
+                DebugConsole.Write("delim returned parent of " + delimParentRet?.nodeType);
                 parent = delimParentRet;
                 delimLevel = delimReturnLevel;
                 continue;

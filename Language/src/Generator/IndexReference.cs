@@ -31,9 +31,9 @@ public class IndexReference : Base
     {
         Spectre.Console.AnsiConsole.MarkupLine("[green]genning arr gep[/]");
         LLVMValueRef varRef = valueStack.Pop();
-        Console.WriteLine(varRef);
+        DebugConsole.Write(varRef);
         LLVMValueRef gepRef = generateGEP(varRef);
-        Console.WriteLine(gepRef);
+        DebugConsole.Write(gepRef);
         valueStack.Push(gepRef);
 
 
@@ -41,7 +41,7 @@ public class IndexReference : Base
         {
             LLVMValueRef gepLoadRef = LLVM.BuildLoad(builder, gepRef, "arrRefLoad");
             valueStack.Push(gepLoadRef);
-            Console.WriteLine(gepLoadRef);
+            DebugConsole.Write(gepLoadRef);
         }
 
         else
@@ -63,7 +63,7 @@ public class IndexReference : Base
 
         // childValueList.Add(LLVM.ConstInt(LLVMTypeRef.Int64Type(), 0, false));
 
-        Console.WriteLine(LLVM.GetTypeKind(varType));
+        DebugConsole.Write(LLVM.GetTypeKind(varType));
 
         if (LLVM.GetTypeKind(varType) != LLVMTypeKind.LLVMPointerTypeKind)
         {
@@ -77,7 +77,7 @@ public class IndexReference : Base
         //BUG: this might need to go before the out of range checking in case there is an offset - idk
         idx.numExpr.value += Config.settings.variable.arrays.startIndex;
         idx.numExpr.generator.generate();
-        Console.WriteLine(valueStack.Peek());
+        DebugConsole.Write(valueStack.Peek());
         childValueList.Add(valueStack.Pop());
 
         return LLVM.BuildStructGEP(builder, varPtr, (uint)idx.numExpr.value, "idxGEP");

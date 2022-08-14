@@ -37,7 +37,7 @@ public class VariableAssignment : Base
         }
         else
         {
-            Console.WriteLine(varAss?.targetValue?.nodeType);
+            DebugConsole.Write(varAss?.targetValue?.nodeType);
             varAss.targetValue.generator.generate();
             LLVMValueRef resultValRef = valueStack.Pop();
             LLVMValueRef storeRef = LLVM.BuildStore(builder, resultValRef, targetValRef);
