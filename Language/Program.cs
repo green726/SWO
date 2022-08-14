@@ -78,12 +78,12 @@ public static class Swo
 
             });
 
-        DebugConsole.WriteAnsi("[green]SWO project successfully compiled[/]");
+        AnsiConsole.MarkupLine("[green]SWO project successfully compiled[/]");
     }
 
     public static void runProject(RunCommandSettings settings)
     {
-        DebugConsole.WriteAnsi("[purple]SWO project running...[/]");
+        AnsiConsole.MarkupLine("[purple]SWO project running...[/]");
 
         DirectoryInfo dirInfo = new DirectoryInfo(settings.path);
 

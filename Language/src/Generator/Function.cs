@@ -63,7 +63,6 @@ public class Function : Base
             LLVM.BuildRetVoid(builder);
         }
 
-        LLVM.VerifyFunction(function, LLVMVerifierFailureAction.LLVMPrintMessageAction);
 
         valueStack.Push(function);
 

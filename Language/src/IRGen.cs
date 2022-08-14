@@ -71,7 +71,6 @@ public static class IRGen
     }
 
 
-
     public static void initialize(LLVMBuilderRef _builder, LLVMModuleRef _module, LLVMPassManagerRef _passManager, LLVMContextRef _context)
     {
         builder = _builder;
@@ -100,11 +99,11 @@ public static class IRGen
         }
 
         DebugConsole.WriteAnsi("[red]module verify below[/]");
-        LLVM.VerifyModule(module, LLVMVerifierFailureAction.LLVMPrintMessageAction, out string verifyMessage);
+        DebugConsole.VerifyModule(module);
         DebugConsole.WriteAnsi("[red]module verify end[/]");
 
         DebugConsole.WriteAnsi("[blue]pre optimizations LLVM IR below [/]");
-        LLVM.DumpModule(module);
+        DebugConsole.DumpModule(module);
         DebugConsole.Write("");
     }
 
@@ -113,7 +112,7 @@ public static class IRGen
         LLVM.RunPassManager(passManager, module);
 
         DebugConsole.WriteAnsi("[blue]post optimizations LLVM IR below [/]");
-        LLVM.DumpModule(module);
+        DebugConsole.DumpModule(module);
         DebugConsole.Write("");
         task.StopTask();
     }

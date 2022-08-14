@@ -56,7 +56,7 @@ public class VariableDeclaration : Base
             }
             LLVM.PositionBuilderAtEnd(builder, mainEntryBlock);
             DebugConsole.Write($"building for mutable var with name of {varDec.name} and type of");
-            LLVM.DumpType(typeLLVM);
+            DebugConsole.DumpType(typeLLVM);
             DebugConsole.Write();
             LLVMValueRef allocaRef = LLVM.BuildAlloca(builder, typeLLVM, varDec.name);
             valueStack.Push(allocaRef);

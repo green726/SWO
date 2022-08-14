@@ -58,7 +58,7 @@ public class BinaryExpression : Base
                     ir = LLVM.BuildICmp(builder, LLVMIntPredicate.LLVMIntEQ, leftHand, rightHand, "comparetmp");
                     break;
                 case AST.BinaryExpression.OperatorType.LessThan:
-                    LLVM.DumpValue(leftHand);
+                    DebugConsole.DumpValue(leftHand);
                     LLVMValueRef cmpRef = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealULT, leftHand, rightHand, "comparetmp");
                     ir = LLVM.BuildUIToFP(builder, cmpRef, LLVMTypeRef.DoubleType(), "booltmp");
                     break;
@@ -80,7 +80,7 @@ public class BinaryExpression : Base
                     ir = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealUEQ, leftHand, rightHand, "comparetmp");
                     break;
                 case AST.BinaryExpression.OperatorType.LessThan:
-                    LLVM.DumpValue(leftHand);
+                    DebugConsole.DumpValue(leftHand);
                     LLVMValueRef cmpRef = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealULT, leftHand, rightHand, "comparetmp");
                     ir = LLVM.BuildUIToFP(builder, cmpRef, LLVMTypeRef.DoubleType(), "booltmp");
                     break;
@@ -89,7 +89,7 @@ public class BinaryExpression : Base
 
         DebugConsole.WriteAnsi("[red]binExpr dump below:[/] ");
 
-        LLVM.DumpValue(ir);
+        DebugConsole.DumpValue(ir);
 
         valueStack.Push(ir);
 

@@ -35,7 +35,7 @@ public class Struct : Base
         LLVM.StructSetBody(structType, elementTypes.ToArray(), false);
 
         DebugConsole.Write("struct type dump");
-        LLVM.DumpType(structType);
+        DebugConsole.DumpType(structType);
 
         typeStack.Push(structType);
         namedTypesLLVM.Add(str.name, structType);

@@ -8,6 +8,29 @@ public static class DebugConsole
 {
     public static bool log = false;
 
+    public static void VerifyFunction(LLVMValueRef function)
+    {
+        if (log)
+        {
+            LLVM.VerifyFunction(function, LLVMVerifierFailureAction.LLVMPrintMessageAction);
+        }
+    }
+
+
+    public static void VerifyModule(LLVMModuleRef module)
+    {
+        if (log)
+        {
+            string msg;
+            LLVM.VerifyModule(module, LLVMVerifierFailureAction.LLVMPrintMessageAction, out msg);
+        }
+        else
+        {
+            // string msg;
+            // LLVM.VerifyModule(module, LLVMVerifierFailureAction.LLVMReturnStatusAction, out msg);
+        }
+    }
+
     public static void Write(object obj)
     {
         if (log)
