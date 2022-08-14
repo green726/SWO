@@ -1,6 +1,9 @@
 using Spectre.Console;
 
 
+using LLVMSharp;
+
+
 public static class DebugConsole
 {
     public static bool log = false;
@@ -29,6 +32,30 @@ public static class DebugConsole
             AnsiConsole.MarkupLine(obj.ToString());
         }
 
+    }
+
+    public static void DumpType(LLVMTypeRef type)
+    {
+        if (log)
+        {
+            LLVM.DumpType(type);
+        }
+    }
+
+    public static void DumpValue(LLVMValueRef value)
+    {
+        if (log)
+        {
+            LLVM.DumpValue(value);
+        }
+    }
+
+    public static void DumpModule(LLVMModuleRef module)
+    {
+        if (log)
+        {
+            LLVM.DumpModule(module);
+        }
     }
 
 }

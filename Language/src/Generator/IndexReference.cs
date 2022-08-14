@@ -29,7 +29,7 @@ public class IndexReference : Base
 
     public override void generate()
     {
-        Spectre.Console.AnsiConsole.MarkupLine("[green]genning arr gep[/]");
+        DebugConsole.WriteAnsi("[green]genning arr gep[/]");
         LLVMValueRef varRef = valueStack.Pop();
         DebugConsole.Write(varRef);
         LLVMValueRef gepRef = generateGEP(varRef);

@@ -20,7 +20,7 @@ public class StringExpression : Expression
             return;
         }
 
-        Spectre.Console.AnsiConsole.MarkupLine($"[red]string expr with value of: {this.value}[/]");
+        DebugConsole.WriteAnsi($"[red]string expr with value of: {this.value}[/]");
         if (parent != null)
         {
             parent.addChild(this);

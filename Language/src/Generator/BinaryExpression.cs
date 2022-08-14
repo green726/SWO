@@ -87,7 +87,7 @@ public class BinaryExpression : Base
             }
         }
 
-        Spectre.Console.AnsiConsole.MarkupLine("[red]binExpr dump below:[/] ");
+        DebugConsole.WriteAnsi("[red]binExpr dump below:[/] ");
 
         LLVM.DumpValue(ir);
 

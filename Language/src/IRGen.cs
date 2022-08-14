@@ -99,11 +99,11 @@ public static class IRGen
             // LLVM.DumpValue(valueStack.Peek());
         }
 
-        AnsiConsole.MarkupLine("[red]module verify below[/]");
+        DebugConsole.WriteAnsi("[red]module verify below[/]");
         LLVM.VerifyModule(module, LLVMVerifierFailureAction.LLVMPrintMessageAction, out string verifyMessage);
-        AnsiConsole.MarkupLine("[red]module verify end[/]");
+        DebugConsole.WriteAnsi("[red]module verify end[/]");
 
-        AnsiConsole.MarkupLine("[blue]pre optimizations LLVM IR below [/]");
+        DebugConsole.WriteAnsi("[blue]pre optimizations LLVM IR below [/]");
         LLVM.DumpModule(module);
         DebugConsole.Write("");
     }
@@ -112,7 +112,7 @@ public static class IRGen
     {
         LLVM.RunPassManager(passManager, module);
 
-        AnsiConsole.MarkupLine("[blue]post optimizations LLVM IR below [/]");
+        DebugConsole.WriteAnsi("[blue]post optimizations LLVM IR below [/]");
         LLVM.DumpModule(module);
         DebugConsole.Write("");
         task.StopTask();

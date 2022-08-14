@@ -9,6 +9,6 @@ public static class GenWarning
         {
             message = $"{message} at [blue]{node.line}:{node.column}[/]:\n```\n[purple]{node.codeExcerpt}[/]\n```";
         }
-        AnsiConsole.MarkupLine(message);
+        DebugConsole.WriteAnsi(message);
     }
 }

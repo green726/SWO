@@ -35,7 +35,7 @@ public class VariableDeclaration : Base
         this.varDec.type.generator.generate();
         typeLLVM = typeStack.Pop();
         // Console.Write(typeLLVM);
-        Spectre.Console.AnsiConsole.MarkupLine($"[red] type stack[/]");
+        DebugConsole.WriteAnsi($"[red] type stack[/]");
 
         if (!varDec.mutable && typeLLVM.TypeKind != LLVMTypeKind.LLVMStructTypeKind)
         {

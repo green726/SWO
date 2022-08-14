@@ -189,7 +189,7 @@ public class VariableDeclaration : Node
                             throw ParserException.FactoryMethod("An array declaration received a default value that did not correspond with its declared size", "Make the initial expression size the same as in the assignment", child);
                         }
                         this.type.size = expr.length;
-                        Spectre.Console.AnsiConsole.MarkupLine($"[green]array size of {expr.length} and type size of {this.type.size} [/]");
+                        DebugConsole.WriteAnsi($"[green]array size of {expr.length} and type size of {this.type.size} [/]");
                     }
                     this.defaultValue = (Expression)child;
                 }
@@ -209,7 +209,7 @@ public class VariableDeclaration : Node
                             throw ParserException.FactoryMethod("An array declaration received a default value that did not correspond with its declared size", "Make the initial expression size the same as in the assignment", child);
                         }
                         this.type.size = expr.length;
-                        Spectre.Console.AnsiConsole.MarkupLine($"[purple]array size of {expr.length} and type size of {this.type.size} [/]");
+                        DebugConsole.WriteAnsi($"[purple]array size of {expr.length} and type size of {this.type.size} [/]");
                     }
                     this.defaultValue = (Expression)child;
                 }

@@ -587,12 +587,12 @@ public static class Parser
 
         tokenList = _tokenList;
 
-        // AnsiConsole.MarkupLine("[red]tokens[/]");
+        // DebugConsole.WriteAnsi("[red]tokens[/]");
         // foreach (Util.Token token in tokenList)
         // {
         //     DebugConsole.Write(token.value + " " + token.type);
         // }
-        // AnsiConsole.MarkupLine("[red]end tokens[/]");
+        // DebugConsole.WriteAnsi("[red]end tokens[/]");
 
         if (task != null)
         {
@@ -772,10 +772,9 @@ public static class Parser
             currentTokenNum++;
         }
 
-        AnsiConsole.MarkupLine("[green]parser debug below[/]");
+        DebugConsole.WriteAnsi("[green]parser debug below[/]");
         printAST(nodes);
-        AnsiConsole.MarkupLine("[green]parser debug end[/]");
-
+        DebugConsole.WriteAnsi("[green]parser debug end[/]");
 
         return nodes;
     }
