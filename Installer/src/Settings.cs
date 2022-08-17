@@ -22,6 +22,11 @@ public class Settings : CommandSettings
     [DefaultValue(false)]
     public bool dontInstallResources { get; init; }
 
+    [Description("The SWO version - you can use a specific version number or specify a branch from the github - set to \"stable\" for the latest stable release")]
+    [CommandOption("-v|--version")]
+    [DefaultValue("stable")]
+    public string version { get; init; }
+
     public Settings()
     {
         this.installPath = Util.evaluatePath();

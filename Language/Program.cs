@@ -61,6 +61,9 @@ public static class Swo
                 var lexTask = ctx.AddTask("Lexing (tokenizing) the SWO code");
                 List<Util.Token> lexedContent = Lexer.lex(fileContents, lexTask);
 
+
+                Parser.addLanguageBuiltins();
+
                 var parseTask = ctx.AddTask("Parsing the SWO code");
                 List<AST.Node> nodes = Parser.parse(lexedContent, parseTask);
 

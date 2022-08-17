@@ -21,19 +21,37 @@ public static class Util
 
         Directory.CreateDirectory(settings.installPath);
 
+
+        string releaseVer = settings.version;
+        if (settings.version == "stable")
+        {
+            releaseVer = "latest";
+        }
+
         if (!settings.dontInstallResources)
         {
-            components.Add(new SWOComponent("https://github.com/green726/SWO/releases/latest/download/Resources.zip", $"{path}{ps}Resources", $"{path}{ps}Resources.zip", "Installing SWO Resources", "Downloading SWO Resources"));
+            components.Add(new SWOComponent($"https://github.com/green726/SWO/releases/{releaseVer}/download/Resources.zip", $"{path}{ps}Resources", $"{path}{ps}Resources.zip", "Installing SWO Resources", "Downloading SWO Resources", "Cloning SWO Resources", "Building SWO Resources", build: false));
         }
         if (!settings.dontInstallSAP)
         {
-            components.Add(new SWOComponent($"https://github.com/green726/SAP/releases/latest/download/SAP-{os}.zip", $"{path}{ps}SAP", $"{path}{ps}SAP.zip", "Installing", "Downloading SAP"));
+            components.Add(new SWOComponent($"https://github.com/green726/SAP/releases/{releaseVer}/download/SAP-{os}.zip", $"{path}{ps}SAP", $"{path}{ps}SAP.zip", "Installing", "Downloading SAP", "Cloning SAP", "Building SAP", "https://github.com/green726/SAP/SAP.git", "SAP"));
         }
-        components.Add(new SWOComponent($"https://github.com/green726/SWO/releases/latest/download/Language-{os}.zip", $"{path}{ps}Language", $"{path}{ps}Language.zip", "Installing the SWO Language", "Downloading the SWO Language"));
+        components.Add(new SWOComponent($"https://github.com/green726/SWO/releases/{releaseVer}/download/Language-{os}.zip", $"{path}{ps}Language", $"{path}{ps}Language.zip", "Installing the SWO Language", "Downloading the SWO Language", "Cloning SWO", "Building SWO", "https://github.com/green726/SWO/SWO.git", "SWO"));
 
-        Installations.download(components).Wait();
-        Installations.install(components).Wait();
-        Installations.addToPath(settings);
+
+        if (settings.version == "stable" || Double.TryParse(settings.version, out double version))
+        {
+            Installations.download(components).Wait();
+            Installations.install(components).Wait();
+            Installations.addToPath(settings);
+        }
+        else
+        {
+            Installations.clone(components, settings.version).Wait();
+            Installations.build(components, os).Wait();
+            Installations.addToPath(settings);
+        }
+
     }
 
 

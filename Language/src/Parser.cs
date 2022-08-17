@@ -583,8 +583,6 @@ public static class Parser
 
     public static List<AST.Node> parse(List<Util.Token> _tokenList, Spectre.Console.ProgressTask task = null)
     {
-        addLanguageBuiltins();
-
         tokenList = _tokenList;
 
         // DebugConsole.WriteAnsi("[red]tokens[/]");

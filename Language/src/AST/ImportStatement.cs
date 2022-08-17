@@ -44,16 +44,21 @@ public class ImportStatement : Node
             this.file = new SWOFile(child.value, filePaths[0]);
         }
 
-
         string importFileValue = this.file.value;
         List<Util.Token> tokens = Lexer.lex(importFileValue);
 
-        List<Util.Token> previousTokenList = Parser.tokenList;
-        Parser.tokenList.InsertRange(Parser.currentTokenNum, tokens);
-        // Parser.tokenList = tokens;
-        // Parser.parseTokenRecursive(tokens[0], 0);
+        // Parser.finalTokenNum += tokens.Count();
+        // Parser.tokenList.InsertRange(Parser.currentTokenNum, tokens);
+        List<Util.Token> prevList = Parser.tokenList;
+        int prevNum = Parser.currentTokenNum;
+        int prevMaxNum = Parser.finalTokenNum;
 
-        Parser.tokenList = previousTokenList;
+        Parser.parse(tokens);
+
+        Parser.tokenList = prevList;
+        Parser.currentTokenNum = prevNum;
+        Parser.finalTokenNum = prevMaxNum;
+
 
         base.addChild(child);
 

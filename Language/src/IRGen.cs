@@ -2,13 +2,6 @@ using LLVMSharp;
 
 using Spectre.Console;
 
-/*below is gep generation (prob useless)
- //below zero next to ulong is the index of the element you want to grab a pointer to
-        LLVMValueRef[] arrIndices = { LLVM.ConstInt(LLVM.Int64Type(), (ulong)0, false) };
-        LLVMValueRef gepRef = LLVM.BuildInBoundsGEP(builder, globalRef, arrIndices, varExp.varName);
-        valueStack.Push(gepRef);
- */
-
 public static class IRGen
 {
     public static int maxStringIntLength = 64;
@@ -89,13 +82,6 @@ public static class IRGen
             node.generator.generate();
             DebugConsole.Write("successfully evaluated node of type " + node.nodeType);
             task.Increment(1);
-
-            // foreach (ASTNode child in node.children)
-            // {
-            //     evaluateNode(child);
-            // }
-            // DebugConsole.Write("stack dump");
-            // LLVM.DumpValue(valueStack.Peek());
         }
 
         DebugConsole.WriteAnsi("[red]module verify below[/]");
@@ -116,5 +102,4 @@ public static class IRGen
         DebugConsole.Write("");
         task.StopTask();
     }
-
 }
