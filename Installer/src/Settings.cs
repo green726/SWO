@@ -24,12 +24,12 @@ public class Settings : CommandSettings
 
     [Description("The SWO version - you can use a specific version number or specify a branch from the github - set to \"stable\" for the latest stable release")]
     [CommandOption("-v|--version")]
-    [DefaultValue("stable")]
-    public string version { get; init; }
+    public string version { get; init; } = "stable";
 
     public Settings()
     {
         this.installPath = Util.evaluatePath();
+        // Console.WriteLine("path: " + this.installPath);
     }
 }
 

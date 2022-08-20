@@ -17,8 +17,7 @@ public class Program
         }
 
 
-
-        // Console.WriteLine("Installation of SWO was successful - restart your terminal to use it | if you experience any issues restart your PC or make an issue on the SWO github repository");
+        Spectre.Console.AnsiConsole.MarkupLine("[green]Installation of SWO was successful - restart your terminal to use it | if you experience any issues restart your PC or make an issue on the SWO github repository[/]");
     }
 
 }

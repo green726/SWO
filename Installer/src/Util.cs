@@ -34,9 +34,9 @@ public static class Util
         }
         if (!settings.dontInstallSAP)
         {
-            components.Add(new SWOComponent($"https://github.com/green726/SAP/releases/{releaseVer}/download/SAP-{os}.zip", $"{path}{ps}SAP", $"{path}{ps}SAP.zip", "Installing", "Downloading SAP", "Cloning SAP", "Building SAP", "https://github.com/green726/SAP/SAP.git", "SAP"));
+            components.Add(new SWOComponent($"https://github.com/green726/SAP/releases/{releaseVer}/download/SAP-{os}.zip", $"{path}{ps}SAP", $"{path}{ps}SAP.zip", "Installing", "Downloading SAP", "Cloning SAP", "Building SAP", "https://github.com/green726/SAP.git", "Client", false));
         }
-        components.Add(new SWOComponent($"https://github.com/green726/SWO/releases/{releaseVer}/download/Language-{os}.zip", $"{path}{ps}Language", $"{path}{ps}Language.zip", "Installing the SWO Language", "Downloading the SWO Language", "Cloning SWO", "Building SWO", "https://github.com/green726/SWO/SWO.git", "SWO"));
+        components.Add(new SWOComponent($"https://github.com/green726/SWO/releases/{releaseVer}/download/Language-{os}.zip", $"{path}{ps}Language", $"{path}{ps}Language.zip", "Installing the SWO Language", "Downloading the SWO Language", "Cloning SWO", "Building SWO", "https://github.com/green726/SWO.git", "Language"));
 
 
         if (settings.version == "stable" || Double.TryParse(settings.version, out double version))
@@ -54,6 +54,13 @@ public static class Util
 
     }
 
+    public static void CopyFilesRecursively(DirectoryInfo source, DirectoryInfo target)
+    {
+        foreach (DirectoryInfo dir in source.GetDirectories())
+            CopyFilesRecursively(dir, target.CreateSubdirectory(dir.Name));
+        foreach (FileInfo file in source.GetFiles())
+            file.CopyTo(Path.Combine(target.FullName, file.Name));
+    }
 
     public static void uninstall(string path, string bashrc)
     {
@@ -99,7 +106,7 @@ public static class Util
         }
         else
         {
-            return $@"{Environment.GetEnvironmentVariable("HOME")}/.SWO";
+            return Environment.ExpandEnvironmentVariables("%HOME%/.SWO");
         }
 
     }

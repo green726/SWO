@@ -3,7 +3,9 @@ using System.IO.Compression;
 using Spectre.Console;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
-using Microsoft.Build;
+using LibGit2Sharp;
+using Microsoft.Build.Evaluation;
+using Microsoft.Build.Execution;
 
 public static class Installations
 {
@@ -101,7 +103,6 @@ public static class Installations
 
     public static void addToPath(Settings settings)
     {
-        string bashrc = @$"{Environment.GetEnvironmentVariable("HOME")}/.bashrc";
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             string envName = "PATH";
@@ -117,6 +118,7 @@ public static class Installations
         }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
+            string bashrc = @$"{Environment.GetEnvironmentVariable("HOME")}/.bashrc";
             if (!settings.dontInstallSAP)
             {
                 File.AppendAllText(bashrc, "export PATH=$PATH:~/.SWO/SAP/ \n");
@@ -140,12 +142,12 @@ public class SWOComponent
     public string cloneURL;
     public double currentDownloadPercent = 0;
     public double previousDownloadPercent = 0;
-    public string name;
+    public string sourceFolderName;
     public bool doBuild = true;
 
     public ProgressTask downloadProgressTask;
 
-    public SWOComponent(string webPath, string installPath, string downloadPath, string installTaskName, string downloadTaskName, string cloneTaskName, string buildTaskName, string cloneURL = "", string name = "", bool build = true)
+    public SWOComponent(string webPath, string installPath, string downloadPath, string installTaskName, string downloadTaskName, string cloneTaskName, string buildTaskName, string cloneURL = "", string sourceFolderName = "", bool build = true)
     {
         this.uri = new Uri(webPath);
         this.installPath = installPath;
@@ -156,13 +158,22 @@ public class SWOComponent
         this.cloneTaskName = cloneTaskName;
         this.buildTaskName = buildTaskName;
         this.doBuild = build;
-        this.name = name;
+        this.sourceFolderName = sourceFolderName;
     }
 
     public Task clone(ProgressTask task, string branch)
     {
-        string gitCloneCommand = $"clone -b {branch} {cloneURL}";
-        Process.Start("git", gitCloneCommand);
+        Directory.CreateDirectory(Path.GetFullPath($"{installPath}/clone"));
+        if (cloneURL == null || cloneURL == "")
+        {
+            task.StopTask();
+            return Task.CompletedTask;
+        }
+        // string gitCloneCommand = $"clone -b {branch} {cloneURL} {installPath}/clone";
+        CloneOptions cloneOpts = new CloneOptions();
+        cloneOpts.BranchName = branch;
+        // cloneOpts.OnProgress = LibGit2Sharp.Handlers.ProgressHandler();
+        Repository.Clone(cloneURL, $"{installPath}/clone", cloneOpts);
         task.StopTask();
 
         return Task.CompletedTask;
@@ -170,19 +181,40 @@ public class SWOComponent
 
     public Task build(ProgressTask task, string os)
     {
-        task.MaxValue = 3;
+        task.MaxValue = 10;
         if (!this.doBuild)
         {
             task.StopTask();
             return Task.CompletedTask;
         }
-        task.Increment(1);
         //build code goes here
+
+        string projPath = $"{installPath}/clone/{sourceFolderName}";
+        string[] projFiles = System.IO.Directory.GetFiles(projPath, "*.csproj");
+
+        if (projFiles.Length > 1)
+        {
+            throw new ArgumentException("Multiple csproj files found in build target directory");
+        }
+        string projFileSingle = Environment.ExpandEnvironmentVariables(projFiles[0]);
+
+        Process proc = new Process();
+        proc.StartInfo.FileName = "dotnet";
+        proc.StartInfo.Arguments = $"publish {projFileSingle} -r {os} --output {projPath}/publish";
+        proc.StartInfo.RedirectStandardOutput = true;
+        proc.Start();
+        proc.WaitForExit();
+        // Project proj = new Project(projFileSingle, new Dictionary<string, string>(), "6.0");
+        // Console.WriteLine("building");
+        // proj.SetGlobalProperty("Configuration", "Release");
+        // bool built = proj.Build();
+
+        task.Increment(8);
         //copy folder and delete code goes here
 
-        Directory.Move($"{installPath}/{name}/bin/Release/net6.0/{os}/publish", $"{installPath}");
+        Util.CopyFilesRecursively(new DirectoryInfo($"{projPath}/publish"), new DirectoryInfo(installPath));
         task.Increment(1);
-        Directory.Delete($"{installPath}/{name}");
+        Directory.Delete($"{installPath}/clone", true);
         task.Increment(1);
 
         return Task.CompletedTask;
