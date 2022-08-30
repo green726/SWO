@@ -47,8 +47,8 @@ public class VariableDeclaration : Node
 
     public VariableDeclaration(Util.Token typeTok, Node parent = null) : base(typeTok)
     {
-        this.nodeType = NodeType.VariableAssignment;
-        this.generator = new Generator.VariableAssignment(this);
+        this.nodeType = NodeType.VariableDeclaration;
+        this.generator = new Generator.VariableDeclaration(this);
         this.newLineReset = true;
 
         this.type = new Type(typeTok);
@@ -156,7 +156,7 @@ public class VariableDeclaration : Node
     public override void addChild(Node child)
     {
         base.addChild(child);
-        DebugConsole.Write("adding child of node type " + child.nodeType + "to varass");
+        DebugConsole.Write("adding child of node type " + child.nodeType + " to vardec");
 
         if (parsingArraySize)
         {
@@ -174,7 +174,7 @@ public class VariableDeclaration : Node
 
         if (!child.isExpression)
         {
-            throw ParserException.FactoryMethod("Value that was not an expression was added to variable assignment", "remove the non-expression", child);
+            throw ParserException.FactoryMethod("Value that was not an expression was added to variable declaration", "remove the non-expression", child);
         }
         switch (childLoop)
         {

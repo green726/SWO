@@ -71,7 +71,7 @@ public class VariableAssignment : AST.Node
     public override void addChild(AST.Node node)
     {
         base.addChild(node);
-        DebugConsole.Write("adding child of node type " + node.nodeType + "to varass");
+        DebugConsole.Write("adding child of node type " + node.nodeType + " to varass");
 
         switch (childLoop)
         {

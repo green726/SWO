@@ -481,6 +481,7 @@ public static class Parser
         AST.VariableExpression varExpr = new AST.VariableExpression(token, parent);
         if (parent?.nodeType != AST.Node.NodeType.VariableExpression)
         {
+            Console.WriteLine("returning var expr");
             return (varExpr, delimLevel);
         }
         return (parent, delimLevel);
@@ -733,12 +734,14 @@ public static class Parser
                     continue;
 
                 case Util.TokenType.AssignmentOp:
+                    Console.WriteLine("assignment op detected");
                     if (parent?.nodeType == AST.Node.NodeType.VariableDeclaration)
                     {
                         parent.addChild(token);
                     }
                     else
                     {
+                        Console.WriteLine("Creating var ass");
                         AST.VariableAssignment varAss = new AST.VariableAssignment(token, parent);
                         currentTokenNum++;
                         parent = varAss;
