@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Tomlyn;
 using Spectre.Console;
 
@@ -13,6 +10,7 @@ public static class Swo
 
     static void Main(string[] args)
     {
+        Console.WriteLine("EEE"); 
         Util.getSWOInstallPath();
 
         CLI cli = new CLI(args);
