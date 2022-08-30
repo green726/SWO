@@ -3,9 +3,6 @@ using System.IO.Compression;
 using Spectre.Console;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
-using LibGit2Sharp;
-using Microsoft.Build.Evaluation;
-using Microsoft.Build.Execution;
 
 public static class Installations
 {
@@ -169,11 +166,13 @@ public class SWOComponent
             task.StopTask();
             return Task.CompletedTask;
         }
-        // string gitCloneCommand = $"clone -b {branch} {cloneURL} {installPath}/clone";
-        CloneOptions cloneOpts = new CloneOptions();
-        cloneOpts.BranchName = branch;
-        // cloneOpts.OnProgress = LibGit2Sharp.Handlers.ProgressHandler();
-        Repository.Clone(cloneURL, $"{installPath}/clone", cloneOpts);
+        string gitCloneCommand = $"clone -b {branch} {cloneURL} {installPath}/clone";
+        Process cloneProc = new Process();
+        cloneProc.StartInfo.FileName = "git";
+        cloneProc.StartInfo.Arguments = gitCloneCommand;
+        cloneProc.Start();
+        cloneProc.WaitForExit();
+
         task.StopTask();
 
         return Task.CompletedTask;
