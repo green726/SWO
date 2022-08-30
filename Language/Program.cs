@@ -10,7 +10,6 @@ public static class Swo
 
     static void Main(string[] args)
     {
-        Console.WriteLine("EEE"); 
         Util.getSWOInstallPath();
 
         CLI cli = new CLI(args);
