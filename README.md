@@ -53,7 +53,7 @@ int @fibRec(int n) {
 
 # Links:
 
-Notion: [https://ivy-turquoise-4f8.notion.site/SWO-c193b980d415499c9103a9716067a5ba](Docs.md)
+Notion: [https://ivy-turquoise-4f8.notion.site/SWO-c193b980d415499c9103a9716067a5ba](https://ivy-turquoise-4f8.notion.site/SWO-c193b980d415499c9103a9716067a5ba)
 
 Internal Documentation: [https://www.notion.so/SWO-Internal-cb00b30071df4b7e80e22baf3b43df62](https://www.notion.so/SWO-Internal-cb00b30071df4b7e80e22baf3b43df62)
 
