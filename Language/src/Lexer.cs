@@ -35,7 +35,7 @@ public static class Lexer
             charNum++;
             column++;
             bool isFinalChar = input.IndexOf(ch) == input.Length - 1;
-            if (ch == ' ' || isFinalChar || ch == '\n' || ch == ')' || ch == '}' || specialChars.Contains(ch.ToString())/*  || lastChar == '\n' */)
+            if (ch == ' ' || isFinalChar || ch == '\n' || ch == ')' || ch == '}' || specialChars.Contains(ch.ToString()))
             {
                 if (lastChar != ' ')
                 {
@@ -95,11 +95,9 @@ public static class Lexer
 
             if (specialChars.Contains(ch.ToString()))
             {
-                //TODO: add handling of special chars (. , ; : etc)
+                tokenList.Add(new Util.Token(Util.TokenType.Special, ch, line, column));
             }
-
-            //TODO: add handling of special chars (. , ; : etc)
-            if (ch != ' ' && (int)ch != 13 && ch != '.' && ch != ',')
+            else if (ch != ' ' && (int)ch != 13)
             {
                 stringBuilder.Append(ch.ToString());
             }

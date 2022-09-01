@@ -315,6 +315,20 @@ public static class Parser
         return currentTok;
     }
 
+    public static Util.Token nextNonSpecial(int startIndex)
+    {
+        int currentIndex = startIndex + 1;
+        Util.Token currentTok = tokenList[currentIndex];
+
+        while (currentTok.type == Util.TokenType.Space || currentTok.type == Util.TokenType.Special)
+        {
+            currentIndex++;
+            currentTok = tokenList[currentIndex];
+        }
+
+        return currentTok;
+    }
+
     public static (AST.Node, int) parseKeyword(Util.Token token, int tokenIndex, AST.Node? parent = null, int delimLevel = 0)
     {
         List<dynamic> ret = new List<dynamic>();
@@ -586,12 +600,12 @@ public static class Parser
     {
         tokenList = _tokenList;
 
-        // DebugConsole.WriteAnsi("[red]tokens[/]");
-        // foreach (Util.Token token in tokenList)
-        // {
-        //     DebugConsole.Write(token.value + " " + token.type);
-        // }
-        // DebugConsole.WriteAnsi("[red]end tokens[/]");
+        DebugConsole.WriteAnsi("[red]tokens[/]");
+        foreach (Util.Token token in tokenList)
+        {
+            DebugConsole.Write(token.value + " " + token.type);
+        }
+        DebugConsole.WriteAnsi("[red]end tokens[/]");
 
         if (task != null)
         {
@@ -755,6 +769,9 @@ public static class Parser
                 case Util.TokenType.String:
                     new AST.StringExpression(token, parent);
                     currentTokenNum++;
+                    continue;
+                case Util.TokenType.Special:
+                    //TODO: implement parsing of special chars
                     continue;
             }
 
