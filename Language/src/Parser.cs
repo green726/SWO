@@ -34,6 +34,8 @@ public static class Parser
 
     public static AST.Node lastMajorParentNode = null;
 
+    public static AST.Node parent;
+
 
     public static void checkNode(AST.Node? node, AST.Node.NodeType[] expectedTypes)
     {
@@ -445,6 +447,15 @@ public static class Parser
             return (funcCall, delimLevel);
         }
 
+        //Below handles variable declarations with no initial value and no keyword - it type checks which is slower but necessary
+        else if (!Config.settings.variable.declaration.keyword.forced)
+        {
+            if (Parser.typeList.Contains(token.value))
+            {
+                return (new AST.VariableDeclaration(token, parent), delimLevel);
+            }
+        }
+
         // else if (parent?.nodeType == AST.Node.NodeType.ForLoop)
         // {
         //     AST.ForLoop forLoop = (AST.ForLoop)parent;
@@ -483,6 +494,7 @@ public static class Parser
                 return (parent, delimLevel);
         }
 
+        //below handles no-keyword but with default value variable assignments
         if (!Config.settings.variable.declaration.keyword.forced)
         {
             if (tokenList[tokenIndex + 2].value == "=" || tokenList[tokenIndex + 2].value == Config.settings.variable.declaration.keyword.mutable)
@@ -492,6 +504,8 @@ public static class Parser
             }
         }
 
+        //below can handle the nested variable expressions
+        //TODO: replace this in favor of special char handling
         AST.VariableExpression varExpr = new AST.VariableExpression(token, parent);
         if (parent?.nodeType != AST.Node.NodeType.VariableExpression)
         {
@@ -613,10 +627,12 @@ public static class Parser
         }
 
 
-        AST.Node? parent = null;
+        parent = null;
         int delimLevel = 0;
         int prevLine = 0;
         int prevColumn = 0;
+
+        currentTokenNum = 0;
 
         List<Util.TokenType> expectedTypes = new List<Util.TokenType>();
 
@@ -624,6 +640,8 @@ public static class Parser
 
         bool singleLineComment = false;
         bool multiLineComment = false;
+
+        DebugConsole.Write("first token: " + tokenList[currentTokenNum].value + " num: " + currentTokenNum);
 
         while (!isFinishedParsing)
         {
@@ -640,11 +658,11 @@ public static class Parser
             isFinishedParsing = currentTokenNum == finalTokenNum;
 
             Util.Token token = tokenList[currentTokenNum];
+            DebugConsole.Write($"token of value: {token.value} and type of {token.type} and parent of {parent?.nodeType} and delim level of {delimLevel}");
 
             prevLine = token.line;
             prevColumn = token.column;
 
-            DebugConsole.Write($"token of value: {token.value} and type of {token.type} and parent of {parent?.nodeType} and delim level of {delimLevel}");
             AST.Node? previousNode = nodes.Count > 0 && currentTokenNum > 0 ? nodes.Last() : null;
 
             if (token.type == Util.TokenType.EOF)
@@ -772,6 +790,8 @@ public static class Parser
                     continue;
                 case Util.TokenType.Special:
                     //TODO: implement parsing of special chars
+                    parent?.addChild(token);
+                    currentTokenNum++;
                     continue;
             }
 

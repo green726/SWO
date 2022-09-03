@@ -55,12 +55,11 @@ public class ImportStatement : Node
 
         Parser.parse(tokens);
 
-        Parser.tokenList = prevList;
         Parser.currentTokenNum = prevNum;
+        Parser.tokenList = prevList;
         Parser.finalTokenNum = prevMaxNum;
 
 
         base.addChild(child);
-
     }
 }

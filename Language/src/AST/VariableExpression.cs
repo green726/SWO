@@ -41,7 +41,17 @@ public class VariableExpression : Expression
         }
         else if (parentRequired)
         {
-            throw new ParserException($"Illegal variable expression {this.value}", token);
+            if (!Config.settings.variable.declaration.keyword.forced)
+            {
+                if (Parser.typeList.Contains(this.value))
+                {
+                   parent = new AST.VariableDeclaration(token, parent);
+                }
+            }
+            else
+            {
+                throw new ParserException($"Illegal variable expression {this.value}", token);
+            }
         }
 
     }

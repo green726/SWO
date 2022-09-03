@@ -26,6 +26,14 @@ public class Struct : Node
 
     public override void addChild(Node child)
     {
+        if (this.name == null && child.nodeType == AST.Node.NodeType.VariableExpression)
+        {
+            VariableExpression varExpr = (VariableExpression)child;
+            this.name = varExpr.value;
+            Parser.typeList.Add(this.name);
+            base.addChild(child);
+            return;
+        }
         if (child.nodeType != NodeType.VariableDeclaration)
         {
             throw new ArgumentException("non var dec added to str");
@@ -40,6 +48,7 @@ public class Struct : Node
         if (this.name == null)
         {
             this.name = child.value;
+            Parser.typeList.Add(this.name);
         }
         else if (child.value == "{" || child.value == "}")
         {
