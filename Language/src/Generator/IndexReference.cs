@@ -18,7 +18,7 @@ public class IndexReference : Base
         {
             case AST.Node.NodeType.VariableExpression:
                 AST.VariableExpression varExprPar = (AST.VariableExpression)idx.parent;
-                idx.isPointer = varExprPar.isPointer;
+                idx.isPointer = varExprPar.isReference;
                 break;
             case AST.Node.NodeType.IndexReference:
                 AST.IndexReference idxPar = (AST.IndexReference)idx.parent;

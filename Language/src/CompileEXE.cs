@@ -92,6 +92,69 @@ public static class EXE
         }
     }
 
+    public static void compileEXE(CompileCommandSettings settings, bool debugLogging = false)
+    {
+        bool windows = settings.targetOSName == "win10-x64";
+
+        LLVM.InitializeX86TargetInfo();
+        LLVM.InitializeX86Target();
+        LLVM.InitializeX86TargetMC();
+        LLVM.InitializeX86AsmParser();
+        LLVM.InitializeX86AsmPrinter();
+
+
+        IntPtr fileNamePtr;
+        // Marshal.FreeHGlobal(fileNamePtr); //BUG: this line breaks the code, maybe we are supposed to do it after we use the fileNamePtr?
+
+
+        string? fileNameFinal;
+
+        if (windows)
+        {
+            targetTriple = Marshal.PtrToStringUTF8(LLVM.GetDefaultTargetTriple());
+            fileNamePtr = Marshal.StringToHGlobalAnsi(settings.resultFileName + ".o");
+            fileNameFinal = Marshal.PtrToStringAnsi(fileNamePtr);
+        }
+        else
+        {
+            targetTriple = Marshal.PtrToStringAuto(LLVM.GetDefaultTargetTriple());
+            fileNamePtr = Marshal.StringToHGlobalAuto(settings.resultFileName + ".o");
+            fileNameFinal = Marshal.PtrToStringAuto(fileNamePtr);
+        }
+
+        targetBool = LLVM.GetTargetFromTriple(targetTriple, out target, out targetErrorMsg);
+        targetMachine = LLVM.CreateTargetMachine(target, targetTriple, "generic", "", LLVMCodeGenOptLevel.LLVMCodeGenLevelDefault, LLVMRelocMode.LLVMRelocDefault, LLVMCodeModel.LLVMCodeModelDefault);
+
+
+        // LLVM.SetTarget(IRGen.module, targetTriple); //idk what these lines of code do, but they didn't fix targetmachine cant generate filetype error
+        // LLVMTargetDataRef dataRef = LLVM.CreateTargetDataLayout(targetMachine);
+        // string? dataRefString = Marshal.PtrToStringAuto(LLVM.CopyStringRepOfTargetData(dataRef));
+        // LLVM.SetDataLayout(IRGen.module, dataRefString);
+
+        if (settings.resultFileType == FileType.LLVMIR)
+        {
+            LLVM.PrintModuleToFile(IRGen.module, $"{settings.resultFileName}.ir", out string errorMsg);
+        }
+
+        else if (settings.resultFileType == FileType.NativeExecutable || settings.resultFileType == FileType.Object || settings.resultFileType == FileType.Binary)
+        {
+            LLVM.TargetMachineEmitToFile(targetMachine, IRGen.module, fileNamePtr, LLVMCodeGenFileType.LLVMObjectFile, out writeErrorMsg);
+        }
+        else if (settings.resultFileType == FileType.Assembly)
+        {
+            LLVM.TargetMachineEmitToFile(targetMachine, IRGen.module, fileNamePtr, LLVMCodeGenFileType.LLVMAssemblyFile, out writeErrorMsg);
+        }
+        if (writeErrorMsg != null && writeErrorMsg != "" && debugLogging)
+        {
+            DebugConsole.Write("writeErrorMsg: " + writeErrorMsg);
+        }
+
+        if (settings.resultFileType == FileType.NativeExecutable)
+        {
+            link(settings);
+        }
+    }
+
 
     public static void compileEXE(CompileCommandSettings settings, Spectre.Console.ProgressTask task, bool debugLogging = false)
     {
@@ -110,19 +173,31 @@ public static class EXE
         IntPtr fileNamePtr;
         // Marshal.FreeHGlobal(fileNamePtr); //BUG: this line breaks the code, maybe we are supposed to do it after we use the fileNamePtr?
 
+        string fileEnding = ".o";
+
+        switch (settings.resultFileType)
+        {
+            case FileType.Assembly:
+                fileEnding = ".asm";
+                break;
+            case FileType.Object:
+                break;
+            case FileType.NativeExecutable:
+                break;
+        }
 
         string? fileNameFinal;
 
         if (windows)
         {
             targetTriple = Marshal.PtrToStringUTF8(LLVM.GetDefaultTargetTriple());
-            fileNamePtr = Marshal.StringToHGlobalAnsi(settings.resultFileName + ".o");
+            fileNamePtr = Marshal.StringToHGlobalAnsi(settings.resultFileName + fileEnding);
             fileNameFinal = Marshal.PtrToStringAnsi(fileNamePtr);
         }
         else
         {
             targetTriple = Marshal.PtrToStringAuto(LLVM.GetDefaultTargetTriple());
-            fileNamePtr = Marshal.StringToHGlobalAuto(settings.resultFileName + ".o");
+            fileNamePtr = Marshal.StringToHGlobalAuto(settings.resultFileName + fileEnding);
             fileNameFinal = Marshal.PtrToStringAuto(fileNamePtr);
         }
 

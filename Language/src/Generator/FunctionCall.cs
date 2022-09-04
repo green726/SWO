@@ -127,9 +127,9 @@ public class FunctionCall : Base
                 return new AST.StringExpression(new Util.Token(Util.TokenType.String, "\"%s\"", 0, 0), funcCall, true);
             case AST.Node.NodeType.VariableExpression:
                 AST.VariableExpression varExpr = (AST.VariableExpression)funcCall.args[0];
-                if (namedGlobalsAST.ContainsKey(varExpr.value))
+                if (namedValuesAST.ContainsKey(varExpr.value))
                 {
-                    return evaluatePrintFormat(namedGlobalsAST[varExpr.value].type);
+                    return evaluatePrintFormat(namedValuesAST[varExpr.value].type);
                 }
                 else if (namedValuesLLVM.ContainsKey(varExpr.value))
                 {

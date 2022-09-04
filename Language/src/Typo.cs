@@ -59,6 +59,23 @@ in 1
         littleWriter.Close();
     }
 
+    public static void initialize()
+    {
+        loadDict(Checker.Little);
+        loadDict(Checker.Big);
+        // foreach (string line in littleDictDefaults)
+        // {
+        //     littleWriter.Write(line);
+        // }
+
+        File.Delete(littlePath);
+        fileStream = new FileStream(littlePath, FileMode.Append);
+        littleWriter = new StreamWriter(fileStream);
+        littleWriter.Write(littleDictDefaults);
+        // littleWriter.Flush();
+        littleWriter.Close();
+    }
+
     public static List<string> spellCheck(string input)
     {
         List<string> retList = new List<string>();

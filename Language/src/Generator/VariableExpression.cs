@@ -18,11 +18,11 @@ public class VariableExpression : Base
         {
             case AST.Node.NodeType.VariableExpression:
                 AST.VariableExpression varExprPar = (AST.VariableExpression)varExpr.parent;
-                varExpr.isPointer = varExprPar.isPointer;
+                varExpr.isReference = varExprPar.isReference;
                 break;
             case AST.Node.NodeType.IndexReference:
                 AST.IndexReference idxPar = (AST.IndexReference)varExpr.parent;
-                varExpr.isPointer = idxPar.isPointer;
+                varExpr.isReference = idxPar.isPointer;
                 break;
         }
     }
@@ -114,7 +114,7 @@ public class VariableExpression : Base
 
             checkIsPtr();
 
-            if (!varExpr.isPointer && varExpr.children.Count() == 0)
+            if (!varExpr.isReference && varExpr.children.Count() == 0)
             {
                 LLVMValueRef numGEPRefLoad = LLVM.BuildLoad(builder, numGEPRef, "structGEPLoad");
                 valueStack.Push(numGEPRefLoad);
@@ -129,7 +129,7 @@ public class VariableExpression : Base
         }
         else
         {
-            if (this.varExpr.isPointer || this.varExpr.children.Count() > 0)
+            if (this.varExpr.isReference || this.varExpr.children.Count() > 0)
             {
                 DebugConsole.Write("ptr var expr detected");
                 valueStack.Push(generateVarRef());
@@ -203,7 +203,7 @@ public class VariableExpression : Base
     public LLVMValueRef generateVarLoad()
     {
         LLVMValueRef varRef = generateVarRef();
-        if (namedGlobalsAST.ContainsKey(varExpr.value))
+        if (namedValuesAST.ContainsKey(varExpr.value))
         {
             return LLVM.BuildLoad(builder, varRef, varExpr.value);
         }

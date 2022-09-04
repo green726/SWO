@@ -20,7 +20,7 @@ public static class IRGen
 
     public static Dictionary<string, LLVMValueRef> namedValuesLLVM = new Dictionary<string, LLVMValueRef>();
 
-    public static Dictionary<string, AST.VariableDeclaration> namedGlobalsAST = new Dictionary<string, AST.VariableDeclaration>();
+    public static Dictionary<string, AST.VariableDeclaration> namedValuesAST = new Dictionary<string, AST.VariableDeclaration>();
 
     public static Dictionary<string, AST.Struct> namedTypesAST = new Dictionary<string, AST.Struct>();
 
@@ -93,6 +93,24 @@ public static class IRGen
         DebugConsole.Write("");
     }
 
+    public static void generateIR(List<AST.Node> nodes)
+    {
+        foreach (AST.Node node in nodes)
+        {
+            DebugConsole.Write("generating node of type " + node.nodeType);
+            node.generator.generate();
+            DebugConsole.Write("successfully evaluated node of type " + node.nodeType);
+        }
+
+        DebugConsole.WriteAnsi("[red]module verify below[/]");
+        DebugConsole.VerifyModule(module);
+        DebugConsole.WriteAnsi("[red]module verify end[/]");
+
+        DebugConsole.WriteAnsi("[blue]pre optimizations LLVM IR below [/]");
+        DebugConsole.DumpModule(module);
+        DebugConsole.Write("");
+    }
+
     public static void optimizeIR(Spectre.Console.ProgressTask task)
     {
         LLVM.RunPassManager(passManager, module);
@@ -101,5 +119,14 @@ public static class IRGen
         DebugConsole.DumpModule(module);
         DebugConsole.Write("");
         task.StopTask();
+    }
+
+    public static void optimizeIR()
+    {
+        LLVM.RunPassManager(passManager, module);
+
+        DebugConsole.WriteAnsi("[blue]post optimizations LLVM IR below [/]");
+        DebugConsole.DumpModule(module);
+        DebugConsole.Write("");
     }
 }

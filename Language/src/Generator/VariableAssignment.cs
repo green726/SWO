@@ -14,15 +14,15 @@ public class VariableAssignment : Base
 
     public override void generate()
     {
-        AST.VariableDeclaration originalVarDec = namedGlobalsAST[varAss.varExpr.value];
-
-        if (originalVarDec.type.value == "string")
-        {
-            throw new GenException("mutable strings not yet supported", varAss);
-        }
+        // AST.VariableDeclaration originalVarDec = namedValuesAST[varAss.varExpr.value];
+        //
+        // if (originalVarDec.type.value == "string")
+        // {
+        //     throw new GenException("mutable strings not yet supported", varAss);
+        // }
 
         // (LLVMValueRef valRef, LLVMTypeRef typeLLVM) = generateVariableValue();
-        varAss.varExpr.isPointer = true;
+        varAss.varExpr.isReference = true;
         varAss.varExpr.generator.generate();
         LLVMValueRef targetValRef = valueStack.Pop();
 

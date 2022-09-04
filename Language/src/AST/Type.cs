@@ -17,6 +17,7 @@ public class Type : AST.Node
         this.nodeType = NodeType.Type;
         this.generator = new Generator.Type(this);
 
+        //TODO: add pointer location options
         if (token.value.EndsWith("*"))
         {
             this.isPointer = true;

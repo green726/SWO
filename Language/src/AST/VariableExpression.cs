@@ -3,7 +3,7 @@ namespace AST;
 public class VariableExpression : Expression
 {
 
-    public bool isPointer = false;
+    public bool isReference = false;
     public bool isDereference = false;
 
     public VariableExpression(Util.Token token, AST.Node? parent = null, bool parentRequired = true) : base(token)
@@ -25,14 +25,15 @@ public class VariableExpression : Expression
         if (token.value.StartsWith("&"))
         {
             DebugConsole.Write("pointer var ref detected");
-            this.isPointer = true;
+            this.isReference = true;
             this.value = token.value.Remove(this.value.Length - 1, 1);
         }
         else if (token.value.StartsWith("*"))
         {
-            DebugConsole.Write("dereference detected");
+            DebugConsole.WriteAnsi("[blue]dereference detected[/]");
             this.isDereference = true;
             this.value = token.value.Remove(0, 1);
+            DebugConsole.WriteAnsi($"[blue]post deref val {this.value}[/]");
         }
 
         if (parent != null)
@@ -41,17 +42,8 @@ public class VariableExpression : Expression
         }
         else if (parentRequired)
         {
-            if (!Config.settings.variable.declaration.keyword.forced)
-            {
-                if (Parser.typeList.Contains(this.value))
-                {
-                   parent = new AST.VariableDeclaration(token, parent);
-                }
-            }
-            else
-            {
-                throw new ParserException($"Illegal variable expression {this.value}", token);
-            }
+
+            throw new ParserException($"Illegal variable expression {this.value}", token);
         }
 
     }

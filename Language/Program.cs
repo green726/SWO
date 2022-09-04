@@ -29,54 +29,81 @@ public static class Swo
 
         string tomlText = System.IO.File.ReadAllText(files[0]);
         projectInfo = Toml.ToModel<ProjectInfo>(tomlText);
-        // projectInfo.checkPath();
         projectInfo.setConfig();
 
-        AnsiConsole.Progress()
-            .Columns(new ProgressColumn[] {
+        if (!settings.debugLogging)
+        {
+            AnsiConsole.Progress()
+                .Columns(new ProgressColumn[] {
             new TaskDescriptionColumn(),
             new ProgressBarColumn(),
             new PercentageColumn(),
             new RemainingTimeColumn(),
             new SpinnerColumn(),
-            }).Start(ctx =>
-            {
-                var configTask = ctx.AddTask("Initializing config");
-                Config.initialize(projectInfo.configFilePath);
-                configTask.StopTask();
-                //TODO: check if its default or leave it alone
-                settings.resultFileName = projectInfo.projectName;
-
-                if (Config.settings.general.typo.enabled)
+                }).Start(ctx =>
                 {
-                    var typoTask = ctx.AddTask("Initializing typo checker");
-                    Typo.initialize(typoTask);
-                    typoTask.StopTask();
-                }
+                    var configTask = ctx.AddTask("Initializing config");
+                    Config.initialize(projectInfo.configFilePath);
+                    configTask.StopTask();
+                    //TODO: check if its default or leave it alone
+                    settings.resultFileName = projectInfo.projectName;
 
-                fileContents = System.IO.File.ReadAllText(projectInfo.entryFile.path);
-                var lexTask = ctx.AddTask("Lexing (tokenizing) the SWO code");
-                List<Util.Token> lexedContent = Lexer.lex(fileContents, lexTask);
+                    if (Config.settings.general.typo.enabled)
+                    {
+                        var typoTask = ctx.AddTask("Initializing typo checker");
+                        Typo.initialize(typoTask);
+                        typoTask.StopTask();
+                    }
 
+                    fileContents = System.IO.File.ReadAllText(projectInfo.entryFile.path);
+                    var lexTask = ctx.AddTask("Lexing (tokenizing) the SWO code");
+                    List<Util.Token> lexedContent = Lexer.lex(fileContents, lexTask);
 
-                Parser.addLanguageBuiltins();
+                    Parser.addLanguageBuiltins();
 
-                var parseTask = ctx.AddTask("Parsing the SWO code");
-                List<AST.Node> nodes = Parser.parse(lexedContent, parseTask);
+                    var parseTask = ctx.AddTask("Parsing the SWO code");
+                    List<AST.Node> nodes = Parser.parse(lexedContent, parseTask);
 
-                var moduleTask = ctx.AddTask("Initializing LLVM");
-                ModuleGen.GenerateModule(moduleTask);
+                    var moduleTask = ctx.AddTask("Initializing LLVM");
+                    ModuleGen.GenerateModule(moduleTask);
 
-                var llvmTask = ctx.AddTask("Compiling to LLVM IR");
-                IRGen.generateIR(nodes, llvmTask);
+                    var llvmTask = ctx.AddTask("Compiling to LLVM IR");
+                    IRGen.generateIR(nodes, llvmTask);
 
-                var passTask = ctx.AddTask("Optimizing the LLVM IR");
-                IRGen.optimizeIR(passTask);
+                    var passTask = ctx.AddTask("Optimizing the LLVM IR");
+                    IRGen.optimizeIR(passTask);
 
-                var exeCompileTask = ctx.AddTask("Compiling the LLVM IR to your desired output");
-                EXE.compileEXE(settings, exeCompileTask, true);
+                    var exeCompileTask = ctx.AddTask("Compiling the LLVM IR to your desired output");
+                    EXE.compileEXE(settings, exeCompileTask, true);
 
-            });
+                });
+        }
+        else
+        {
+            Config.initialize(projectInfo.configFilePath);
+            //TODO: check if its default or leave it alone
+            settings.resultFileName = projectInfo.projectName;
+
+            if (Config.settings.general.typo.enabled)
+            {
+                Typo.initialize();
+            }
+
+            fileContents = System.IO.File.ReadAllText(projectInfo.entryFile.path);
+            List<Util.Token> lexedContent = Lexer.lex(fileContents);
+            Parser.addLanguageBuiltins();
+
+            List<AST.Node> nodes = Parser.parse(lexedContent);
+
+            ModuleGen.GenerateModule();
+
+            IRGen.generateIR(nodes);
+
+            IRGen.optimizeIR();
+
+            EXE.compileEXE(settings, true);
+
+        }
 
         AnsiConsole.MarkupLine("[green]SWO project successfully compiled[/]");
     }

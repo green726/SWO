@@ -140,7 +140,7 @@ public static class Parser
 
     public static string printVarAss(AST.VariableAssignment varAss)
     {
-        return $"{varAss.nodeType} with name of {varAss.varExpr.value} and children of [{printASTRet(varAss.children)}]";
+        return $"{varAss?.nodeType} with name of {varAss?.varExpr?.value} and children of [{printASTRet(varAss?.children)}]";
     }
 
     public static string printProto(AST.Prototype proto)
@@ -452,6 +452,7 @@ public static class Parser
         {
             if (Parser.typeList.Contains(token.value))
             {
+                DebugConsole.WriteAnsi("[red]detected no keyword variable dec WITHOUT equals[/]");
                 return (new AST.VariableDeclaration(token, parent), delimLevel);
             }
         }
@@ -499,6 +500,7 @@ public static class Parser
         {
             if (tokenList[tokenIndex + 2].value == "=" || tokenList[tokenIndex + 2].value == Config.settings.variable.declaration.keyword.mutable)
             {
+                DebugConsole.WriteAnsi("[red]detected no keyword variable dec with equals[/]");
                 AST.VariableDeclaration varDec = new AST.VariableDeclaration(token, parent);
                 return (varDec, delimLevel);
             }
@@ -509,7 +511,7 @@ public static class Parser
         AST.VariableExpression varExpr = new AST.VariableExpression(token, parent);
         if (parent?.nodeType != AST.Node.NodeType.VariableExpression)
         {
-            Console.WriteLine("returning var expr");
+            DebugConsole.Write("returning var expr");
             return (varExpr, delimLevel);
         }
         return (parent, delimLevel);

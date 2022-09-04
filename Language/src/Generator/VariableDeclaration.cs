@@ -32,10 +32,11 @@ public class VariableDeclaration : Base
             init = true;
         }
 
+        DebugConsole.Write(this.varDec.type.value);
         this.varDec.type.generator.generate();
         typeLLVM = typeStack.Pop();
-        // Console.Write(typeLLVM);
         DebugConsole.WriteAnsi($"[red] type stack[/]");
+        DebugConsole.Write(typeLLVM);
 
         if (!varDec.mutable && typeLLVM.TypeKind != LLVMTypeKind.LLVMStructTypeKind)
         {
@@ -73,7 +74,7 @@ public class VariableDeclaration : Base
         }
 
         DebugConsole.Write("adding var to named globals with name of" + varDec.name);
-        namedGlobalsAST.Add(varDec.name, varDec);
+        namedValuesAST.Add(varDec.name, varDec);
     }
 
     public void buildGlobalString()
