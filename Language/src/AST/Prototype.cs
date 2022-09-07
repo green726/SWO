@@ -13,10 +13,13 @@ public class Prototype : AST.Node
 
     public bool external = false;
 
-    public Prototype(Util.Token token, List<Util.Token> arguments = null, bool startWithRet = false, bool external = false) : base(token)
+    public Prototype(Util.Token token, AST.Node parent = null, List<Util.Token> arguments = null, bool startWithRet = false, bool external = false) : base(token)
     {
         this.nodeType = NodeType.Prototype;
         this.generator = new Generator.Prototype(this);
+
+
+        this.external = external;
 
         if (startWithRet == false)
         {
@@ -65,7 +68,11 @@ public class Prototype : AST.Node
 
             // Parser.nodes.Add(this);
         }
-        this.external = external;
+        if (parent?.nodeType != AST.Node.NodeType.ExternStatement && parent != null)
+        {
+            throw ParserException.FactoryMethod("A prototype may not have a non-extern parent", "Make the prototype top level", this);
+        }
+        parent?.addChild(this);
 
     }
 

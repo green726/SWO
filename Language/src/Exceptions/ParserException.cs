@@ -13,7 +13,7 @@ public class ParserException : Exception
 
     public override string? Source { get => base.Source; set => base.Source = value; }
 
-    public override string? StackTrace {get;}/* => base.StackTrace; */
+    public override string? StackTrace { get; }/* => base.StackTrace; */
 
     public ParserException(string msg, AST.Node node) : base($"{msg} at {node?.line}:{node?.column}")
     {
@@ -74,6 +74,25 @@ public class ParserException : Exception
 
         return new ParserException(input);
     }
+
+    public static ParserException FactoryMethod(string whatHappened, string recommendedFix, AST.Node node, AST.Node parent, bool typoSuspected = false, string typoString = "")
+    {
+        string input = "";
+        if (typoSuspected && Config.settings.general.typo.enabled)
+        {
+            string codeBlock = getCodeBlock(node);
+            List<string> typoFixes = Typo.spellCheck(typoString);
+            input = $"{whatHappened}: \n```\n{codeBlock}\n```\nHow You Can Fix This: \n{recommendedFix} \nPossible typo solutions: {typoFixes.ToString()}\nError Was Thrown At {node.line}:{node.column}";
+        }
+        else
+        {
+            string codeBlock = getCodeBlock(node);
+            input = $"{whatHappened}\n```\n{codeBlock}\n```\nHow You Can Fix This: \n{recommendedFix} \nError Was Thrown At {node.line}:{node.column}";
+        }
+
+        return new ParserException(input);
+    }
+
 
     public static string getCodeBlock(AST.Node node)
     {

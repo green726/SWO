@@ -62,6 +62,7 @@ public abstract class Node
         Return,
         ArrayExpression,
         NullExpression,
+        ExternStatement,
     }
 
     public virtual void addSpace(Util.Token space)
@@ -80,19 +81,32 @@ public abstract class Node
             Parser.nodes.Remove(this);
             this.parent = parent;
         }
+    }
 
+    public virtual void addCode(Util.Token code)
+    {
+        this.codeExcerpt += code.value;
+    }
 
+    public virtual void addCode(string code)
+    {
+        this.codeExcerpt += code;
+    }
+
+    public virtual void addNL()
+    {
+        this.codeExcerpt += "\n";
     }
 
     public virtual void addChild(Node child)
     {
-        this.codeExcerpt += child.codeExcerpt;
+        // this.codeExcerpt += child.codeExcerpt;
         children.Add(child);
     }
 
     public virtual void addChild(Util.Token child)
     {
-        this.codeExcerpt += child.value;
+        // this.codeExcerpt += child.value;
     }
 
     public virtual void removeChild(Node child)

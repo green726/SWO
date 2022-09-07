@@ -400,12 +400,12 @@ public static class Parser
         }
         else if (token.value == Config.settings.function.declaration.externKeyword)
         {
-            AST.Prototype proto = new AST.Prototype(token, external: true);
-            return (proto, delimLevel);
+            AST.ExternStatement externStat = new AST.ExternStatement(token, parent);
+            return (externStat, delimLevel);
         }
         else if (Config.settings.function.declaration.marker.word && token.value == Config.settings.function.declaration.marker.value)
         {
-            AST.Prototype proto = new AST.Prototype(token);
+            AST.Prototype proto = new AST.Prototype(token, parent);
             return (proto, delimLevel);
         }
         else if (!Config.settings.function.declaration.marker.word)
@@ -419,13 +419,13 @@ public static class Parser
                 }
                 else
                 {
-                    AST.Prototype proto = new AST.Prototype(token);
+                    AST.Prototype proto = new AST.Prototype(token, parent);
                     return (proto, delimLevel);
                 }
             }
             else if (nextToken.value[0].ToString() == Config.settings.function.declaration.marker.value && Config.settings.function.declaration.returnTypeLocation == ConfigModel.ReturnTypeLocation.Start)
             {
-                AST.Prototype proto = new AST.Prototype(token, startWithRet: true);
+                AST.Prototype proto = new AST.Prototype(token, parent, startWithRet: true);
                 return (proto, delimLevel);
             }
         }
@@ -541,6 +541,8 @@ public static class Parser
                     parent?.addChild(token);
                     break;
                 case AST.Node.NodeType.Prototype:
+                    break;
+                case AST.Node.NodeType.ExternStatement:
                     break;
                 default:
                     parent?.addChild(token);
@@ -660,6 +662,8 @@ public static class Parser
             isFinishedParsing = currentTokenNum == finalTokenNum;
 
             Util.Token token = tokenList[currentTokenNum];
+
+            parent?.addCode(token);
             DebugConsole.Write($"token of value: {token.value} and type of {token.type} and parent of {parent?.nodeType} and delim level of {delimLevel}");
 
             prevLine = token.line;
@@ -837,7 +841,7 @@ public static class Parser
         printProtoArgs.Add(new Util.Token(Util.TokenType.Keyword, "x", 0, 0));
         Util.Token printToken = new Util.Token(Util.TokenType.Keyword, "@printf", 0, 0);
 
-        AST.Prototype printProto = new AST.Prototype(printToken, printProtoArgs);
+        AST.Prototype printProto = new AST.Prototype(printToken, null, printProtoArgs);
         nodes.Insert(0, printProto);
 
         List<Util.Token> printlnProtoArgs = new List<Util.Token>();
@@ -846,10 +850,8 @@ public static class Parser
         printlnProtoArgs.Add(new Util.Token(Util.TokenType.Keyword, "x", 0, 0));
         Util.Token printlnToken = new Util.Token(Util.TokenType.Keyword, "@println", 0, 0);
 
-        AST.Prototype printlnProto = new AST.Prototype(printlnToken, printlnProtoArgs);
+        AST.Prototype printlnProto = new AST.Prototype(printlnToken, null, printlnProtoArgs);
         nodes.Insert(0, printlnProto);
-
-
     }
 }
 

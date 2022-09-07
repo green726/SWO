@@ -11,9 +11,6 @@ public class Function : AST.Node
 
     public bool multiLine = false;
 
-    // public bool utilFunc = false;
-
-
     //NOTE: Constructor 1:
     public Function(Prototype prototype, List<AST.Node>? body = null, bool topLevel = true) : base(prototype)
     {
@@ -22,6 +19,12 @@ public class Function : AST.Node
 
 
         if (body == null) body = new List<AST.Node>();
+
+        DebugConsole.WriteAnsi("[purple]proto extern: " + prototype.external + "[/]");
+        if (prototype.external)
+        {
+            throw ParserException.FactoryMethod("Prototype marked external implemented with body", "Unmark it as external, or remove the body/implementation of the prototype", this, prototype);
+        }
         this.prototype = prototype;
         this.body = body;
 
@@ -40,6 +43,13 @@ public class Function : AST.Node
     public Function(Prototype prototype, AST.Node body, bool topLevel = true) : base(prototype)
 
     {
+
+        if (prototype.external)
+        {
+            throw ParserException.FactoryMethod("Prototype marked external implemented with body", "Unmark it as external, or remove the body/implementation of the prototype", prototype);
+        }
+
+
         this.newLineReset = true;
         this.multiLine = false;
         this.nodeType = NodeType.Function;
