@@ -6,7 +6,7 @@ public static class Lexer
     private static List<Util.Token> tokenList;
     private static string[] binOps = { "+", "-", "*", "/", "==", "<" };
     private static string[] assignmentOps = { "=", "+=", "-=", "*=", "/=", ":=" };
-    private static string[] specialChars = { ":", ".", "," };
+    private static string[] specialChars = { ":", ".", ",", ";" };
 
     public static string inputStr;
 
@@ -35,7 +35,7 @@ public static class Lexer
             charNum++;
             column++;
             bool isFinalChar = input.IndexOf(ch) == input.Length - 1;
-            if (ch == ' ' || isFinalChar || ch == '\n' || ch == ')' || ch == '}' || specialChars.Contains(ch.ToString()))
+            if (ch == ' ' || isFinalChar || ch == '\n' || ch == ')' || ch == '}' || specialChars.Contains(ch.ToString()) || ch == ';')
             {
                 if (lastChar != ' ')
                 {

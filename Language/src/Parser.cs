@@ -796,9 +796,45 @@ public static class Parser
                     continue;
                 case Util.TokenType.Special:
                     //TODO: implement parsing of special chars
-                    parent?.addChild(token);
-                    currentTokenNum++;
-                    continue;
+                    if (token.value == ";")
+                    {
+                        if (Config.settings.general.semiColon.mode != "None")
+                        {
+                            if (delimLevel > 0)
+                            {
+                                while (parent?.newLineReset == true)
+                                {
+                                    parent = parent.parent;
+                                }
+                                currentTokenNum++;
+                                continue;
+                            }
+
+                            if (parent?.nodeType != AST.Node.NodeType.Function && parent?.nodeType != AST.Node.NodeType.IfStatement && parent?.nodeType != AST.Node.NodeType.ElseStatement && parent?.nodeType != AST.Node.NodeType.ForLoop /* && tokenList[tokenIndex - 1].value != "{" */ && delimLevel == 0)
+                            {
+                                currentTokenNum++;
+                                parent = null;
+                                continue;
+                            }
+                            else
+                            {
+                                currentTokenNum++;
+                                continue;
+                            }
+                        }
+                        else
+                        {
+                            throw ParserException.FactoryMethod("Illegal semi colon", "Remove the semi colon", token, parent);
+                        }
+                        break;
+                    }
+                    else
+                    {
+                        parent?.addChild(token);
+                        currentTokenNum++;
+                        continue;
+                    }
+
             }
 
             if (token.isDelim)

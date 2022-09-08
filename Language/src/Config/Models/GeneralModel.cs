@@ -9,6 +9,15 @@ public class GeneralModel
     public CommentModel comment { get; set; } = new CommentModel();
 
     public LinkerModel linker { get; set; } = new LinkerModel();
+
+    public SemiColonModel semiColon { get; set; } = new SemiColonModel();
+}
+
+public class SemiColonModel
+{
+    //Optional, Forced, None
+    public string mode { get; set; } = "Optional";
+
 }
 
 public class NullModel
