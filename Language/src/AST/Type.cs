@@ -78,5 +78,29 @@ public class Type : AST.Node
         throw new ParserException("Unknown type used", this);
     }
 
+    public uint getIntBits()
+    {
+        if (value.StartsWith("int"))
+        {
+            string intBits = value.Remove(0, 3);
+
+            if (uint.TryParse(intBits, out uint bits))
+            {
+                return bits;
+            }
+        }
+        if (value.StartsWith("uint"))
+        {
+            string intBits = value.Remove(0, 4);
+
+            if (uint.TryParse(intBits, out uint bits))
+            {
+                return bits;
+            }
+        }
+
+        throw ParserException.FactoryMethod("A non integer was treated as an integer", "Remove the type", this, this?.parent);
+    }
+
 }
 

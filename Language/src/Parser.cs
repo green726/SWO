@@ -24,7 +24,7 @@ public static class Parser
     public static int ifFuncNum = 0;
 
     //NOTE: below can be used to add user defined types (structs/classes)
-    public static List<string> typeList = new List<string>() { "double", "int", "string" };
+    public static List<string> typeList = new List<string>() { "double", "float", "string" };
 
     //NOTE: below are all for the while loop func
     public static int finalTokenNum = 0;
@@ -35,6 +35,60 @@ public static class Parser
     public static AST.Node lastMajorParentNode = null;
 
     public static AST.Node parent;
+
+    public static bool isType(Util.Token token)
+    {
+        if (typeList.Contains(token.value))
+        {
+            return true;
+        }
+        if (token.value.StartsWith("int"))
+        {
+            string intBits = token.value.Remove(0, 3);
+
+            if (int.TryParse(intBits, out int bits))
+            {
+                return true;
+            }
+        }
+        if (token.value.StartsWith("uint"))
+        {
+            string intBits = token.value.Remove(0, 4);
+
+            if (int.TryParse(intBits, out int bits))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static bool isType(string value)
+    {
+        if (typeList.Contains(value))
+        {
+            return true;
+        }
+        if (value.StartsWith("int"))
+        {
+            string intBits = value.Remove(0, 3);
+
+            if (int.TryParse(intBits, out int bits))
+            {
+                return true;
+            }
+        }
+        if (value.StartsWith("uint"))
+        {
+            string intBits = value.Remove(0, 4);
+
+            if (int.TryParse(intBits, out int bits))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 
 
     public static void checkNode(AST.Node? node, AST.Node.NodeType[] expectedTypes)
@@ -873,7 +927,7 @@ public static class Parser
 
         printProtoArgs.Add(new Util.Token(Util.TokenType.Keyword, "string", 0, 0));
         printProtoArgs.Add(new Util.Token(Util.TokenType.Keyword, "format", 0, 0));
-        printProtoArgs.Add(new Util.Token(Util.TokenType.Keyword, "int", 0, 0));
+        printProtoArgs.Add(new Util.Token(Util.TokenType.Keyword, "int64", 0, 0));
         printProtoArgs.Add(new Util.Token(Util.TokenType.Keyword, "x", 0, 0));
         Util.Token printToken = new Util.Token(Util.TokenType.Keyword, "@printf", 0, 0);
 

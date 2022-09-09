@@ -20,7 +20,7 @@ public class NumberExpression : Expression
                 this.type = new Type("double", this);
                 break;
             case Util.TokenType.Int:
-                this.value = (int)Int64.Parse(token.value);
+                this.value = (int)int.Parse(token.value);
                 this.type = new Type("int", this);
                 break;
         }

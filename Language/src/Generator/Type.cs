@@ -13,6 +13,7 @@ public class Type : Base
 
     public override void generate()
     {
+        // LLVMTypeRef llvmType = getBasicType();
         if (!type.isArray)
         {
             if (type.isPointer)
@@ -32,79 +33,44 @@ public class Type : Base
             else
             {
                 uint count = (uint)type.size;
-                switch (type.value)
-                {
-                    case "double":
-                        typeStack.Push(LLVM.ArrayType(LLVM.DoubleType(), count));
-                        break;
-                    case "int":
-                        typeStack.Push(LLVM.ArrayType(LLVM.IntType(1), count));
-                        break;
-                    case "string":
-                        typeStack.Push(LLVM.ArrayType(LLVM.ArrayType(LLVM.Int8Type(), 3), count));
-                        break;
-                    // case "null":
-                    //     typeStack.Push(LLVM.VoidType());
-                    //     break;
-                    default:
-                        throw GenException.FactoryMethod("An unknown type was referenced", "Make it a known type, or remove it", this.type, true, this.type.value);
-
-                }
-
+                typeStack.Push(LLVM.ArrayType(getBasicType(), count));
             }
+        }
+    }
+
+    public LLVMTypeRef getBasicType()
+    {
+        if (namedTypesLLVM.ContainsKey(type.value))
+        {
+            return namedTypesLLVM[type.value];
+        }
+        else if (type.value.StartsWith("int") || type.value.StartsWith("uint"))
+        {
+            uint bits = type.getIntBits();
+            return LLVM.IntType(bits);
+        }
+        switch (type.value)
+        {
+            case "double":
+                return LLVM.DoubleType();
+            case "int":
+                return LLVM.IntType(1);
+            case "string":
+                return LLVM.ArrayType(LLVM.Int8Type(), 3);
+            case "null":
+                return LLVM.VoidType();
+            default:
+                throw GenException.FactoryMethod("An unknown type was referenced", "Make it a known type, or remove it", this.type, true, this.type.value);
         }
     }
 
     public void genPointer()
     {
-        if (namedTypesLLVM.ContainsKey(type.value))
-        {
-            typeStack.Push(LLVM.PointerType(namedTypesLLVM[type.value], 0));
-        }
-        LLVMTypeRef typeRef = LLVMTypeRef.VoidType();
-        switch (type.value)
-        {
-            case "double":
-                typeRef = LLVM.DoubleType();
-                break;
-            case "int":
-                typeRef = LLVM.IntType(1);
-                break;
-            case "string":
-                typeRef = LLVM.ArrayType(LLVM.Int8Type(), 3);
-                break;
-            case "null":
-                typeRef = LLVM.VoidType();
-                break;
-            default:
-                throw GenException.FactoryMethod("An unknown type was referenced", "Make it a known type, or remove it", this.type, true, this.type.value);
-        }
-        typeStack.Push(LLVM.PointerType(typeRef, 0));
+        typeStack.Push(LLVM.PointerType(getBasicType(), 0));
     }
 
     public void genNonArray()
     {
-        if (namedTypesLLVM.ContainsKey(type.value))
-        {
-            typeStack.Push(namedTypesLLVM[type.value]);
-            return;
-        }
-        switch (type.value)
-        {
-            case "double":
-                typeStack.Push(LLVM.DoubleType());
-                break;
-            case "int":
-                typeStack.Push(LLVM.IntType(1));
-                break;
-            case "string":
-                typeStack.Push(LLVM.ArrayType(LLVM.Int8Type(), 3));
-                break;
-            case "null":
-                typeStack.Push(LLVM.VoidType());
-                break;
-            default:
-                throw GenException.FactoryMethod("An unknown type was referenced", "Make it a known type, or remove it", this.type, true, this.type.value);
-        }
+        typeStack.Push(getBasicType());
     }
 }
