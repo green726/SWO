@@ -25,7 +25,9 @@ public class Prototype : AST.Node
         {
             if (!Config.settings.function.declaration.marker.word)
             {
+                DebugConsole.WriteAnsi("[yellow]string name was substringed[/]");
                 this.name = token.value.Substring(1);
+                DebugConsole.Write("post substring val: " + this.name);
             }
             else
             {

@@ -80,6 +80,10 @@ public class Type : AST.Node
 
     public uint getIntBits()
     {
+        if (value == "int")
+        {
+            return 64;
+        }
         if (value.StartsWith("int"))
         {
             string intBits = value.Remove(0, 3);
@@ -89,7 +93,7 @@ public class Type : AST.Node
                 return bits;
             }
         }
-        if (value.StartsWith("uint"))
+        else if (value.StartsWith("uint"))
         {
             string intBits = value.Remove(0, 4);
 

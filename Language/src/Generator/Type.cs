@@ -56,7 +56,7 @@ public class Type : Base
             case "int":
                 return LLVM.IntType(1);
             case "string":
-                return LLVM.ArrayType(LLVM.Int8Type(), 3);
+                return LLVM.ArrayType(LLVM.Int8Type(), 2);
             case "null":
                 return LLVM.VoidType();
             default:

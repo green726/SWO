@@ -48,7 +48,7 @@ public class FunctionDeclarationModel
     public bool reorder { get; set; } = false;
     public ReturnTypeLocation returnTypeLocation { get; set; } = ReturnTypeLocation.Start;
 
-    public string externKeyword {get; set;} = "extern";
+    public string externKeyword { get; set; } = "extern";
 }
 
 public enum ReturnTypeLocation
@@ -79,7 +79,6 @@ public class FunctionCallingModel
 {
     public FunctionCallingArgs args { get; set; } = new FunctionCallingArgs();
 
-    public FunctionCallingBuiltin builtin { get; set; } = new FunctionCallingBuiltin();
 }
 
 public class FunctionCallingArgs
@@ -88,16 +87,4 @@ public class FunctionCallingArgs
     public List<string> delimeters { get; set; } = new List<string>() { "(", ")" };
 
     public string seperator { get; set; } = ",";
-}
-
-public class FunctionCallingBuiltin
-{
-    public FunctionCallingBuiltinMarker marker { get; set; } = new FunctionCallingBuiltinMarker();
-}
-
-public class FunctionCallingBuiltinMarker
-{
-    public string value { get; set; } = "!";
-    public bool enabled { get; set; } = true;
-    public string location { get; set; } = "end";
 }

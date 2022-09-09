@@ -483,33 +483,14 @@ public static class Parser
                 return (proto, delimLevel);
             }
         }
-        if (Config.settings.function.calling.builtin.marker.location == "end" && token.value.EndsWith(Config.settings.function.calling.builtin.marker.value))
+        if (nextToken.value == Config.settings.function.calling.args.delimeters[0] || nextToken.value == "(")
         {
-            //treat it as a builtin call
-            AST.FunctionCall builtinCall = new AST.FunctionCall(token, null, true, parent, false);
-            return (builtinCall, delimLevel);
-        }
-        else if (Config.settings.function.calling.builtin.marker.location == "beginning" && token.value.StartsWith(Config.settings.function.calling.builtin.marker.value))
-        {
-            //treat it as a builtin call
-            AST.FunctionCall builtinCall = new AST.FunctionCall(token, null, true, parent, false);
-            return (builtinCall, delimLevel);
-        }
-        else if (nextToken.value == Config.settings.function.calling.args.delimeters[0])
-        {
-            AST.FunctionCall funcCall = new AST.FunctionCall(token, null, false, parent);
+            DebugConsole.WriteAnsi("[purple]making new func call[/]");
+            AST.FunctionCall funcCall = new AST.FunctionCall(token, null, parent);
             return (funcCall, delimLevel);
         }
 
-        //Below handles variable declarations with no initial value and no keyword - it type checks which is slower but necessary
-        else if (!Config.settings.variable.declaration.keyword.forced)
-        {
-            if (Parser.typeList.Contains(token.value))
-            {
-                DebugConsole.WriteAnsi("[red]detected no keyword variable dec WITHOUT equals[/]");
-                return (new AST.VariableDeclaration(token, parent), delimLevel);
-            }
-        }
+
 
         // else if (parent?.nodeType == AST.Node.NodeType.ForLoop)
         // {
@@ -538,15 +519,23 @@ public static class Parser
             case AST.Node.NodeType.VariableAssignment:
                 // AST.VariableAssignment varAss = (AST.VariableAssignment)parent;
                 break;
-            case AST.Node.NodeType.VariableDeclaration:
-                parent?.addChild(token);
-                return (parent, delimLevel);
+
             case AST.Node.NodeType.ImportStatement:
                 parent.addChild(token);
                 return (parent.parent, delimLevel);
             case AST.Node.NodeType.Struct:
                 parent.addChild(token);
                 return (parent, delimLevel);
+        }
+
+        //Below handles variable declarations with no initial value and no keyword - it type checks which is slower but necessary
+        if (!Config.settings.variable.declaration.keyword.forced)
+        {
+            if (Parser.typeList.Contains(token.value))
+            {
+                DebugConsole.WriteAnsi("[red]detected no keyword variable dec WITHOUT equals[/]");
+                return (new AST.VariableDeclaration(token, parent), delimLevel);
+            }
         }
 
         //below handles no-keyword but with default value variable assignments
@@ -558,6 +547,11 @@ public static class Parser
                 AST.VariableDeclaration varDec = new AST.VariableDeclaration(token, parent);
                 return (varDec, delimLevel);
             }
+        }
+
+        if (parent?.nodeType == AST.Node.NodeType.VariableDeclaration) {
+                parent?.addChild(token);
+                return (parent, delimLevel);
         }
 
         //below can handle the nested variable expressions
@@ -916,32 +910,32 @@ public static class Parser
 
     public static void addLanguageBuiltins()
     {
-        Util.Token newLineAssToken = new Util.Token(Util.TokenType.Keyword, "const", 0, 0);
-        AST.VariableDeclaration newLineAss = new AST.VariableDeclaration(newLineAssToken, false);
-        newLineAss.addChild(new Util.Token(Util.TokenType.Keyword, "string", 0, 0));
-        newLineAss.addChild(new Util.Token(Util.TokenType.Keyword, "nl", 0, 0));
-        newLineAss.addChild(new Util.Token(Util.TokenType.AssignmentOp, "=", 0, 0));
-        newLineAss.addChild(new AST.StringExpression(new Util.Token(Util.TokenType.String, "\"\n\"", 0, 0), newLineAss));
-
-        List<Util.Token> printProtoArgs = new List<Util.Token>();
-
-        printProtoArgs.Add(new Util.Token(Util.TokenType.Keyword, "string", 0, 0));
-        printProtoArgs.Add(new Util.Token(Util.TokenType.Keyword, "format", 0, 0));
-        printProtoArgs.Add(new Util.Token(Util.TokenType.Keyword, "int64", 0, 0));
-        printProtoArgs.Add(new Util.Token(Util.TokenType.Keyword, "x", 0, 0));
-        Util.Token printToken = new Util.Token(Util.TokenType.Keyword, "@printf", 0, 0);
-
-        AST.Prototype printProto = new AST.Prototype(printToken, null, printProtoArgs);
-        nodes.Insert(0, printProto);
-
-        List<Util.Token> printlnProtoArgs = new List<Util.Token>();
-
-        printlnProtoArgs.Add(new Util.Token(Util.TokenType.Keyword, "double", 0, 0));
-        printlnProtoArgs.Add(new Util.Token(Util.TokenType.Keyword, "x", 0, 0));
-        Util.Token printlnToken = new Util.Token(Util.TokenType.Keyword, "@println", 0, 0);
-
-        AST.Prototype printlnProto = new AST.Prototype(printlnToken, null, printlnProtoArgs);
-        nodes.Insert(0, printlnProto);
+        // Util.Token newLineAssToken = new Util.Token(Util.TokenType.Keyword, "const", 0, 0);
+        // AST.VariableDeclaration newLineAss = new AST.VariableDeclaration(newLineAssToken, false);
+        // newLineAss.addChild(new Util.Token(Util.TokenType.Keyword, "string", 0, 0));
+        // newLineAss.addChild(new Util.Token(Util.TokenType.Keyword, "nl", 0, 0));
+        // newLineAss.addChild(new Util.Token(Util.TokenType.AssignmentOp, "=", 0, 0));
+        // newLineAss.addChild(new AST.StringExpression(new Util.Token(Util.TokenType.String, "\"\n\"", 0, 0), newLineAss));
+        //
+        // List<Util.Token> printProtoArgs = new List<Util.Token>();
+        //
+        // printProtoArgs.Add(new Util.Token(Util.TokenType.Keyword, "string", 0, 0));
+        // printProtoArgs.Add(new Util.Token(Util.TokenType.Keyword, "format", 0, 0));
+        // printProtoArgs.Add(new Util.Token(Util.TokenType.Keyword, "int64", 0, 0));
+        // printProtoArgs.Add(new Util.Token(Util.TokenType.Keyword, "x", 0, 0));
+        // Util.Token printToken = new Util.Token(Util.TokenType.Keyword, "@printf", 0, 0);
+        //
+        // AST.Prototype printProto = new AST.Prototype(printToken, null, printProtoArgs);
+        // nodes.Insert(0, printProto);
+        //
+        // List<Util.Token> printlnProtoArgs = new List<Util.Token>();
+        //
+        // printlnProtoArgs.Add(new Util.Token(Util.TokenType.Keyword, "double", 0, 0));
+        // printlnProtoArgs.Add(new Util.Token(Util.TokenType.Keyword, "x", 0, 0));
+        // Util.Token printlnToken = new Util.Token(Util.TokenType.Keyword, "@println", 0, 0);
+        //
+        // AST.Prototype printlnProto = new AST.Prototype(printlnToken, null, printlnProtoArgs);
+        // nodes.Insert(0, printlnProto);
     }
 }
 

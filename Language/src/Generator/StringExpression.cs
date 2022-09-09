@@ -56,7 +56,8 @@ public class StringExpression : Base
         }
         else
         {
-            valueStack.Push(LLVM.BuildGlobalString(builder, str.value, "strtmp"));
+            DebugConsole.WriteAnsi($"[green]strexpr value: {str.value}[/]");
+            valueStack.Push(LLVM.ConstString("%d", 2, true));
         }
 
     }

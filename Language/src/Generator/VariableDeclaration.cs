@@ -17,11 +17,11 @@ public class VariableDeclaration : Base
     public override void generate()
     {
         if (varDec.generated) { return; }
-        if (varDec.type.value == "string")
-        {
-            buildGlobalString();
-            return;
-        }
+        // if (varDec.type.value == "string")
+        // {
+        //     buildGlobalString();
+        //     return;
+        // }
 
         LLVMValueRef valRef = new LLVMValueRef();
 
@@ -82,45 +82,46 @@ public class VariableDeclaration : Base
         AST.StringExpression strExpr = (AST.StringExpression)this.varDec.defaultValue;
         if (varDec.generated) { return; }
 
-        List<LLVMValueRef> asciiList = new List<LLVMValueRef>();
+        // List<LLVMValueRef> asciiList = new List<LLVMValueRef>();
+        //
+        // bool escaped = false;
+        // DebugConsole.Write(this.varDec.defaultValue.nodeType);
+        // foreach (char ch in strExpr.value)
+        // {
+        //     if (ch == '\\')
+        //     {
+        //         escaped = true;
+        //         continue;
+        //     }
+        //     if (escaped)
+        //     {
+        //         switch (ch)
+        //         {
+        //             case 'n':
+        //                 int newLineCode = 10;
+        //                 asciiList.Add(LLVM.ConstInt(LLVM.Int8Type(), (ulong)newLineCode, false));
+        //                 escaped = false;
+        //                 continue;
+        //         }
+        //     }
+        //     int code = (int)ch;
+        //     asciiList.Add(LLVM.ConstInt(LLVM.Int8Type(), (ulong)code, false));
+        //     escaped = false;
+        // }
+        // asciiList.Add(LLVM.ConstInt(LLVM.Int8Type(), (ulong)0, false));
+        //
+        // LLVMValueRef[] intsRef = asciiList.ToArray();
 
-        bool escaped = false;
-        DebugConsole.Write(this.varDec.defaultValue.nodeType);
-        foreach (char ch in strExpr.value)
-        {
-            if (ch == '\\')
-            {
-                escaped = true;
-                continue;
-            }
-            if (escaped)
-            {
-                switch (ch)
-                {
-                    case 'n':
-                        int newLineCode = 10;
-                        asciiList.Add(LLVM.ConstInt(LLVM.Int8Type(), (ulong)newLineCode, false));
-                        escaped = false;
-                        continue;
-                }
-            }
-            int code = (int)ch;
-            asciiList.Add(LLVM.ConstInt(LLVM.Int8Type(), (ulong)code, false));
-            escaped = false;
-        }
-        asciiList.Add(LLVM.ConstInt(LLVM.Int8Type(), (ulong)0, false));
 
-        LLVMValueRef[] intsRef = asciiList.ToArray();
+        // LLVMValueRef globalArr = LLVM.AddGlobal(module, LLVMTypeRef.ArrayType(LLVMTypeRef.Int8Type(), (uint)intsRef.Length), varDec.name);
 
-        LLVMValueRef globalArr = LLVM.AddGlobal(module, LLVMTypeRef.ArrayType(LLVMTypeRef.Int8Type(), (uint)intsRef.Length), varDec.name);
+        // if (init)
+        // {
+        //     LLVMValueRef arrayRef = LLVM.ConstArray(LLVMTypeRef.Int8Type(), intsRef);
+        //     LLVM.SetInitializer(globalArr, arrayRef);
+        // }
 
-        if (init)
-        {
-            LLVMValueRef arrayRef = LLVM.ConstArray(LLVMTypeRef.Int8Type(), intsRef);
-            LLVM.SetInitializer(globalArr, arrayRef);
-        }
-
-        valueStack.Push(globalArr);
+        // valueStack.Push(globalArr);
 
     }
 }
