@@ -21,7 +21,7 @@ public class Type : AST.Node
         if (token.value.EndsWith("*"))
         {
             this.isPointer = true;
-            token.value.Remove(token.value.Length - 1);
+            token.value = token.value.Substring(0, token.value.Length - 1);
         }
 
         this.value = token.value;

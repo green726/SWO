@@ -38,6 +38,7 @@ public static class IRGen
     public static int getStructFieldIndex(AST.VariableExpression varExpr)
     {
         int index = currentStruct.Pop().getPropIndex(varExpr.value);
+
         return index;
     }
 

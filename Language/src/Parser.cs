@@ -528,15 +528,7 @@ public static class Parser
                 return (parent, delimLevel);
         }
 
-        //Below handles variable declarations with no initial value and no keyword - it type checks which is slower but necessary
-        if (!Config.settings.variable.declaration.keyword.forced)
-        {
-            if (Parser.typeList.Contains(token.value))
-            {
-                DebugConsole.WriteAnsi("[red]detected no keyword variable dec WITHOUT equals[/]");
-                return (new AST.VariableDeclaration(token, parent), delimLevel);
-            }
-        }
+
 
         //below handles no-keyword but with default value variable assignments
         if (!Config.settings.variable.declaration.keyword.forced)
@@ -549,9 +541,21 @@ public static class Parser
             }
         }
 
-        if (parent?.nodeType == AST.Node.NodeType.VariableDeclaration) {
-                parent?.addChild(token);
-                return (parent, delimLevel);
+        //NOTE: this needs to be below the other type or else inital value decs wont work
+        //Below handles variable declarations with no initial value and no keyword - it type checks which is slower but necessary
+        if (!Config.settings.variable.declaration.keyword.forced)
+        {
+            if (Parser.typeList.Contains(token.value))
+            {
+                DebugConsole.WriteAnsi("[red]detected no keyword variable dec WITHOUT equals[/]");
+                return (new AST.VariableDeclaration(token, parent), delimLevel);
+            }
+        }
+
+        if (parent?.nodeType == AST.Node.NodeType.VariableDeclaration)
+        {
+            parent?.addChild(token);
+            return (parent, delimLevel);
         }
 
         //below can handle the nested variable expressions

@@ -24,15 +24,15 @@ public class VariableExpression : Expression
 
         if (token.value.StartsWith("&"))
         {
-            DebugConsole.Write("pointer var ref detected");
+            DebugConsole.WriteAnsi("[yellow]reference detected[/]");
             this.isReference = true;
-            this.value = token.value.Remove(this.value.Length - 1, 1);
+            this.value = token.value.Substring(1, token.value.Length - 1);
         }
         else if (token.value.StartsWith("*"))
         {
             DebugConsole.WriteAnsi("[blue]dereference detected[/]");
             this.isDereference = true;
-            this.value = token.value.Remove(0, 1);
+            this.value = token.value.Substring(1, token.value.Length - 1);
             DebugConsole.WriteAnsi($"[blue]post deref val {this.value}[/]");
         }
 
