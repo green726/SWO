@@ -6,7 +6,7 @@ public static class Lexer
     private static List<Util.Token> tokenList;
     private static string[] binOps = { "+", "-", "*", "/", "==", "<" };
     private static string[] assignmentOps = { "=", "+=", "-=", "*=", "/=", ":=" };
-    private static string[] specialChars = { ":", ".", ",", ";" };
+    private static string[] specialChars = { ":", ".", ",", ";", "&", "*" };
 
     public static string inputStr;
 

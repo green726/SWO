@@ -3,8 +3,6 @@ namespace AST;
 public class VariableExpression : Expression
 {
 
-    public bool isReference = false;
-    public bool isDereference = false;
 
     public VariableExpression(Util.Token token, AST.Node? parent = null, bool parentRequired = true) : base(token)
     {
@@ -22,19 +20,7 @@ public class VariableExpression : Expression
         //     this.addChild(new NumberExpression(new Util.Token(Util.TokenType.Int, splitStr[1], token.line, token.column + 1), this));
         // }
 
-        if (token.value.StartsWith("&"))
-        {
-            DebugConsole.WriteAnsi("[yellow]reference detected[/]");
-            this.isReference = true;
-            this.value = token.value.Substring(1, token.value.Length - 1);
-        }
-        else if (token.value.StartsWith("*"))
-        {
-            DebugConsole.WriteAnsi("[blue]dereference detected[/]");
-            this.isDereference = true;
-            this.value = token.value.Substring(1, token.value.Length - 1);
-            DebugConsole.WriteAnsi($"[blue]post deref val {this.value}[/]");
-        }
+
 
         if (parent != null)
         {

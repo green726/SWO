@@ -3,11 +3,11 @@ namespace Generator;
 using LLVMSharp;
 using static IRGen;
 
-public class StringExpression : Base
+public class StringExpression : Expression
 {
     AST.StringExpression str;
 
-    public StringExpression(AST.Node node)
+    public StringExpression(AST.Node node) : base((AST.Expression)node)
     {
         this.str = (AST.StringExpression)node;
     }
@@ -59,6 +59,8 @@ public class StringExpression : Base
             DebugConsole.WriteAnsi($"[green]strexpr value: {str.value}[/]");
             valueStack.Push(LLVM.ConstString("%d", 2, true));
         }
+
+        base.generate();
 
     }
 }
