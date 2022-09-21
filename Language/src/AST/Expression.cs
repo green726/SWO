@@ -11,20 +11,19 @@ public abstract class Expression : Node
     {
         this.isExpression = true;
 
-
-        if (Parser.tokenList[Parser.currentTokenNum - 1].value == "&")
-        {
-            DebugConsole.WriteAnsi("[yellow]reference detected[/]");
-            this.isReference = true;
-            this.value = token.value.Substring(1, token.value.Length - 1);
-        }
-        else if (Parser.tokenList[Parser.currentTokenNum - 1].value == "*")
-        {
-            DebugConsole.WriteAnsi("[blue]dereference detected[/]");
-            this.isDereference = true;
-            this.value = token.value.Substring(1, token.value.Length - 1);
-            DebugConsole.WriteAnsi($"[blue]post deref val {this.value}[/]");
-        }
+        // if (Parser.tokenList[Parser.currentTokenNum - 1].value == "&")
+        // {
+        //     DebugConsole.WriteAnsi("[yellow]reference detected[/]");
+        //     this.isReference = true;
+        //     this.value = token.value.Substring(1, token.value.Length - 1);
+        // }
+        // else if (Parser.tokenList[Parser.currentTokenNum - 1].value == "*")
+        // {
+        //     DebugConsole.WriteAnsi("[blue]dereference detected[/]");
+        //     this.isDereference = true;
+        //     this.value = token.value.Substring(1, token.value.Length - 1);
+        //     DebugConsole.WriteAnsi($"[blue]post deref val {this.value}[/]");
+        // }
     }
 
     public Expression(Node node, Node? parent = null) : base(node)

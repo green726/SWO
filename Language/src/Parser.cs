@@ -846,6 +846,19 @@ public static class Parser
                     new AST.StringExpression(token, parent);
                     currentTokenNum++;
                     continue;
+                case Util.TokenType.Modifier:
+                    switch (token.value)
+                    {
+                        case "*":
+                            parent = new AST.Dereference(token, parent);
+                            currentTokenNum++;
+                            continue;
+                        case "&":
+                            currentTokenNum++;
+                            parent = new AST.Reference(token, parent);
+                            continue;
+                    }
+                    break;
                 case Util.TokenType.Special:
                     //TODO: implement parsing of special chars
                     if (token.value == ";")
@@ -886,7 +899,6 @@ public static class Parser
                         currentTokenNum++;
                         continue;
                     }
-
             }
 
             if (token.isDelim)

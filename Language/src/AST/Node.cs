@@ -63,6 +63,8 @@ public abstract class Node
         ArrayExpression,
         NullExpression,
         ExternStatement,
+        Reference,
+        Dereference,
     }
 
     public virtual void addSpace(Util.Token space)

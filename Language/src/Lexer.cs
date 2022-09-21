@@ -6,7 +6,8 @@ public static class Lexer
     private static List<Util.Token> tokenList;
     private static string[] binOps = { "+", "-", "*", "/", "==", "<" };
     private static string[] assignmentOps = { "=", "+=", "-=", "*=", "/=", ":=" };
-    private static string[] specialChars = { ":", ".", ",", ";", "&", "*" };
+    private static string[] specialChars = { ":", ".", ",", ";" };
+    private static string[] modifierChars = { "&", "*" };
 
     public static string inputStr;
 
@@ -96,6 +97,11 @@ public static class Lexer
             if (specialChars.Contains(ch.ToString()))
             {
                 tokenList.Add(new Util.Token(Util.TokenType.Special, ch, line, column));
+            }
+            //NOTE: handling of modifier chars (ie reference/dereference) - they are only handeled if they are at the start of a word
+            else if (modifierChars.Contains(ch.ToString()) && stringBuilder.ToString() == "")
+            {
+                tokenList.Add(new Util.Token(Util.TokenType.Modifier, ch, line, column));
             }
             else if (ch != ' ' && (int)ch != 13)
             {

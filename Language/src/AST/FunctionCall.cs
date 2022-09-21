@@ -30,7 +30,6 @@ public class FunctionCall : Expression
         else if (topLevel)
         {
             // Parser.nodes.Add(this);
-
         }
     }
 
