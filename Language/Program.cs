@@ -59,7 +59,6 @@ public static class SWO
                     var lexTask = ctx.AddTask("Lexing (tokenizing) the SWO code");
                     List<Util.Token> lexedContent = Lexer.lex(fileContents, lexTask);
 
-                    Parser.addLanguageBuiltins();
 
                     var parseTask = ctx.AddTask("Parsing the SWO code");
                     List<AST.Node> nodes = Parser.parse(lexedContent, parseTask);
@@ -91,7 +90,6 @@ public static class SWO
 
             fileContents = System.IO.File.ReadAllText(projectInfo.entryFile.path);
             List<Util.Token> lexedContent = Lexer.lex(fileContents);
-            Parser.addLanguageBuiltins();
 
             List<AST.Node> nodes = Parser.parse(lexedContent);
 

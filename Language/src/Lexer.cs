@@ -38,7 +38,9 @@ public static class Lexer
             bool isFinalChar = input.IndexOf(ch) == input.Length - 1;
             if (ch == ' ' || isFinalChar || ch == '\n' || ch == ')' || ch == '}' || specialChars.Contains(ch.ToString()) || ch == ';')
             {
-                if (lastChar != ' ')
+
+                //NOTE: below will avoid doing anything if you are in a string
+                if (lastChar != ' ' && !stringBuilder.ToString().StartsWith("\""))
                 {
                     checkStringBuilder(stringBuilder, line, column, charNum);
                     stringBuilder = new StringBuilder();
@@ -94,6 +96,19 @@ public static class Lexer
                     continue;
             }
 
+            if (ch == '"')
+            {
+                if (stringBuilder.ToString().StartsWith("\""))
+                {
+                    stringBuilder.Append(ch);
+                    DebugConsole.WriteAnsi($"[green]detected end of string and builder val is now: {stringBuilder.ToString()}[/]");
+                    tokenList.Add(new Util.Token(Util.TokenType.String, stringBuilder.ToString(), line, column));
+                    stringBuilder = new StringBuilder();
+                    lastChar = ch;
+                    continue;
+                }
+            }
+
             if (specialChars.Contains(ch.ToString()))
             {
                 tokenList.Add(new Util.Token(Util.TokenType.Special, ch, line, column));
@@ -106,6 +121,17 @@ public static class Lexer
             else if (ch != ' ' && (int)ch != 13)
             {
                 stringBuilder.Append(ch.ToString());
+            }
+            else
+            {
+                if (stringBuilder.ToString().StartsWith("\""))
+                {
+                    stringBuilder.Append(ch.ToString());
+                }
+                else
+                {
+                    tokenList.Add(new Util.Token(Util.TokenType.Space, ch, line, column));
+                }
             }
             lastChar = ch;
         }
@@ -153,10 +179,10 @@ public static class Lexer
         {
             tokenList.Add(new Util.Token(Util.TokenType.AssignmentOp, stringBuilder.ToString(), line, column, charNum, false));
         }
-        else if (firstChar == '"' && stringBuilder.ToString().EndsWith('"'))
-        {
-            tokenList.Add(new Util.Token(Util.TokenType.String, stringBuilder.ToString(), line, column, charNum));
-        }
+        // else if (firstChar == '"' && stringBuilder.ToString().EndsWith('"'))
+        // {
+        //     tokenList.Add(new Util.Token(Util.TokenType.String, stringBuilder.ToString(), line, column, charNum));
+        // }
         else if (stringBuilder.ToString() != " " && stringBuilder.ToString() != "" && stringBuilder.ToString() != "\n")
         {
             tokenList.Add(new Util.Token(Util.TokenType.Keyword, stringBuilder.ToString(), line, column, charNum));

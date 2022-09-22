@@ -17,13 +17,16 @@ public class Reference : Expression
 
         LLVMValueRef valRef = valueStack.Pop();
 
+        DebugConsole.WriteAnsi($"[blue]valueRef: {valRef}[/]");
+
         LLVMTypeRef typeRef = LLVM.TypeOf(valRef);
 
-        DebugConsole.WriteAnsi($"[blue]typeRef: {typeRef}[/]");
+        DebugConsole.WriteAnsi($"[blue]typeRef: {typeRef} type kind: {typeRef.TypeKind}[/]");
 
         if (typeRef.TypeKind == LLVMTypeKind.LLVMPointerTypeKind)
         {
             base.generate();
+            valueStack.Push(valRef);
             return;
         }
 

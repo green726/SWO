@@ -14,51 +14,51 @@ public class StringExpression : Expression
 
     public override void generate()
     {
-        // if (str.builtInString)
-        // {
-        //     switch (str.value)
-        //     {
-        //         case "\"%s\"":
-        //             LLVMValueRef stringFormatRef = LLVM.GetNamedGlobal(module, "stringFormat");
-        //             if (stringFormatRef.Pointer == IntPtr.Zero)
-        //             {
-        //                 valueStack.Push(LLVM.BuildGlobalString(builder, str.value, "stringFormat"));
-        //             }
-        //             else
-        //             {
-        //                 valueStack.Push(stringFormatRef);
-        //             }
-        //             break;
-        //         case "\"%f\"":
-        //             LLVMValueRef numberFormatRef = LLVM.GetNamedGlobal(module, "numberFormat");
-        //             if (numberFormatRef.Pointer == IntPtr.Zero)
-        //             {
-        //                 valueStack.Push(LLVM.BuildGlobalString(builder, str.value, "numberFormat"));
-        //             }
-        //             else
-        //             {
-        //                 valueStack.Push(numberFormatRef);
-        //             }
-        //             break;
-        //         case "\"\n\"":
-        //             LLVMValueRef newLineRef = LLVM.GetNamedGlobal(module, "newLine");
-        //             if (newLineRef.Pointer == IntPtr.Zero)
-        //             {
-        //                 valueStack.Push(LLVM.BuildGlobalString(builder, str.value, "newLine"));
-        //             }
-        //             else
-        //             {
-        //                 valueStack.Push(newLineRef);
-        //             }
-        //             break;
-        //     }
-        //
-        // }
-        // else
-        // {
-        DebugConsole.WriteAnsi("[red]strexpr value: " + str.value + "[/]");
-        valueStack.Push(LLVM.BuildGlobalString(builder, str.value, "strtmp"));
-        // }
+        List<LLVMValueRef> asciiList = new List<LLVMValueRef>();
+
+        bool escaped = false;
+        foreach (char ch in str.value)
+        {
+            if (ch == '\\')
+            {
+                escaped = true;
+                continue;
+            }
+            if (escaped)
+            {
+                switch (ch)
+                {
+                    case 'n':
+                        int newLineCode = 10;
+                        asciiList.Add(LLVM.ConstInt(LLVM.Int8Type(), (ulong)newLineCode, false));
+                        escaped = false;
+                        continue;
+                }
+            }
+            int code = (int)ch;
+            asciiList.Add(LLVM.ConstInt(LLVM.Int8Type(), (ulong)code, false));
+            escaped = false;
+        }
+        asciiList.Add(LLVM.ConstInt(LLVM.Int8Type(), (ulong)0, false));
+
+        LLVMValueRef[] intsRef = asciiList.ToArray();
+
+        LLVMTypeRef arrType = LLVMTypeRef.ArrayType(LLVMTypeRef.Int8Type(), (uint)intsRef.Length);
+
+        LLVMValueRef constArrRef = LLVM.ConstArray(LLVMTypeRef.Int8Type(), intsRef);
+
+        valueStack.Push(constArrRef);
+
+        if (str.parent?.nodeType != AST.Node.NodeType.VariableDeclaration)
+        {
+            LLVMValueRef globalRef = LLVM.AddGlobal(module, arrType, "strtmp");
+
+            LLVM.SetInitializer(globalRef, constArrRef);
+            valueStack.Push(globalRef);
+        }
+
+        // DebugConsole.WriteAnsi("[red]strexpr value: " + str.value + "[/]");
+        // valueStack.Push(LLVM.BuildGlobalString(builder, str.value, "strtmp"));
 
         base.generate();
 

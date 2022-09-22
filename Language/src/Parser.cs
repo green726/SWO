@@ -372,9 +372,21 @@ public static class Parser
         }
         return ret;
     }
+    public static Util.Token nextNonSpace()
+    {
+        int currentIndex = currentTokenNum + 1;
+        Util.Token currentTok = tokenList[currentIndex];
 
+        while (currentTok.type == Util.TokenType.Space)
+        {
+            currentIndex++;
+            currentTok = tokenList[currentIndex];
+        }
 
-    public static Util.Token nextNonSpace(int startIndex)
+        return currentTok;
+    }
+
+    public static (Util.Token, int) nextNonSpace(int startIndex)
     {
         int currentIndex = startIndex + 1;
         Util.Token currentTok = tokenList[currentIndex];
@@ -385,7 +397,7 @@ public static class Parser
             currentTok = tokenList[currentIndex];
         }
 
-        return currentTok;
+        return (currentTok, currentIndex);
     }
 
     public static Util.Token nextNonSpecial(int startIndex)
@@ -405,8 +417,7 @@ public static class Parser
     public static (AST.Node, int) parseKeyword(Util.Token token, int tokenIndex, AST.Node? parent = null, int delimLevel = 0)
     {
         List<dynamic> ret = new List<dynamic>();
-        Util.Token nextToken = tokenList[tokenIndex + 1];
-        int nextTokenIndex = tokenIndex + 1;
+        (Util.Token nextToken, int nextTokenIndex) = nextNonSpace(tokenIndex);
 
         if (token.value == Config.settings.variable.declaration.keyword.mutable)
         {
@@ -550,7 +561,8 @@ public static class Parser
         //below handles no-keyword but with default value variable assignments
         if (!Config.settings.variable.declaration.keyword.forced)
         {
-            if (tokenList[tokenIndex + 2].value == "=" || tokenList[tokenIndex + 2].value == Config.settings.variable.declaration.keyword.mutable)
+            (Util.Token twoToks, int twoToksIdx) = nextNonSpace(nextTokenIndex);
+            if (twoToks.value == "=" || twoToks.value == Config.settings.variable.declaration.keyword.mutable)
             {
                 DebugConsole.WriteAnsi("[red]detected no keyword variable dec with equals[/]");
                 AST.VariableDeclaration varDec = new AST.VariableDeclaration(token, parent);
@@ -588,7 +600,6 @@ public static class Parser
 
     public static (AST.Node parent, int delimLevel) parseDelim(Util.Token token, int tokenIndex, AST.Node? parent = null, int delimLevel = 0)
     {
-
         if (token.type == Util.TokenType.DelimiterOpen)
         {
             if (token.value == "[" && parent?.nodeType != AST.Node.NodeType.VariableDeclaration)
@@ -636,7 +647,7 @@ public static class Parser
                 case AST.Node.NodeType.Prototype:
                     if (token.value == ")")
                     {
-                        if (tokenList[tokenIndex + 1].value == "{")
+                        if (nextNonSpace().value == "{")
                         {
                             parent = new AST.Function((AST.Prototype)parent);
                             delimLevel--;
@@ -690,7 +701,10 @@ public static class Parser
         DebugConsole.WriteAnsi("[red]tokens[/]");
         foreach (Util.Token token in tokenList)
         {
-            DebugConsole.Write(token.value + " " + token.type);
+            if (token.type != Util.TokenType.String)
+            {
+                DebugConsole.Write(token.value + " " + token.type);
+            }
         }
         DebugConsole.WriteAnsi("[red]end tokens[/]");
 
@@ -733,7 +747,10 @@ public static class Parser
             Util.Token token = tokenList[currentTokenNum];
 
             parent?.addCode(token);
-            DebugConsole.Write($"token of value: {token.value} and type of {token.type} and parent of {parent?.nodeType} and delim level of {delimLevel}");
+            if (token.type != Util.TokenType.Space)
+            {
+                DebugConsole.Write($"token of value: {token.value} and type of {token.type} and parent of {parent?.nodeType} and delim level of {delimLevel}");
+            }
 
             prevLine = token.line;
             prevColumn = token.column;
@@ -811,7 +828,6 @@ public static class Parser
             {
                 case Util.TokenType.Space:
                     parent?.addSpace(token);
-                    break;
                     break;
                 case Util.TokenType.Int:
 
@@ -938,37 +954,6 @@ public static class Parser
         DebugConsole.WriteAnsi("[green]parser debug end[/]");
 
         return nodes;
-    }
-
-
-    public static void addLanguageBuiltins()
-    {
-        // Util.Token newLineAssToken = new Util.Token(Util.TokenType.Keyword, "const", 0, 0);
-        // AST.VariableDeclaration newLineAss = new AST.VariableDeclaration(newLineAssToken, false);
-        // newLineAss.addChild(new Util.Token(Util.TokenType.Keyword, "string", 0, 0));
-        // newLineAss.addChild(new Util.Token(Util.TokenType.Keyword, "nl", 0, 0));
-        // newLineAss.addChild(new Util.Token(Util.TokenType.AssignmentOp, "=", 0, 0));
-        // newLineAss.addChild(new AST.StringExpression(new Util.Token(Util.TokenType.String, "\"\n\"", 0, 0), newLineAss));
-        //
-        // List<Util.Token> printProtoArgs = new List<Util.Token>();
-        //
-        // printProtoArgs.Add(new Util.Token(Util.TokenType.Keyword, "string", 0, 0));
-        // printProtoArgs.Add(new Util.Token(Util.TokenType.Keyword, "format", 0, 0));
-        // printProtoArgs.Add(new Util.Token(Util.TokenType.Keyword, "int64", 0, 0));
-        // printProtoArgs.Add(new Util.Token(Util.TokenType.Keyword, "x", 0, 0));
-        // Util.Token printToken = new Util.Token(Util.TokenType.Keyword, "@printf", 0, 0);
-        //
-        // AST.Prototype printProto = new AST.Prototype(printToken, null, printProtoArgs);
-        // nodes.Insert(0, printProto);
-        //
-        // List<Util.Token> printlnProtoArgs = new List<Util.Token>();
-        //
-        // printlnProtoArgs.Add(new Util.Token(Util.TokenType.Keyword, "double", 0, 0));
-        // printlnProtoArgs.Add(new Util.Token(Util.TokenType.Keyword, "x", 0, 0));
-        // Util.Token printlnToken = new Util.Token(Util.TokenType.Keyword, "@println", 0, 0);
-        //
-        // AST.Prototype printlnProto = new AST.Prototype(printlnToken, null, printlnProtoArgs);
-        // nodes.Insert(0, printlnProto);
     }
 }
 
