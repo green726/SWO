@@ -24,6 +24,9 @@ public class VariableExpression : Base
                 AST.IndexReference idxPar = (AST.IndexReference)varExpr.parent;
                 varExpr.isReference = idxPar.isPointer;
                 break;
+                // case AST.Node.NodeType.Reference:
+                //     varExpr.isReference = true;
+                //     break;
         }
     }
 
@@ -98,6 +101,8 @@ public class VariableExpression : Base
 
     public override void generate()
     {
+
+
         DebugConsole.Write("genning varExpr with value of " + varExpr.value + " parent type of " + varExpr.parent?.nodeType + " and children count of " + varExpr.children.Count());
         if (varExpr?.parent?.nodeType == AST.Node.NodeType.VariableExpression || varExpr?.parent?.nodeType == AST.Node.NodeType.IndexReference)
         {

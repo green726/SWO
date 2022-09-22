@@ -19,6 +19,14 @@ public class Reference : Expression
 
         LLVMTypeRef typeRef = LLVM.TypeOf(valRef);
 
+        DebugConsole.WriteAnsi($"[blue]typeRef: {typeRef}[/]");
+
+        if (typeRef.TypeKind == LLVMTypeKind.LLVMPointerTypeKind)
+        {
+            base.generate();
+            return;
+        }
+
         LLVMTypeRef ptrType = LLVM.PointerType(typeRef, 0);
 
         LLVMValueRef ptrValue = LLVM.ConstPointerCast(valRef, ptrType);

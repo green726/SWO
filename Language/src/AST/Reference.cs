@@ -29,6 +29,7 @@ public class Reference : Expression
         }
 
         this.actualExpr = (AST.Expression)child;
+        this.actualExpr.isReference = true;
 
         Parser.parent = this.parent;
 

@@ -21,7 +21,7 @@ public class NumberExpression : Base
                 break;
             case "int":
                 //TODO: figure out the context of the numExpr and set its int bits to align with that (assuming it fits, if not, throw an error)
-                valueStack.Push(LLVM.ConstInt(LLVM.Int64Type(), (ulong)numExpr.value, true));
+                valueStack.Push(LLVM.ConstInt(LLVM.Int32Type(), (ulong)numExpr.value, true));
                 DebugConsole.WriteAnsi($"[red]numExpr {numExpr.value} and llvm val of {valueStack.Peek()}[/]");
                 break;
         }
