@@ -12,7 +12,8 @@ public class StringExpression : Expression
 
         Parser.checkToken(token, expectedType: Util.TokenType.String);
 
-        this.value = token.value;
+        string valueWithoutQuotes = token.value.Substring(1, token.value.Length - 2);
+        this.value = valueWithoutQuotes;
         this.builtInString = builtInString;
 
         if (dontAdd == true)

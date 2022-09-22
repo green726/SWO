@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class Prototype : AST.Node
 {
     public string name = "";
-    public Dictionary<Type, string> arguments = new Dictionary<Type, string>();
+    public Dictionary<string, Type> arguments = new Dictionary<string, Type>();
     private bool typePredicted = true;
     private Type prevType;
 
@@ -13,11 +13,10 @@ public class Prototype : AST.Node
 
     public bool external = false;
 
-    public Prototype(Util.Token token, AST.Node parent = null, List<Util.Token> arguments = null, bool startWithRet = false, bool external = false) : base(token)
+    public Prototype(Util.Token token, AST.Node parent = null, bool startWithRet = false, bool external = false) : base(token)
     {
         this.nodeType = NodeType.Prototype;
         this.generator = new Generator.Prototype(this);
-
 
         this.external = external;
 
@@ -40,29 +39,8 @@ public class Prototype : AST.Node
             this.returnType = new Type(token);
         }
 
-        if (arguments != null)
-        {
-            foreach (Util.Token item in arguments)
-            {
-                // DebugConsole.Write("funcArgs " + item.value);
-                if (typePredicted)
-                {
-                    Parser.checkToken(item, expectedType: Util.TokenType.Keyword);
-                    prevType = new Type(new Util.Token(Util.TokenType.Keyword, item.value, this.line, this.column));
-                }
-                else
-                {
-                    this.arguments.Add(prevType, item.value);
-                }
 
-                //swap typePredicted
-                typePredicted = !typePredicted;
-            }
-        }
-        else
-        {
-            this.arguments = new Dictionary<Type, string>();
-        }
+        this.arguments = new Dictionary<string, Type>();
 
         //TODO: replace this node type with external section
         if (external/*  || parent.nodeType == NodeType.BinaryExpression */)
@@ -78,54 +56,72 @@ public class Prototype : AST.Node
 
     }
 
-
-    public void addArgs(List<Util.Token> arguments)
+    //NOTE: addArgs are just extended from the add child - just to seperate handling of other tokens added (like names)
+    public void addArg(AST.Node arg)
     {
-        foreach (Util.Token item in arguments)
+        if (typePredicted)
         {
-            // DebugConsole.Write("funcArgs " + item.value);
-            if (typePredicted)
-            {
-                Parser.checkToken(item, expectedType: Util.TokenType.Keyword);
-                prevType = new Type(new Util.Token(Util.TokenType.Keyword, item.value, this.line, this.column));
-            }
-            else
-            {
-                //TODO: replace with config delim
-                if (item.value == "[" || item.value == "]")
-                {
-                    DebugConsole.Write("array param detected");
-                    prevType.addChild(item);
-                    return;
-                }
-                this.arguments.Add(prevType, item.value);
-            }
-
-            //swap typePredicted
-            DebugConsole.Write("swapping type predicted");
+            prevType = (AST.Type)arg;
             typePredicted = !typePredicted;
+        }
+        else
+        {
+            // throw ParserException.FactoryMethod();
         }
     }
 
-    public override void addChild(Util.Token item)
+    public void addArg(Util.Token token)
     {
+        if (typePredicted)
+        {
+            prevType = new Type(token);
+            typePredicted = !typePredicted;
+        }
+        else
+        {
+            // throw ParserException.FactoryMethod();
+            arguments.Add(token.value, prevType);
+        }
+    }
+
+    public override void addChild(AST.Node child)
+    {
+        // throw ParserException.FactoryMethod();
+        base.addChild(child);
+    }
+
+    public override void addChild(Util.Token child)
+    {
+        DebugConsole.WriteAnsi($"[green]adding child to proto with name {name} (type predicted is: " + typePredicted + ") with value: " + child.value + " [/]");
         if (this.name == "")
         {
             if (!Config.settings.function.declaration.marker.word)
             {
-                this.name = item.value.Substring(1);
+                this.name = child.value.Substring(1);
             }
             else
             {
-                this.name = item.value;
+                this.name = child.value;
             }
             return;
         }
 
-        //TODO: replace this with config delims
-        else if (item.value != "(" && item.value != ")")
+        //NOTE: uses commas to handle arg seperation
+        if (child.value == ",")
         {
-            addArgs(new List<Util.Token>() { item });
+            typePredicted = true;
+            prevType = null;
+        }
+        else if (child.value == "[" || child.value == "]")
+        {
+            DebugConsole.Write("array param detected");
+            prevType.addChild(child);
+            return;
+        }
+        //TODO: replace this with config delims
+        else if (child.value != "(" && child.value != ")")
+        {
+            addArg(child);
         }
     }
 }

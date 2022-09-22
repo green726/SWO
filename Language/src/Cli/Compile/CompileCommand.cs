@@ -7,7 +7,7 @@ public class CompileCommand : Command<CompileCommandSettings>
 {
     public override int Execute([NotNull] CommandContext context, [NotNull] CompileCommandSettings settings)
     {
-        Swo.compileProject(settings);
+        SWO.compileProject(settings);
         return 0;
     }
 }

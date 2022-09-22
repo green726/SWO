@@ -38,22 +38,21 @@ public class Prototype : Base
         else
         {
 
-            foreach (KeyValuePair<AST.Type, string> arg in proto.arguments)
+            foreach (KeyValuePair<string, AST.Type> arg in proto.arguments)
             {
-                arg.Key.generator.generate();
+                arg.Value.generator.generate();
                 arguments.Add(typeStack.Pop());
             }
 
             proto.returnType.generator.generate();
             function = LLVM.AddFunction(module, proto.name, LLVM.FunctionType(typeStack.Pop(), arguments.ToArray(), false));
             LLVM.SetLinkage(function, LLVMLinkage.LLVMExternalLinkage);
-
         }
 
         int argLoopIndex = 0;
-        foreach (KeyValuePair<AST.Type, string> arg in proto.arguments)
+        foreach (KeyValuePair<string, AST.Type> arg in proto.arguments)
         {
-            string argumentName = arg.Value;
+            string argumentName = arg.Key;
 
             LLVMValueRef param = LLVM.GetParam(function, (uint)argLoopIndex);
             LLVM.SetValueName(param, argumentName);

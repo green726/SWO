@@ -44,17 +44,14 @@ public class Type : Base
         {
             return namedTypesLLVM[type.value];
         }
-        else if (type.value.StartsWith("int") || type.value.StartsWith("uint"))
-        {
-            uint bits = type.getIntBits();
-            return LLVM.IntType(bits);
+        (bool isInt, int bits) = Parser.checkInt(type.value);
+        if (isInt) {
+            return LLVM.IntType((uint)bits);
         }
         switch (type.value)
         {
             case "double":
                 return LLVM.DoubleType();
-            case "int":
-                return LLVM.IntType(1);
             case "string":
                 //TODO: implement strings as stdlib so they can have a sane type
                 return LLVM.ArrayType(LLVM.Int8Type(), 3);

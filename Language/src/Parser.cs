@@ -42,25 +42,8 @@ public static class Parser
         {
             return true;
         }
-        if (token.value.StartsWith("int"))
-        {
-            string intBits = token.value.Remove(0, 3);
-
-            if (int.TryParse(intBits, out int bits))
-            {
-                return true;
-            }
-        }
-        if (token.value.StartsWith("uint"))
-        {
-            string intBits = token.value.Remove(0, 4);
-
-            if (int.TryParse(intBits, out int bits))
-            {
-                return true;
-            }
-        }
-        return false;
+        (bool isInt, int bits) = checkInt(token.value);
+        return isInt;
     }
 
     public static bool isType(string value)
@@ -69,25 +52,59 @@ public static class Parser
         {
             return true;
         }
+        (bool isInt, int bits) = checkInt(value);
+        return isInt;
+    }
+
+    public static (bool, int) checkInt(string value)
+    {
         if (value.StartsWith("int"))
         {
-            string intBits = value.Remove(0, 3);
+            string strBits = value.Remove(0, 3);
 
-            if (int.TryParse(intBits, out int bits))
+            if (strBits == "")
             {
-                return true;
+                return (true, 32);
+            }
+
+            if (int.TryParse(strBits, out int bits))
+            {
+                return (true, bits);
             }
         }
-        if (value.StartsWith("uint"))
+        else if (value.StartsWith("uint"))
         {
-            string intBits = value.Remove(0, 4);
+            string strBits = value.Remove(0, 4);
 
-            if (int.TryParse(intBits, out int bits))
+            if (strBits == "")
             {
-                return true;
+                return (true, 32);
+            }
+
+            if (int.TryParse(strBits, out int bits))
+            {
+                return (true, bits);
             }
         }
-        return false;
+        else if (value.StartsWith("i"))
+        {
+            string strBits = value.Remove(0, 1);
+
+            if (int.TryParse(strBits, out int bits))
+            {
+                return (true, bits);
+            }
+        }
+        else if (value.StartsWith("ui"))
+        {
+            string strBits = value.Remove(0, 2);
+
+            if (int.TryParse(strBits, out int bits))
+            {
+                return (true, bits);
+            }
+        }
+        return (false, 0);
     }
 
 
@@ -177,7 +194,7 @@ public static class Parser
         if (func.prototype.arguments.Count() > 0)
         {
 
-            stringBuilder.Append($"first arg type: {printType(func.prototype.arguments.ElementAt(0).Key)}");
+            stringBuilder.Append($"first arg type: {printType(func.prototype.arguments.ElementAt(0).Value)}");
         }
         stringBuilder.Append($"{func.nodeType} name: {func.prototype.name} args: {Serialize(func.prototype.arguments.ToList())} body start: ");
         stringBuilder.Append(printASTRet(func.body));
@@ -545,7 +562,7 @@ public static class Parser
         //Below handles variable declarations with no initial value and no keyword - it type checks which is slower but necessary
         if (!Config.settings.variable.declaration.keyword.forced)
         {
-            if (Parser.typeList.Contains(token.value))
+            if (isType(token))
             {
                 DebugConsole.WriteAnsi("[red]detected no keyword variable dec WITHOUT equals[/]");
                 return (new AST.VariableDeclaration(token, parent), delimLevel);

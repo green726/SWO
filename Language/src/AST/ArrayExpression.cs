@@ -51,6 +51,7 @@ public class ArrayExpression : Expression
 
     public override void addChild(Util.Token child)
     {
+
         base.addChild(child);
     }
 }

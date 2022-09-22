@@ -9,7 +9,7 @@ public class RunCommand : Command<RunCommandSettings>
         CompileCommand compileCommand = new CompileCommand();
         compileCommand.Execute(context, settings);
 
-        Swo.runProject(settings);
+        SWO.runProject(settings);
 
         return 0;
     }

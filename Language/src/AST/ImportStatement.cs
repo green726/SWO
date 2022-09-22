@@ -19,7 +19,7 @@ public class ImportStatement : Node
 
     public override void addChild(Util.Token child)
     {
-        List<Library> matchingLib = Swo.projectInfo.libraries.Where(library => library.name == child.value).ToList();
+        List<Library> matchingLib = SWO.projectInfo.libraries.Where(library => library.name == child.value).ToList();
         if (matchingLib.Count() == 1)
         {
             this.library = matchingLib[0];
@@ -30,7 +30,7 @@ public class ImportStatement : Node
         }
         else
         {
-            string[] filePaths = Directory.GetFiles(Swo.projectInfo.path, child.value + ".swo");
+            string[] filePaths = Directory.GetFiles(SWO.projectInfo.path, child.value + ".swo");
 
             if (filePaths.Length > 1)
             {

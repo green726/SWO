@@ -2,7 +2,7 @@
 using Tomlyn;
 using Spectre.Console;
 
-public static class Swo
+public static class SWO
 {
     private static string fileContents;
     public static bool windows = false;
