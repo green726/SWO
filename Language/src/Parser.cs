@@ -857,7 +857,7 @@ public static class Parser
                     continue;
 
                 case Util.TokenType.AssignmentOp:
-                    Console.WriteLine("assignment op detected");
+                    DebugConsole.Write("assignment op detected");
                     if (parent?.nodeType == AST.Node.NodeType.VariableDeclaration)
                     {
                         parent.addChild(token);
