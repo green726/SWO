@@ -31,139 +31,48 @@ public class ForLoop : AST.Node
         {
             throw ParserException.FactoryMethod("An illegal parentless (top level) for loop was created", "Place the for loop within a function", this);
         }
-        parseIteration = 1;
+        parseIteration = 0;
+    }
+
+    // for (int i = 0; i < 5; i++;) {
+    //
+    // }
+
+    public void addComplex(Util.Token child)
+    {
+    }
+
+    public void addSimple(Util.Token child)
+    {
+    }
+
+    public void addComplex(AST.Node child)
+    {
+        if (parseIteration == 0)
+        {
+        }
+    }
+
+    public void addSimple(AST.Node child)
+    {
     }
 
     public override void addChild(Util.Token child)
     {
-
-        base.addChild(child);
-        if (isBody)
+        if (complex)
         {
-            throw ParserException.FactoryMethod("An unknown value was added to the body of a for loop", "Remove the unknown value from the for loop", child);
+            addComplex(child);
         }
         else
         {
-            if (child.value == Config.settings.loop.forModel.body.delimeters[0]/* Util.TokenType.BrackDelimiterOpen */ && !isBody)
-            {
-                isBody = true;
-                return;
-            }
-
-            switch (parseIteration)
-            {
-                case 1:
-                    if (child.value != Config.settings.loop.forModel.declaration.delimeters[0]/* Util.TokenType.ParenDelimiterOpen */)
-                    {
-                        throw ParserException.FactoryMethod("An \"(\" character was expected to begin the for loop but was not found", "add the \"(\" character or remove an illegal character", child);
-                    }
-                    break;
-                case 2:
-                    if (child.type != Util.TokenType.Keyword)
-                    {
-                        throw new ParserException($"expected keyword but got {child.type}", child);
-                    }
-                    this.index = new PhiVariable(this);
-                    this.indexName = child;
-                    break;
-                case 3:
-                    if (child.value == "=")
-                    {
-                        complex = true;
-                    }
-                    else
-                    {
-                        stepValue = new NumberExpression(new Util.Token(Util.TokenType.Int, "1", this.line, this.column), this);
-                        if (child.value == "in")
-                        {
-
-                        }
-                        else if (child.value == "of")
-                        {
-                            valueLoop = true;
-                        }
-                        else
-                        {
-                            // return;
-                            throw ParserException.FactoryMethod("An illegal token was received in a for loop", "replace the illegal token with either \"for\" or \"of\"", child);
-                        }
-                    }
-                    break;
-                case 4:
-                    if (complex)
-                    {
-
-                    }
-                    else
-                    {
-                        switch (child.type)
-                        {
-                            // case Util.TokenType.Number:
-                            // DebugConsole.Write($"adding iteration object with value of {child.value}");
-                            // iterationObject = Int32.Parse(child.value);
-                            // this.index.addChild(new Util.Token(Util.TokenType.Keyword, "double", child.line, child.column));
-                            // this.index.addChild(child);
-                            // this.index.addChild(new Util.Token(Util.TokenType.AssignmentOp, "=", child.line, child.column));
-                            // this.index.addChild(new Util.Token(Util.TokenType.Number, "0", child.line, child.column));
-                            // this.index.setType("double");
-                            // this.index.setValue()
-                            // break;
-                        }
-                    }
-                    break;
-                case 5:
-                    if (complex)
-                    {
-
-                    }
-                    else
-                    {
-                        if (child.value == Config.settings.loop.forModel.declaration.delimeters[1]/* Util.TokenType.ParenDelimiterClose */)
-                        {
-                            isBody = true;
-                        }
-                        else
-                        {
-                            throw ParserException.FactoryMethod("Expected closing parentheses in for loop but recieved an illegal character", "Add a closing parentheses to the end of the for loop or remove the illegal character", child);
-                        }
-                    }
-                    break;
-                case 6:
-                    if (complex)
-                    {
-
-                    }
-                    else
-                    {
-                        throw ParserException.FactoryMethod("extra values in declaration of a simple for loop (a for loop declared with \"in\" or \"of\")", "remove the extra values or turn the for loop into a complex loop (a c for loop)", child);
-                    }
-                    break;
-            }
-            parseIteration++;
+            addSimple(child);
         }
+        base.addChild(child);
     }
 
     public override void addChild(AST.Node child)
     {
         base.addChild(child);
-        if (isBody)
-        {
-            body.Add(child);
-        }
-        else if (parseIteration == 4 && child.nodeType == NodeType.NumberExpression && !isBody)
-        {
-            NumberExpression numExpr = (NumberExpression)child;
-            iterationObject = numExpr;
-            this.index.setName(this.indexName.value);
-            this.index.setValue("0");
-            this.index.setType("double");
-            parseIteration++;
-        }
-        // else
-        // {
-        //     throw new ParserException($"illegal addition of AST.Node child of type ({child.nodeType}) to for loop", child);
-        // }
-
     }
 
     public override void removeChild(AST.Node child)
