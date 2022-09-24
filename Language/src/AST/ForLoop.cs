@@ -36,8 +36,8 @@ public class ForLoop : AST.Node
 
     public override void addChild(Util.Token child)
     {
-
         base.addChild(child);
+
         if (isBody)
         {
             throw ParserException.FactoryMethod("An unknown value was added to the body of a for loop", "Remove the unknown value from the for loop", child);
