@@ -1,0 +1,55 @@
+functions:
+    functions are declared like this:
+    ```
+    @foo (arg1type arg1, arg2type arg2) {
+
+    }
+```
+    functions are called like this:
+    ```
+    foo(arg1, arg2)
+    ```
+    SWO builtin functions are called like this:
+    ```
+    print!(1)
+    ```
+
+    for now all functions return ints
+
+    ```
+loops:
+    Currently only simple index for loop:
+    ```
+    for (i in 10) {
+        print!(i)
+    }
+    ```
+
+if statements:
+    Only single parameter if statements are supported 
+    ```
+    if (foo == bar) {
+        print!(foo)
+    }
+    ```
+    Else statements are simply attached after the if statement 
+    ```
+    if (foo == bar) {
+        print!(foo)
+    }
+    else {
+        print!(bar)
+    }
+    ```
+
+Variables: 
+    Constans are declared like this:
+    ```
+    const type name = value 
+    const int foo = 1
+    ```
+    mutables (variables) are declared like this:
+    ```
+    var type name = value 
+    var int bar = 2
+    ```
