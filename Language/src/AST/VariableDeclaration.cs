@@ -117,7 +117,7 @@ public class VariableDeclaration : Node
                 //     this.defaultValue = child;
                 //     break;
                 default:
-                    throw new ParserException($"Illegal extra items after variable assignment", this);
+                    throw new ParserException($"Illegal extra items after variable declaration", this);
 
             }
         }

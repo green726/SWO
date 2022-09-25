@@ -217,8 +217,6 @@ public class VariableExpression : Base
             return varRef;
         }
     }
-
-
 }
 
 public class PhiVariable : Base
@@ -242,7 +240,5 @@ public class PhiVariable : Base
         {
             throw new GenException($"could not find local phi variable named {phiVar.name}", phiVar);
         }
-
     }
-
 }

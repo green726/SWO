@@ -14,9 +14,14 @@ public class ForLoop : Base
 
     public override void generate()
     {
+        forLoop.phiVarDec.type = forLoop.varDec.type;
+        forLoop.phiVarDec.value = forLoop.varDec.defaultValue;
+        forLoop.phiVarDec.numExpr = (AST.NumberExpression)forLoop.varDec.defaultValue;
+        forLoop.phiVarDec.name = forLoop.varDec.name;
 
-        //evaluate the starting value of the loop index obj
-        forLoop.index.numExpr.generator.generate();
+
+        //evaluate the starting value of the loop phiVarDec obj
+        forLoop.phiVarDec.numExpr.generator.generate();
         LLVMValueRef startValRef = valueStack.Pop();
 
         //create the basic blocks for the loop
@@ -29,8 +34,8 @@ public class ForLoop : Base
 
         LLVM.PositionBuilderAtEnd(builder, loopBlock);
 
-        //create the index obj for the loop
-        forLoop.index.generator.generate();
+        //create the phiVarDec obj for the loop
+        forLoop.phiVarDec.generator.generate();
         LLVMValueRef phiVarRef = valueStack.Pop();
 
         //initialize it with its start value
@@ -43,17 +48,17 @@ public class ForLoop : Base
 
 
         bool oldVariablePresent = false;
-        if (namedValuesLLVM.ContainsKey(forLoop.index.name))
+        if (namedValuesLLVM.ContainsKey(forLoop.phiVarDec.name))
         {
-            oldVariableRef = namedValuesLLVM[forLoop.index.name];
+            oldVariableRef = namedValuesLLVM[forLoop.phiVarDec.name];
             oldVariablePresent = true;
-            namedValuesLLVM[forLoop.index.name] = phiVarRef;
-            // namedGlobalsAST[forLoop.index.name] =
+            namedValuesLLVM[forLoop.phiVarDec.name] = phiVarRef;
+            // namedGlobalsAST[forLoop.phiVarDec.name] =
         }
         else
         {
-            DebugConsole.Write($"adding phiVarRef with name of {forLoop.index.name} to named values");
-            namedValuesLLVM.Add(forLoop.index.name, phiVarRef);
+            DebugConsole.Write($"adding phiVarRef with name of {forLoop.phiVarDec.name} to named values");
+            namedValuesLLVM.Add(forLoop.phiVarDec.name, phiVarRef);
         }
 
         //emit the body of the loop
@@ -65,7 +70,7 @@ public class ForLoop : Base
         DebugConsole.Write("successfully evaluated for loop body");
 
         //evaluate the step variable - might need to change this idk
-        forLoop.stepValue.generator.generate();
+        forLoop.loopIteration.generator.generate();
         LLVMValueRef stepVarRef = valueStack.Pop();
 
         //increment the phivar by the step value
@@ -74,10 +79,11 @@ public class ForLoop : Base
         //evaluate the end condition of the loop:
 
         //create a new comparison expression with the end value as the left hand
-        AST.BinaryExpression endBinExpr = new AST.BinaryExpression(new Util.Token(Util.TokenType.Operator, "<", forLoop.line, forLoop.column), forLoop.index, forLoop);
+        AST.BinaryExpression endBinExpr = new AST.BinaryExpression(new Util.Token(Util.TokenType.Operator, "<", forLoop.line, forLoop.column), forLoop.phiVarDec, forLoop);
 
         //add 0 as the right hand of the binary expression - IDK why I do this, but LLVM did so ill figure it out later
-        endBinExpr.addChild(forLoop.iterationObject);
+        //HACK: maybe need to uncomment this and fix it
+        // endBinExpr.addChild(forLoop.iterationObject);
 
         //generate the LLVM binary expression for the ending condition
         endBinExpr.generator.generate();
@@ -105,12 +111,12 @@ public class ForLoop : Base
         //either replace the phiVarRef with the old variable in the vars dictionary, or remove it altogether
         if (oldVariablePresent)
         {
-            namedValuesLLVM[forLoop.index.name] = oldVariableRef;
+            namedValuesLLVM[forLoop.phiVarDec.name] = oldVariableRef;
         }
         else
         {
             DebugConsole.Write("removing phi var ref from named values");
-            namedValuesLLVM.Remove(forLoop.index.name);
+            namedValuesLLVM.Remove(forLoop.phiVarDec.name);
         }
 
         valueStack.Push(LLVM.ConstReal(LLVMTypeRef.DoubleType(), 0));

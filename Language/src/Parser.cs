@@ -231,7 +231,8 @@ public static class Parser
 
     public static string printForLoop(AST.ForLoop forLoop)
     {
-        return $"For loop with iteration object of {forLoop.iterationObject} and index obj of {printPhiVar(forLoop.index)} complexity of {forLoop.complex} and body of ( {printASTRet(forLoop.body)} ) body end";
+        // return $"For loop with iteration object of {forLoop.iterationObject} and index obj of {printPhiVar(forLoop.index)} complexity of {forLoop.complex} and body of ( {printASTRet(forLoop.body)} ) body end";
+        return $"";
     }
 
     public static string printPhiVar(AST.PhiVariable phiVar)
@@ -533,12 +534,6 @@ public static class Parser
         switch (parent?.nodeType)
         {
             case AST.Node.NodeType.ForLoop:
-                AST.ForLoop forLoop = (AST.ForLoop)parent;
-                if (!forLoop.isBody)
-                {
-                    parent.addChild(token);
-                    return (parent, delimLevel);
-                }
                 break;
             case AST.Node.NodeType.Prototype:
                 AST.Prototype proto = (AST.Prototype)parent;
@@ -713,7 +708,6 @@ public static class Parser
             task.MaxValue = tokenList.Count();
         }
 
-
         parent = null;
         int delimLevel = 0;
         int prevLine = 0;
@@ -855,7 +849,6 @@ public static class Parser
                     parent = keyParent;
                     delimLevel = keyDelimLevel;
                     continue;
-
                 case Util.TokenType.AssignmentOp:
                     DebugConsole.Write("assignment op detected");
                     if (parent?.nodeType == AST.Node.NodeType.VariableDeclaration)
