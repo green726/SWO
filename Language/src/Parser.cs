@@ -36,6 +36,8 @@ public static class Parser
 
     public static AST.Node parent;
 
+    public static string[] binaryMathOps = {"+", "-", "*", "/"};
+
     public static bool isType(Util.Token token)
     {
         if (typeList.Contains(token.value))
@@ -233,11 +235,6 @@ public static class Parser
     {
         // return $"For loop with iteration object of {forLoop.iterationObject} and index obj of {printPhiVar(forLoop.index)} complexity of {forLoop.complex} and body of ( {printASTRet(forLoop.body)} ) body end";
         return $"";
-    }
-
-    public static string printPhiVar(AST.PhiVariable phiVar)
-    {
-        return $"phi variable with type of {phiVar.type.value} and name of {phiVar.name} and value of {phiVar.value}";
     }
 
     public static string printType(AST.Type type)
@@ -857,7 +854,7 @@ public static class Parser
                     }
                     else
                     {
-                        Console.WriteLine("Creating var ass");
+                        DebugConsole.WriteAnsi("[purple]Creating var ass[/]");
                         AST.VariableAssignment varAss = new AST.VariableAssignment(token, parent);
                         currentTokenNum++;
                         parent = varAss;
@@ -865,8 +862,6 @@ public static class Parser
                         // VariableReAssignment varReAss = new VariableReAssignment(token);
                         // return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, varReAss, delimLevel: delimLevel);
                     }
-
-
                     break;
                 case Util.TokenType.String:
                     new AST.StringExpression(token, parent);

@@ -54,6 +54,14 @@ public class VariableAssignment : AST.Node
             //     this.children.Add(prevVarExpr);
             // }
         }
+
+        if (token.value.Substring(1) == "=" && Parser.binaryMathOps.Contains(token.value.Remove(1)))
+        {
+            string tokenOp = token.value.Remove(1);
+            //TODO: handle compound ops like +=
+            this.binReassignment = true;
+            this.bin = new BinaryExpression(new Util.Token(Util.TokenType.Operator, tokenOp, token.line, token.column), varExpr, parent);
+        }
     }
 
 
@@ -71,10 +79,16 @@ public class VariableAssignment : AST.Node
     public override void addChild(AST.Node node)
     {
         base.addChild(node);
-        DebugConsole.Write("adding child of node type " + node.nodeType + " to varass");
+        DebugConsole.Write("adding child of node type " + node.nodeType + " to varass with loop iteration of: " + childLoop);
 
         switch (childLoop)
         {
+            case 0:
+                if (this.binReassignment == true)
+                {
+                    this?.bin?.addChild(node);
+                }
+                break;
             case 1:
                 if (node.nodeType == NodeType.BinaryExpression)
                 {

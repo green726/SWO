@@ -218,27 +218,3 @@ public class VariableExpression : Base
         }
     }
 }
-
-public class PhiVariable : Base
-{
-    AST.PhiVariable phiVar;
-
-    public PhiVariable(AST.Node node)
-    {
-        this.phiVar = (AST.PhiVariable)node;
-    }
-
-    public override void generate()
-    {
-        LLVMValueRef varRef = namedValuesLLVM[phiVar.name];
-        if (varRef.Pointer != IntPtr.Zero)
-        {
-            valueStack.Push(varRef);
-            return;
-        }
-        else
-        {
-            throw new GenException($"could not find local phi variable named {phiVar.name}", phiVar);
-        }
-    }
-}

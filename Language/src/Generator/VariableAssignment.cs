@@ -30,14 +30,15 @@ public class VariableAssignment : Base
         // valueStack.Push(loadRef);
         if (varAss.binReassignment)
         {
-            this.varAss.bin.generator.generate();
+            DebugConsole.WriteAnsi("[green]bin reass detected[/]");
+            this?.varAss?.bin?.generator.generate();
             LLVMValueRef binValRef = valueStack.Pop();
             LLVMValueRef storeRef = LLVM.BuildStore(builder, binValRef, targetValRef);
             valueStack.Push(storeRef);
         }
         else
         {
-            DebugConsole.Write(varAss?.targetValue?.nodeType);
+            DebugConsole.WriteAnsi("[green]non bin reass detected[/]");
             varAss.targetValue.generator.generate();
             LLVMValueRef resultValRef = valueStack.Pop();
             LLVMValueRef storeRef = LLVM.BuildStore(builder, resultValRef, targetValRef);

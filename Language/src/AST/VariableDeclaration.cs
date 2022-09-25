@@ -20,6 +20,8 @@ public class VariableDeclaration : Node
 
     public bool keyword = true;
 
+    public bool local = false;
+
     public VariableDeclaration(Util.Token token, bool mutable, AST.Node? parent = null) : base(token)
     {
         this.nodeType = NodeType.VariableDeclaration;
@@ -38,9 +40,11 @@ public class VariableDeclaration : Node
         {
             DebugConsole.Write("adding var dec to parser nodes");
             Parser.nodes.Add(this);
+            local = false;
         }
         else
         {
+            local = true;
             parent?.addChild(this);
         }
     }
@@ -69,9 +73,11 @@ public class VariableDeclaration : Node
         {
             DebugConsole.Write("adding var dec to parser nodes");
             Parser.nodes.Add(this);
+            this.local = false;
         }
         else
         {
+            this.local = true;
             parent?.addChild(this);
         }
     }

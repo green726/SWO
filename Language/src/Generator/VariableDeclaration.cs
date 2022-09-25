@@ -38,7 +38,7 @@ public class VariableDeclaration : Base
         DebugConsole.WriteAnsi($"[red] type stack[/]");
         DebugConsole.Write(typeLLVM);
 
-        if (!varDec.mutable && typeLLVM.TypeKind != LLVMTypeKind.LLVMStructTypeKind)
+        if (!varDec.mutable && typeLLVM.TypeKind != LLVMTypeKind.LLVMStructTypeKind && !varDec.local)
         {
             LLVMValueRef constRef = LLVM.AddGlobal(module, typeLLVM, varDec.name);
             if (init)
@@ -49,28 +49,43 @@ public class VariableDeclaration : Base
         }
         else
         {
-            if (!mainBuilt)
+            if (varDec.local)
             {
-                DebugConsole.Write("adding to main nodes to build");
-                nodesToBuild.Add(varDec);
-                return;
-            }
-            LLVM.PositionBuilderAtEnd(builder, mainEntryBlock);
-            DebugConsole.Write($"building for mutable var with name of {varDec.name} and type of");
-            DebugConsole.DumpType(typeLLVM);
-            DebugConsole.Write();
-            LLVMValueRef allocaRef = LLVM.BuildAlloca(builder, typeLLVM, varDec.name);
-            valueStack.Push(allocaRef);
-            DebugConsole.Write("built and pushed alloca: " + allocaRef);
-            if (init)
-            {
-                DebugConsole.Write("store ref target: " + valRef);
-                LLVMValueRef storeRef = LLVM.BuildStore(builder, valRef, allocaRef);
-                valueStack.Push(storeRef);
-                DebugConsole.Write("built and pushed store ref: " + storeRef);
-            }
+                LLVMValueRef allocaRef = LLVM.BuildAlloca(builder, typeLLVM, varDec.name);
+                valueStack.Push(allocaRef);
+                if (init)
+                {
+                    LLVMValueRef storeRef = LLVM.BuildStore(builder, valRef, allocaRef);
+                    valueStack.Push(storeRef);
+                }
 
-            namedMutablesLLVM.Add(varDec.name, allocaRef);
+                namedMutablesLLVM.Add(varDec.name, allocaRef);
+            }
+            else
+            {
+                if (!mainBuilt)
+                {
+                    DebugConsole.Write("adding to main nodes to build");
+                    nodesToBuild.Add(varDec);
+                    return;
+                }
+                LLVM.PositionBuilderAtEnd(builder, mainEntryBlock);
+                DebugConsole.Write($"building for mutable var with name of {varDec.name} and type of");
+                DebugConsole.DumpType(typeLLVM);
+                DebugConsole.Write();
+                LLVMValueRef allocaRef = LLVM.BuildAlloca(builder, typeLLVM, varDec.name);
+                valueStack.Push(allocaRef);
+                DebugConsole.Write("built and pushed alloca: " + allocaRef);
+                if (init)
+                {
+                    DebugConsole.Write("store ref target: " + valRef);
+                    LLVMValueRef storeRef = LLVM.BuildStore(builder, valRef, allocaRef);
+                    valueStack.Push(storeRef);
+                    DebugConsole.Write("built and pushed store ref: " + storeRef);
+                }
+
+                namedMutablesLLVM.Add(varDec.name, allocaRef);
+            }
         }
 
         DebugConsole.Write("adding var to named globals with name of" + varDec.name);

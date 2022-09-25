@@ -31,10 +31,10 @@ public class BinaryExpression : Base
                 break;
         }
 
-        switch (binExpr.rightHand.nodeType)
+        switch (binExpr?.rightHand?.nodeType)
         {
             default:
-                binExpr.rightHand.generator.generate();
+                binExpr?.rightHand?.generator.generate();
                 rightHand = valueStack.Pop();
                 break;
         }
@@ -59,8 +59,8 @@ public class BinaryExpression : Base
                     break;
                 case AST.BinaryExpression.OperatorType.LessThan:
                     DebugConsole.DumpValue(leftHand);
-                    LLVMValueRef cmpRef = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealULT, leftHand, rightHand, "comparetmp");
-                    ir = LLVM.BuildUIToFP(builder, cmpRef, LLVMTypeRef.DoubleType(), "booltmp");
+                    LLVMValueRef cmpRef = LLVM.BuildICmp(builder, LLVMIntPredicate.LLVMIntULT, leftHand, rightHand, "lessthantmp");
+                    ir = LLVM.BuildUIToFP(builder, cmpRef, LLVMTypeRef.Int1Type(), "booltmp");
                     break;
             }
         }
@@ -81,7 +81,7 @@ public class BinaryExpression : Base
                     break;
                 case AST.BinaryExpression.OperatorType.LessThan:
                     DebugConsole.DumpValue(leftHand);
-                    LLVMValueRef cmpRef = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealULT, leftHand, rightHand, "comparetmp");
+                    LLVMValueRef cmpRef = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealULT, leftHand, rightHand, "lessthantmp");
                     ir = LLVM.BuildUIToFP(builder, cmpRef, LLVMTypeRef.DoubleType(), "booltmp");
                     break;
             }

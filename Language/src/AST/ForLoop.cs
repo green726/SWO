@@ -11,7 +11,6 @@ public class ForLoop : AST.Node
     public BinaryExpression loopCondition;
     //the iteration for the loop (ie i++;)
     public VariableAssignment loopIteration;
-    public PhiVariable phiVarDec;
     private int parseIteration;
 
 
@@ -78,7 +77,6 @@ public class ForLoop : AST.Node
                 }
                 //TODO: enforce the type of the varDec to be a string
                 this.varDec = (AST.VariableDeclaration)child;
-                this.phiVarDec = new PhiVariable(varDec, this);
                 break;
             case 1:
                 if (child.nodeType != NodeType.VariableExpression)
@@ -109,41 +107,5 @@ public class ForLoop : AST.Node
     {
         base.removeChild(child);
         body.Remove(child);
-    }
-}
-
-public class PhiVariable : AST.Node
-{
-    public string name;
-    public Type type;
-    public AST.Expression value;
-    public NumberExpression numExpr;
-
-    public PhiVariable(AST.VariableDeclaration varDec, AST.Node parent) : base(varDec)
-    {
-        this.nodeType = NodeType.PhiVariable;
-        this.generator = new Generator.PhiVariable(this);
-
-        this.parent = parent;
-    }
-
-    // public void setValue(string value)
-    // {
-    //     this.value = value;
-    //
-    //     Util.Token numExprToken = new Util.Token(Util.TokenType.Int, value, this.line, this.column);
-    //     this.numExpr = new NumberExpression(numExprToken, this);
-    // }
-
-    public void setType(string type)
-    {
-        Util.Token typeToken = new Util.Token(Util.TokenType.Keyword, type, this.line, this.column);
-        this.type = new Type(typeToken);
-    }
-
-    public void setName(string name)
-    {
-        DebugConsole.Write($"setting phi var name to {name}");
-        this.name = name;
     }
 }
