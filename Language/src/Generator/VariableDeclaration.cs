@@ -59,7 +59,7 @@ public class VariableDeclaration : Base
                     valueStack.Push(storeRef);
                 }
 
-                namedMutablesLLVM.Add(varDec.name, allocaRef);
+                namedValuesLLVM.Add(varDec.name, allocaRef);
             }
             else
             {
@@ -84,11 +84,11 @@ public class VariableDeclaration : Base
                     DebugConsole.Write("built and pushed store ref: " + storeRef);
                 }
 
-                namedMutablesLLVM.Add(varDec.name, allocaRef);
+                namedValuesLLVM.Add(varDec.name, allocaRef);
             }
         }
 
         DebugConsole.Write("adding var to named globals with name of" + varDec.name);
-        namedValuesAST.Add(varDec.name, varDec);
+        // namedValuesAST.Add(varDec.name, varDec);
     }
 }

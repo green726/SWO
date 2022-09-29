@@ -15,52 +15,57 @@ public static class IRGen
     public static LLVMPassManagerRef passManager;
 
     public static readonly Stack<LLVMValueRef> valueStack = new Stack<LLVMValueRef>();
-
     public static readonly Stack<LLVMTypeRef> typeStack = new Stack<LLVMTypeRef>();
 
+
     public static Dictionary<string, LLVMValueRef> namedValuesLLVM = new Dictionary<string, LLVMValueRef>();
-
-    public static Dictionary<string, AST.VariableDeclaration> namedValuesAST = new Dictionary<string, AST.VariableDeclaration>();
-
     public static Dictionary<string, AST.Struct> namedTypesAST = new Dictionary<string, AST.Struct>();
-
     public static Dictionary<string, LLVMTypeRef> namedTypesLLVM = new Dictionary<string, LLVMTypeRef>();
 
-    // public static Dictionary<string, LLVMValueRef> namedMutablesLLVM = new Dictionary<string, LLVMValueRef>();
 
     public static Stack<Dictionary<string, LLVMTypeRef>> namedTypesLLVMStack = new Stack<Dictionary<string, LLVMTypeRef>>();
     public static Stack<Dictionary<string, AST.Struct>> namedTypesASTStack = new Stack<Dictionary<string, AST.Struct>>();
     public static Stack<Dictionary<string, LLVMValueRef>> namedValuesLLVMStack = new Stack<Dictionary<string, LLVMValueRef>>();
-    public static Stack<Dictionary<string, AST.VariableDeclaration>> namedValuesASTStack = new Stack<Dictionary<string, AST.VariableDeclaration>>();
-    // public static Stack<Dictionary<string, LLVMValueRef>> namedMutablesLLVMStack = new Stack<Dictionary<string, LLVMValueRef>>();
 
     public static LLVMValueRef getNamedValueInScope(string name)
     {
-        return new LLVMValueRef();
+        LLVMValueRef val;
+        namedValuesLLVMStack.Pop().TryGetValue(name, out val);
+        return val;
     }
 
-    public static LLVMValueRef getNamedTypeInScope(string name)
+    public static AST.Struct getNamedTypeASTInScope(string name)
     {
-        return new LLVMValueRef();
+        AST.Struct str;
+        namedTypesASTStack.Pop().TryGetValue(name, out str);
+        return str;
     }
 
-    public static void addNamedValueInScope(int scope, string name, LLVMValueRef value)
+    public static LLVMTypeRef getNamedTypeLLVMInScope(string name)
+    {
+        LLVMTypeRef val;
+        namedTypesLLVMStack.Pop().TryGetValue(name, out val);
+        return val;
+    }
+
+    public static void addNamedValueInScope(string name, LLVMValueRef value)
     {
         namedValuesLLVMStack.Pop().Add(name, value);
     }
 
-    public static void addNamedTypeInScope(int scope, string name, LLVMTypeRef type)
+    public static void addNamedTypeLLVMInScope(string name, LLVMTypeRef type)
     {
         namedTypesLLVMStack.Pop().Add(name, type);
     }
 
-
+    public static void addNamedTypeASTInScope(string name, AST.Struct str)
+    {
+        namedTypesASTStack.Pop().Add(name, str);
+    }
 
     public static LLVMBasicBlockRef mainEntryBlock;
-
     public static bool mainBuilt = false;
     public static List<AST.Node> nodesToBuild = new List<AST.Node>();
-
 
     public static Stack<AST.Struct> currentStruct = new Stack<AST.Struct>();
 

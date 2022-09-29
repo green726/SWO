@@ -18,8 +18,9 @@ public class Function : Base
     public override void generate()
     {
         if (func.generated) { return; }
-        //TODO: change this in the future once more variables are added
-        namedValuesLLVM.Clear();
+        //BUG: might not be working
+        namedValuesLLVMStack.Pop();
+        namedValuesLLVMStack.Append(new Dictionary<string, LLVMValueRef>());
 
         func.prototype.generator.generate();
 
@@ -28,9 +29,6 @@ public class Function : Base
 
 
         LLVM.PositionBuilderAtEnd(builder, entryBlock);
-
-        // try
-        // {
 
         if (func.prototype.name == "main")
         {
@@ -65,9 +63,6 @@ public class Function : Base
 
 
         valueStack.Push(function);
-
-
-        // LLVM.DumpValue(function);
     }
 
 }

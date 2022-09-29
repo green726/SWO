@@ -171,30 +171,30 @@ public class VariableExpression : Base
         {
             // DebugConsole.Write(String.Join(",", namedValuesLLVM.Keys.ToArray()));
             // DebugConsole.Write("named values LLVM count " + namedValuesLLVM.Count);
-            if (namedMutablesLLVM.ContainsKey(varExpr.value))
+            // if (namedMutablesLLVM.ContainsKey(varExpr.value))
+            // {
+            //     return namedMutablesLLVM[varExpr.value];
+            // }
+            // else
+            // {
+            if (namedValuesLLVM.ContainsKey(varExpr.value))
             {
-                return namedMutablesLLVM[varExpr.value];
-            }
-            else
-            {
-                if (namedValuesLLVM.ContainsKey(varExpr.value))
+                varRef = namedValuesLLVM[varExpr.value];
+                if (varRef.Pointer != IntPtr.Zero)
                 {
-                    varRef = namedValuesLLVM[varExpr.value];
-                    if (varRef.Pointer != IntPtr.Zero)
-                    {
-                        return varRef;
-                    }
-                }
-                else if (Config.settings.variable.declaration.reorder && Parser.declaredGlobalsDict.ContainsKey(varExpr.value))
-                {
-                    LLVMBasicBlockRef currentBlock = LLVM.GetInsertBlock(builder);
-                    AST.VariableDeclaration varDec = Parser.declaredGlobalsDict[varExpr.value];
-                    varDec.generator.generate();
-                    varDec.generated = true;
-                    LLVM.PositionBuilderAtEnd(builder, currentBlock);
-                    return generateVarRef();
+                    return varRef;
                 }
             }
+            else if (Config.settings.variable.declaration.reorder && Parser.declaredGlobalsDict.ContainsKey(varExpr.value))
+            {
+                LLVMBasicBlockRef currentBlock = LLVM.GetInsertBlock(builder);
+                AST.VariableDeclaration varDec = Parser.declaredGlobalsDict[varExpr.value];
+                varDec.generator.generate();
+                varDec.generated = true;
+                LLVM.PositionBuilderAtEnd(builder, currentBlock);
+                return generateVarRef();
+            }
+            // }
 
             throw GenException.FactoryMethod("An unknown variable was referenced", "Likely a typo", varExpr, true, varExpr.value);
         }
@@ -208,7 +208,7 @@ public class VariableExpression : Base
     public LLVMValueRef generateVarLoad()
     {
         LLVMValueRef varRef = generateVarRef();
-        if (namedValuesAST.ContainsKey(varExpr.value))
+        if (varRef.TypeOf().TypeKind == LLVMTypeKind.LLVMPointerTypeKind)
         {
             return LLVM.BuildLoad(builder, varRef, varExpr.value);
         }
