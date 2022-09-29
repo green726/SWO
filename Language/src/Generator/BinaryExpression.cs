@@ -25,6 +25,10 @@ public class BinaryExpression : Base
             case AST.Node.NodeType.BinaryExpression:
                 leftHand = valueStack.Pop();
                 break;
+            case AST.Node.NodeType.VariableExpression:
+                binExpr.leftHand.generator.generate();
+                leftHand = recursiveDeReference(valueStack.Pop());
+                break;
             default:
                 binExpr.leftHand.generator.generate();
                 leftHand = valueStack.Pop();
@@ -33,6 +37,10 @@ public class BinaryExpression : Base
 
         switch (binExpr?.rightHand?.nodeType)
         {
+            // case AST.Node.NodeType.VariableExpression:
+            //     binExpr.rightHand.generator.generate();
+            //     rightHand = recursiveDeReference(valueStack.Pop());
+            //     break;
             default:
                 binExpr?.rightHand?.generator.generate();
                 rightHand = valueStack.Pop();
@@ -67,7 +75,6 @@ public class BinaryExpression : Base
 
         else
         {
-
             switch (binExpr.operatorType)
             {
                 case AST.BinaryExpression.OperatorType.Add:

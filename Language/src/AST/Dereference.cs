@@ -21,6 +21,7 @@ public class Dereference : Expression
         }
 
         this.actualExpr = (AST.Expression)child;
+        this.actualExpr.isDereference = true;
 
         base.addChild(child);
     }

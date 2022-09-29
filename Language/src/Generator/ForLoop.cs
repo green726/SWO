@@ -40,6 +40,9 @@ public class ForLoop : Base
 
         //evaluate the step variable - might need to change this idk
         forLoop.loopIteration.generator.generate();
+        LLVMValueRef iterationBin = valueStack.Pop();
+        DebugConsole.WriteAnsi("Iteration bin: ");
+        iterationBin.Dump();
         // LLVMValueRef stepVarRef = valueStack.Pop();
 
         //increment the phivar by the step value
@@ -47,6 +50,8 @@ public class ForLoop : Base
 
         //generate the LLVM binary expression for the ending condition
         forLoop.loopCondition.generator.generate();
+
+        DebugConsole.Write("post binexpr for loop");
 
         LLVMValueRef endCondRef = valueStack.Pop();
 

@@ -2,8 +2,6 @@ namespace AST;
 
 public class VariableExpression : Expression
 {
-
-
     public VariableExpression(Util.Token token, AST.Node? parent = null, bool parentRequired = true) : base(token)
     {
         this.nodeType = NodeType.VariableExpression;

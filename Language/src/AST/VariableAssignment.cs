@@ -40,7 +40,7 @@ public class VariableAssignment : AST.Node
             }
 
 
-            this.childLoop = 1;
+            this.childLoop = 0;
         }
         else
         {
@@ -57,6 +57,7 @@ public class VariableAssignment : AST.Node
 
         if (token.value.Substring(1) == "=" && Parser.binaryMathOps.Contains(token.value.Remove(1)))
         {
+            DebugConsole.WriteAnsi("[yellow]compound var ass detected[/]");
             string tokenOp = token.value.Remove(1);
             //TODO: handle compound ops like +=
             this.binReassignment = true;
@@ -80,14 +81,18 @@ public class VariableAssignment : AST.Node
     {
         base.addChild(node);
         DebugConsole.Write("adding child of node type " + node.nodeType + " to varass with loop iteration of: " + childLoop);
-
+        if (this.binReassignment == true)
+        {
+            this?.bin?.addChild(node);
+            DebugConsole.WriteAnsi("[yellow]adding child to varass bin[/]");
+            childLoop++;
+            base.addChild(node);
+            return;
+        }
         switch (childLoop)
         {
             case 0:
-                if (this.binReassignment == true)
-                {
-                    this?.bin?.addChild(node);
-                }
+
                 break;
             case 1:
                 if (node.nodeType == NodeType.BinaryExpression)
@@ -106,6 +111,7 @@ public class VariableAssignment : AST.Node
         }
         // this.targetValue = node;
         childLoop++;
+        base.addChild(node);
     }
 
 

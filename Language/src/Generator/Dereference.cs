@@ -13,18 +13,22 @@ public class Dereference : Expression
 
     public override void generate()
     {
-        // LLVMValueRef valRef = valueStack.Pop();
-        //
-        // LLVMTypeRef typeRef = LLVM.TypeOf(valRef);
-        //
-        // LLVMTypeRef ptrType = LLVM.PointerType(typeRef, 0);
-        //
-        // LLVMValueRef ptrValue = LLVM.ConstPointerCast(valRef, ptrType);
-        //
-        // valueStack.Push(ptrValue);
-
-
+        checkPtrAndGen(valueStack.Pop());
 
         base.generate();
+    }
+
+    public void checkPtrAndGen(LLVMValueRef valInput)
+    {
+        LLVMTypeRef typeRef = LLVM.TypeOf(valInput);
+
+        if (typeRef.TypeKind != LLVMTypeKind.LLVMPointerTypeKind)
+        {
+            valueStack.Push(valInput);
+            return;
+        }
+
+        LLVMValueRef loadRef = LLVM.BuildLoad(builder, valInput, "loadtmp");
+        checkPtrAndGen(valInput);
     }
 }

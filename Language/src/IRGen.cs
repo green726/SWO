@@ -64,6 +64,41 @@ public static class IRGen
         throw GenException.FactoryMethod($"An unknown or unsupported type ({type.TypeKind.ToString()}) was used", "You used an undefined or illegal type | Likely a typo", parent, true, type.TypeKind.ToString());
     }
 
+    public static LLVMValueRef recursiveDeReference(LLVMValueRef startRef)
+    {
+        LLVMTypeRef typeRef = LLVM.TypeOf(startRef);
+
+        DebugConsole.Write("typeRef kind: " + typeRef.TypeKind);
+
+        if (typeRef.TypeKind == LLVMTypeKind.LLVMPointerTypeKind)
+        {
+            LLVMValueRef loadRef = getDereference(startRef);
+
+            return recursiveDeReference(loadRef);
+        }
+        else
+        {
+            return startRef;
+        }
+
+
+    }
+
+    public static LLVMValueRef getDereference(LLVMValueRef startRef)
+    {
+        if (startRef.TypeOf().TypeKind != LLVMTypeKind.LLVMPointerTypeKind)
+        {
+            return startRef;
+        }
+        LLVMValueRef loadRef = LLVM.BuildLoad(builder, startRef, "loadtmp");
+        return loadRef;
+    }
+
+    public static LLVMValueRef getReference(LLVMValueRef startRef)
+    {
+        return new LLVMValueRef();
+    }
+
 
     public static void initialize(LLVMBuilderRef _builder, LLVMModuleRef _module, LLVMPassManagerRef _passManager, LLVMContextRef _context)
     {
