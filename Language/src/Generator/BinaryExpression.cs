@@ -67,8 +67,9 @@ public class BinaryExpression : Base
                     break;
                 case AST.BinaryExpression.OperatorType.LessThan:
                     DebugConsole.DumpValue(leftHand);
-                    LLVMValueRef cmpRef = LLVM.BuildICmp(builder, LLVMIntPredicate.LLVMIntULT, leftHand, rightHand, "lessthantmp");
-                    ir = LLVM.BuildUIToFP(builder, cmpRef, LLVMTypeRef.Int1Type(), "booltmp");
+                    LLVMValueRef cmpRef = LLVM.BuildICmp(builder, LLVMIntPredicate.LLVMIntSLT, leftHand, rightHand, "lessthantmp");
+                    ir = cmpRef;
+                    // ir = LLVM.BuildUIToFP(builder, cmpRef, LLVMTypeRef.Int1Type(), "booltmp");
                     break;
             }
         }
