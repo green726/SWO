@@ -36,7 +36,7 @@ public static class Parser
 
     public static AST.Node parent;
 
-    public static string[] binaryMathOps = {"+", "-", "*", "/"};
+    public static string[] binaryMathOps = { "+", "-", "*", "/" };
 
     public static bool isType(Util.Token token)
     {
@@ -630,6 +630,10 @@ public static class Parser
             switch (parent?.nodeType)
             {
                 case AST.Node.NodeType.ForLoop:
+                    if (token.value != ")")
+                    {
+                        break;
+                    }
                     delimLevel--;
                     return (parent, delimLevel);
                 case AST.Node.NodeType.IfStatement:

@@ -45,11 +45,10 @@ public class ForLoop : Base
         foreach (AST.Node node in forLoop.body)
         {
             node.generator.generate();
+            DebugConsole.Write("generated node of type in for loop body: " + node.nodeType);
         }
 
         LLVM.BuildBr(builder, loopIncrementBlock);
-
-        DebugConsole.Write("successfully evaluated for loop body");
 
         LLVM.PositionBuilderAtEnd(builder, loopIncrementBlock);
 
@@ -63,11 +62,6 @@ public class ForLoop : Base
 
         //reposition the builder
         LLVM.PositionBuilderAtEnd(builder, postLoopBlock);
-
-        //various cleanups are below 
-
-        //update the phivarref with the new values
-        // LLVM.AddIncoming(loopVarDec, new LLVMValueRef[] { nextVarRef }, new LLVMBasicBlockRef[] { endOfLoopBlock }, 1);
 
     }
 }
