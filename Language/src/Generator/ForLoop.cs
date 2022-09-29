@@ -18,17 +18,28 @@ public class ForLoop : Base
 
         //create the basic blocks for the loop
         LLVMBasicBlockRef parentBlock = LLVM.GetInsertBlock(builder).GetBasicBlockParent();
-        LLVMBasicBlockRef preHeaderBlock = LLVM.GetInsertBlock(builder);
+        LLVMBasicBlockRef loopConditionBlock = LLVM.AppendBasicBlock(parentBlock, "loopCond");
         LLVMBasicBlockRef loopBlock = LLVM.AppendBasicBlock(parentBlock, "loop");
-
-        //create the condition break
-        LLVM.BuildBr(builder, loopBlock);
-
-        LLVM.PositionBuilderAtEnd(builder, loopBlock);
+        LLVMBasicBlockRef loopIncrementBlock = LLVM.AppendBasicBlock(parentBlock, "loopIncrement");
+        LLVMBasicBlockRef postLoopBlock = LLVM.AppendBasicBlock(parentBlock, "postloop");
 
         //create the phiVarDec obj for the loop
         forLoop.varDec.generator.generate();
         LLVMValueRef loopVarDec = valueStack.Pop();
+
+        LLVM.BuildBr(builder, loopConditionBlock);
+
+        //loop condition checking code
+        LLVM.PositionBuilderAtEnd(builder, loopConditionBlock);
+
+        DebugConsole.Write("for loop condition generating");
+
+        forLoop.loopCondition.generator.generate();
+        LLVMValueRef endCondRef = valueStack.Pop();
+
+        LLVM.BuildCondBr(builder, endCondRef, loopBlock, postLoopBlock);
+
+        LLVM.PositionBuilderAtEnd(builder, loopBlock);
 
         //emit the body of the loop
         foreach (AST.Node node in forLoop.body)
@@ -36,31 +47,19 @@ public class ForLoop : Base
             node.generator.generate();
         }
 
+        LLVM.BuildBr(builder, loopIncrementBlock);
+
         DebugConsole.Write("successfully evaluated for loop body");
+
+        LLVM.PositionBuilderAtEnd(builder, loopIncrementBlock);
 
         //evaluate the step variable - might need to change this idk
         forLoop.loopIteration.generator.generate();
         LLVMValueRef iterationBin = valueStack.Pop();
         DebugConsole.WriteAnsi("Iteration bin: ");
         iterationBin.Dump();
-        // LLVMValueRef stepVarRef = valueStack.Pop();
 
-        //increment the phivar by the step value
-        // LLVMValueRef nextVarRef = LLVM.BuildFAdd(builder, loopVarDec, stepVarRef, "nextvar");
-
-        //generate the LLVM binary expression for the ending condition
-        forLoop.loopCondition.generator.generate();
-
-        DebugConsole.Write("post binexpr for loop");
-
-        LLVMValueRef endCondRef = valueStack.Pop();
-
-        // generate the post loop basic block
-        LLVMBasicBlockRef endOfLoopBlock = LLVM.GetInsertBlock(builder);
-        LLVMBasicBlockRef postLoopBlock = LLVM.AppendBasicBlock(parentBlock, "postloop");
-
-        //create the condition break to evalaute where to go (ie run loop again or break out of loop)
-        LLVM.BuildCondBr(builder, endCondRef, loopBlock, postLoopBlock);
+        LLVM.BuildBr(builder, loopConditionBlock);
 
         //reposition the builder
         LLVM.PositionBuilderAtEnd(builder, postLoopBlock);
@@ -69,8 +68,6 @@ public class ForLoop : Base
 
         //update the phivarref with the new values
         // LLVM.AddIncoming(loopVarDec, new LLVMValueRef[] { nextVarRef }, new LLVMBasicBlockRef[] { endOfLoopBlock }, 1);
-        // LLVM.BuildStore(builder, nextVarRef, )
 
-        valueStack.Push(LLVM.ConstReal(LLVMTypeRef.DoubleType(), 0));
     }
 }
