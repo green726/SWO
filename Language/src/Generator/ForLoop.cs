@@ -56,7 +56,7 @@ public class ForLoop : Base
         forLoop.loopIteration.generator.generate();
         LLVMValueRef iterationBin = valueStack.Pop();
         DebugConsole.WriteAnsi("Iteration bin: ");
-        iterationBin.Dump();
+        DebugConsole.DumpValue(iterationBin);
 
         LLVM.BuildBr(builder, loopConditionBlock);
 
