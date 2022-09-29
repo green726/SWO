@@ -26,12 +26,41 @@ public static class IRGen
 
     public static Dictionary<string, LLVMTypeRef> namedTypesLLVM = new Dictionary<string, LLVMTypeRef>();
 
+    // public static Dictionary<string, LLVMValueRef> namedMutablesLLVM = new Dictionary<string, LLVMValueRef>();
+
+    public static Stack<Dictionary<string, LLVMTypeRef>> namedTypesLLVMStack = new Stack<Dictionary<string, LLVMTypeRef>>();
+    public static Stack<Dictionary<string, AST.Struct>> namedTypesASTStack = new Stack<Dictionary<string, AST.Struct>>();
+    public static Stack<Dictionary<string, LLVMValueRef>> namedValuesLLVMStack = new Stack<Dictionary<string, LLVMValueRef>>();
+    public static Stack<Dictionary<string, AST.VariableDeclaration>> namedValuesASTStack = new Stack<Dictionary<string, AST.VariableDeclaration>>();
+    // public static Stack<Dictionary<string, LLVMValueRef>> namedMutablesLLVMStack = new Stack<Dictionary<string, LLVMValueRef>>();
+
+    public static LLVMValueRef getNamedValueInScope(string name)
+    {
+        return new LLVMValueRef();
+    }
+
+    public static LLVMValueRef getNamedTypeInScope(string name)
+    {
+        return new LLVMValueRef();
+    }
+
+    public static void addNamedValueInScope(int scope, string name, LLVMValueRef value)
+    {
+        namedValuesLLVMStack.Pop().Add(name, value);
+    }
+
+    public static void addNamedTypeInScope(int scope, string name, LLVMTypeRef type)
+    {
+        namedTypesLLVMStack.Pop().Add(name, type);
+    }
+
+
+
     public static LLVMBasicBlockRef mainEntryBlock;
 
     public static bool mainBuilt = false;
     public static List<AST.Node> nodesToBuild = new List<AST.Node>();
 
-    public static Dictionary<string, LLVMValueRef> namedMutablesLLVM = new Dictionary<string, LLVMValueRef>();
 
     public static Stack<AST.Struct> currentStruct = new Stack<AST.Struct>();
 

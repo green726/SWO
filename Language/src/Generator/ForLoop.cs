@@ -19,7 +19,7 @@ public class ForLoop : Base
         //create the basic blocks for the loop
         LLVMBasicBlockRef parentBlock = LLVM.GetInsertBlock(builder).GetBasicBlockParent();
         LLVMBasicBlockRef loopConditionBlock = LLVM.AppendBasicBlock(parentBlock, "loopCond");
-        LLVMBasicBlockRef loopBlock = LLVM.AppendBasicBlock(parentBlock, "loop");
+        LLVMBasicBlockRef loopBlock = LLVM.AppendBasicBlock(parentBlock, "loopBody");
         LLVMBasicBlockRef loopIncrementBlock = LLVM.AppendBasicBlock(parentBlock, "loopIncrement");
         LLVMBasicBlockRef postLoopBlock = LLVM.AppendBasicBlock(parentBlock, "postloop");
 
