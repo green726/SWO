@@ -19,14 +19,10 @@ public class Function : Base
     {
         if (func.generated) { return; }
         //BUG: might not be working
-        namedValuesLLVMStack.Pop();
-        namedValuesLLVMStack.Append(new Dictionary<string, LLVMValueRef>());
-
         func.prototype.generator.generate();
 
         LLVMValueRef function = valueStack.Pop();
         LLVMBasicBlockRef entryBlock = LLVM.AppendBasicBlock(function, "entry");
-
 
         LLVM.PositionBuilderAtEnd(builder, entryBlock);
 
@@ -63,6 +59,7 @@ public class Function : Base
 
 
         valueStack.Push(function);
+        clearNamedValueScope();
     }
 
 }

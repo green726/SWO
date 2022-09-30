@@ -22,46 +22,70 @@ public static class IRGen
     public static Dictionary<string, AST.Struct> namedTypesAST = new Dictionary<string, AST.Struct>();
     public static Dictionary<string, LLVMTypeRef> namedTypesLLVM = new Dictionary<string, LLVMTypeRef>();
 
-
-    public static Stack<Dictionary<string, LLVMTypeRef>> namedTypesLLVMStack = new Stack<Dictionary<string, LLVMTypeRef>>();
-    public static Stack<Dictionary<string, AST.Struct>> namedTypesASTStack = new Stack<Dictionary<string, AST.Struct>>();
+    // public static Stack<Dictionary<string, LLVMTypeRef>> namedTypesLLVMStack = new Stack<Dictionary<string, LLVMTypeRef>>();
+    // public static Stack<Dictionary<string, AST.Struct>> namedTypesASTStack = new Stack<Dictionary<string, AST.Struct>>();
     public static Stack<Dictionary<string, LLVMValueRef>> namedValuesLLVMStack = new Stack<Dictionary<string, LLVMValueRef>>();
 
     public static LLVMValueRef getNamedValueInScope(string name)
     {
         LLVMValueRef val;
-        namedValuesLLVMStack.Pop().TryGetValue(name, out val);
+        namedValuesLLVMStack.Peek().TryGetValue(name, out val);
         return val;
     }
 
-    public static AST.Struct getNamedTypeASTInScope(string name)
+    public static void clearNamedValueScope()
     {
-        AST.Struct str;
-        namedTypesASTStack.Pop().TryGetValue(name, out str);
-        return str;
+        namedValuesLLVMStack.Pop();
     }
 
-    public static LLVMTypeRef getNamedTypeLLVMInScope(string name)
+    public static void addLayerToNamedValueStack()
     {
-        LLVMTypeRef val;
-        namedTypesLLVMStack.Pop().TryGetValue(name, out val);
-        return val;
+        if (namedValuesLLVMStack.Count > 0)
+        {
+            namedValuesLLVMStack.Push(new Dictionary<string, LLVMValueRef>(namedValuesLLVMStack.Peek()));
+        }
+        else
+        {
+            namedValuesLLVMStack.Push(new Dictionary<string, LLVMValueRef>());
+        }
     }
+
+    public static bool valueExistsInScope(string name)
+    {
+        return namedValuesLLVMStack.Peek().ContainsKey(name);
+    }
+
 
     public static void addNamedValueInScope(string name, LLVMValueRef value)
     {
-        namedValuesLLVMStack.Pop().Add(name, value);
+        namedValuesLLVMStack.Peek().Add(name, value);
     }
 
-    public static void addNamedTypeLLVMInScope(string name, LLVMTypeRef type)
-    {
-        namedTypesLLVMStack.Pop().Add(name, type);
-    }
+    // public static AST.Struct getNamedTypeASTInScope(string name)
+    // {
+    //     AST.Struct str;
+    //     namedTypesASTStack.Pop().TryGetValue(name, out str);
+    //     return str;
+    // }
 
-    public static void addNamedTypeASTInScope(string name, AST.Struct str)
-    {
-        namedTypesASTStack.Pop().Add(name, str);
-    }
+    // public static LLVMTypeRef getNamedTypeLLVMInScope(string name)
+    // {
+    //     LLVMTypeRef val;
+    //     namedTypesLLVMStack.Pop().TryGetValue(name, out val);
+    //     return val;
+    // }
+
+
+
+    // public static void addNamedTypeLLVMInScope(string name, LLVMTypeRef type)
+    // {
+    //     namedTypesLLVMStack.Pop().Add(name, type);
+    // }
+    //
+    // public static void addNamedTypeASTInScope(string name, AST.Struct str)
+    // {
+    //     namedTypesASTStack.Pop().Add(name, str);
+    // }
 
     public static LLVMBasicBlockRef mainEntryBlock;
     public static bool mainBuilt = false;

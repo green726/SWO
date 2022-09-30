@@ -26,6 +26,7 @@ public class Function : AST.Node
             throw ParserException.FactoryMethod("Prototype marked external implemented with body", "Unmark it as external, or remove the body/implementation of the prototype", this, prototype);
         }
         this.prototype = prototype;
+        this.prototype.parent = this;
         this.body = body;
 
         if (topLevel)

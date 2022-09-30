@@ -49,6 +49,12 @@ public class Prototype : Base
             LLVM.SetLinkage(function, LLVMLinkage.LLVMExternalLinkage);
         }
 
+        //NOTE: adding layer for the function
+        if (proto?.parent?.nodeType == AST.Node.NodeType.Function)
+        {
+            DebugConsole.WriteAnsi("[purple]KASHDKJAHSD[/]");
+            addLayerToNamedValueStack();
+        }
         int argLoopIndex = 0;
         foreach (KeyValuePair<string, AST.Type> arg in proto.arguments)
         {
@@ -57,7 +63,10 @@ public class Prototype : Base
             LLVMValueRef param = LLVM.GetParam(function, (uint)argLoopIndex);
             LLVM.SetValueName(param, argumentName);
 
-            namedValuesLLVM[argumentName] = param;
+            if (proto?.parent?.nodeType == AST.Node.NodeType.Function)
+            {
+                addNamedValueInScope(argumentName, param);
+            }
             DebugConsole.Write("created argument with name of " + argumentName);
             argLoopIndex++;
         }

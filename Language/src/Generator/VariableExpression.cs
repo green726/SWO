@@ -166,42 +166,46 @@ public class VariableExpression : Base
 
     public LLVMValueRef generateVarRef()
     {
-        LLVMValueRef varRef = LLVM.GetNamedGlobal(module, varExpr.value);
-        if (varRef.Pointer == IntPtr.Zero)
+        LLVMValueRef varRef; /* = LLVM.GetNamedGlobal(module, varExpr.value); */
+        // if (varRef.Pointer == IntPtr.Zero)
+        // {
+        // DebugConsole.Write(String.Join(",", namedValuesLLVM.Keys.ToArray()));
+        // DebugConsole.Write("named values LLVM count " + namedValuesLLVM.Count);
+        // if (namedMutablesLLVM.ContainsKey(varExpr.value))
+        // {
+        //     return namedMutablesLLVM[varExpr.value];
+        // }
+        // else
+        // {
+        // if (namedValuesLLVM.ContainsKey(varExpr.value))
+        if (valueExistsInScope(varExpr.value))
         {
-            // DebugConsole.Write(String.Join(",", namedValuesLLVM.Keys.ToArray()));
-            // DebugConsole.Write("named values LLVM count " + namedValuesLLVM.Count);
-            // if (namedMutablesLLVM.ContainsKey(varExpr.value))
-            // {
-            //     return namedMutablesLLVM[varExpr.value];
-            // }
-            // else
-            // {
-            if (namedValuesLLVM.ContainsKey(varExpr.value))
+            DebugConsole.WriteAnsi("[green]detected variable in scope[/]");
+            // varRef = namedValuesLLVM[varExpr.value];
+            varRef = getNamedValueInScope(varExpr.value);
+            if (varRef.Pointer != IntPtr.Zero)
             {
-                varRef = namedValuesLLVM[varExpr.value];
-                if (varRef.Pointer != IntPtr.Zero)
-                {
-                    return varRef;
-                }
+                return varRef;
             }
-            else if (Config.settings.variable.declaration.reorder && Parser.declaredGlobalsDict.ContainsKey(varExpr.value))
-            {
-                LLVMBasicBlockRef currentBlock = LLVM.GetInsertBlock(builder);
-                AST.VariableDeclaration varDec = Parser.declaredGlobalsDict[varExpr.value];
-                varDec.generator.generate();
-                varDec.generated = true;
-                LLVM.PositionBuilderAtEnd(builder, currentBlock);
-                return generateVarRef();
-            }
-            // }
+        }
+        else if (Config.settings.variable.declaration.reorder && Parser.declaredGlobalsDict.ContainsKey(varExpr.value))
+        {
+            DebugConsole.WriteAnsi("[purple]stupid reordering[/]");
+            LLVMBasicBlockRef currentBlock = LLVM.GetInsertBlock(builder);
+            AST.VariableDeclaration varDec = Parser.declaredGlobalsDict[varExpr.value];
+            varDec.generator.generate();
+            varDec.generated = true;
+            LLVM.PositionBuilderAtEnd(builder, currentBlock);
+            return generateVarRef();
+        }
+        // }
 
-            throw GenException.FactoryMethod("An unknown variable was referenced", "Likely a typo", varExpr, true, varExpr.value);
-        }
-        else
-        {
-            return varRef;
-        }
+        throw GenException.FactoryMethod("An unknown variable was referenced", "Likely a typo", varExpr, true, varExpr.value);
+        // }
+        // else
+        // {
+        //     return varRef;
+        // }
 
     }
 

@@ -15,6 +15,7 @@ public class ForLoop : Base
     public override void generate()
     {
         //TODO: replace all the phi var stuff in here with normal SWO variables (mem2reg should optimize it all into phi vars)
+        addLayerToNamedValueStack();
 
         //create the basic blocks for the loop
         LLVMBasicBlockRef parentBlock = LLVM.GetInsertBlock(builder).GetBasicBlockParent();
@@ -62,6 +63,7 @@ public class ForLoop : Base
 
         //reposition the builder
         LLVM.PositionBuilderAtEnd(builder, postLoopBlock);
+        clearNamedValueScope();
 
     }
 }
