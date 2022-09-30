@@ -92,9 +92,6 @@ public class VariableAssignment : AST.Node
         switch (childLoop)
         {
             case 0:
-
-                break;
-            case 1:
                 if (node.nodeType == NodeType.BinaryExpression)
                 {
                     BinaryExpression binExpr = (BinaryExpression)node;
@@ -107,6 +104,8 @@ public class VariableAssignment : AST.Node
                     this.binReassignment = false;
                     this.targetValue = node;
                 }
+                break;
+            case 1:
                 break;
         }
         // this.targetValue = node;

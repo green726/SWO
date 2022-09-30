@@ -60,6 +60,10 @@ public static class Parser
 
     public static (bool, int) checkInt(string value)
     {
+        if (value.EndsWith("*"))
+        {
+            value = value.Remove(value.Length - 1);
+        }
         if (value.StartsWith("int"))
         {
             string strBits = value.Remove(0, 3);
@@ -905,7 +909,7 @@ public static class Parser
                             if (parent?.nodeType != AST.Node.NodeType.Function && parent?.nodeType != AST.Node.NodeType.IfStatement && parent?.nodeType != AST.Node.NodeType.ElseStatement && parent?.nodeType != AST.Node.NodeType.ForLoop /* && tokenList[tokenIndex - 1].value != "{" */ && delimLevel == 0)
                             {
                                 currentTokenNum++;
-                                parent = null;
+                                parent = parent.parent;
                                 continue;
                             }
                             else

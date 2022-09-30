@@ -9,6 +9,7 @@ public class VariableExpression : Expression
 
         this.value = token.value;
         this.parent = parent;
+        this.newLineReset = true;
 
         // if (token.value.Contains("[") && token.value.Contains("]"))
         // {

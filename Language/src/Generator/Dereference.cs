@@ -13,6 +13,8 @@ public class Dereference : Expression
 
     public override void generate()
     {
+        DebugConsole.WriteAnsi("[blue]dereference genning[/]");
+        this.deref.actualExpr.generator.generate();
         checkPtrAndGen(valueStack.Pop());
 
         base.generate();
@@ -24,11 +26,16 @@ public class Dereference : Expression
 
         if (typeRef.TypeKind != LLVMTypeKind.LLVMPointerTypeKind)
         {
+            DebugConsole.WriteAnsi("[blue]pushing: [/]");
+            DebugConsole.DumpValue(valInput);
             valueStack.Push(valInput);
             return;
         }
 
+
         LLVMValueRef loadRef = LLVM.BuildLoad(builder, valInput, "loadtmp");
-        checkPtrAndGen(valInput);
+        DebugConsole.WriteAnsi("[blue]load ref[/]");
+        DebugConsole.DumpValue(loadRef);
+        checkPtrAndGen(loadRef);
     }
 }

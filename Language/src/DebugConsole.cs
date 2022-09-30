@@ -62,6 +62,7 @@ public static class DebugConsole
         if (log)
         {
             LLVM.DumpType(type);
+            Console.WriteLine();
         }
     }
 
@@ -70,6 +71,7 @@ public static class DebugConsole
         if (log)
         {
             LLVM.DumpValue(value);
+            Console.WriteLine();
         }
     }
 
@@ -78,6 +80,7 @@ public static class DebugConsole
         if (log)
         {
             LLVM.DumpModule(module);
+            Console.WriteLine();
         }
     }
 

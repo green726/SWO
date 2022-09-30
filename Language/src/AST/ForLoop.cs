@@ -35,6 +35,7 @@ public class ForLoop : AST.Node
 
     public override void addChild(Util.Token child)
     {
+        base.addChild(child);
         if (child.value == ";")
         {
             // parseIteration++;
@@ -50,7 +51,6 @@ public class ForLoop : AST.Node
         {
             throw ParserException.FactoryMethod($"Illegal child added to for loop", "Remove it", child, this);
         }
-        base.addChild(child);
     }
 
     // for (int i = 0; i < 5; i++;) {

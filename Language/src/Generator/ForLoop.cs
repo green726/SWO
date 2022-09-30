@@ -19,26 +19,16 @@ public class ForLoop : Base
 
         //create the basic blocks for the loop
         LLVMBasicBlockRef parentBlock = LLVM.GetInsertBlock(builder).GetBasicBlockParent();
-        LLVMBasicBlockRef loopConditionBlock = LLVM.AppendBasicBlock(parentBlock, "loopCond");
         LLVMBasicBlockRef loopBlock = LLVM.AppendBasicBlock(parentBlock, "loopBody");
         LLVMBasicBlockRef loopIncrementBlock = LLVM.AppendBasicBlock(parentBlock, "loopIncrement");
+        LLVMBasicBlockRef loopConditionBlock = LLVM.AppendBasicBlock(parentBlock, "loopCond");
         LLVMBasicBlockRef postLoopBlock = LLVM.AppendBasicBlock(parentBlock, "postloop");
 
         //create the phiVarDec obj for the loop
         forLoop.varDec.generator.generate();
         LLVMValueRef loopVarDec = valueStack.Pop();
 
-        LLVM.BuildBr(builder, loopConditionBlock);
-
-        //loop condition checking code
-        LLVM.PositionBuilderAtEnd(builder, loopConditionBlock);
-
-        DebugConsole.Write("for loop condition generating");
-
-        forLoop.loopCondition.generator.generate();
-        LLVMValueRef endCondRef = valueStack.Pop();
-
-        LLVM.BuildCondBr(builder, endCondRef, loopBlock, postLoopBlock);
+        LLVM.BuildBr(builder, loopBlock);
 
         LLVM.PositionBuilderAtEnd(builder, loopBlock);
 
@@ -53,13 +43,25 @@ public class ForLoop : Base
 
         LLVM.PositionBuilderAtEnd(builder, loopIncrementBlock);
 
-        //evaluate the step variable - might need to change this idk
+        //evaluate the step variable
         forLoop.loopIteration.generator.generate();
         LLVMValueRef iterationBin = valueStack.Pop();
         DebugConsole.WriteAnsi("Iteration bin: ");
         DebugConsole.DumpValue(iterationBin);
 
         LLVM.BuildBr(builder, loopConditionBlock);
+
+        LLVM.PositionBuilderAtEnd(builder, loopConditionBlock);
+
+        //loop condition checking code
+        LLVM.PositionBuilderAtEnd(builder, loopConditionBlock);
+
+        DebugConsole.Write("for loop condition generating");
+
+        forLoop.loopCondition.generator.generate();
+        LLVMValueRef endCondRef = valueStack.Pop();
+
+        LLVM.BuildCondBr(builder, endCondRef, loopBlock, postLoopBlock);
 
         //reposition the builder
         LLVM.PositionBuilderAtEnd(builder, postLoopBlock);
