@@ -23,6 +23,7 @@ public class Prototype : Base
 
         if (function.Pointer != IntPtr.Zero)
         {
+            //TODO: handle function overloading
             // If func already has a body, reject this.
             if (LLVM.CountBasicBlocks(function) != 0)
             {

@@ -539,13 +539,10 @@ public static class Parser
             case AST.Node.NodeType.VariableAssignment:
                 // AST.VariableAssignment varAss = (AST.VariableAssignment)parent;
                 break;
-
             case AST.Node.NodeType.ImportStatement:
                 parent.addChild(token);
                 return (parent.parent, delimLevel);
-            case AST.Node.NodeType.Struct:
-                parent.addChild(token);
-                return (parent, delimLevel);
+
         }
 
 
@@ -573,11 +570,16 @@ public static class Parser
             }
         }
 
-        if (parent?.nodeType == AST.Node.NodeType.VariableDeclaration)
+        switch (parent?.nodeType)
         {
-            parent?.addChild(token);
-            return (parent, delimLevel);
+            case AST.Node.NodeType.VariableDeclaration:
+                parent?.addChild(token);
+                return (parent, delimLevel);
+            case AST.Node.NodeType.Struct:
+                parent.addChild(token);
+                return (parent, delimLevel);
         }
+
 
         //below can handle the nested variable expressions
         //TODO: replace this in favor of special char handling

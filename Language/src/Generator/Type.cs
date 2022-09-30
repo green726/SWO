@@ -55,7 +55,7 @@ public class Type : Base
                 return LLVM.DoubleType();
             case "string":
                 //TODO: implement strings as stdlib so they can have a sane type
-                return LLVM.ArrayType(LLVM.Int8Type(), 3);
+                return LLVM.ArrayType(LLVM.Int8Type(), 0);
             case "null":
                 return LLVM.VoidType();
             default:
