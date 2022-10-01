@@ -10,6 +10,8 @@ public class Dereference : Expression
 
         this.generator = new Generator.Dereference(this);
 
+        this.parent = parent;
+
         parent?.addChild(this);
     }
 

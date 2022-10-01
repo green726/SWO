@@ -29,7 +29,6 @@ public class Prototype : Base
             {
                 throw new GenException($"redefinition of function named {proto.name}", proto);
             }
-
             // if func originally took a different number of args, reject.
             if (LLVM.CountParams(function) != argumentCount)
             {

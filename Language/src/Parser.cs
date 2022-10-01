@@ -17,6 +17,8 @@ public static class Parser
 
     public static Dictionary<string, AST.Function> declaredFunctionDict = new Dictionary<string, AST.Function>();
     public static Dictionary<string, AST.VariableDeclaration> declaredGlobalsDict = new Dictionary<string, AST.VariableDeclaration>();
+    //HACK: might want to do this differently
+    public static Dictionary<string[], AST.Prototype> declaredFuncs = new Dictionary<string[], AST.Prototype>();
 
     public static int prevLine = 0;
     public static int prevColumn = 0;
@@ -37,6 +39,7 @@ public static class Parser
     public static AST.Node parent;
 
     public static string[] binaryMathOps = { "+", "-", "*", "/" };
+
 
     public static bool isType(Util.Token token)
     {
@@ -922,7 +925,13 @@ public static class Parser
                         {
                             throw ParserException.FactoryMethod("Illegal semi colon", "Remove the semi colon", token, parent);
                         }
-                        break;
+                    }
+                    else if (token.value == "->")
+                    {
+                        AST.Dereference deRef = new AST.Dereference(token, parent);
+                        parent = deRef;
+                        currentTokenNum++;
+                        continue;
                     }
                     else
                     {

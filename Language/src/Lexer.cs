@@ -36,6 +36,10 @@ public static class Lexer
             charNum++;
             column++;
             bool isFinalChar = input.IndexOf(ch) == input.Length - 1;
+
+            //TODO: handle the arrow op
+
+
             if (ch == ' ' || isFinalChar || ch == '\n' || ch == ')' || ch == '}' || specialChars.Contains(ch.ToString()) || ch == ';')
             {
 
@@ -109,9 +113,15 @@ public static class Lexer
                 }
             }
 
+            //NOTE: below needs to stay if
             if (specialChars.Contains(ch.ToString()))
             {
                 tokenList.Add(new Util.Token(Util.TokenType.Special, ch, line, column));
+            }
+            else if (stringBuilder.ToString().EndsWith("-") && ch == '>')
+            {
+                handleMultiCharSpecial("->", stringBuilder.ToString(), line, column, charNum);
+                stringBuilder = new StringBuilder();
             }
             //NOTE: handling of modifier chars (ie reference/dereference) - they are only handeled if they are at the start of a word
             else if (modifierChars.Contains(ch.ToString()) && stringBuilder.ToString() == "")
@@ -138,6 +148,14 @@ public static class Lexer
 
         tokenList.Add(new Util.Token(Util.TokenType.EOF, "", line, column, charNum));
         return tokenList;
+    }
+
+    public static void handleMultiCharSpecial(string special, string value, int line, int column, int charNum)
+    {
+        string removedVal = value.Remove(value.Length - 1);
+        tokenList.Add(new Util.Token(Util.TokenType.Keyword, removedVal, line, column));
+        tokenList.Add(new Util.Token(Util.TokenType.Special, special, line, column));
+
     }
 
     public static void lexDelimiter(Util.TokenType type, StringBuilder builder, char ch, int line, int column, int charNum)

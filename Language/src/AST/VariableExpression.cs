@@ -20,14 +20,12 @@ public class VariableExpression : Expression
         // }
 
 
-
         if (parent != null)
         {
             parent.addChild(this);
         }
         else if (parentRequired)
         {
-
             throw new ParserException($"Illegal variable expression {this.value}", token);
         }
 
@@ -45,7 +43,7 @@ public class VariableExpression : Expression
 
     public override void addChild(AST.Node child)
     {
-        if (child.nodeType != NodeType.VariableExpression && child.nodeType != NodeType.IndexReference)
+        if (child.nodeType != NodeType.VariableExpression && child.nodeType != NodeType.IndexReference && child.nodeType != NodeType.Reference && child.nodeType != NodeType.Dereference)
         {
             throw ParserException.FactoryMethod("An illegal child was added to a variable expression", "remove it", child);
         }

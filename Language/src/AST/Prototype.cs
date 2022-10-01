@@ -45,7 +45,6 @@ public class Prototype : AST.Node
         //TODO: replace this node type with external section
         if (external/*  || parent.nodeType == NodeType.BinaryExpression */)
         {
-
             // Parser.nodes.Add(this);
         }
         if (parent?.nodeType != AST.Node.NodeType.ExternStatement && parent != null)

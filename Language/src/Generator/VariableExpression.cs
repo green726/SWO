@@ -102,7 +102,7 @@ public class VariableExpression : Base
     public override void generate()
     {
         DebugConsole.Write("genning varExpr with value of " + varExpr.value + " parent type of " + varExpr.parent?.nodeType + " and children count of " + varExpr.children.Count());
-        if (varExpr?.parent?.nodeType == AST.Node.NodeType.VariableExpression || varExpr?.parent?.nodeType == AST.Node.NodeType.IndexReference)
+        if (varExpr?.parent?.nodeType == AST.Node.NodeType.VariableExpression || varExpr?.parent?.nodeType == AST.Node.NodeType.IndexReference || varExpr?.parent?.parent?.nodeType == AST.Node.NodeType.VariableExpression)
         {
             int num = 0;
             LLVMValueRef gepPtr = valueStack.Pop();
@@ -117,11 +117,11 @@ public class VariableExpression : Base
 
             checkIsPtr();
 
-            if (!varExpr.isReference && varExpr.children.Count() == 0)
-            {
-                LLVMValueRef numGEPRefLoad = LLVM.BuildLoad(builder, numGEPRef, "structGEPLoad");
-                valueStack.Push(numGEPRefLoad);
-            }
+            // if (!varExpr.isReference/*  && varExpr.children.Count() == 0 */)
+            // {
+            //     LLVMValueRef numGEPRefLoad = LLVM.BuildLoad(builder, numGEPRef, "structGEPLoad");
+            //     valueStack.Push(numGEPRefLoad);
+            // }
 
             //NOTE: incase this iteself is another struct set the current struct to this for the rest of its children
             updateCurrentStruct(gepPtr, num);
