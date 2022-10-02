@@ -152,6 +152,10 @@ public class Prototype : AST.Node
         {
             if (typePredicted == true)
             {
+                if (this?.parent?.nodeType != NodeType.ExternStatement)
+                {
+                    throw ParserException.FactoryMethod("A variable argument prototype was declared outside of an extern statement (variable argument functions are not yet supported - only prototypes for external functions are currently supported)", "Remove the variable argument declaration or place the prototype in an extern statement", child, this);
+                }
                 this.variableArgument = true;
             }
             else
