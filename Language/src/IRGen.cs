@@ -17,7 +17,6 @@ public static class IRGen
     public static readonly Stack<LLVMValueRef> valueStack = new Stack<LLVMValueRef>();
     public static readonly Stack<LLVMTypeRef> typeStack = new Stack<LLVMTypeRef>();
 
-
     public static Dictionary<string, LLVMValueRef> namedValuesLLVM = new Dictionary<string, LLVMValueRef>();
     public static Dictionary<string, AST.Struct> namedTypesAST = new Dictionary<string, AST.Struct>();
     public static Dictionary<string, LLVMTypeRef> namedTypesLLVM = new Dictionary<string, LLVMTypeRef>();

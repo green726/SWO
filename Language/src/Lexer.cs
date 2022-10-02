@@ -6,11 +6,10 @@ public static class Lexer
     private static List<Util.Token> tokenList;
     private static string[] binOps = { "+", "-", "*", "/", "==", "<" };
     private static string[] assignmentOps = { "=", "+=", "-=", "*=", "/=", ":=" };
-    private static string[] specialChars = { ":", ".", ",", ";" };
+    private static string[] specialChars = { ":", ".", ",", ";", "#" };
     private static string[] modifierChars = { "&", "*" };
 
     public static string inputStr;
-
 
     public static List<Util.Token> lex(string input, Spectre.Console.ProgressTask task = null)
     {

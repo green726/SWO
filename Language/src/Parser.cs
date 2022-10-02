@@ -983,6 +983,12 @@ public static class Parser
                         currentTokenNum++;
                         continue;
                     }
+                    else if (token.value == "#")
+                    {
+                        parent?.addChild(token);
+                        currentTokenNum++;
+                        continue;
+                    }
                     else
                     {
                         parent?.addChild(token);

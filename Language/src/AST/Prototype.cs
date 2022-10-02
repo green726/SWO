@@ -15,6 +15,8 @@ public class Prototype : AST.Node
 
     public bool external = false;
 
+    public bool variableArgument = false;
+
     public Prototype(Util.Token token, AST.Node parent = null, bool startWithRet = false, bool external = false) : base(token)
     {
         this.nodeType = NodeType.Prototype;
@@ -121,6 +123,11 @@ public class Prototype : AST.Node
 
     public override void addChild(Util.Token child)
     {
+        if (this.variableArgument == true && child.value != ")")
+        {
+            throw ParserException.FactoryMethod("Illegal additions to prototype after declaring variable arguments", "Remove the illegal additions or the variable argument declaration", child, this);
+        }
+
         // DebugConsole.WriteAnsi($"[green]adding child to proto with name {name} (type predicted is: " + typePredicted + ") with value: " + child.value + " [/]");
         if (this.name == "")
         {
@@ -140,6 +147,17 @@ public class Prototype : AST.Node
         {
             typePredicted = true;
             prevType = null;
+        }
+        else if (child.value == "#")
+        {
+            if (typePredicted == true)
+            {
+                this.variableArgument = true;
+            }
+            else
+            {
+                throw ParserException.FactoryMethod("Illegal variable argument prototype declaration (\"#\")", "Put the variable argument symbol (...) in a legal location (ie \"printf(int i, #)\") or remove it", child, this);
+            }
         }
         else if (child.value == "[" || child.value == "]")
         {

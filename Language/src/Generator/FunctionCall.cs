@@ -32,7 +32,6 @@ public class FunctionCall : Base
 
         LLVMValueRef funcRef = LLVM.GetNamedFunction(module, nameToSearch);
 
-
         if (funcRef.Pointer == IntPtr.Zero)
         {
             // if (Config.settings.function.declaration.reorder && Parser.declaredFunctionDict.ContainsKey(funcCall.functionName) && LLVM.GetNamedFunction(module, funcCall.functionName).Pointer == IntPtr.Zero)
@@ -50,7 +49,7 @@ public class FunctionCall : Base
             // }
         }
 
-        if (LLVM.CountParams(funcRef) != funcCall.args.Count)
+        if (LLVM.CountParams(funcRef) != funcCall.args.Count && LLVM.IsFunctionVarArg(funcRef.TypeOf().GetElementType()) == false)
         {
             throw new GenException($"Incorrect # arguments passed ({funcCall.args.Count} passed but {LLVM.CountParams(funcRef)} required)", funcCall);
         }

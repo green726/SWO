@@ -45,7 +45,8 @@ public class Prototype : Base
             }
 
             proto.returnType.generator.generate();
-            function = LLVM.AddFunction(module, proto.name, LLVM.FunctionType(typeStack.Pop(), arguments.ToArray(), false));
+            LLVMTypeRef funcType = LLVM.FunctionType(typeStack.Pop(), arguments.ToArray(), proto.variableArgument);
+            function = LLVM.AddFunction(module, proto.name, funcType);
             LLVM.SetLinkage(function, LLVMLinkage.LLVMExternalLinkage);
         }
 
@@ -69,6 +70,8 @@ public class Prototype : Base
             DebugConsole.Write("created argument with name of " + argumentName);
             argLoopIndex++;
         }
+
+        DebugConsole.DumpValue(function);
 
         valueStack.Push(function);
     }
