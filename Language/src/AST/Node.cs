@@ -57,6 +57,7 @@ public abstract class Node
         IfStatementDeclaration,
         ElseStatement,
         ForLoop,
+        WhileLoop,
         PhiVariable,
         ImportStatement,
         Return,

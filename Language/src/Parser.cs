@@ -522,6 +522,11 @@ public static class Parser
             AST.ForLoop forLoop = new AST.ForLoop(token, parent);
             return (forLoop, delimLevel);
         }
+        else if (token.value == "while")
+        {
+            AST.WhileLoop whileLoop = new AST.WhileLoop(token, parent);
+            return (whileLoop, delimLevel);
+        }
         else if (token.value == Config.settings.function.declaration.externKeyword)
         {
             AST.ExternStatement externStat = new AST.ExternStatement(token, parent);
@@ -676,6 +681,13 @@ public static class Parser
             switch (parent?.nodeType)
             {
                 case AST.Node.NodeType.ForLoop:
+                    if (token.value != ")")
+                    {
+                        break;
+                    }
+                    delimLevel--;
+                    return (parent, delimLevel);
+                case AST.Node.NodeType.WhileLoop:
                     if (token.value != ")")
                     {
                         break;

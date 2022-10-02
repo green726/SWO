@@ -19,10 +19,10 @@ public class ForLoop : Base
 
         //create the basic blocks for the loop
         LLVMBasicBlockRef parentBlock = LLVM.GetInsertBlock(builder).GetBasicBlockParent();
-        LLVMBasicBlockRef loopBlock = LLVM.AppendBasicBlock(parentBlock, "loopBody");
-        LLVMBasicBlockRef loopIncrementBlock = LLVM.AppendBasicBlock(parentBlock, "loopIncrement");
-        LLVMBasicBlockRef loopConditionBlock = LLVM.AppendBasicBlock(parentBlock, "loopCond");
-        LLVMBasicBlockRef postLoopBlock = LLVM.AppendBasicBlock(parentBlock, "postloop");
+        LLVMBasicBlockRef loopBlock = LLVM.AppendBasicBlock(parentBlock, "forLoopBody");
+        LLVMBasicBlockRef loopIncrementBlock = LLVM.AppendBasicBlock(parentBlock, "forLoopIncrement");
+        LLVMBasicBlockRef loopConditionBlock = LLVM.AppendBasicBlock(parentBlock, "forLoopCond");
+        LLVMBasicBlockRef postLoopBlock = LLVM.AppendBasicBlock(parentBlock, "forPostloop");
 
         //create the phiVarDec obj for the loop
         forLoop.varDec.generator.generate();
