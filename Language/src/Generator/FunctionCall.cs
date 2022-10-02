@@ -1,5 +1,6 @@
 namespace Generator;
 
+
 using LLVMSharp;
 using static IRGen;
 
@@ -14,23 +15,39 @@ public class FunctionCall : Base
 
     public override void generate()
     {
-        LLVMValueRef funcRef = LLVM.GetNamedFunction(module, funcCall.functionName);
+        string nameToSearch = "";
+        if (Parser.declaredFuncs.ContainsKey(funcCall.functionName))
+        {
+            nameToSearch = funcCall.functionName;
+        }
+        else
+        {
+            string altName = funcCall.functionName + funcCall.generateAltName();
+
+            this.funcCall.type = Parser.declaredFuncs[altName].returnType;
+
+            DebugConsole.WriteAnsi($"[red]alt name in function call gen: {altName}[/]");
+            nameToSearch = altName;
+        }
+
+        LLVMValueRef funcRef = LLVM.GetNamedFunction(module, nameToSearch);
+
 
         if (funcRef.Pointer == IntPtr.Zero)
         {
-            if (Config.settings.function.declaration.reorder && Parser.declaredFunctionDict.ContainsKey(funcCall.functionName) && LLVM.GetNamedFunction(module, funcCall.functionName).Pointer == IntPtr.Zero)
-            {
-                LLVMBasicBlockRef currentBlock = LLVM.GetInsertBlock(builder);
-                AST.Function calledFunc = Parser.declaredFunctionDict[funcCall.functionName];
-                calledFunc.generator.generate();
-                calledFunc.generated = true;
-                LLVM.PositionBuilderAtEnd(builder, currentBlock);
-                funcRef = LLVM.GetNamedFunction(module, funcCall.functionName);
-            }
-            else
-            {
-                throw new GenException($"Unknown function ({funcCall.functionName}) referenced", funcCall);
-            }
+            // if (Config.settings.function.declaration.reorder && Parser.declaredFunctionDict.ContainsKey(funcCall.functionName) && LLVM.GetNamedFunction(module, funcCall.functionName).Pointer == IntPtr.Zero)
+            // {
+            //     LLVMBasicBlockRef currentBlock = LLVM.GetInsertBlock(builder);
+            //     AST.Function calledFunc = Parser.declaredFunctionDict[funcCall.functionName];
+            //     calledFunc.generator.generate();
+            //     calledFunc.generated = true;
+            //     LLVM.PositionBuilderAtEnd(builder, currentBlock);
+            //     funcRef = LLVM.GetNamedFunction(module, funcCall.functionName);
+            // }
+            // else
+            // {
+            throw new GenException($"Unknown function ({funcCall.functionName}) referenced", funcCall);
+            // }
         }
 
         if (LLVM.CountParams(funcRef) != funcCall.args.Count)

@@ -9,6 +9,7 @@ public class NullExpression : Expression
 
         this.parent = parent;
         this.parent?.addChild(this);
+        this.type = new AST.Type("void", this);
     }
 
 }

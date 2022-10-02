@@ -1,6 +1,8 @@
 namespace AST;
 
 using System.Collections.Generic;
+using System.Text;
+
 
 public class Prototype : AST.Node
 {
@@ -52,7 +54,7 @@ public class Prototype : AST.Node
             throw ParserException.FactoryMethod("A prototype may not have a non-extern parent", "Make the prototype top level", this);
         }
         parent?.addChild(this);
-
+        this.parent = parent;
     }
 
     //NOTE: addArgs are just extended from the add child - just to seperate handling of other tokens added (like names)
@@ -80,6 +82,34 @@ public class Prototype : AST.Node
         {
             // throw ParserException.FactoryMethod();
             arguments.Add(token.value, prevType);
+        }
+    }
+
+    public string getArgTypes()
+    {
+        StringBuilder stringBuilder = new StringBuilder();
+        foreach (KeyValuePair<string, Type> arg in this.arguments)
+        {
+            stringBuilder.Append("_" + arg.Value.value);
+        }
+
+        return stringBuilder.ToString();
+    }
+
+    public void handleOverload()
+    {
+        if (this.parent?.nodeType != AST.Node.NodeType.ExternStatement)
+        {
+            string altName = this.name + getArgTypes();
+            DebugConsole.WriteAnsi("[red]alt name below[/]");
+            DebugConsole.Write(altName);
+
+            Parser.declaredFuncs.Add(altName, this);
+            this.name = altName;
+        }
+        else
+        {
+            Parser.declaredFuncs.Add(this.name, this);
         }
     }
 

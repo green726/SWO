@@ -4,9 +4,6 @@ using System;
 
 public class NumberExpression : Expression
 {
-    // new public double value;
-    public Type type;
-
     public NumberExpression(Util.Token token, AST.Node? parent) : base(token)
 
     {

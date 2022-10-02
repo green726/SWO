@@ -2,14 +2,14 @@ namespace AST;
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 public class FunctionCall : Expression
 {
     public string? functionName;
-    public List<AST.Node> args;
+    public List<AST.Expression> args;
 
-    public FunctionCall(Util.Token token, List<AST.Node>? args, AST.Node? parent = null, bool topLevel = false) : base(token)
-
+    public FunctionCall(Util.Token token, List<AST.Expression>? args, AST.Node? parent = null, bool topLevel = false) : base(token)
     {
         this.newLineReset = true;
         this.nodeType = NodeType.FunctionCall;
@@ -18,7 +18,8 @@ public class FunctionCall : Expression
         string builtinName = token.value.Substring(0, (token.value.Length - 1));
 
         this.functionName = token.value;
-        this.args = args ??= new List<AST.Node>();
+
+        this.args = args ??= new List<AST.Expression>();
 
         if (parent != null)
         {
@@ -33,21 +34,34 @@ public class FunctionCall : Expression
         }
     }
 
+    public string generateAltName()
+    {
+        StringBuilder altNameSb = new StringBuilder();
+
+        foreach (AST.Expression argExpr in args)
+        {
+            DebugConsole.Write(argExpr.nodeType);
+            DebugConsole.Write(argExpr.type.value);
+            altNameSb.Append("_" + argExpr.type.value);
+        }
+        return altNameSb.ToString();
+    }
+
     public override void addChild(AST.Node child)
     {
         base.addChild(child);
-        args.Add(child);
+        args.Add((AST.Expression)child);
     }
 
     public override void removeChild(AST.Node child)
     {
-        args.Remove(child);
+        args.Remove((AST.Expression)child);
         base.removeChild(child);
     }
 
     public void addChildAtStart(AST.Node child)
     {
-        args.Insert(0, child);
+        args.Insert(0, (AST.Expression)child);
         base.addChild(child);
     }
 }

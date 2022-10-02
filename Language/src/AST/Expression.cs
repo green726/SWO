@@ -7,6 +7,8 @@ public abstract class Expression : Node
     public bool isReference = false;
     public bool isDereference = false;
 
+    public AST.Type type { get; set; }
+
     public Expression(Util.Token token, Node? parent = null) : base(token)
     {
         this.isExpression = true;

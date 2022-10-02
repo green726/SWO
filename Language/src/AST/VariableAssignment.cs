@@ -95,7 +95,7 @@ public class VariableAssignment : AST.Node
                 if (node.nodeType == NodeType.BinaryExpression)
                 {
                     BinaryExpression binExpr = (BinaryExpression)node;
-                    binExpr.leftHand = this.children.Last();
+                    binExpr.leftHand = (AST.Expression)this.children.Last();
                     this.binReassignment = true;
                     this.bin = binExpr;
                 }

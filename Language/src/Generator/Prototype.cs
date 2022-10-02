@@ -14,6 +14,7 @@ public class Prototype : Base
 
     public override void generate()
     {
+        proto.handleOverload();
         DebugConsole.WriteAnsi("[yellow]proto named " + proto.name + " [/]");
         //begin argument generation
         int argumentCount = proto.arguments.Count();
@@ -37,7 +38,6 @@ public class Prototype : Base
         }
         else
         {
-
             foreach (KeyValuePair<string, AST.Type> arg in proto.arguments)
             {
                 arg.Value.generator.generate();
@@ -52,7 +52,6 @@ public class Prototype : Base
         //NOTE: adding layer for the function
         if (proto?.parent?.nodeType == AST.Node.NodeType.Function)
         {
-            DebugConsole.WriteAnsi("[purple]KASHDKJAHSD[/]");
             addLayerToNamedValueStack();
         }
         int argLoopIndex = 0;

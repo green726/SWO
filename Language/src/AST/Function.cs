@@ -34,10 +34,10 @@ public class Function : AST.Node
             Parser.nodes.Add(this);
         }
 
-        if (Config.settings.function.declaration.reorder && !Parser.declaredFunctionDict.ContainsKey(prototype.name))
-        {
-            Parser.declaredFunctionDict.Add(prototype.name, this);
-        }
+        // if (Config.settings.function.declaration.reorder && !Parser.declaredFunctionDict.ContainsKey(prototype.name))
+        // {
+        //     Parser.declaredFunctionDict.Add(prototype.name, this);
+        // }
     }
 
     //NOTE: Constructor 2:
@@ -65,10 +65,10 @@ public class Function : AST.Node
             Parser.nodes.Add(this);
         }
 
-        if (Config.settings.function.declaration.reorder)
-        {
-            Parser.declaredFunctionDict.Add(prototype.name, this);
-        }
+        // if (Config.settings.function.declaration.reorder)
+        // {
+        //     Parser.declaredFunctionDict.Add(prototype.name, this);
+        // }
     }
 
     public override void removeChild(AST.Node child)

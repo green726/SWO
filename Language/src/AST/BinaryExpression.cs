@@ -4,8 +4,8 @@ using System.Linq;
 
 public class BinaryExpression : Expression
 {
-    public AST.Node leftHand;
-    public AST.Node? rightHand;
+    public AST.Expression leftHand;
+    public AST.Expression? rightHand;
     public OperatorType operatorType;
 
     public enum OperatorType
@@ -58,7 +58,7 @@ public class BinaryExpression : Expression
             {
                 Function prevFunc = (Function)parent;
                 Parser.checkNode(prevFunc.body.Last(), Parser.binaryExpectedNodes);
-                this.leftHand = prevFunc.body.Last();
+                this.leftHand = (AST.Expression)prevFunc.body.Last();
             }
             else if (this.parent.nodeType == NodeType.FunctionCall)
             {
@@ -69,7 +69,7 @@ public class BinaryExpression : Expression
             else if (this.parent.nodeType == NodeType.IfStatement)
             {
                 IfStatement ifStat = (IfStatement)parent;
-                this.leftHand = ifStat.children.Last();
+                this.leftHand = (AST.Expression)ifStat.children.Last();
                 ifStat.children.RemoveAt(ifStat.children.Count - 1);
             }
             else if (this.parent.nodeType == NodeType.VariableAssignment)
@@ -80,7 +80,7 @@ public class BinaryExpression : Expression
             }
             else if (this.parent.nodeType == NodeType.VariableExpression)
             {
-                this.leftHand = parent;
+                this.leftHand = (AST.Expression)parent;
                 this.parent = parent.parent;
             }
             else if (this.parent.nodeType == NodeType.Return)
@@ -92,7 +92,7 @@ public class BinaryExpression : Expression
             else
             {
                 Parser.checkNode(previousNode, Parser.binaryExpectedNodes);
-                this.leftHand = previousNode;
+                this.leftHand = (AST.Expression)previousNode;
             }
         }
         if (this?.leftHand?.nodeType == AST.Node.NodeType.NumberExpression || this?.leftHand?.nodeType == NodeType.VariableExpression)
@@ -119,6 +119,8 @@ public class BinaryExpression : Expression
             this.parent.addChild(this);
         }
 
+        this.type = this.leftHand.type;
+
     }
     public override void addChild(AST.Node child)
     {
@@ -128,7 +130,7 @@ public class BinaryExpression : Expression
         }
         else if (rightHand == null)
         {
-            this.rightHand = child;
+            this.rightHand = (AST.Expression)child;
         }
         else if (rightHand != null)
         {

@@ -16,6 +16,8 @@ public class StringExpression : Expression
         this.value = valueWithoutQuotes;
         this.builtInString = builtInString;
 
+        this.type = new AST.Type("string", this);
+
         if (dontAdd == true)
         {
             return;
