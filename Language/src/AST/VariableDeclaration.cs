@@ -47,6 +47,8 @@ public class VariableDeclaration : Node
             local = true;
             parent?.addChild(this);
         }
+
+
     }
 
     public VariableDeclaration(Util.Token typeTok, Node parent = null) : base(typeTok)
@@ -80,6 +82,8 @@ public class VariableDeclaration : Node
             this.local = true;
             parent?.addChild(this);
         }
+        Parser.addNamedValueInScope(this.name, this.type);
+        DebugConsole.WriteAnsi("[green]adding vardec to stack[/]");
     }
 
     public override void addChild(Util.Token child)
@@ -97,7 +101,8 @@ public class VariableDeclaration : Node
             switch (childLoop)
             {
                 case 0:
-                    this.type = new Type(child);
+                    this.type = new Type(child); Parser.addNamedValueInScope(this.name, this.type);
+                    DebugConsole.WriteAnsi("[green]adding vardec to stack[/]");
                     break;
                 case 1:
                     //TODO: replace this with config delimiter

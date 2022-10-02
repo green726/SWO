@@ -42,7 +42,6 @@ public class Function : AST.Node
 
     //NOTE: Constructor 2:
     public Function(Prototype prototype, AST.Node body, bool topLevel = true) : base(prototype)
-
     {
 
         if (prototype.external)

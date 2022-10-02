@@ -121,7 +121,7 @@ public class Prototype : AST.Node
 
     public override void addChild(Util.Token child)
     {
-        DebugConsole.WriteAnsi($"[green]adding child to proto with name {name} (type predicted is: " + typePredicted + ") with value: " + child.value + " [/]");
+        // DebugConsole.WriteAnsi($"[green]adding child to proto with name {name} (type predicted is: " + typePredicted + ") with value: " + child.value + " [/]");
         if (this.name == "")
         {
             if (!Config.settings.function.declaration.marker.word)

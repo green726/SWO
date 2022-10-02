@@ -41,6 +41,42 @@ public static class Parser
 
     public static string[] binaryMathOps = { "+", "-", "*", "/" };
 
+    public static Stack<Dictionary<string, AST.Type>> variablesTypeStack = new Stack<Dictionary<string, AST.Type>>();
+
+    public static AST.Type getNamedValueInScope(string name)
+    {
+        AST.Type val;
+        variablesTypeStack.Peek().TryGetValue(name, out val);
+        return val;
+    }
+
+    public static void clearNamedValueScope()
+    {
+        variablesTypeStack.Pop();
+    }
+
+    public static void addLayerToNamedValueStack()
+    {
+        if (variablesTypeStack.Count > 0)
+        {
+            variablesTypeStack.Push(new Dictionary<string, AST.Type>(variablesTypeStack.Peek()));
+        }
+        else
+        {
+            variablesTypeStack.Push(new Dictionary<string, AST.Type>());
+        }
+    }
+
+    public static bool valueExistsInScope(string name)
+    {
+        return variablesTypeStack.Peek().ContainsKey(name);
+    }
+
+
+    public static void addNamedValueInScope(string name, AST.Type value)
+    {
+        variablesTypeStack.Peek().Add(name, value);
+    }
 
     public static bool isType(Util.Token token)
     {
@@ -702,6 +738,7 @@ public static class Parser
 
     public static List<AST.Node> parse(List<Util.Token> _tokenList, Spectre.Console.ProgressTask task = null)
     {
+        addLayerToNamedValueStack();
         tokenList = _tokenList;
 
         DebugConsole.WriteAnsi("[red]tokens[/]");

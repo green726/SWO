@@ -10,9 +10,9 @@ public class VariableExpression : Expression
         this.value = token.value;
 
         //TODO: implement the same variable scoping in the parser as the generator has
-        // AST.VariableDeclaration originalDec = Parser.declaredGlobalsDict[this.value];
-        // this.type = originalDec.type;
-        this.type = new Type("int", this);
+        AST.Type originalType = Parser.getNamedValueInScope(this.value);
+        this.type = originalType;
+        // this.type = new Type("int", this);
 
         this.parent = parent;
         this.newLineReset = true;
