@@ -10,8 +10,10 @@ public class VariableExpression : Expression
         this.value = token.value;
 
         //TODO: implement the same variable scoping in the parser as the generator has
+        DebugConsole.Write(this.value);
         AST.Type originalType = Parser.getNamedValueInScope(this.value);
         this.type = originalType;
+        DebugConsole.WriteAnsi($"[yellow]original type + {this.type.value}[/]");
         // this.type = new Type("int", this);
 
         this.parent = parent;

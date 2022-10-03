@@ -50,13 +50,14 @@ public static class Parser
         return val;
     }
 
-    public static void clearNamedValueScope()
+    public static void clearNamedASTStack()
     {
         variablesTypeStack.Pop();
     }
 
-    public static void addLayerToNamedValueStack()
+    public static void addLayerToNamedASTStack()
     {
+        DebugConsole.WriteAnsi("[yellow]adding layer to stack[/]");
         if (variablesTypeStack.Count > 0)
         {
             variablesTypeStack.Push(new Dictionary<string, AST.Type>(variablesTypeStack.Peek()));
@@ -67,7 +68,16 @@ public static class Parser
         }
     }
 
-    public static bool valueExistsInScope(string name)
+    public static void removeLayerFromASTStack()
+    {
+        if (variablesTypeStack.Count > 0)
+        {
+            DebugConsole.WriteAnsi("[yellow]removing layer[/]");
+            variablesTypeStack.Pop();
+        }
+    }
+
+    public static bool valueExistsInScopeAST(string name)
     {
         return variablesTypeStack.Peek().ContainsKey(name);
     }
@@ -652,6 +662,7 @@ public static class Parser
                 delimLevel++;
                 return (parent, delimLevel);
             }
+            bool addLayer = true;
             switch (parent?.nodeType)
             {
                 case AST.Node.NodeType.VariableDeclaration:
@@ -667,17 +678,29 @@ public static class Parser
                     break;
                 case AST.Node.NodeType.ExternStatement:
                     break;
+                case AST.Node.NodeType.Function:
+                    if (token.value == "{")
+                    {
+                        addLayer = false;
+                    }
+                    break;
                 default:
                     parent?.addChild(token);
                     break;
             }
             // DebugConsole.Write("pushing parent with node type of " + parent.nodeType + " to parent stack and parent parent of node type " + parent?.parent?.nodeType);
             delimParentStack.Push(parent);
+            // DebugConsole.WriteAnsi("[purple]puhsing level to layer stack[/]");
+            if (addLayer)
+            {
+                addLayerToNamedASTStack();
+            }
             delimLevel++;
         }
         else if (token.type == Util.TokenType.DelimiterClose)
         {
             AST.Node delimParent = delimParentStack.Pop();
+            bool removeLayer = true;
             switch (parent?.nodeType)
             {
                 case AST.Node.NodeType.ForLoop:
@@ -704,6 +727,7 @@ public static class Parser
                         if (nextNonSpace().value == "{")
                         {
                             parent = new AST.Function((AST.Prototype)parent);
+                            removeLayer = false;
                             delimLevel--;
                             return (parent, delimLevel);
                         }
@@ -733,6 +757,11 @@ public static class Parser
                     break;
             }
             delimLevel--;
+            if (removeLayer)
+            {
+                removeLayerFromASTStack();
+                // DebugConsole.WriteAnsi("[purple]removing layer from ast stack[/]");
+            }
             if (delimLevel == 0)
             {
                 parent = null;
@@ -750,7 +779,6 @@ public static class Parser
 
     public static List<AST.Node> parse(List<Util.Token> _tokenList, Spectre.Console.ProgressTask task = null)
     {
-        addLayerToNamedValueStack();
         tokenList = _tokenList;
 
         DebugConsole.WriteAnsi("[red]tokens[/]");
@@ -762,6 +790,7 @@ public static class Parser
             }
         }
         DebugConsole.WriteAnsi("[red]end tokens[/]");
+        addLayerToNamedASTStack();
 
         if (task != null)
         {

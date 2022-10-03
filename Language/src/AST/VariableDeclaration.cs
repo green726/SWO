@@ -82,8 +82,6 @@ public class VariableDeclaration : Node
             this.local = true;
             parent?.addChild(this);
         }
-        Parser.addNamedValueInScope(this.name, this.type);
-        DebugConsole.WriteAnsi("[green]adding vardec to stack[/]");
     }
 
     public override void addChild(Util.Token child)
@@ -138,6 +136,8 @@ public class VariableDeclaration : Node
             {
                 case 0:
                     this.name = child.value;
+                    Parser.addNamedValueInScope(this.name, this.type);
+                    DebugConsole.WriteAnsi($"[green]adding vardec to stack with name: {this.name}[/]");
                     break;
                 case 1:
                     if (Config.settings.variable.declaration.keyword.mutableIsSymbol)

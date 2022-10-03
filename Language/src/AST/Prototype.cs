@@ -21,6 +21,7 @@ public class Prototype : AST.Node
     {
         this.nodeType = NodeType.Prototype;
         this.generator = new Generator.Prototype(this);
+        // Parser.addLayerToNamedASTStack();
 
         this.external = external;
 
@@ -84,6 +85,8 @@ public class Prototype : AST.Node
         {
             // throw ParserException.FactoryMethod();
             arguments.Add(token.value, prevType);
+            DebugConsole.Write(token.value);
+            Parser.addNamedValueInScope(token.value, prevType);
         }
     }
 
