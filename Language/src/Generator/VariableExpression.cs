@@ -186,11 +186,11 @@ public class VariableExpression : Base
                 return varRef;
             }
         }
-        else if (Config.settings.variable.declaration.reorder && Parser.declaredGlobalsDict.ContainsKey(varExpr.value))
+        else if (Config.settings.variable.declaration.reorder && Parser.getInstance().declaredGlobalsDict.ContainsKey(varExpr.value))
         {
             DebugConsole.WriteAnsi("[purple]stupid reordering[/]");
             LLVMBasicBlockRef currentBlock = LLVM.GetInsertBlock(builder);
-            AST.VariableDeclaration varDec = Parser.declaredGlobalsDict[varExpr.value];
+            AST.VariableDeclaration varDec = Parser.getInstance().declaredGlobalsDict[varExpr.value];
             varDec.generator.generate();
             varDec.generated = true;
             LLVM.PositionBuilderAtEnd(builder, currentBlock);

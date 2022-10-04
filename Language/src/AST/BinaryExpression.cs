@@ -57,13 +57,13 @@ public class BinaryExpression : Expression
             if (this.parent.nodeType == NodeType.Function)
             {
                 Function prevFunc = (Function)parent;
-                Parser.checkNode(prevFunc.body.Last(), Parser.binaryExpectedNodes);
+                Parser.checkNode(prevFunc.body.Last(), Parser.getInstance().binaryExpectedNodes);
                 this.leftHand = (AST.Expression)prevFunc.body.Last();
             }
             else if (this.parent.nodeType == NodeType.FunctionCall)
             {
                 FunctionCall prevCall = (FunctionCall)parent;
-                Parser.checkNode(prevCall.args.Last(), Parser.binaryExpectedNodes);
+                Parser.checkNode(prevCall.args.Last(), Parser.getInstance().binaryExpectedNodes);
                 this.leftHand = prevCall.args.Last();
             }
             else if (this.parent.nodeType == NodeType.IfStatement)
@@ -91,7 +91,7 @@ public class BinaryExpression : Expression
             }
             else
             {
-                Parser.checkNode(previousNode, Parser.binaryExpectedNodes);
+                Parser.checkNode(previousNode, Parser.getInstance().binaryExpectedNodes);
                 this.leftHand = (AST.Expression)previousNode;
             }
         }
@@ -112,7 +112,7 @@ public class BinaryExpression : Expression
             //NOTE: - commented out below code is to throw in an anonymous function 
             // PrototypeAST proto = new PrototypeAST();
             // FunctionAST func = new FunctionAST(proto, this);
-            Parser.nodes.Add(this);
+            Parser.getInstance().nodes.Add(this);
         }
         else
         {

@@ -2,60 +2,77 @@
 
 using System.Text;
 using static System.Text.Json.JsonSerializer;
-using Spectre.Console;
 
-public static class Parser
+public class Parser
 {
-    public static List<AST.Node> nodes = new List<AST.Node>();
-    public static List<Util.Token> tokenList;
+    //NOTE: below is a stack containing instances of parser (used for multi file)
+    public static Stack<Parser> parserStack = new Stack<Parser>();
 
-    public static List<AST.VariableDeclaration> globalVarAss = new List<AST.VariableDeclaration>();
+    public static Parser addInstance()
+    {
+        Parser newParser = new Parser();
+        parserStack.Push(newParser);
+        return newParser;
+    }
 
-    public static Util.TokenType[] binaryExpectedTokens = { Util.TokenType.Int, Util.TokenType.Keyword };
-    public static Util.TokenType[] delimiterExpectedTokens = { Util.TokenType.Keyword };
-    public static AST.Node.NodeType[] binaryExpectedNodes = { AST.Node.NodeType.NumberExpression, AST.Node.NodeType.BinaryExpression, AST.Node.NodeType.VariableExpression, AST.Node.NodeType.PhiVariable };
+    public static Parser removeInstance()
+    {
+        return parserStack.Pop();
+    }
 
-    // public static Dictionary<string, AST.Function> declaredFunctionDict = new Dictionary<string, AST.Function>();
-    public static Dictionary<string, AST.VariableDeclaration> declaredGlobalsDict = new Dictionary<string, AST.VariableDeclaration>();
+    public static Parser getInstance()
+    {
+        return parserStack.Peek();
+    }
+
+    public List<AST.Node> nodes = new List<AST.Node>();
+    public List<Util.Token> tokenList;
+
+    public List<AST.VariableDeclaration> globalVarAss = new List<AST.VariableDeclaration>();
+
+    public Util.TokenType[] binaryExpectedTokens = { Util.TokenType.Int, Util.TokenType.Keyword };
+    public Util.TokenType[] delimiterExpectedTokens = { Util.TokenType.Keyword };
+    public AST.Node.NodeType[] binaryExpectedNodes = { AST.Node.NodeType.NumberExpression, AST.Node.NodeType.BinaryExpression, AST.Node.NodeType.VariableExpression, AST.Node.NodeType.PhiVariable };
+
+    // public Dictionary<string, AST.Function> declaredFunctionDict = new Dictionary<string, AST.Function>();
+    public Dictionary<string, AST.VariableDeclaration> declaredGlobalsDict = new Dictionary<string, AST.VariableDeclaration>();
     //HACK: might want to do this differently
     //NOTE: modified name
-    public static Dictionary<string, AST.Prototype> declaredFuncs = new Dictionary<string, AST.Prototype>();
+    public Dictionary<string, AST.Prototype> declaredFuncs = new Dictionary<string, AST.Prototype>();
 
-    public static int prevLine = 0;
-    public static int prevColumn = 0;
-
-    public static int ifFuncNum = 0;
+    public int prevLine = 0;
+    public int prevColumn = 0;
 
     //NOTE: below can be used to add user defined types (structs/classes)
-    public static List<string> typeList = new List<string>() { "double", "float", "string" };
+    public List<string> typeList = new List<string>() { "double", "float", "string" };
 
     //NOTE: below are all for the while loop func
-    public static int finalTokenNum = 0;
-    public static int currentTokenNum = 0;
-    public static bool isFinishedParsing = false;
-    public static Stack<AST.Node> delimParentStack = new Stack<AST.Node>();
+    public int finalTokenNum = 0;
+    public int currentTokenNum = 0;
+    public bool isFinishedParsing = false;
+    public Stack<AST.Node> delimParentStack = new Stack<AST.Node>();
 
-    public static AST.Node lastMajorParentNode = null;
+    public AST.Node lastMajorParentNode = null;
 
-    public static AST.Node parent;
+    public AST.Node parent;
 
-    public static string[] binaryMathOps = { "+", "-", "*", "/" };
+    public string[] binaryMathOps = { "+", "-", "*", "/" };
 
-    public static Stack<Dictionary<string, AST.Type>> variablesTypeStack = new Stack<Dictionary<string, AST.Type>>();
+    public Stack<Dictionary<string, AST.Type>> variablesTypeStack = new Stack<Dictionary<string, AST.Type>>();
 
-    public static AST.Type getNamedValueInScope(string name)
+    public AST.Type getNamedValueInScope(string name)
     {
         AST.Type val;
         variablesTypeStack.Peek().TryGetValue(name, out val);
         return val;
     }
 
-    public static void clearNamedASTStack()
+    public void clearNamedASTStack()
     {
         variablesTypeStack.Pop();
     }
 
-    public static void addLayerToNamedASTStack()
+    public void addLayerToNamedASTStack()
     {
         DebugConsole.WriteAnsi("[yellow]adding layer to stack[/]");
         if (variablesTypeStack.Count > 0)
@@ -68,7 +85,7 @@ public static class Parser
         }
     }
 
-    public static void removeLayerFromASTStack()
+    public void removeLayerFromASTStack()
     {
         if (variablesTypeStack.Count > 0)
         {
@@ -77,18 +94,18 @@ public static class Parser
         }
     }
 
-    public static bool valueExistsInScopeAST(string name)
+    public bool valueExistsInScopeAST(string name)
     {
         return variablesTypeStack.Peek().ContainsKey(name);
     }
 
 
-    public static void addNamedValueInScope(string name, AST.Type value)
+    public void addNamedValueInScope(string name, AST.Type value)
     {
         variablesTypeStack.Peek().Add(name, value);
     }
 
-    public static bool isType(Util.Token token)
+    public bool isType(Util.Token token)
     {
         if (typeList.Contains(token.value))
         {
@@ -98,7 +115,7 @@ public static class Parser
         return isInt;
     }
 
-    public static bool isType(string value)
+    public bool isType(string value)
     {
         if (typeList.Contains(value))
         {
@@ -108,7 +125,7 @@ public static class Parser
         return isInt;
     }
 
-    public static (bool, int) checkInt(string value)
+    public (bool, int) checkInt(string value)
     {
         if (value.EndsWith("*"))
         {
@@ -168,7 +185,7 @@ public static class Parser
     {
         if (node == null)
         {
-            throw new ParserException($"expected a node at but got null", prevLine, prevColumn);
+            // throw new ParserException();
         }
 
         foreach (AST.Node.NodeType expectedNodeType in expectedTypes)
@@ -184,7 +201,7 @@ public static class Parser
         }
     }
 
-    public static void checkNode(AST.Node? node, AST.Node.NodeType[] expectedTypes, ParserException except)
+    public void checkNode(AST.Node? node, AST.Node.NodeType[] expectedTypes, ParserException except)
     {
         if (node == null)
         {
@@ -204,7 +221,7 @@ public static class Parser
         }
     }
 
-    public static void checkToken(Util.Token? token, List<Util.TokenType>? expectedTypes = null, Util.TokenType? expectedType = null)
+    public void checkToken(Util.Token? token, List<Util.TokenType>? expectedTypes = null, Util.TokenType? expectedType = null)
     {
         if (token == null)
         {
@@ -235,7 +252,7 @@ public static class Parser
         }
     }
 
-    public static string printBinary(AST.BinaryExpression bin)
+    public string printBinary(AST.BinaryExpression bin)
     {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.Append($"{bin.nodeType} op: {bin.operatorType} lhs type: {bin.leftHand.nodeType} rhs type: {bin?.rightHand?.nodeType} binop children below:");
@@ -244,7 +261,7 @@ public static class Parser
         return stringBuilder.ToString();
     }
 
-    public static string printFunc(AST.Function func)
+    public string printFunc(AST.Function func)
     {
         StringBuilder stringBuilder = new StringBuilder();
         if (func.prototype.arguments.Count() > 0)
@@ -260,43 +277,43 @@ public static class Parser
         return stringBuilder.ToString();
     }
 
-    public static string printFuncCall(AST.FunctionCall funcCall)
+    public string printFuncCall(AST.FunctionCall funcCall)
     {
         return $"{funcCall.nodeType} with name of {funcCall.functionName} and args of {String.Join(", ", funcCall.args)}";
     }
 
-    public static string printVarAss(AST.VariableAssignment varAss)
+    public string printVarAss(AST.VariableAssignment varAss)
     {
         return $"{varAss?.nodeType} with name of {varAss?.varExpr?.value} and children of [{printASTRet(varAss?.children)}]";
     }
 
-    public static string printProto(AST.Prototype proto)
+    public string printProto(AST.Prototype proto)
     {
         return $"{proto.nodeType} with name of {proto.name}";
     }
 
-    public static string printIfStat(AST.IfStatement ifStat)
+    public string printIfStat(AST.IfStatement ifStat)
     {
         return $"if statement with expression of {printBinary(ifStat.declaration.expression)} and body of ( {printASTRet(ifStat.thenBody)} ) body end | else statement: {printElseStat(ifStat.elseStat)}";
     }
 
-    public static string printElseStat(AST.ElseStatement elseStat)
+    public string printElseStat(AST.ElseStatement elseStat)
     {
         return $"else statement with body of ( {printASTRet(elseStat.elseBody)} )";
     }
 
-    public static string printForLoop(AST.ForLoop forLoop)
+    public string printForLoop(AST.ForLoop forLoop)
     {
         // return $"For loop with iteration object of {forLoop.iterationObject} and index obj of {printPhiVar(forLoop.index)} complexity of {forLoop.complex} and body of ( {printASTRet(forLoop.body)} ) body end";
         return $"";
     }
 
-    public static string printType(AST.Type type)
+    public string printType(AST.Type type)
     {
         return $"type with name of {type.value} and is array of {type.isArray}";
     }
 
-    public static string printASTRet(List<AST.Node> nodesPrint)
+    public string printASTRet(List<AST.Node> nodesPrint)
     {
         StringBuilder stringBuilder = new StringBuilder();
 
@@ -354,7 +371,7 @@ public static class Parser
         return stringBuilder.ToString();
     }
 
-    public static void printAST(List<AST.Node> nodesPrint)
+    public void printAST(List<AST.Node> nodesPrint)
     {
         StringBuilder stringBuilder = new StringBuilder();
 
@@ -409,7 +426,7 @@ public static class Parser
         DebugConsole.Write(stringBuilder);
     }
 
-    public static List<Util.Token> getTokensUntil(int startIndex, Util.TokenType stopType)
+    public List<Util.Token> getTokensUntil(int startIndex, Util.TokenType stopType)
     {
         List<Util.Token> ret = new List<Util.Token>();
         Util.Token currentToken = tokenList[startIndex];
@@ -424,7 +441,7 @@ public static class Parser
         }
         return ret;
     }
-    public static Util.Token nextNonSpace()
+    public Util.Token nextNonSpace()
     {
         int currentIndex = currentTokenNum + 1;
         Util.Token currentTok = tokenList[currentIndex];
@@ -438,7 +455,7 @@ public static class Parser
         return currentTok;
     }
 
-    public static (Util.Token, int) nextNonSpace(int startIndex)
+    public (Util.Token, int) nextNonSpace(int startIndex)
     {
         int currentIndex = startIndex + 1;
         Util.Token currentTok = tokenList[currentIndex];
@@ -452,7 +469,7 @@ public static class Parser
         return (currentTok, currentIndex);
     }
 
-    public static Util.Token nextNonSpecial(int startIndex)
+    public Util.Token nextNonSpecial(int startIndex)
     {
         int currentIndex = startIndex + 1;
         Util.Token currentTok = tokenList[currentIndex];
@@ -466,7 +483,7 @@ public static class Parser
         return currentTok;
     }
 
-    public static (AST.Node, int) parseKeyword(Util.Token token, int tokenIndex, AST.Node? parent = null, int delimLevel = 0)
+    public (AST.Node, int) parseKeyword(Util.Token token, int tokenIndex, AST.Node? parent = null, int delimLevel = 0)
     {
         List<dynamic> ret = new List<dynamic>();
         (Util.Token nextToken, int nextTokenIndex) = nextNonSpace(tokenIndex);
@@ -651,7 +668,7 @@ public static class Parser
         return (parent, delimLevel);
     }
 
-    public static (AST.Node parent, int delimLevel) parseDelim(Util.Token token, int tokenIndex, AST.Node? parent = null, int delimLevel = 0)
+    public (AST.Node parent, int delimLevel) parseDelim(Util.Token token, int tokenIndex, AST.Node? parent = null, int delimLevel = 0)
     {
         if (token.type == Util.TokenType.DelimiterOpen)
         {
@@ -777,7 +794,7 @@ public static class Parser
     }
 
 
-    public static List<AST.Node> parse(List<Util.Token> _tokenList, Spectre.Console.ProgressTask task = null)
+    public List<AST.Node> parse(List<Util.Token> _tokenList, Spectre.Console.ProgressTask task = null)
     {
         tokenList = _tokenList;
 
@@ -982,7 +999,7 @@ public static class Parser
                             {
                                 while (parent?.newLineReset == true)
                                 {
-                                    parent = parent.parent;
+                                    parent = parent?.parent;
                                 }
                                 currentTokenNum++;
                                 continue;
@@ -991,7 +1008,7 @@ public static class Parser
                             if (parent?.nodeType != AST.Node.NodeType.Function && parent?.nodeType != AST.Node.NodeType.IfStatement && parent?.nodeType != AST.Node.NodeType.ElseStatement && parent?.nodeType != AST.Node.NodeType.ForLoop /* && tokenList[tokenIndex - 1].value != "{" */ && delimLevel == 0)
                             {
                                 currentTokenNum++;
-                                parent = parent.parent;
+                                parent = parent?.parent;
                                 continue;
                             }
                             else

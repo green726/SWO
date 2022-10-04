@@ -81,7 +81,7 @@ public abstract class Node
         }
         if (parent != null)
         {
-            Parser.nodes.Remove(this);
+            Parser.getInstance().nodes.Remove(this);
             this.parent = parent;
         }
     }

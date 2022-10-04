@@ -30,7 +30,7 @@ public class VariableDeclaration : Node
         this.newLineReset = true;
 
         this.mutable = mutable;
-        Parser.globalVarAss.Add(this);
+        Parser.getInstance().globalVarAss.Add(this);
 
         this.parent = parent;
 
@@ -39,7 +39,7 @@ public class VariableDeclaration : Node
         if (parent == null)
         {
             DebugConsole.Write("adding var dec to parser nodes");
-            Parser.nodes.Add(this);
+            Parser.getInstance().nodes.Add(this);
             local = false;
         }
         else
@@ -74,7 +74,7 @@ public class VariableDeclaration : Node
         if (parent == null)
         {
             DebugConsole.Write("adding var dec to parser nodes");
-            Parser.nodes.Add(this);
+            Parser.getInstance().nodes.Add(this);
             this.local = false;
         }
         else
@@ -99,7 +99,7 @@ public class VariableDeclaration : Node
             switch (childLoop)
             {
                 case 0:
-                    this.type = new Type(child); Parser.addNamedValueInScope(this.name, this.type);
+                    this.type = new Type(child); Parser.getInstance().addNamedValueInScope(this.name, this.type);
                     DebugConsole.WriteAnsi("[green]adding vardec to stack[/]");
                     break;
                 case 1:
@@ -117,7 +117,7 @@ public class VariableDeclaration : Node
                     {
                         Typo.addToLittle(this);
                     }
-                    Parser.declaredGlobalsDict.Add(this.name, this);
+                    Parser.getInstance().declaredGlobalsDict.Add(this.name, this);
                     break;
                 case 2:
                     if (child.type != Util.TokenType.AssignmentOp) throw new ParserException($"expected assignment op but got {child.type} in a variable assignment", child);
@@ -136,7 +136,7 @@ public class VariableDeclaration : Node
             {
                 case 0:
                     this.name = child.value;
-                    Parser.addNamedValueInScope(this.name, this.type);
+                    Parser.getInstance().addNamedValueInScope(this.name, this.type);
                     DebugConsole.WriteAnsi($"[green]adding vardec to stack with name: {this.name}[/]");
                     break;
                 case 1:

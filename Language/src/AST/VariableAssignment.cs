@@ -29,7 +29,7 @@ public class VariableAssignment : AST.Node
                 // prevVarExpr.isPointer = true;
                 this.children.Add(prevVarExpr);
 
-                this.parent = Parser.lastMajorParentNode;
+                this.parent = Parser.getInstance().lastMajorParentNode;
                 this.parent?.addChild(this);
             }
 
@@ -55,7 +55,7 @@ public class VariableAssignment : AST.Node
             // }
         }
 
-        if (token.value.Substring(1) == "=" && Parser.binaryMathOps.Contains(token.value.Remove(1)))
+        if (token.value.Substring(1) == "=" && Parser.getInstance().binaryMathOps.Contains(token.value.Remove(1)))
         {
             DebugConsole.WriteAnsi("[yellow]compound var ass detected[/]");
             string tokenOp = token.value.Remove(1);

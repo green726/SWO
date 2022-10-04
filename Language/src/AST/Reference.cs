@@ -31,7 +31,7 @@ public class Reference : Expression
         this.actualExpr = (AST.Expression)child;
         this.actualExpr.isReference = true;
 
-        Parser.parent = this.parent;
+        Parser.getInstance().parent = this.parent;
 
         base.addChild(child);
     }

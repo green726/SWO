@@ -49,15 +49,17 @@ public class ImportStatement : Node
 
         // Parser.finalTokenNum += tokens.Count();
         // Parser.tokenList.InsertRange(Parser.currentTokenNum, tokens);
-        List<Util.Token> prevList = Parser.tokenList;
-        int prevNum = Parser.currentTokenNum;
-        int prevMaxNum = Parser.finalTokenNum;
-
-        Parser.parse(tokens);
-
-        Parser.currentTokenNum = prevNum;
-        Parser.tokenList = prevList;
-        Parser.finalTokenNum = prevMaxNum;
+        // List<Util.Token> prevList = Parser.tokenList;
+        // int prevNum = Parser.currentTokenNum;
+        // int prevMaxNum = Parser.finalTokenNum;
+        //
+        // Parser.parse(tokens);
+        //
+        // Parser.currentTokenNum = prevNum;
+        // Parser.tokenList = prevList;
+        // Parser.finalTokenNum = prevMaxNum;
+        //
+        //TODO: implement imports
 
 
         base.addChild(child);

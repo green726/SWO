@@ -101,8 +101,6 @@ public class IfStatement : AST.Node
 
         this.elseStat = new ElseStatement(this, token);
 
-        Parser.ifFuncNum++;
-
     }
     public override void addChild(AST.Node child)
     {

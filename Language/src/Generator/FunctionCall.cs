@@ -16,7 +16,7 @@ public class FunctionCall : Base
     public override void generate()
     {
         string nameToSearch = "";
-        if (Parser.declaredFuncs.ContainsKey(funcCall.functionName))
+        if (Parser.getInstance().declaredFuncs.ContainsKey(funcCall.functionName))
         {
             nameToSearch = funcCall.functionName;
         }
@@ -24,7 +24,7 @@ public class FunctionCall : Base
         {
             string altName = funcCall.functionName + funcCall.generateAltName();
 
-            this.funcCall.type = Parser.declaredFuncs[altName].returnType;
+            this.funcCall.type = Parser.getInstance().declaredFuncs[altName].returnType;
 
             DebugConsole.WriteAnsi($"[red]alt name in function call gen: {altName}[/]");
             nameToSearch = altName;

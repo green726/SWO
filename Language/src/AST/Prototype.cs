@@ -86,7 +86,7 @@ public class Prototype : AST.Node
             // throw ParserException.FactoryMethod();
             arguments.Add(token.value, prevType);
             DebugConsole.Write(token.value);
-            Parser.addNamedValueInScope(token.value, prevType);
+            Parser.getInstance().addNamedValueInScope(token.value, prevType);
         }
     }
 
@@ -109,12 +109,12 @@ public class Prototype : AST.Node
             DebugConsole.WriteAnsi("[red]alt name below[/]");
             DebugConsole.Write(altName);
 
-            Parser.declaredFuncs.Add(altName, this);
+            Parser.getInstance().declaredFuncs.Add(altName, this);
             this.name = altName;
         }
         else
         {
-            Parser.declaredFuncs.Add(this.name, this);
+            Parser.getInstance().declaredFuncs.Add(this.name, this);
         }
     }
 

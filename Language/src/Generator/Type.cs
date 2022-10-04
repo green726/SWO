@@ -44,7 +44,7 @@ public class Type : Base
         {
             return namedTypesLLVM[type.value];
         }
-        (bool isInt, int bits) = Parser.checkInt(type.value);
+        (bool isInt, int bits) = Parser.getInstance().checkInt(type.value);
         if (isInt)
         {
             return LLVM.IntType((uint)bits);

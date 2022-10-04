@@ -31,7 +31,7 @@ public class Function : AST.Node
 
         if (topLevel)
         {
-            Parser.nodes.Add(this);
+            Parser.getInstance().nodes.Add(this);
         }
 
         // if (Config.settings.function.declaration.reorder && !Parser.declaredFunctionDict.ContainsKey(prototype.name))
@@ -61,7 +61,7 @@ public class Function : AST.Node
 
         if (topLevel)
         {
-            Parser.nodes.Add(this);
+            Parser.getInstance().nodes.Add(this);
         }
 
         // if (Config.settings.function.declaration.reorder)
