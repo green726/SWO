@@ -2,42 +2,69 @@ using LLVMSharp;
 
 using Spectre.Console;
 
-public static class IRGen
+public class IRGen
 {
-    public static int maxStringIntLength = 64;
+    public static Stack<IRGen> generatorStack = new Stack<IRGen>();
 
-    public static LLVMContextRef context;
+    public static IRGen getInstance()
+    {
+        return generatorStack.Peek();
+    }
 
-    public static LLVMModuleRef module;
+    public static IRGen addInstance(LLVMBuilderRef _builder, LLVMModuleRef _module, LLVMPassManagerRef _passManager, LLVMContextRef _context)
+    {
+        IRGen newGen = new IRGen(_builder, _module, _passManager, _context);
+        generatorStack.Push(newGen);
+        return newGen;
+    }
 
-    public static LLVMBuilderRef builder;
+    public static IRGen removeInstance()
+    {
+        return generatorStack.Pop();
+    }
 
-    public static LLVMPassManagerRef passManager;
+    public IRGen(LLVMBuilderRef _builder, LLVMModuleRef _module, LLVMPassManagerRef _passManager, LLVMContextRef _context)
+    {
+        builder = _builder;
+        module = _module;
+        passManager = _passManager;
+        context = _context;
+    }
 
-    public static readonly Stack<LLVMValueRef> valueStack = new Stack<LLVMValueRef>();
-    public static readonly Stack<LLVMTypeRef> typeStack = new Stack<LLVMTypeRef>();
+    public int maxStringIntLength = 64;
 
-    public static Dictionary<string, LLVMValueRef> namedValuesLLVM = new Dictionary<string, LLVMValueRef>();
-    public static Dictionary<string, AST.Struct> namedTypesAST = new Dictionary<string, AST.Struct>();
-    public static Dictionary<string, LLVMTypeRef> namedTypesLLVM = new Dictionary<string, LLVMTypeRef>();
+    public LLVMContextRef context;
 
-    // public static Stack<Dictionary<string, LLVMTypeRef>> namedTypesLLVMStack = new Stack<Dictionary<string, LLVMTypeRef>>();
-    // public static Stack<Dictionary<string, AST.Struct>> namedTypesASTStack = new Stack<Dictionary<string, AST.Struct>>();
-    public static Stack<Dictionary<string, LLVMValueRef>> namedValuesLLVMStack = new Stack<Dictionary<string, LLVMValueRef>>();
+    public LLVMModuleRef module;
 
-    public static LLVMValueRef getNamedValueInScope(string name)
+    public LLVMBuilderRef builder;
+
+    public LLVMPassManagerRef passManager;
+
+    public readonly Stack<LLVMValueRef> valueStack = new Stack<LLVMValueRef>();
+    public readonly Stack<LLVMTypeRef> typeStack = new Stack<LLVMTypeRef>();
+
+    public Dictionary<string, LLVMValueRef> namedValuesLLVM = new Dictionary<string, LLVMValueRef>();
+    public Dictionary<string, AST.Struct> namedTypesAST = new Dictionary<string, AST.Struct>();
+    public Dictionary<string, LLVMTypeRef> namedTypesLLVM = new Dictionary<string, LLVMTypeRef>();
+
+    // public Stack<Dictionary<string, LLVMTypeRef>> namedTypesLLVMStack = new Stack<Dictionary<string, LLVMTypeRef>>();
+    // public Stack<Dictionary<string, AST.Struct>> namedTypesASTStack = new Stack<Dictionary<string, AST.Struct>>();
+    public Stack<Dictionary<string, LLVMValueRef>> namedValuesLLVMStack = new Stack<Dictionary<string, LLVMValueRef>>();
+
+    public LLVMValueRef getNamedValueInScope(string name)
     {
         LLVMValueRef val;
         namedValuesLLVMStack.Peek().TryGetValue(name, out val);
         return val;
     }
 
-    public static void clearNamedValueScope()
+    public void clearNamedValueScope()
     {
         namedValuesLLVMStack.Pop();
     }
 
-    public static void addLayerToNamedValueStack()
+    public void addLayerToNamedValueStack()
     {
         if (namedValuesLLVMStack.Count > 0)
         {
@@ -49,25 +76,25 @@ public static class IRGen
         }
     }
 
-    public static bool valueExistsInScope(string name)
+    public bool valueExistsInScope(string name)
     {
         return namedValuesLLVMStack.Peek().ContainsKey(name);
     }
 
 
-    public static void addNamedValueInScope(string name, LLVMValueRef value)
+    public void addNamedValueInScope(string name, LLVMValueRef value)
     {
         namedValuesLLVMStack.Peek().Add(name, value);
     }
 
-    // public static AST.Struct getNamedTypeASTInScope(string name)
+    // public AST.Struct getNamedTypeASTInScope(string name)
     // {
     //     AST.Struct str;
     //     namedTypesASTStack.Pop().TryGetValue(name, out str);
     //     return str;
     // }
 
-    // public static LLVMTypeRef getNamedTypeLLVMInScope(string name)
+    // public LLVMTypeRef getNamedTypeLLVMInScope(string name)
     // {
     //     LLVMTypeRef val;
     //     namedTypesLLVMStack.Pop().TryGetValue(name, out val);
@@ -76,37 +103,37 @@ public static class IRGen
 
 
 
-    // public static void addNamedTypeLLVMInScope(string name, LLVMTypeRef type)
+    // public void addNamedTypeLLVMInScope(string name, LLVMTypeRef type)
     // {
     //     namedTypesLLVMStack.Pop().Add(name, type);
     // }
     //
-    // public static void addNamedTypeASTInScope(string name, AST.Struct str)
+    // public void addNamedTypeASTInScope(string name, AST.Struct str)
     // {
     //     namedTypesASTStack.Pop().Add(name, str);
     // }
 
-    public static LLVMBasicBlockRef mainEntryBlock;
-    public static bool mainBuilt = false;
-    public static List<AST.Node> nodesToBuild = new List<AST.Node>();
+    public LLVMBasicBlockRef mainEntryBlock;
+    public bool mainBuilt = false;
+    public List<AST.Node> nodesToBuild = new List<AST.Node>();
 
-    public static Stack<AST.Struct> currentStruct = new Stack<AST.Struct>();
+    public Stack<AST.Struct> currentStruct = new Stack<AST.Struct>();
 
-    public static int getStructFieldIndex(AST.VariableExpression varExpr)
+    public int getStructFieldIndex(AST.VariableExpression varExpr)
     {
         int index = currentStruct.Pop().getPropIndex(varExpr.value);
 
         return index;
     }
 
-    public static int getStructFieldIndex(string fieldName)
+    public int getStructFieldIndex(string fieldName)
     {
         int index = currentStruct.Pop().getPropIndex(fieldName);
 
         return index;
     }
 
-    public static AST.Type LLVMTypeToASTType(LLVMTypeRef type, AST.Node parent)
+    public AST.Type LLVMTypeToASTType(LLVMTypeRef type, AST.Node parent)
     {
         switch (type.TypeKind)
         {
@@ -121,7 +148,7 @@ public static class IRGen
         throw GenException.FactoryMethod($"An unknown or unsupported type ({type.TypeKind.ToString()}) was used", "You used an undefined or illegal type | Likely a typo", parent, true, type.TypeKind.ToString());
     }
 
-    public static LLVMValueRef recursiveDeReference(LLVMValueRef startRef)
+    public LLVMValueRef recursiveDeReference(LLVMValueRef startRef)
     {
         LLVMTypeRef typeRef = LLVM.TypeOf(startRef);
 
@@ -141,7 +168,7 @@ public static class IRGen
 
     }
 
-    public static LLVMValueRef getDereference(LLVMValueRef startRef)
+    public LLVMValueRef getDereference(LLVMValueRef startRef)
     {
         if (startRef.TypeOf().TypeKind != LLVMTypeKind.LLVMPointerTypeKind)
         {
@@ -151,21 +178,15 @@ public static class IRGen
         return loadRef;
     }
 
-    public static LLVMValueRef getReference(LLVMValueRef startRef)
+    public LLVMValueRef getReference(LLVMValueRef startRef)
     {
         return new LLVMValueRef();
     }
 
 
-    public static void initialize(LLVMBuilderRef _builder, LLVMModuleRef _module, LLVMPassManagerRef _passManager, LLVMContextRef _context)
-    {
-        builder = _builder;
-        module = _module;
-        passManager = _passManager;
-        context = _context;
-    }
 
-    public static void generateIR(List<AST.Node> nodes, Spectre.Console.ProgressTask task)
+
+    public void generateIR(List<AST.Node> nodes, Spectre.Console.ProgressTask task)
     {
         task.MaxValue = nodes.Count;
 
@@ -186,7 +207,7 @@ public static class IRGen
         DebugConsole.Write("");
     }
 
-    public static void generateIR(List<AST.Node> nodes)
+    public void generateIR(List<AST.Node> nodes)
     {
         foreach (AST.Node node in nodes)
         {
@@ -204,7 +225,7 @@ public static class IRGen
         DebugConsole.Write("");
     }
 
-    public static void optimizeIR(Spectre.Console.ProgressTask task)
+    public void optimizeIR(Spectre.Console.ProgressTask task)
     {
         LLVM.RunPassManager(passManager, module);
 
@@ -214,7 +235,7 @@ public static class IRGen
         task.StopTask();
     }
 
-    public static void optimizeIR()
+    public void optimizeIR()
     {
         LLVM.RunPassManager(passManager, module);
 

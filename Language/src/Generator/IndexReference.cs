@@ -30,17 +30,17 @@ public class IndexReference : Base
     public override void generate()
     {
         DebugConsole.WriteAnsi("[green]genning arr gep[/]");
-        LLVMValueRef varRef = valueStack.Pop();
+        LLVMValueRef varRef = gen.valueStack.Pop();
         DebugConsole.Write(varRef);
         LLVMValueRef gepRef = generateGEP(varRef);
         DebugConsole.Write(gepRef);
-        valueStack.Push(gepRef);
+        gen.valueStack.Push(gepRef);
 
 
         if (idx.children.Count() == 0)
         {
-            LLVMValueRef gepLoadRef = LLVM.BuildLoad(builder, gepRef, "arrRefLoad");
-            valueStack.Push(gepLoadRef);
+            LLVMValueRef gepLoadRef = LLVM.BuildLoad(gen.builder, gepRef, "arrRefLoad");
+            gen.valueStack.Push(gepLoadRef);
             DebugConsole.Write(gepLoadRef);
         }
 
@@ -77,10 +77,10 @@ public class IndexReference : Base
         //BUG: this might need to go before the out of range checking in case there is an offset - idk
         idx.numExpr.value += Config.settings.variable.arrays.startIndex;
         idx.numExpr.generator.generate();
-        DebugConsole.Write(valueStack.Peek());
-        childValueList.Add(valueStack.Pop());
+        DebugConsole.Write(gen.valueStack.Peek());
+        childValueList.Add(gen.valueStack.Pop());
 
-        return LLVM.BuildStructGEP(builder, varPtr, (uint)idx.numExpr.value, "idxGEP");
+        return LLVM.BuildStructGEP(gen.builder, varPtr, (uint)idx.numExpr.value, "idxGEP");
 
     }
 }

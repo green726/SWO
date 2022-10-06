@@ -21,17 +21,17 @@ public class Function : Base
         //BUG: might not be working
         func.prototype.generator.generate();
 
-        LLVMValueRef function = valueStack.Pop();
+        LLVMValueRef function = gen.valueStack.Pop();
         LLVMBasicBlockRef entryBlock = LLVM.AppendBasicBlock(function, "entry");
 
-        LLVM.PositionBuilderAtEnd(builder, entryBlock);
+        LLVM.PositionBuilderAtEnd(gen.builder, entryBlock);
 
         if (func.prototype.name == "main")
         {
             DebugConsole.Write("main func identified");
-            mainEntryBlock = entryBlock;
-            mainBuilt = true;
-            foreach (AST.Node node in nodesToBuild)
+            gen.mainEntryBlock = entryBlock;
+            gen.mainBuilt = true;
+            foreach (AST.Node node in gen.nodesToBuild)
             {
                 DebugConsole.Write("genning nodes necessary before main func");
                 node.generator.generate();
@@ -54,12 +54,12 @@ public class Function : Base
 
         if (!this.topLevelRet)
         {
-            LLVM.BuildRetVoid(builder);
+            LLVM.BuildRetVoid(gen.builder);
         }
 
 
-        valueStack.Push(function);
-        clearNamedValueScope();
+        gen.valueStack.Push(function);
+        gen.clearNamedValueScope();
     }
 
 }

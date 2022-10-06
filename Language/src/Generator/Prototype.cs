@@ -20,7 +20,7 @@ public class Prototype : Base
         int argumentCount = proto.arguments.Count();
         List<LLVMTypeRef> arguments = new List<LLVMTypeRef>();
         //check if function is already defined
-        var function = LLVM.GetNamedFunction(module, proto.name);
+        var function = LLVM.GetNamedFunction(gen.module, proto.name);
 
         if (function.Pointer != IntPtr.Zero)
         {
@@ -41,19 +41,19 @@ public class Prototype : Base
             foreach (KeyValuePair<string, AST.Type> arg in proto.arguments)
             {
                 arg.Value.generator.generate();
-                arguments.Add(typeStack.Pop());
+                arguments.Add(gen.typeStack.Pop());
             }
 
             proto.returnType.generator.generate();
-            LLVMTypeRef funcType = LLVM.FunctionType(typeStack.Pop(), arguments.ToArray(), proto.variableArgument);
-            function = LLVM.AddFunction(module, proto.name, funcType);
+            LLVMTypeRef funcType = LLVM.FunctionType(gen.typeStack.Pop(), arguments.ToArray(), proto.variableArgument);
+            function = LLVM.AddFunction(gen.module, proto.name, funcType);
             LLVM.SetLinkage(function, LLVMLinkage.LLVMExternalLinkage);
         }
 
         //NOTE: adding layer for the function
         if (proto?.parent?.nodeType == AST.Node.NodeType.Function)
         {
-            addLayerToNamedValueStack();
+            gen.addLayerToNamedValueStack();
         }
         int argLoopIndex = 0;
         foreach (KeyValuePair<string, AST.Type> arg in proto.arguments)
@@ -65,7 +65,7 @@ public class Prototype : Base
 
             if (proto?.parent?.nodeType == AST.Node.NodeType.Function)
             {
-                addNamedValueInScope(argumentName, param);
+                gen.addNamedValueInScope(argumentName, param);
             }
             DebugConsole.Write("created argument with name of " + argumentName);
             argLoopIndex++;
@@ -73,7 +73,7 @@ public class Prototype : Base
 
         DebugConsole.DumpValue(function);
 
-        valueStack.Push(function);
+        gen.valueStack.Push(function);
     }
 
 }

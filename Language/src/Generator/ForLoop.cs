@@ -15,10 +15,10 @@ public class ForLoop : Base
     public override void generate()
     {
         //TODO: replace all the phi var stuff in here with normal SWO variables (mem2reg should optimize it all into phi vars)
-        addLayerToNamedValueStack();
+        gen.addLayerToNamedValueStack();
 
         //create the basic blocks for the loop
-        LLVMBasicBlockRef parentBlock = LLVM.GetInsertBlock(builder).GetBasicBlockParent();
+        LLVMBasicBlockRef parentBlock = LLVM.GetInsertBlock(gen.builder).GetBasicBlockParent();
         LLVMBasicBlockRef loopBlock = LLVM.AppendBasicBlock(parentBlock, "forLoopBody");
         LLVMBasicBlockRef loopIncrementBlock = LLVM.AppendBasicBlock(parentBlock, "forLoopIncrement");
         LLVMBasicBlockRef loopConditionBlock = LLVM.AppendBasicBlock(parentBlock, "forLoopCond");
@@ -26,11 +26,11 @@ public class ForLoop : Base
 
         //create the phiVarDec obj for the loop
         forLoop.varDec.generator.generate();
-        LLVMValueRef loopVarDec = valueStack.Pop();
+        LLVMValueRef loopVarDec = gen.valueStack.Pop();
 
-        LLVM.BuildBr(builder, loopBlock);
+        LLVM.BuildBr(gen.builder, loopBlock);
 
-        LLVM.PositionBuilderAtEnd(builder, loopBlock);
+        LLVM.PositionBuilderAtEnd(gen.builder, loopBlock);
 
         //emit the body of the loop
         foreach (AST.Node node in forLoop.body)
@@ -39,33 +39,33 @@ public class ForLoop : Base
             DebugConsole.Write("generated node of type in for loop body: " + node.nodeType);
         }
 
-        LLVM.BuildBr(builder, loopIncrementBlock);
+        LLVM.BuildBr(gen.builder, loopIncrementBlock);
 
-        LLVM.PositionBuilderAtEnd(builder, loopIncrementBlock);
+        LLVM.PositionBuilderAtEnd(gen.builder, loopIncrementBlock);
 
         //evaluate the step variable
         forLoop.loopIteration.generator.generate();
-        LLVMValueRef iterationBin = valueStack.Pop();
+        LLVMValueRef iterationBin = gen.valueStack.Pop();
         DebugConsole.WriteAnsi("Iteration bin: ");
         DebugConsole.DumpValue(iterationBin);
 
-        LLVM.BuildBr(builder, loopConditionBlock);
+        LLVM.BuildBr(gen.builder, loopConditionBlock);
 
-        LLVM.PositionBuilderAtEnd(builder, loopConditionBlock);
+        LLVM.PositionBuilderAtEnd(gen.builder, loopConditionBlock);
 
         //loop condition checking code
-        LLVM.PositionBuilderAtEnd(builder, loopConditionBlock);
+        LLVM.PositionBuilderAtEnd(gen.builder, loopConditionBlock);
 
         DebugConsole.Write("for loop condition generating");
 
         forLoop.loopCondition.generator.generate();
-        LLVMValueRef endCondRef = valueStack.Pop();
+        LLVMValueRef endCondRef = gen.valueStack.Pop();
 
-        LLVM.BuildCondBr(builder, endCondRef, loopBlock, postLoopBlock);
+        LLVM.BuildCondBr(gen.builder, endCondRef, loopBlock, postLoopBlock);
 
         //reposition the builder
-        LLVM.PositionBuilderAtEnd(builder, postLoopBlock);
-        clearNamedValueScope();
+        LLVM.PositionBuilderAtEnd(gen.builder, postLoopBlock);
+        gen.clearNamedValueScope();
 
     }
 }

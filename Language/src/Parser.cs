@@ -1,5 +1,4 @@
 //TODO: double check the previous node stuff for binexpr
-
 using System.Text;
 using static System.Text.Json.JsonSerializer;
 
@@ -7,6 +6,7 @@ public class Parser
 {
     //NOTE: below is a stack containing instances of parser (used for multi file)
     public static Stack<Parser> parserStack = new Stack<Parser>();
+    public static int completedParsers = 0;
 
     public static Parser addInstance()
     {
@@ -794,7 +794,7 @@ public class Parser
     }
 
 
-    public List<AST.Node> parse(List<Util.Token> _tokenList, Spectre.Console.ProgressTask task = null)
+    public Parser parse(List<Util.Token> _tokenList, Spectre.Console.ProgressTask task = null)
     {
         tokenList = _tokenList;
 
@@ -1062,7 +1062,21 @@ public class Parser
         printAST(nodes);
         DebugConsole.WriteAnsi("[green]parser debug end[/]");
 
-        return nodes;
+        return this;
+    }
+
+
+    public static List<Parser> startParsing(List<Util.Token> tokenList, Spectre.Console.ProgressTask task = null)
+    {
+        addInstance();
+        getInstance().parse(tokenList, task);
+
+        while (completedParsers < parserStack.Count())
+        {
+
+        }
+
+        return parserStack.ToList();
     }
 }
 

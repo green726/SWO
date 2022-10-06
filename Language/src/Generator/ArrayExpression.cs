@@ -1,7 +1,6 @@
 namespace Generator;
 
 using LLVMSharp;
-using static IRGen;
 
 public class ArrayExpression : Base
 {
@@ -14,10 +13,12 @@ public class ArrayExpression : Base
 
     public override void generate()
     {
+        base.generate();
+
         arrExpr.containedType.size = arrExpr.length;
         arrExpr.containedType.generator.generate();
 
-        LLVMTypeRef typeLLVM = typeStack.Pop();
+        LLVMTypeRef typeLLVM = gen.typeStack.Pop();
 
         DebugConsole.Write("array expr type: " + typeLLVM);
 
@@ -26,10 +27,10 @@ public class ArrayExpression : Base
         for (int i = 0; i < arrExpr.length; i++)
         {
             arrExpr.value[i].generator.generate();
-            values[i] = valueStack.Pop();
+            values[i] = gen.valueStack.Pop();
             DebugConsole.Write("arr expr value: " + values[i]);
         }
 
-        valueStack.Push(LLVM.ConstArray(typeLLVM, values));
+        gen.valueStack.Push(LLVM.ConstArray(typeLLVM, values));
     }
 }

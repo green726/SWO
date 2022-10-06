@@ -2,7 +2,7 @@ using LLVMSharp;
 
 public static class ModuleGen
 {
-    public static void GenerateModule(Spectre.Console.ProgressTask task)
+    public static IRGen CreateNewGenerator(Spectre.Console.ProgressTask task)
     {
         task.MaxValue = 10;
 
@@ -44,11 +44,12 @@ public static class ModuleGen
 
         // LLVM.InitializeFunctionPassManager(passManager);
 
-        IRGen.initialize(builder, module, passManager, context);
         task.Increment(1);
+        return IRGen.addInstance(builder, module, passManager, context);
+
     }
 
-    public static void GenerateModule()
+    public static IRGen CreateNewGenerator()
     {
 
         LLVMContextRef context = LLVM.ContextCreate();
@@ -80,6 +81,6 @@ public static class ModuleGen
 
         // LLVM.InitializeFunctionPassManager(passManager);
 
-        IRGen.initialize(builder, module, passManager, context);
+        return IRGen.addInstance(builder, module, passManager, context);
     }
 }

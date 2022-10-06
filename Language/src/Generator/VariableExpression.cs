@@ -52,10 +52,10 @@ public class VariableExpression : Base
             DebugConsole.Write(indexOfEquals);
             strName = strName.Remove(indexOfEquals - 1);
 
-            if (namedTypesAST.ContainsKey(strName))
+            if (gen.namedTypesAST.ContainsKey(strName))
             {
-                AST.Struct strType = namedTypesAST[strName];
-                currentStruct.Push(strType);
+                AST.Struct strType = gen.namedTypesAST[strName];
+                gen.currentStruct.Push(strType);
                 DebugConsole.Write("updated currentStruct");
             }
 
@@ -85,10 +85,10 @@ public class VariableExpression : Base
                 strName = strName.Remove(0, 1);
             }
 
-            if (namedTypesAST.ContainsKey(strName))
+            if (gen.namedTypesAST.ContainsKey(strName))
             {
-                AST.Struct strType = namedTypesAST[strName];
-                currentStruct.Push(strType);
+                AST.Struct strType = gen.namedTypesAST[strName];
+                gen.currentStruct.Push(strType);
                 DebugConsole.Write("updated currentStruct");
             }
 
@@ -105,14 +105,14 @@ public class VariableExpression : Base
         if (varExpr?.parent?.nodeType == AST.Node.NodeType.VariableExpression || varExpr?.parent?.nodeType == AST.Node.NodeType.IndexReference || varExpr?.parent?.parent?.nodeType == AST.Node.NodeType.VariableExpression)
         {
             int num = 0;
-            LLVMValueRef gepPtr = valueStack.Pop();
+            LLVMValueRef gepPtr = gen.valueStack.Pop();
             DebugConsole.Write("gepPtr: " + gepPtr);
 
-            num = getStructFieldIndex(varExpr);
+            num = gen.getStructFieldIndex(varExpr);
             DebugConsole.Write("got struct gep num: " + num);
 
-            LLVMValueRef numGEPRef = LLVM.BuildStructGEP(builder, gepPtr, (uint)num, "structGEPTmp");
-            valueStack.Push(numGEPRef);
+            LLVMValueRef numGEPRef = LLVM.BuildStructGEP(gen.builder, gepPtr, (uint)num, "structGEPTmp");
+            gen.valueStack.Push(numGEPRef);
             DebugConsole.Write(numGEPRef);
 
             checkIsPtr();
@@ -135,14 +135,14 @@ public class VariableExpression : Base
             if (this.varExpr.isReference || this.varExpr.children.Count() > 0)
             {
                 DebugConsole.Write("ptr var expr detected");
-                valueStack.Push(generateVarRef());
+                gen.valueStack.Push(generateVarRef());
             }
             else
             {
                 DebugConsole.Write("generating load ref");
                 LLVMValueRef loadRef = generateVarLoad();
                 DebugConsole.Write("genned load ref");
-                valueStack.Push(loadRef);
+                gen.valueStack.Push(loadRef);
             }
 
             updateCurrentStruct();
@@ -176,11 +176,11 @@ public class VariableExpression : Base
         // else
         // {
         // if (namedValuesLLVM.ContainsKey(varExpr.value))
-        if (valueExistsInScope(varExpr.value))
+        if (gen.valueExistsInScope(varExpr.value))
         {
             DebugConsole.WriteAnsi("[green]detected variable in scope[/]");
             // varRef = namedValuesLLVM[varExpr.value];
-            varRef = getNamedValueInScope(varExpr.value);
+            varRef = gen.getNamedValueInScope(varExpr.value);
             if (varRef.Pointer != IntPtr.Zero)
             {
                 return varRef;
@@ -189,11 +189,11 @@ public class VariableExpression : Base
         else if (Config.settings.variable.declaration.reorder && Parser.getInstance().declaredGlobalsDict.ContainsKey(varExpr.value))
         {
             DebugConsole.WriteAnsi("[purple]stupid reordering[/]");
-            LLVMBasicBlockRef currentBlock = LLVM.GetInsertBlock(builder);
+            LLVMBasicBlockRef currentBlock = LLVM.GetInsertBlock(gen.builder);
             AST.VariableDeclaration varDec = Parser.getInstance().declaredGlobalsDict[varExpr.value];
             varDec.generator.generate();
             varDec.generated = true;
-            LLVM.PositionBuilderAtEnd(builder, currentBlock);
+            LLVM.PositionBuilderAtEnd(gen.builder, currentBlock);
             return generateVarRef();
         }
         // }
@@ -212,7 +212,7 @@ public class VariableExpression : Base
         LLVMValueRef varRef = generateVarRef();
         if (varRef.TypeOf().TypeKind == LLVMTypeKind.LLVMPointerTypeKind)
         {
-            return LLVM.BuildLoad(builder, varRef, varExpr.value);
+            return LLVM.BuildLoad(gen.builder, varRef, varExpr.value);
         }
         else
         {

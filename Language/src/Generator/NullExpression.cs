@@ -13,6 +13,6 @@ public class NullExpression : Base
 
     public override void generate()
     {
-        valueStack.Push(LLVM.ConstNull(LLVMTypeRef.VoidType()));
+        gen.valueStack.Push(LLVM.ConstNull(LLVMTypeRef.VoidType()));
     }
 }

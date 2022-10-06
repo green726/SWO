@@ -28,64 +28,64 @@ public class VariableDeclaration : Base
         if (this.varDec.defaultValue.nodeType != AST.Node.NodeType.NullExpression)
         {
             this.varDec.defaultValue.generator.generate();
-            valRef = valueStack.Pop();
+            valRef = gen.valueStack.Pop();
             init = true;
         }
 
         DebugConsole.Write(this.varDec.type.value);
         this.varDec.type.generator.generate();
-        typeLLVM = typeStack.Pop();
+        typeLLVM = gen.typeStack.Pop();
         DebugConsole.WriteAnsi($"[red] type stack[/]");
         DebugConsole.Write(typeLLVM);
 
         if (!varDec.mutable && typeLLVM.TypeKind != LLVMTypeKind.LLVMStructTypeKind && !varDec.local)
         {
-            LLVMValueRef constRef = LLVM.AddGlobal(module, typeLLVM, varDec.name);
+            LLVMValueRef constRef = LLVM.AddGlobal(gen.module, typeLLVM, varDec.name);
             if (init)
             {
                 LLVM.SetInitializer(constRef, valRef);
             }
-            valueStack.Push(constRef);
+            gen.valueStack.Push(constRef);
         }
         else
         {
             if (varDec.local)
             {
-                LLVMValueRef allocaRef = LLVM.BuildAlloca(builder, typeLLVM, varDec.name);
-                valueStack.Push(allocaRef);
+                LLVMValueRef allocaRef = LLVM.BuildAlloca(gen.builder, typeLLVM, varDec.name);
+                gen.valueStack.Push(allocaRef);
                 if (init)
                 {
-                    LLVMValueRef storeRef = LLVM.BuildStore(builder, valRef, allocaRef);
-                    valueStack.Push(storeRef);
+                    LLVMValueRef storeRef = LLVM.BuildStore(gen.builder, valRef, allocaRef);
+                    gen.valueStack.Push(storeRef);
                 }
 
-                addNamedValueInScope(varDec.name, allocaRef);
+                gen.addNamedValueInScope(varDec.name, allocaRef);
                 // namedValuesLLVM.Add(varDec.name, allocaRef);
             }
             else
             {
-                if (!mainBuilt)
+                if (!gen.mainBuilt)
                 {
                     DebugConsole.Write("adding to main nodes to build");
-                    nodesToBuild.Add(varDec);
+                    gen.nodesToBuild.Add(varDec);
                     return;
                 }
-                LLVM.PositionBuilderAtEnd(builder, mainEntryBlock);
+                LLVM.PositionBuilderAtEnd(gen.builder, gen.mainEntryBlock);
                 DebugConsole.Write($"building for mutable var with name of {varDec.name} and type of");
                 DebugConsole.DumpType(typeLLVM);
                 DebugConsole.Write();
-                LLVMValueRef allocaRef = LLVM.BuildAlloca(builder, typeLLVM, varDec.name);
-                valueStack.Push(allocaRef);
+                LLVMValueRef allocaRef = LLVM.BuildAlloca(gen.builder, typeLLVM, varDec.name);
+                gen.valueStack.Push(allocaRef);
                 DebugConsole.Write("built and pushed alloca: " + allocaRef);
                 if (init)
                 {
                     DebugConsole.Write("store ref target: " + valRef);
-                    LLVMValueRef storeRef = LLVM.BuildStore(builder, valRef, allocaRef);
-                    valueStack.Push(storeRef);
+                    LLVMValueRef storeRef = LLVM.BuildStore(gen.builder, valRef, allocaRef);
+                    gen.valueStack.Push(storeRef);
                     DebugConsole.Write("built and pushed store ref: " + storeRef);
                 }
 
-                addNamedValueInScope(varDec.name, allocaRef);
+                gen.addNamedValueInScope(varDec.name, allocaRef);
                 // namedValuesLLVM.Add(varDec.name, allocaRef);
             }
         }

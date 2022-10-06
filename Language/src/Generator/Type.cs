@@ -33,16 +33,16 @@ public class Type : Base
             else
             {
                 uint count = (uint)type.size;
-                typeStack.Push(LLVM.ArrayType(getBasicType(), count));
+                gen.typeStack.Push(LLVM.ArrayType(getBasicType(), count));
             }
         }
     }
 
     public LLVMTypeRef getBasicType()
     {
-        if (namedTypesLLVM.ContainsKey(type.value))
+        if (gen.namedTypesLLVM.ContainsKey(type.value))
         {
-            return namedTypesLLVM[type.value];
+            return gen.namedTypesLLVM[type.value];
         }
         (bool isInt, int bits) = Parser.getInstance().checkInt(type.value);
         if (isInt)
@@ -65,11 +65,11 @@ public class Type : Base
 
     public void genPointer()
     {
-        typeStack.Push(LLVM.PointerType(getBasicType(), 0));
+        gen.typeStack.Push(LLVM.PointerType(getBasicType(), 0));
     }
 
     public void genNonArray()
     {
-        typeStack.Push(getBasicType());
+        gen.typeStack.Push(getBasicType());
     }
 }

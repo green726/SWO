@@ -62,8 +62,7 @@ public static class SWO
 
                     var parseTask = ctx.AddTask("Parsing the SWO code");
 
-                    Parser.addInstance();
-                    List<AST.Node> nodes = Parser.getInstance().parse(lexedContent, parseTask);
+                    List<Parser> nodes = Parser.startParsing(lexedContent, parseTask);
 
                     var moduleTask = ctx.AddTask("Initializing LLVM");
                     ModuleGen.GenerateModule(moduleTask);
@@ -93,7 +92,6 @@ public static class SWO
             fileContents = System.IO.File.ReadAllText(projectInfo.entryFile.path);
             List<Util.Token> lexedContent = Lexer.lex(fileContents);
 
-            Parser.addInstance();
             List<AST.Node> nodes = Parser.getInstance().parse(lexedContent);
 
             ModuleGen.GenerateModule();

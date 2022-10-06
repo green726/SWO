@@ -14,7 +14,7 @@ public class Struct : Base
     public override void generate()
     {
         DebugConsole.Write("adding str with name of " + str.name + " to dict");
-        namedTypesAST.Add(str.name, this.str);
+        gen.namedTypesAST.Add(str.name, this.str);
 
         foreach (AST.Node node in str.properties)
         {
@@ -28,16 +28,16 @@ public class Struct : Base
         {
             AST.VariableDeclaration varDec = (AST.VariableDeclaration)node;
             varDec.type.generator.generate();
-            elementTypes.Add(typeStack.Pop());
+            elementTypes.Add(gen.typeStack.Pop());
         }
 
-        LLVMTypeRef structType = LLVM.StructCreateNamed(context, this.str.name);
+        LLVMTypeRef structType = LLVM.StructCreateNamed(gen.context, this.str.name);
         LLVM.StructSetBody(structType, elementTypes.ToArray(), false);
 
         DebugConsole.Write("struct type dump");
         DebugConsole.DumpType(structType);
 
-        typeStack.Push(structType);
-        namedTypesLLVM.Add(str.name, structType);
+        gen.typeStack.Push(structType);
+        gen.namedTypesLLVM.Add(str.name, structType);
     }
 }

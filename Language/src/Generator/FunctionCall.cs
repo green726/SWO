@@ -30,7 +30,7 @@ public class FunctionCall : Base
             nameToSearch = altName;
         }
 
-        LLVMValueRef funcRef = LLVM.GetNamedFunction(module, nameToSearch);
+        LLVMValueRef funcRef = LLVM.GetNamedFunction(gen.module, nameToSearch);
 
         if (funcRef.Pointer == IntPtr.Zero)
         {
@@ -59,10 +59,10 @@ public class FunctionCall : Base
         for (int i = 0; i < argumentCount; ++i)
         {
             funcCall.args[i].generator.generate();
-            argsRef[i] = valueStack.Pop();
+            argsRef[i] = gen.valueStack.Pop();
         }
 
-        valueStack.Push(LLVM.BuildCall(builder, funcRef, argsRef, "calltmp"));
+        gen.valueStack.Push(LLVM.BuildCall(gen.builder, funcRef, argsRef, "calltmp"));
 
     }
 

@@ -15,14 +15,14 @@ public class Return : Base
     public override void generate()
     {
         ret.expr.generator.generate();
-        LLVMValueRef retValue = valueStack.Pop();
+        LLVMValueRef retValue = gen.valueStack.Pop();
         checkType(retValue.TypeOf());
-        valueStack.Push(LLVM.BuildRet(builder, retValue));
+        gen.valueStack.Push(LLVM.BuildRet(gen.builder, retValue));
     }
 
     private void checkType(LLVMTypeRef retType)
     {
-        LLVMValueRef funcRef = LLVM.GetLastFunction(module);
+        LLVMValueRef funcRef = LLVM.GetLastFunction(gen.module);
 
         LLVMTypeKind funcRetTypeKind = funcRef.TypeOf().GetReturnType().GetElementType().TypeKind;
         LLVMTypeKind retTypeKind = retType.TypeKind;

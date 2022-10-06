@@ -47,14 +47,14 @@ public class StringExpression : Expression
 
         LLVMValueRef constArrRef = LLVM.ConstArray(LLVMTypeRef.Int8Type(), intsRef);
 
-        valueStack.Push(constArrRef);
+        gen.valueStack.Push(constArrRef);
 
         if (str.parent?.nodeType != AST.Node.NodeType.VariableDeclaration)
         {
-            LLVMValueRef globalRef = LLVM.AddGlobal(module, arrType, "strtmp");
+            LLVMValueRef globalRef = LLVM.AddGlobal(gen.module, arrType, "strtmp");
 
             LLVM.SetInitializer(globalRef, constArrRef);
-            valueStack.Push(globalRef);
+            gen.valueStack.Push(globalRef);
         }
 
         // DebugConsole.WriteAnsi("[red]strexpr value: " + str.value + "[/]");

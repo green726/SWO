@@ -15,7 +15,7 @@ public class Dereference : Expression
     {
         DebugConsole.WriteAnsi("[blue]dereference genning[/]");
         this.deref.actualExpr.generator.generate();
-        checkPtrAndGen(valueStack.Pop());
+        checkPtrAndGen(gen.valueStack.Pop());
 
         base.generate();
     }
@@ -28,12 +28,12 @@ public class Dereference : Expression
         {
             DebugConsole.WriteAnsi("[blue]pushing: [/]");
             DebugConsole.DumpValue(valInput);
-            valueStack.Push(valInput);
+            gen.valueStack.Push(valInput);
             return;
         }
 
 
-        LLVMValueRef loadRef = LLVM.BuildLoad(builder, valInput, "loadtmp");
+        LLVMValueRef loadRef = LLVM.BuildLoad(gen.builder, valInput, "loadtmp");
         DebugConsole.WriteAnsi("[blue]load ref[/]");
         DebugConsole.DumpValue(loadRef);
         checkPtrAndGen(loadRef);

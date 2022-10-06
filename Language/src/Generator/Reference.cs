@@ -15,7 +15,7 @@ public class Reference : Expression
     {
         reference.actualExpr.generator.generate();
 
-        LLVMValueRef valRef = valueStack.Pop();
+        LLVMValueRef valRef = gen.valueStack.Pop();
 
         DebugConsole.WriteAnsi($"[blue]valueRef: {valRef}[/]");
 
@@ -26,7 +26,7 @@ public class Reference : Expression
         if (typeRef.TypeKind == LLVMTypeKind.LLVMPointerTypeKind)
         {
             base.generate();
-            valueStack.Push(valRef);
+            gen.valueStack.Push(valRef);
             return;
         }
 
@@ -37,7 +37,7 @@ public class Reference : Expression
         DebugConsole.WriteAnsi("[red]ref pointer val: [/]");
         DebugConsole.Write(ptrValue);
 
-        valueStack.Push(ptrValue);
+        gen.valueStack.Push(ptrValue);
 
         base.generate();
     }

@@ -24,7 +24,7 @@ public class VariableAssignment : Base
         // (LLVMValueRef valRef, LLVMTypeRef typeLLVM) = generateVariableValue();
         varAss.varExpr.isReference = true;
         varAss.varExpr.generator.generate();
-        LLVMValueRef targetValRef = valueStack.Pop();
+        LLVMValueRef targetValRef = gen.valueStack.Pop();
 
         // LLVMValueRef loadRef = LLVM.BuildLoad(builder, namedMutablesLLVM[binVarName], binVarName);
         // valueStack.Push(loadRef);
@@ -32,17 +32,17 @@ public class VariableAssignment : Base
         {
             DebugConsole.WriteAnsi("[green]bin reass detected[/]");
             this?.varAss?.bin?.generator.generate();
-            LLVMValueRef binValRef = valueStack.Pop();
-            LLVMValueRef storeRef = LLVM.BuildStore(builder, binValRef, targetValRef);
-            valueStack.Push(storeRef);
+            LLVMValueRef binValRef = gen.valueStack.Pop();
+            LLVMValueRef storeRef = LLVM.BuildStore(gen.builder, binValRef, targetValRef);
+            gen.valueStack.Push(storeRef);
         }
         else
         {
             DebugConsole.WriteAnsi("[green]non bin reass detected[/]");
             varAss.targetValue.generator.generate();
-            LLVMValueRef resultValRef = valueStack.Pop();
-            LLVMValueRef storeRef = LLVM.BuildStore(builder, resultValRef, targetValRef);
-            valueStack.Push(storeRef);
+            LLVMValueRef resultValRef = gen.valueStack.Pop();
+            LLVMValueRef storeRef = LLVM.BuildStore(gen.builder, resultValRef, targetValRef);
+            gen.valueStack.Push(storeRef);
         }
     }
 }
