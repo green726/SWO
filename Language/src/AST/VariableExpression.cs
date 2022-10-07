@@ -11,7 +11,7 @@ public class VariableExpression : Expression
 
         //TODO: implement the same variable scoping in the parser as the generator has
         DebugConsole.Write(this.value);
-        AST.Type originalType = Parser.getInstance().getNamedValueInScope(this.value);
+        AST.Type originalType = parser.getNamedValueInScope(this.value);
         this.type = originalType;
         DebugConsole.WriteAnsi($"[yellow]original type + {this.type.value}[/]");
         // this.type = new Type("int", this);

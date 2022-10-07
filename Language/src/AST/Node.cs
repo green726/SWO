@@ -6,6 +6,8 @@ public abstract class Node
 {
     public Generator.Base generator;
 
+    public Parser parser;
+
     public List<Node> children = new List<Node>();
     public Node? parent = null;
 
@@ -27,6 +29,7 @@ public abstract class Node
         this.codeExcerpt = token.value;
         this.line = token.line;
         this.column = token.column;
+        parser = Parser.getInstance();
     }
 
     protected Node(Node node)
@@ -35,6 +38,7 @@ public abstract class Node
         this.column = node.column;
         this.charNum = node.charNum;
         this.codeExcerpt = node.codeExcerpt;
+        parser = Parser.getInstance();
     }
 
     public enum NodeType
@@ -81,7 +85,7 @@ public abstract class Node
         }
         if (parent != null)
         {
-            Parser.getInstance().nodes.Remove(this);
+            parser.nodes.Remove(this);
             this.parent = parent;
         }
     }

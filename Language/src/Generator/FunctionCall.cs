@@ -15,8 +15,9 @@ public class FunctionCall : Base
 
     public override void generate()
     {
+        base.generate();
         string nameToSearch = "";
-        if (Parser.getInstance().declaredFuncs.ContainsKey(funcCall.functionName))
+        if (funcCall.parser.declaredFuncs.ContainsKey(funcCall.functionName))
         {
             nameToSearch = funcCall.functionName;
         }

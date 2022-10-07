@@ -29,7 +29,7 @@ public class NumberExpression : Expression
         }
         else
         {
-            Parser.getInstance().nodes.Add(this);
+            parser.nodes.Add(this);
         }
     }
 }

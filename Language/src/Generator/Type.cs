@@ -13,6 +13,7 @@ public class Type : Base
 
     public override void generate()
     {
+        base.generate();
         // LLVMTypeRef llvmType = getBasicType();
         if (!type.isArray)
         {
@@ -44,7 +45,7 @@ public class Type : Base
         {
             return gen.namedTypesLLVM[type.value];
         }
-        (bool isInt, int bits) = Parser.getInstance().checkInt(type.value);
+        (bool isInt, int bits) = type.parser.checkInt(type.value);
         if (isInt)
         {
             return LLVM.IntType((uint)bits);

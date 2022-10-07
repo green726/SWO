@@ -59,23 +59,31 @@ public static class SWO
                     var lexTask = ctx.AddTask("Lexing (tokenizing) the SWO code");
                     List<Util.Token> lexedContent = Lexer.lex(fileContents, lexTask);
 
-
                     var parseTask = ctx.AddTask("Parsing the SWO code");
 
-                    List<Parser> nodes = Parser.startParsing(lexedContent, parseTask);
+                    List<Parser> parsers = Parser.startParsing(lexedContent, projectInfo.entryFile.nameWithoutExtension, parseTask);
 
                     var moduleTask = ctx.AddTask("Initializing LLVM");
-                    ModuleGen.CreateNewGenerator(moduleTask);
+                    List<IRGen> generators = ModuleGen.CreateNewGenerators(parsers, moduleTask);
 
                     var llvmTask = ctx.AddTask("Compiling to LLVM IR");
-                    IRGen.generateIR(nodes, llvmTask);
+                    int i = 0;
 
                     var passTask = ctx.AddTask("Optimizing the LLVM IR");
-                    IRGen.optimizeIR(passTask);
+                    foreach (IRGen generator in generators)
+                    {
+                        generator.generateIR(parsers[i].nodes);
+                        generator.optimizeIR(passTask);
+                        i++;
+                    }
 
                     var exeCompileTask = ctx.AddTask("Compiling the LLVM IR to your desired output");
-                    EXE.compileEXE(settings, exeCompileTask, true);
-
+                    List<string> fileNames = new List<string>();
+                    foreach (IRGen generator in generators)
+                    {
+                        fileNames.Add(EXE.compileEXE(settings, generator, exeCompileTask));
+                    }
+                    EXE.link(settings, fileNames);
                 });
         }
         else
@@ -92,16 +100,24 @@ public static class SWO
             fileContents = System.IO.File.ReadAllText(projectInfo.entryFile.path);
             List<Util.Token> lexedContent = Lexer.lex(fileContents);
 
-            List<AST.Node> nodes = Parser.getInstance().parse(lexedContent);
+            List<Parser> parsers = Parser.startParsing(lexedContent, projectInfo.entryFile.nameWithoutExtension);
 
-            ModuleGen.GenerateModule();
+            List<IRGen> generators = ModuleGen.CreateNewGenerators(parsers);
 
-            IRGen.generateIR(nodes);
+            int i = 0;
+            foreach (IRGen generator in generators)
+            {
+                generator.generateIR(parsers[i].nodes);
+                generator.optimizeIR();
+                i++;
+            }
 
-            IRGen.optimizeIR();
-
-            EXE.compileEXE(settings, true);
-
+            List<string> fileNames = new List<string>();
+            foreach (IRGen generator in generators)
+            {
+                fileNames.Add(EXE.compileEXE(settings, generator));
+            }
+            EXE.link(settings, fileNames);
         }
 
         AnsiConsole.MarkupLine("[green]SWO project successfully compiled[/]");

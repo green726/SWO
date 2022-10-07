@@ -17,6 +17,7 @@ public class Function : Base
 
     public override void generate()
     {
+        base.generate();
         if (func.generated) { return; }
         //BUG: might not be working
         func.prototype.generator.generate();

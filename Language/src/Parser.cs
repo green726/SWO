@@ -7,9 +7,9 @@ public class Parser
     //NOTE: below is a stack containing instances of parser (used for multi file)
     public static Stack<Parser> parserStack = new Stack<Parser>();
 
-    public static Parser addInstance(List<Util.Token> _tokenList, Spectre.Console.ProgressTask _task = null)
+    public static Parser addInstance(List<Util.Token> tokenList, string fileName, Spectre.Console.ProgressTask task = null)
     {
-        Parser newParser = new Parser(_tokenList, _task);
+        Parser newParser = new Parser(tokenList, fileName, task);
         parserStack.Push(newParser);
         return newParser;
     }
@@ -23,6 +23,8 @@ public class Parser
     {
         return parserStack.Peek();
     }
+
+    public string fileName = "";
 
     public bool singleLineComment = false;
     public bool multiLineComment = false;
@@ -53,7 +55,7 @@ public class Parser
 
     //NOTE: below are all for the while loop func
     public int finalTokenNum = 0;
-    public int currentTokenNum = 0;
+    public int currentTokenNum = -1;
     public bool isFinishedParsing = false;
     public Stack<AST.Node> delimParentStack = new Stack<AST.Node>();
 
@@ -803,8 +805,7 @@ public class Parser
 
     public void parse()
     {
-        parent = null;
-        currentTokenNum = 0;
+        currentTokenNum++;
 
         List<Util.TokenType> expectedTypes = new List<Util.TokenType>();
 
@@ -1034,17 +1035,19 @@ public class Parser
             //     return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, parent);
         }
 
-        DebugConsole.WriteAnsi("[green]parser debug below[/]");
-        printAST(nodes);
-        DebugConsole.WriteAnsi("[green]parser debug end[/]");
+        // DebugConsole.WriteAnsi("[green]parser debug below[/]");
+        // printAST(nodes);
+        // DebugConsole.WriteAnsi("[green]parser debug end[/]");
 
         return;
     }
 
-    public Parser(List<Util.Token> tokenList, Spectre.Console.ProgressTask progressTask = null)
+    public Parser(List<Util.Token> tokenList, string fileName, Spectre.Console.ProgressTask progressTask = null)
     {
         this.tokenList = tokenList;
         this.progressTask = progressTask;
+
+        this.fileName = fileName;
 
         DebugConsole.WriteAnsi("[red]tokens[/]");
         foreach (Util.Token token in tokenList)
@@ -1064,13 +1067,13 @@ public class Parser
     }
 
 
-    public static List<Parser> startParsing(List<Util.Token> tokenList, Spectre.Console.ProgressTask task = null)
+    public static List<Parser> startParsing(List<Util.Token> tokenList, string fileName, Spectre.Console.ProgressTask task = null)
     {
-        addInstance(tokenList, task);
+        DebugConsole.WriteAnsi($"[red]fileName: {fileName}[/]");
+        addInstance(tokenList, fileName, task);
         // getInstance().parse(tokenList, task);
 
         List<Parser> completedParsersList = new List<Parser>();
-
 
         Parser topParser = getInstance();
         while (parserStack.Count > 0)

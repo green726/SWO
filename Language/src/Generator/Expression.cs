@@ -29,6 +29,7 @@ public abstract class Expression : Base
         //         valueStack.Push(ptrValue);
         //     }
         // }
+        base.generate();
     }
 
 }

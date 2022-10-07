@@ -16,7 +16,7 @@ public class Struct : Node
 
         this.parent = parent;
 
-        Parser.getInstance().nodes.Add(this);
+        parser.nodes.Add(this);
     }
 
     public int getPropIndex(string propName)
@@ -30,7 +30,7 @@ public class Struct : Node
         {
             VariableExpression varExpr = (VariableExpression)child;
             this.name = varExpr.value;
-            Parser.getInstance().typeList.Add(this.name);
+            parser.typeList.Add(this.name);
             base.addChild(child);
             return;
         }
@@ -48,7 +48,7 @@ public class Struct : Node
         if (this.name == null)
         {
             this.name = child.value;
-            Parser.getInstance().typeList.Add(this.name);
+            parser.typeList.Add(this.name);
         }
         else if (child.value == "{" || child.value == "}")
         {

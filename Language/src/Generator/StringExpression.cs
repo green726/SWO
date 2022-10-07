@@ -14,6 +14,7 @@ public class StringExpression : Expression
 
     public override void generate()
     {
+        base.generate();
         List<LLVMValueRef> asciiList = new List<LLVMValueRef>();
 
         bool escaped = false;
@@ -47,7 +48,7 @@ public class StringExpression : Expression
 
         LLVMValueRef constArrRef = LLVM.ConstArray(LLVMTypeRef.Int8Type(), intsRef);
 
-        gen.valueStack.Push(constArrRef);
+        this.gen.valueStack.Push(constArrRef);
 
         if (str.parent?.nodeType != AST.Node.NodeType.VariableDeclaration)
         {
@@ -59,8 +60,6 @@ public class StringExpression : Expression
 
         // DebugConsole.WriteAnsi("[red]strexpr value: " + str.value + "[/]");
         // valueStack.Push(LLVM.BuildGlobalString(builder, str.value, "strtmp"));
-
-        base.generate();
 
     }
 }

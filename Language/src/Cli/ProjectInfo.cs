@@ -111,6 +111,7 @@ public class Library
 
 public class SWOFile
 {
+    public string nameWithoutExtension { get; set; }
     public string name { get; set; }
     public string path { get; set; }
 
@@ -127,6 +128,7 @@ public class SWOFile
     {
         this.name = name;
         this.path = path;
+        this.nameWithoutExtension = Path.GetFileNameWithoutExtension(path);
     }
 
     public SWOFile()

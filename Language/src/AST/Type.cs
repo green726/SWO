@@ -67,7 +67,7 @@ public class Type : AST.Node
 
     private void checkTypes(string value)
     {
-        foreach (string type in Parser.getInstance().typeList)
+        foreach (string type in parser.typeList)
         {
             if (type == value)
             {

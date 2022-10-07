@@ -14,6 +14,7 @@ public class NumberExpression : Base
 
     public override void generate()
     {
+        base.generate();
         switch (numExpr.type.value)
         {
             case "double":

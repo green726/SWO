@@ -14,6 +14,7 @@ public class Prototype : Base
 
     public override void generate()
     {
+        base.generate();
         proto.handleOverload();
         DebugConsole.WriteAnsi("[yellow]proto named " + proto.name + " [/]");
         //begin argument generation

@@ -10,7 +10,7 @@ public class StringExpression : Expression
         this.nodeType = NodeType.StringExpression;
         this.generator = new Generator.StringExpression(this);
 
-        Parser.getInstance().checkToken(token, expectedType: Util.TokenType.String);
+        parser.checkToken(token, expectedType: Util.TokenType.String);
 
         string valueWithoutQuotes = token.value.Substring(1, token.value.Length - 2);
         this.value = valueWithoutQuotes;
