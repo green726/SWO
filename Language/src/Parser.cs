@@ -6,11 +6,10 @@ public class Parser
 {
     //NOTE: below is a stack containing instances of parser (used for multi file)
     public static Stack<Parser> parserStack = new Stack<Parser>();
-    public static int completedParsers = 0;
 
-    public static Parser addInstance()
+    public static Parser addInstance(List<Util.Token> _tokenList, Spectre.Console.ProgressTask _task = null)
     {
-        Parser newParser = new Parser();
+        Parser newParser = new Parser(_tokenList, _task);
         parserStack.Push(newParser);
         return newParser;
     }
@@ -24,6 +23,15 @@ public class Parser
     {
         return parserStack.Peek();
     }
+
+    public bool singleLineComment = false;
+    public bool multiLineComment = false;
+
+    public int delimLevel = 0;
+    public int prevLine = 0;
+    public int prevColumn = 0;
+
+    public Spectre.Console.ProgressTask progressTask;
 
     public List<AST.Node> nodes = new List<AST.Node>();
     public List<Util.Token> tokenList;
@@ -40,9 +48,6 @@ public class Parser
     //NOTE: modified name
     public Dictionary<string, AST.Prototype> declaredFuncs = new Dictionary<string, AST.Prototype>();
 
-    public int prevLine = 0;
-    public int prevColumn = 0;
-
     //NOTE: below can be used to add user defined types (structs/classes)
     public List<string> typeList = new List<string>() { "double", "float", "string" };
 
@@ -55,6 +60,8 @@ public class Parser
     public AST.Node lastMajorParentNode = null;
 
     public AST.Node parent;
+
+    public AST.Node? previousNode;
 
     public string[] binaryMathOps = { "+", "-", "*", "/" };
 
@@ -794,9 +801,250 @@ public class Parser
     }
 
 
-    public Parser parse(List<Util.Token> _tokenList, Spectre.Console.ProgressTask task = null)
+    public void parse()
     {
-        tokenList = _tokenList;
+        parent = null;
+        currentTokenNum = 0;
+
+        List<Util.TokenType> expectedTypes = new List<Util.TokenType>();
+
+        finalTokenNum = tokenList.Count();
+
+        if (parent?.isExpression == false)
+        {
+            lastMajorParentNode = parent;
+        }
+
+        if (progressTask != null)
+        {
+            progressTask.Increment(1);
+        }
+
+        isFinishedParsing = currentTokenNum == finalTokenNum;
+
+        Util.Token token = tokenList[currentTokenNum];
+
+        parent?.addCode(token);
+        if (token.type != Util.TokenType.Space)
+        {
+            DebugConsole.Write($"token of value: {token.value} and type of {token.type} and parent of {parent?.nodeType} and delim level of {delimLevel}");
+        }
+
+        prevLine = token.line;
+        prevColumn = token.column;
+
+        previousNode = nodes.Count > 0 && currentTokenNum > 0 ? nodes.Last() : null;
+
+        if (token.type == Util.TokenType.EOF)
+        {
+            this.isFinishedParsing = true;
+            return;
+        }
+        else if (token.type == Util.TokenType.EOL)
+        {
+            if (singleLineComment)
+            {
+                singleLineComment = false;
+
+                return;
+            }
+
+            if (delimLevel > 0)
+            {
+                while (parent?.newLineReset == true)
+                {
+                    parent = parent.parent;
+
+                }
+
+                return;
+            }
+
+            if (parent?.nodeType != AST.Node.NodeType.Function && parent?.nodeType != AST.Node.NodeType.IfStatement && parent?.nodeType != AST.Node.NodeType.ElseStatement && parent?.nodeType != AST.Node.NodeType.ForLoop /* && tokenList[tokenIndex - 1].value != "{" */ && delimLevel == 0)
+            {
+
+                parent = null;
+                return;
+            }
+            else
+            {
+
+                return;
+            }
+        }
+
+        if (token.value == Config.settings.general.comment.singleLine)
+        {
+            singleLineComment = true;
+
+            return;
+        }
+        else if (token.value == Config.settings.general.comment.multiLineOpen)
+        {
+            multiLineComment = true;
+
+            return;
+        }
+        else if (token.value == Config.settings.general.comment.multiLineClose)
+        {
+            multiLineComment = false;
+
+            return;
+        }
+
+        if (singleLineComment || multiLineComment)
+        {
+
+            return;
+        }
+
+        if (expectedTypes != null)
+        {
+            checkToken(token, expectedTypes);
+        }
+
+        switch (token.type)
+        {
+            case Util.TokenType.Space:
+                parent?.addSpace(token);
+                break;
+            case Util.TokenType.Int:
+
+                // if (parent.nodeType == AST.Node.NodeType.VariableAssignment)
+                // {
+                //     parent.addChild(token);
+                //     break;
+                // }
+                new AST.NumberExpression(token, parent);
+                break;
+            case Util.TokenType.Double:
+                new AST.NumberExpression(token, parent);
+                break;
+
+            case Util.TokenType.Operator:
+                AST.BinaryExpression binExpr = new AST.BinaryExpression(token, previousNode, parent);
+
+                parent = binExpr;
+                return;
+
+            case Util.TokenType.Keyword:
+                (AST.Node keyParent, int keyDelimLevel) = parseKeyword(token, currentTokenNum, parent, delimLevel);
+                //0 is the keyword AST.Node, 1 is the next token, and 2 is the next token index
+
+                parent = keyParent;
+                delimLevel = keyDelimLevel;
+                return;
+            case Util.TokenType.AssignmentOp:
+                DebugConsole.Write("assignment op detected");
+                if (parent?.nodeType == AST.Node.NodeType.VariableDeclaration)
+                {
+                    parent.addChild(token);
+                }
+                else
+                {
+                    DebugConsole.WriteAnsi("[purple]Creating var ass[/]");
+                    AST.VariableAssignment varAss = new AST.VariableAssignment(token, parent);
+
+                    parent = varAss;
+                    return;
+                    // VariableReAssignment varReAss = new VariableReAssignment(token);
+                    // return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, varReAss, delimLevel: delimLevel);
+                }
+                break;
+            case Util.TokenType.String:
+                new AST.StringExpression(token, parent);
+
+                return;
+            case Util.TokenType.Modifier:
+                switch (token.value)
+                {
+                    case "*":
+                        parent = new AST.Dereference(token, parent);
+
+                        return;
+                    case "&":
+
+                        parent = new AST.Reference(token, parent);
+                        return;
+                }
+                break;
+            case Util.TokenType.Special:
+                //TODO: implement parsing of special chars
+                if (token.value == ";")
+                {
+                    if (Config.settings.general.semiColon.mode != "None")
+                    {
+                        if (delimLevel > 0)
+                        {
+                            while (parent?.newLineReset == true)
+                            {
+                                parent = parent?.parent;
+                            }
+
+                            return;
+                        }
+
+                        if (parent?.nodeType != AST.Node.NodeType.Function && parent?.nodeType != AST.Node.NodeType.IfStatement && parent?.nodeType != AST.Node.NodeType.ElseStatement && parent?.nodeType != AST.Node.NodeType.ForLoop /* && tokenList[tokenIndex - 1].value != "{" */ && delimLevel == 0)
+                        {
+
+                            parent = parent?.parent;
+                            return;
+                        }
+                        else
+                        {
+
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        throw ParserException.FactoryMethod("Illegal semi colon", "Remove the semi colon", token, parent);
+                    }
+                }
+                else if (token.value == "->")
+                {
+                    AST.Dereference deRef = new AST.Dereference(token, parent);
+                    parent = deRef;
+
+                    return;
+                }
+                else if (token.value == "#")
+                {
+                    parent?.addChild(token);
+
+                    return;
+                }
+                else
+                {
+                    parent?.addChild(token);
+                    return;
+                }
+        }
+
+        if (token.isDelim)
+        {
+            (AST.Node delimParentRet, int delimReturnLevel) = parseDelim(token, currentTokenNum, parent, delimLevel);
+
+            DebugConsole.Write("delim returned parent of " + delimParentRet?.nodeType);
+            parent = delimParentRet;
+            delimLevel = delimReturnLevel;
+            return;
+            // return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, delimParent, delimLevel: delimRet[1]);
+            // if (parent != null)
+            //     return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, parent);
+        }
+
+        DebugConsole.WriteAnsi("[green]parser debug below[/]");
+        printAST(nodes);
+        DebugConsole.WriteAnsi("[green]parser debug end[/]");
+
+        return;
+    }
+
+    public Parser(List<Util.Token> tokenList, Spectre.Console.ProgressTask progressTask = null)
+    {
+        this.tokenList = tokenList;
+        this.progressTask = progressTask;
 
         DebugConsole.WriteAnsi("[red]tokens[/]");
         foreach (Util.Token token in tokenList)
@@ -809,274 +1057,36 @@ public class Parser
         DebugConsole.WriteAnsi("[red]end tokens[/]");
         addLayerToNamedASTStack();
 
-        if (task != null)
+        if (progressTask != null)
         {
-            task.MaxValue = tokenList.Count();
+            progressTask.MaxValue = tokenList.Count();
         }
-
-        parent = null;
-        int delimLevel = 0;
-        int prevLine = 0;
-        int prevColumn = 0;
-
-        currentTokenNum = 0;
-
-        List<Util.TokenType> expectedTypes = new List<Util.TokenType>();
-
-        finalTokenNum = tokenList.Count();
-
-        bool singleLineComment = false;
-        bool multiLineComment = false;
-
-        DebugConsole.Write("first token: " + tokenList[currentTokenNum].value + " num: " + currentTokenNum);
-
-        while (!isFinishedParsing)
-        {
-            if (parent?.isExpression == false)
-            {
-                lastMajorParentNode = parent;
-            }
-
-            if (task != null)
-            {
-                task.Increment(1);
-            }
-
-            isFinishedParsing = currentTokenNum == finalTokenNum;
-
-            Util.Token token = tokenList[currentTokenNum];
-
-            parent?.addCode(token);
-            if (token.type != Util.TokenType.Space)
-            {
-                DebugConsole.Write($"token of value: {token.value} and type of {token.type} and parent of {parent?.nodeType} and delim level of {delimLevel}");
-            }
-
-            prevLine = token.line;
-            prevColumn = token.column;
-
-            AST.Node? previousNode = nodes.Count > 0 && currentTokenNum > 0 ? nodes.Last() : null;
-
-            if (token.type == Util.TokenType.EOF)
-            {
-                break;
-            }
-            else if (token.type == Util.TokenType.EOL)
-            {
-                if (singleLineComment)
-                {
-                    singleLineComment = false;
-                    currentTokenNum++;
-                    continue;
-                }
-
-                if (delimLevel > 0)
-                {
-                    while (parent?.newLineReset == true)
-                    {
-                        parent = parent.parent;
-
-                    }
-                    currentTokenNum++;
-                    continue;
-                }
-
-                if (parent?.nodeType != AST.Node.NodeType.Function && parent?.nodeType != AST.Node.NodeType.IfStatement && parent?.nodeType != AST.Node.NodeType.ElseStatement && parent?.nodeType != AST.Node.NodeType.ForLoop /* && tokenList[tokenIndex - 1].value != "{" */ && delimLevel == 0)
-                {
-                    currentTokenNum++;
-                    parent = null;
-                    continue;
-                }
-                else
-                {
-                    currentTokenNum++;
-                    continue;
-                }
-            }
-
-            if (token.value == Config.settings.general.comment.singleLine)
-            {
-                singleLineComment = true;
-                currentTokenNum++;
-                continue;
-            }
-            else if (token.value == Config.settings.general.comment.multiLineOpen)
-            {
-                multiLineComment = true;
-                currentTokenNum++;
-                continue;
-            }
-            else if (token.value == Config.settings.general.comment.multiLineClose)
-            {
-                multiLineComment = false;
-                currentTokenNum++;
-                continue;
-            }
-
-            if (singleLineComment || multiLineComment)
-            {
-                currentTokenNum++;
-                continue;
-            }
-
-            if (expectedTypes != null)
-            {
-                checkToken(token, expectedTypes);
-            }
-
-            switch (token.type)
-            {
-                case Util.TokenType.Space:
-                    parent?.addSpace(token);
-                    break;
-                case Util.TokenType.Int:
-
-                    // if (parent.nodeType == AST.Node.NodeType.VariableAssignment)
-                    // {
-                    //     parent.addChild(token);
-                    //     break;
-                    // }
-                    new AST.NumberExpression(token, parent);
-                    break;
-                case Util.TokenType.Double:
-                    new AST.NumberExpression(token, parent);
-                    break;
-
-                case Util.TokenType.Operator:
-                    AST.BinaryExpression binExpr = new AST.BinaryExpression(token, previousNode, parent);
-                    currentTokenNum++;
-                    parent = binExpr;
-                    continue;
-
-                case Util.TokenType.Keyword:
-                    (AST.Node keyParent, int keyDelimLevel) = parseKeyword(token, currentTokenNum, parent, delimLevel);
-                    //0 is the keyword AST.Node, 1 is the next token, and 2 is the next token index
-                    currentTokenNum++;
-                    parent = keyParent;
-                    delimLevel = keyDelimLevel;
-                    continue;
-                case Util.TokenType.AssignmentOp:
-                    DebugConsole.Write("assignment op detected");
-                    if (parent?.nodeType == AST.Node.NodeType.VariableDeclaration)
-                    {
-                        parent.addChild(token);
-                    }
-                    else
-                    {
-                        DebugConsole.WriteAnsi("[purple]Creating var ass[/]");
-                        AST.VariableAssignment varAss = new AST.VariableAssignment(token, parent);
-                        currentTokenNum++;
-                        parent = varAss;
-                        continue;
-                        // VariableReAssignment varReAss = new VariableReAssignment(token);
-                        // return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, varReAss, delimLevel: delimLevel);
-                    }
-                    break;
-                case Util.TokenType.String:
-                    new AST.StringExpression(token, parent);
-                    currentTokenNum++;
-                    continue;
-                case Util.TokenType.Modifier:
-                    switch (token.value)
-                    {
-                        case "*":
-                            parent = new AST.Dereference(token, parent);
-                            currentTokenNum++;
-                            continue;
-                        case "&":
-                            currentTokenNum++;
-                            parent = new AST.Reference(token, parent);
-                            continue;
-                    }
-                    break;
-                case Util.TokenType.Special:
-                    //TODO: implement parsing of special chars
-                    if (token.value == ";")
-                    {
-                        if (Config.settings.general.semiColon.mode != "None")
-                        {
-                            if (delimLevel > 0)
-                            {
-                                while (parent?.newLineReset == true)
-                                {
-                                    parent = parent?.parent;
-                                }
-                                currentTokenNum++;
-                                continue;
-                            }
-
-                            if (parent?.nodeType != AST.Node.NodeType.Function && parent?.nodeType != AST.Node.NodeType.IfStatement && parent?.nodeType != AST.Node.NodeType.ElseStatement && parent?.nodeType != AST.Node.NodeType.ForLoop /* && tokenList[tokenIndex - 1].value != "{" */ && delimLevel == 0)
-                            {
-                                currentTokenNum++;
-                                parent = parent?.parent;
-                                continue;
-                            }
-                            else
-                            {
-                                currentTokenNum++;
-                                continue;
-                            }
-                        }
-                        else
-                        {
-                            throw ParserException.FactoryMethod("Illegal semi colon", "Remove the semi colon", token, parent);
-                        }
-                    }
-                    else if (token.value == "->")
-                    {
-                        AST.Dereference deRef = new AST.Dereference(token, parent);
-                        parent = deRef;
-                        currentTokenNum++;
-                        continue;
-                    }
-                    else if (token.value == "#")
-                    {
-                        parent?.addChild(token);
-                        currentTokenNum++;
-                        continue;
-                    }
-                    else
-                    {
-                        parent?.addChild(token);
-                        currentTokenNum++;
-                        continue;
-                    }
-            }
-
-            if (token.isDelim)
-            {
-                (AST.Node delimParentRet, int delimReturnLevel) = parseDelim(token, currentTokenNum, parent, delimLevel);
-                currentTokenNum++;
-                DebugConsole.Write("delim returned parent of " + delimParentRet?.nodeType);
-                parent = delimParentRet;
-                delimLevel = delimReturnLevel;
-                continue;
-                // return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, delimParent, delimLevel: delimRet[1]);
-                // if (parent != null)
-                //     return parseTokenRecursive(tokenList[tokenIndex + 1], tokenIndex + 1, parent);
-            }
-            currentTokenNum++;
-        }
-
-        DebugConsole.WriteAnsi("[green]parser debug below[/]");
-        printAST(nodes);
-        DebugConsole.WriteAnsi("[green]parser debug end[/]");
-
-        return this;
     }
 
 
     public static List<Parser> startParsing(List<Util.Token> tokenList, Spectre.Console.ProgressTask task = null)
     {
-        addInstance();
-        getInstance().parse(tokenList, task);
+        addInstance(tokenList, task);
+        // getInstance().parse(tokenList, task);
 
-        while (completedParsers < parserStack.Count())
+        List<Parser> completedParsersList = new List<Parser>();
+
+
+        Parser topParser = getInstance();
+        while (parserStack.Count > 0)
         {
-
+            if (topParser.isFinishedParsing)
+            {
+                completedParsersList.Add(removeInstance());
+                topParser = getInstance();
+            }
+            topParser.parse();
         }
 
-        return parserStack.ToList();
+        return completedParsersList;
     }
+
+    //take in main file -> add to parser stack -> parse normally -> when finished parsing return the parser and remove it from the stack (add it to list of completed)
+    //take in main file -> add to parser stack -> parse normally -> encounter an import -> create a new parser instance -> push it to the stack -> parse there -> give nodes back to parent parser -> allow parent parser to continue -> remove public nodes from the last thing -> individually generate each file -> link them together
 }
 
