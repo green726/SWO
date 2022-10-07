@@ -62,9 +62,7 @@ public class ImportStatement : Node
         //TODO: implement imports
 
 
-
-
-
+        Parser.addInstance(tokens);
         base.addChild(child);
     }
 }

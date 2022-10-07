@@ -1078,6 +1078,10 @@ public class Parser
             if (topParser.isFinishedParsing)
             {
                 completedParsersList.Add(removeInstance());
+                if (parserStack.Count == 0)
+                {
+                    break;
+                }
                 topParser = getInstance();
             }
             topParser.parse();

@@ -65,7 +65,7 @@ public static class SWO
                     List<Parser> nodes = Parser.startParsing(lexedContent, parseTask);
 
                     var moduleTask = ctx.AddTask("Initializing LLVM");
-                    ModuleGen.GenerateModule(moduleTask);
+                    ModuleGen.CreateNewGenerator(moduleTask);
 
                     var llvmTask = ctx.AddTask("Compiling to LLVM IR");
                     IRGen.generateIR(nodes, llvmTask);
