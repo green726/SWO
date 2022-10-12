@@ -11,9 +11,9 @@ public class IRGen
         return generatorStack.Peek();
     }
 
-    public static IRGen addInstance(LLVMBuilderRef _builder, LLVMModuleRef _module, LLVMPassManagerRef _passManager, string fileName)
+    public static IRGen addInstance(LLVMBuilderRef _builder, LLVMModuleRef _module, LLVMPassManagerRef _passManager, Parser _parser, string fileName)
     {
-        IRGen newGen = new IRGen(_builder, _module, _passManager, fileName);
+        IRGen newGen = new IRGen(_builder, _module, _passManager, _parser, fileName);
         generatorStack.Push(newGen);
         return newGen;
     }
@@ -23,14 +23,17 @@ public class IRGen
         return generatorStack.Pop();
     }
 
-    public IRGen(LLVMBuilderRef _builder, LLVMModuleRef _module, LLVMPassManagerRef _passManager, string fileName)
+    public IRGen(LLVMBuilderRef _builder, LLVMModuleRef _module, LLVMPassManagerRef _passManager, Parser parser, string fileName)
     {
         DebugConsole.WriteAnsi($"[blue]fileName: {fileName}[/]");
         this.fileName = fileName;
         builder = _builder;
         module = _module;
         passManager = _passManager;
+        this.parser = parser;
     }
+
+    public Parser parser;
 
     public string fileName = "";
 

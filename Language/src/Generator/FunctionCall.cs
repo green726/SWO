@@ -25,7 +25,7 @@ public class FunctionCall : Base
         {
             string altName = funcCall.functionName + funcCall.generateAltName();
 
-            this.funcCall.type = Parser.getInstance().declaredFuncs[altName].returnType;
+            this.funcCall.type = gen.parser.declaredFuncs[altName].returnType;
 
             DebugConsole.WriteAnsi($"[red]alt name in function call gen: {altName}[/]");
             nameToSearch = altName;

@@ -46,7 +46,7 @@ public static class ModuleGen
             LLVM.AddCFGSimplificationPass(passManager);
             task.Increment(1);
 
-            IRGen gen = IRGen.addInstance(builder, module, passManager, parser.fileName);
+            IRGen gen = IRGen.addInstance(builder, module, passManager, parser, parser.fileName);
             generators.Add(gen);
 
         }
@@ -90,7 +90,7 @@ public static class ModuleGen
             LLVM.AddCFGSimplificationPass(passManager);
 
             // LLVM.InitializeFunctionPassManager(passManager);
-            IRGen gen = IRGen.addInstance(builder, module, passManager, parser.fileName);
+            IRGen gen = IRGen.addInstance(builder, module, passManager, parser, parser.fileName);
             generators.Add(gen);
 
         }

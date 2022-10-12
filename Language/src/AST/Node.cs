@@ -8,6 +8,8 @@ public abstract class Node
 
     public Parser parser;
 
+    private Parser parentParser;
+
     public List<Node> children = new List<Node>();
     public Node? parent = null;
 
@@ -30,6 +32,7 @@ public abstract class Node
         this.line = token.line;
         this.column = token.column;
         parser = Parser.getInstance();
+        parentParser = parser.parentParser;
     }
 
     protected Node(Node node)
@@ -39,6 +42,7 @@ public abstract class Node
         this.charNum = node.charNum;
         this.codeExcerpt = node.codeExcerpt;
         parser = Parser.getInstance();
+        parentParser = parser.parentParser;
     }
 
     public enum NodeType
@@ -120,5 +124,14 @@ public abstract class Node
     {
         this.codeExcerpt.Replace(child.codeExcerpt, "");
         children.Remove(child);
+    }
+
+    public virtual void checkExport()
+    {
+        //TODO: add public and private here
+        if (parent == null)
+        {
+            this.parentParser.nodes.Add(this);
+        }
     }
 }

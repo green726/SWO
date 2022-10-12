@@ -16,12 +16,18 @@ public class Parser
 
     public static Parser removeInstance()
     {
-        return parserStack.Pop();
+        if (parserStack.Count > 0)
+            return parserStack.Pop();
+        else
+            return null;
     }
 
     public static Parser getInstance()
     {
-        return parserStack.Peek();
+        if (parserStack.Count > 0)
+            return parserStack.Peek();
+        else
+            return null;
     }
 
     public string fileName = "";
@@ -39,6 +45,8 @@ public class Parser
     public List<Util.Token> tokenList;
 
     public List<AST.VariableDeclaration> globalVarAss = new List<AST.VariableDeclaration>();
+
+    public Parser parentParser;
 
     public Util.TokenType[] binaryExpectedTokens = { Util.TokenType.Int, Util.TokenType.Keyword };
     public Util.TokenType[] delimiterExpectedTokens = { Util.TokenType.Keyword };
@@ -807,6 +815,12 @@ public class Parser
     {
         currentTokenNum++;
 
+        previousNode = nodes.Count > 0 && currentTokenNum > 0 ? nodes.Last() : null;
+
+        //NOTE: handles imports and adding stuff
+        previousNode?.checkExport();
+
+
         List<Util.TokenType> expectedTypes = new List<Util.TokenType>();
 
         finalTokenNum = tokenList.Count();
@@ -823,6 +837,11 @@ public class Parser
 
         isFinishedParsing = currentTokenNum == finalTokenNum;
 
+        if (isFinishedParsing)
+        {
+            return;
+        }
+
         Util.Token token = tokenList[currentTokenNum];
 
         parent?.addCode(token);
@@ -834,7 +853,6 @@ public class Parser
         prevLine = token.line;
         prevColumn = token.column;
 
-        previousNode = nodes.Count > 0 && currentTokenNum > 0 ? nodes.Last() : null;
 
         if (token.type == Util.TokenType.EOF)
         {
@@ -1048,6 +1066,8 @@ public class Parser
         this.progressTask = progressTask;
 
         this.fileName = fileName;
+
+        this.parentParser = Parser.getInstance();
 
         DebugConsole.WriteAnsi("[red]tokens[/]");
         foreach (Util.Token token in tokenList)
