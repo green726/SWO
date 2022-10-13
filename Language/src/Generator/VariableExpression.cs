@@ -101,6 +101,7 @@ public class VariableExpression : Base
 
     public override void generate()
     {
+        base.generate();
         DebugConsole.Write("genning varExpr with value of " + varExpr.value + " parent type of " + varExpr.parent?.nodeType + " and children count of " + varExpr.children.Count());
         if (varExpr?.parent?.nodeType == AST.Node.NodeType.VariableExpression || varExpr?.parent?.nodeType == AST.Node.NodeType.IndexReference || varExpr?.parent?.parent?.nodeType == AST.Node.NodeType.VariableExpression)
         {
@@ -176,6 +177,7 @@ public class VariableExpression : Base
         // else
         // {
         // if (namedValuesLLVM.ContainsKey(varExpr.value))
+        DebugConsole.Write(gen.fileName);
         if (gen.valueExistsInScope(varExpr.value))
         {
             DebugConsole.WriteAnsi("[green]detected variable in scope[/]");

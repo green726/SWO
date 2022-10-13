@@ -44,7 +44,6 @@ public class Prototype : AST.Node
             this.returnType = new Type(token);
         }
 
-
         this.arguments = new Dictionary<string, Type>();
 
         //TODO: replace this node type with external section
@@ -177,5 +176,15 @@ public class Prototype : AST.Node
         {
             addArg(child);
         }
+    }
+
+    public override void checkExport()
+    {
+        if (parser.parentParser != null)
+        {
+            DebugConsole.Write(parser.parentParser.fileName);
+            parser.parentParser.declaredFuncs.Add(this.name + getArgTypes(), this);
+        }
+        base.checkExport();
     }
 }

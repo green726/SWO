@@ -27,6 +27,7 @@ public class Function : AST.Node
         }
         this.prototype = prototype;
         this.prototype.parent = this;
+        this.prototype.checkExport();
         this.body = body;
 
         if (topLevel)

@@ -25,14 +25,16 @@ public abstract class Node
 
     public bool newLineReset = false;
 
+    public bool exportChecked = false;
+
     protected Node(Util.Token token)
     {
         this.charNum = token.charNum;
         this.codeExcerpt = token.value;
         this.line = token.line;
         this.column = token.column;
-        parser = Parser.getInstance();
-        parentParser = parser.parentParser;
+        this.parser = Parser.getInstance();
+        this.parentParser = parser.parentParser;
     }
 
     protected Node(Node node)
@@ -41,8 +43,8 @@ public abstract class Node
         this.column = node.column;
         this.charNum = node.charNum;
         this.codeExcerpt = node.codeExcerpt;
-        parser = Parser.getInstance();
-        parentParser = parser.parentParser;
+        this.parser = Parser.getInstance();
+        this.parentParser = parser.parentParser;
     }
 
     public enum NodeType
@@ -129,9 +131,10 @@ public abstract class Node
     public virtual void checkExport()
     {
         //TODO: add public and private here
-        if (parent == null)
+        if (parent == null && Parser.exportTypes.Contains(this.nodeType) && parser.parentParser != null)
         {
             this.parentParser.nodes.Add(this);
         }
+        exportChecked = true;
     }
 }

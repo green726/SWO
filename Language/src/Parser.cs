@@ -4,6 +4,7 @@ using static System.Text.Json.JsonSerializer;
 
 public class Parser
 {
+    public static List<AST.Node.NodeType> exportTypes = new List<AST.Node.NodeType>() { AST.Node.NodeType.Prototype, AST.Node.NodeType.Struct };
     //NOTE: below is a stack containing instances of parser (used for multi file)
     public static Stack<Parser> parserStack = new Stack<Parser>();
 
@@ -818,8 +819,11 @@ public class Parser
         previousNode = nodes.Count > 0 && currentTokenNum > 0 ? nodes.Last() : null;
 
         //NOTE: handles imports and adding stuff
-        previousNode?.checkExport();
-
+        if (previousNode != null && !previousNode.exportChecked)
+        {
+            DebugConsole.Write("checking export for node of type " + previousNode.nodeType);
+            previousNode?.checkExport();
+        }
 
         List<Util.TokenType> expectedTypes = new List<Util.TokenType>();
 
@@ -847,7 +851,7 @@ public class Parser
         parent?.addCode(token);
         if (token.type != Util.TokenType.Space)
         {
-            DebugConsole.Write($"token of value: {token.value} and type of {token.type} and parent of {parent?.nodeType} and delim level of {delimLevel}");
+            DebugConsole.Write($"token of value: {token.value} and type of {token.type} and parent of {parent?.nodeType} and delim level of {delimLevel} in file named {fileName} and previous node of type {previousNode?.nodeType}");
         }
 
         prevLine = token.line;
@@ -1098,6 +1102,10 @@ public class Parser
         Parser topParser = getInstance();
         while (parserStack.Count > 0)
         {
+            if (topParser != getInstance())
+            {
+                topParser = getInstance();
+            }
             if (topParser.isFinishedParsing)
             {
                 completedParsersList.Add(removeInstance());
@@ -1106,6 +1114,7 @@ public class Parser
                     break;
                 }
                 topParser = getInstance();
+                DebugConsole.WriteAnsi("[green]switching current parser to " + topParser.fileName + "[/]");
             }
             topParser.parse();
         }
