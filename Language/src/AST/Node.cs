@@ -133,6 +133,7 @@ public abstract class Node
         //TODO: add public and private here
         if (parent == null && Parser.exportTypes.Contains(this.nodeType) && parser.parentParser != null)
         {
+            DebugConsole.WriteAnsi("[yellow]adding export node to parent parser named " + parentParser.fileName + " [/]");
             this.parentParser.nodes.Add(this);
         }
         exportChecked = true;

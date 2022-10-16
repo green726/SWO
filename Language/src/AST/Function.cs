@@ -20,14 +20,14 @@ public class Function : AST.Node
 
         if (body == null) body = new List<AST.Node>();
 
-        DebugConsole.WriteAnsi("[purple]proto extern: " + prototype.external + "[/]");
         if (prototype.external)
         {
             throw ParserException.FactoryMethod("Prototype marked external implemented with body", "Unmark it as external, or remove the body/implementation of the prototype", this, prototype);
         }
         this.prototype = prototype;
-        this.prototype.parent = this;
+        //NOTE: prototype check export must be above setting parent
         this.prototype.checkExport();
+        this.prototype.parent = this;
         this.body = body;
 
         if (topLevel)
@@ -50,13 +50,13 @@ public class Function : AST.Node
             throw ParserException.FactoryMethod("Prototype marked external implemented with body", "Unmark it as external, or remove the body/implementation of the prototype", prototype);
         }
 
-
         this.newLineReset = true;
         this.multiLine = false;
         this.nodeType = NodeType.Function;
         this.generator = new Generator.Function(this);
 
         this.prototype = prototype;
+        this.prototype.checkExport();
         this.body = new List<AST.Node>();
         this.body.Add(body);
 

@@ -215,6 +215,7 @@ public class IRGen
 
     public void generateIR(List<AST.Node> nodes)
     {
+        DebugConsole.WriteAnsi("[red]genning file named " + fileName + "[/]");
         foreach (AST.Node node in nodes)
         {
             DebugConsole.Write("generating node of type " + node.nodeType);

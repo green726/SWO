@@ -46,7 +46,8 @@ public static class ModuleGen
             LLVM.AddCFGSimplificationPass(passManager);
             task.Increment(1);
 
-            IRGen gen = IRGen.addInstance(builder, module, passManager, parser, parser.fileName);
+
+            IRGen gen = new IRGen(builder, module, passManager, parser, parser.fileName);
             generators.Add(gen);
 
         }
@@ -65,7 +66,7 @@ public static class ModuleGen
             // LLVMContextRef context = LLVM.ContextCreate();
 
             // Make the module, which holds all the code.
-            LLVMModuleRef module = LLVM.ModuleCreateWithName("SWO");
+            LLVMModuleRef module = LLVM.ModuleCreateWithName(parser.fileName);
             LLVMBuilderRef builder = LLVM.CreateBuilder();
 
             // Create a function pass manager for this engine
@@ -90,7 +91,8 @@ public static class ModuleGen
             LLVM.AddCFGSimplificationPass(passManager);
 
             // LLVM.InitializeFunctionPassManager(passManager);
-            IRGen gen = IRGen.addInstance(builder, module, passManager, parser, parser.fileName);
+            // TODO: dont add instance - just create new generator
+            IRGen gen = new IRGen(builder, module, passManager, parser, parser.fileName);
             generators.Add(gen);
 
         }

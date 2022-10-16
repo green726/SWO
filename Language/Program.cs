@@ -107,6 +107,7 @@ public static class SWO
             int i = 0;
             foreach (IRGen generator in generators)
             {
+                IRGen.generatorStack.Push(generator);
                 generator.generateIR(parsers[i].nodes);
                 generator.optimizeIR();
                 i++;
