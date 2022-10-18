@@ -198,12 +198,10 @@ public class Prototype : AST.Node
         {
             DebugConsole.WriteAnsi("[green]checking export for proto: " + this.name + " [/]");
             this.exportChecked = true;
-            // parser.parentParser.declaredFuncs.Add(this.name + getArgTypes(), this);
             Prototype proto = new Prototype(this);
 
             DebugConsole.WriteAnsi("[yellow]adding export node to parent parser named " + parser.parentParser.fileName + " [/]");
             this.parser.parentParser.nodes.Add(proto);
         }
-        // base.checkExport();
     }
 }

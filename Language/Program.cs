@@ -72,6 +72,7 @@ public static class SWO
                     var passTask = ctx.AddTask("Optimizing the LLVM IR");
                     foreach (IRGen generator in generators)
                     {
+                        IRGen.generatorStack.Push(generator);
                         generator.generateIR(parsers[i].nodes);
                         generator.optimizeIR(passTask);
                         i++;
