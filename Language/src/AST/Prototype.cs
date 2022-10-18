@@ -17,8 +17,18 @@ public class Prototype : AST.Node
 
     public bool variableArgument = false;
 
-    public Prototype(AST.Node parent = null) : base(parent)
+    public Prototype(AST.Prototype parent) : base(parent)
     {
+        this.name = parent.name;
+        this.external = true;
+        this.exportChecked = true;
+        this.returnType = parent.returnType;
+        this.arguments = parent.arguments;
+        this.variableArgument = parent.variableArgument;
+        this.parser = parent.parser.parentParser;
+
+        this.nodeType = NodeType.Prototype;
+        this.generator = new Generator.Prototype(this);
     }
 
     public Prototype(Util.Token token, AST.Node parent = null, bool startWithRet = false, bool external = false) : base(token)
@@ -186,19 +196,13 @@ public class Prototype : AST.Node
     {
         if (parser.parentParser != null)
         {
-            DebugConsole.WriteAnsi("[green]checking export for proto: " + this?.parent?.nodeType + " [/]");
-            parser.parentParser.declaredFuncs.Add(this.name + getArgTypes(), this);
-
+            DebugConsole.WriteAnsi("[green]checking export for proto: " + this.name + " [/]");
+            this.exportChecked = true;
+            // parser.parentParser.declaredFuncs.Add(this.name + getArgTypes(), this);
             Prototype proto = new Prototype(this);
-            proto.name = this.name;
-            proto.external = true;
-            proto.exportChecked = true;
-            proto.returnType = this.returnType;
-            proto.arguments = this.arguments;
-            proto.variableArgument = this.variableArgument;
 
             DebugConsole.WriteAnsi("[yellow]adding export node to parent parser named " + parser.parentParser.fileName + " [/]");
-            this.parser.parentParser.nodes.Add(this);
+            this.parser.parentParser.nodes.Add(proto);
         }
         // base.checkExport();
     }
