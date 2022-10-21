@@ -11,6 +11,18 @@ public class GeneralModel
     public LinkerModel linker { get; set; } = new LinkerModel();
 
     public SemiColonModel semiColon { get; set; } = new SemiColonModel();
+
+    public ProjectModel project { get; set; } = new ProjectModel();
+}
+
+public class ProjectModel
+{
+    public STDLibModel STDLib { get; set; } = new STDLibModel();
+}
+
+public class STDLibModel
+{
+    public bool include { get; set; } = false;
 }
 
 public class SemiColonModel

@@ -31,6 +31,8 @@ public class ProjectInfo
 
     public string path { get; set; } = "";
 
+    public bool STDLibIncluded { get; set; } = true;
+
     public void write()
     {
         var tomlString = Toml.FromModel(this);
@@ -40,6 +42,26 @@ public class ProjectInfo
 
     public ProjectInfo()
     {
+        if (Config.settings.general.project.STDLib.include)
+        {
+            if (!STDLibIncluded)
+            {
+                libraries.Add(new Library("stdlib", false));
+            }
+        }
+        else
+        {
+            if (STDLibIncluded)
+            {
+                foreach (Library lib in libraries)
+                {
+                    if (lib.name == "stdlib")
+                    {
+                        libraries.Remove(lib);
+                    }
+                }
+            }
+        }
     }
 
     public void setConfig()
@@ -100,13 +122,24 @@ public class ProjectInfo
     }
 }
 
-
-
-
 public class Library
 {
     public string name { get; set; } = "";
     public bool foreign { get; set; } = false;
+    public ASTFile libraryAST { get; set; }
+
+    public Library(string name, bool foreign = false)
+    {
+        //TODO: search globally in the swo libraries for this name - if not found search locally in project
+        this.libraryAST = new ASTFile();
+    }
+}
+
+public class ASTFile
+{
+    public ASTFile()
+    {
+    }
 }
 
 public class SWOFile
