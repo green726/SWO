@@ -5,7 +5,7 @@ using System.Linq;
 public class BinaryExpression : Expression
 {
     public AST.Expression leftHand;
-    public AST.Expression? rightHand;
+    public AST.Expression rightHand;
     public OperatorType operatorType;
 
     public enum OperatorType
@@ -18,7 +18,7 @@ public class BinaryExpression : Expression
         LessThan,
     }
 
-    public BinaryExpression(Util.Token token, AST.Node? previousNode, AST.Node? parent) : base(token)
+    public BinaryExpression(Util.Token token, AST.Node previousNode, AST.Node parent) : base(token)
 
     {
         this.nodeType = NodeType.BinaryExpression;

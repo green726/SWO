@@ -72,7 +72,7 @@ public class Parser
 
     public AST.Node parent;
 
-    public AST.Node? previousNode;
+    public AST.Node previousNode;
 
     public string[] binaryMathOps = { "+", "-", "*", "/" };
 
@@ -199,7 +199,7 @@ public class Parser
     }
 
 
-    public static void checkNode(AST.Node? node, AST.Node.NodeType[] expectedTypes)
+    public static void checkNode(AST.Node node, AST.Node.NodeType[] expectedTypes)
     {
         if (node == null)
         {
@@ -219,7 +219,7 @@ public class Parser
         }
     }
 
-    public void checkNode(AST.Node? node, AST.Node.NodeType[] expectedTypes, ParserException except)
+    public void checkNode(AST.Node node, AST.Node.NodeType[] expectedTypes, ParserException except)
     {
         if (node == null)
         {
@@ -239,36 +239,31 @@ public class Parser
         }
     }
 
-    public void checkToken(Util.Token? token, List<Util.TokenType>? expectedTypes = null, Util.TokenType? expectedType = null)
+    public void checkToken(Util.Token token, List<Util.TokenType> expectedTypes)
     {
-        if (token == null)
+        foreach (Util.TokenType expectedTokenType in expectedTypes)
         {
-            throw new ParserException($"expected a token but got null", prevLine, prevColumn);
+            if (token.type != expectedTokenType && expectedTokenType == expectedTypes.Last())
+            {
+                throw new ParserException($"expected token of type {string.Join(", ", expectedTypes)} but got {token.type}", token);
+            }
+            else if (token.type == expectedTokenType)
+            {
+                break;
+            }
         }
 
-        if (expectedTypes != null)
-        {
-            foreach (Util.TokenType expectedTokenType in expectedTypes)
-            {
-                if (token.type != expectedTokenType && expectedTokenType == expectedTypes.Last())
-                {
-                    throw new ParserException($"expected token of type {string.Join(", ", expectedTypes)} but got {token.type}", token);
-                }
-                else if (token.type == expectedTokenType)
-                {
-                    break;
-                }
-            }
+    }
 
-        }
-        else
+
+    public void checkToken(Util.Token token, Util.TokenType expectedType)
+    {
+        if (token.type != expectedType)
         {
-            if (token.type != expectedType)
-            {
-                throw new ParserException($"expected token of type {expectedType} but got {token.type}", token);
-            }
+            throw new ParserException($"expected token of type {expectedType} but got {token.type}", token);
         }
     }
+
 
     public string printBinary(AST.BinaryExpression bin)
     {
@@ -501,7 +496,7 @@ public class Parser
         return currentTok;
     }
 
-    public (AST.Node, int) parseKeyword(Util.Token token, int tokenIndex, AST.Node? parent = null, int delimLevel = 0)
+    public (AST.Node, int) parseKeyword(Util.Token token, int tokenIndex, AST.Node parent, int delimLevel = 0)
     {
         List<dynamic> ret = new List<dynamic>();
         (Util.Token nextToken, int nextTokenIndex) = nextNonSpace(tokenIndex);
@@ -544,6 +539,7 @@ public class Parser
         else if (token.value == Config.settings.general.import.keyword)
         {
             AST.ImportStatement importStatement = new AST.ImportStatement(token);
+            DebugConsole.WriteAnsi("[red]returning import stat as parent[/]");
             return (importStatement, delimLevel);
             // return new List<dynamic>() { importStatement, delimLevel };
         }
@@ -635,8 +631,9 @@ public class Parser
                 break;
             case AST.Node.NodeType.ImportStatement:
                 parent.addChild(token);
-                return (parent.parent, delimLevel);
-
+                DebugConsole.Write("ASDKJASKDj");
+                DebugConsole.WriteAnsi($"[green]returning parent of {parent.nodeType}[/]");
+                return (parent, delimLevel);
         }
 
 
@@ -686,7 +683,7 @@ public class Parser
         return (parent, delimLevel);
     }
 
-    public (AST.Node parent, int delimLevel) parseDelim(Util.Token token, int tokenIndex, AST.Node? parent = null, int delimLevel = 0)
+    public (AST.Node parent, int delimLevel) parseDelim(Util.Token token, int tokenIndex, AST.Node parent, int delimLevel = 0)
     {
         if (token.type == Util.TokenType.DelimiterOpen)
         {
@@ -848,10 +845,17 @@ public class Parser
 
         Util.Token token = tokenList[currentTokenNum];
 
-        parent?.addCode(token);
         if (token.type != Util.TokenType.Space)
         {
             DebugConsole.Write($"token of value: {token.value} and type of {token.type} and parent of {parent?.nodeType} and delim level of {delimLevel} in file named {fileName} and previous node of type {previousNode?.nodeType}");
+        }
+        if (this.parent?.nodeType == AST.Node.NodeType.Empty)
+        {
+            previousNode?.addCode(token);
+        }
+        else
+        {
+            this.parent?.addCode(token);
         }
 
         prevLine = token.line;
@@ -928,9 +932,9 @@ public class Parser
 
         switch (token.type)
         {
-            case Util.TokenType.Space:
-                parent?.addSpace(token);
-                break;
+            // case Util.TokenType.Space:
+            //     parent?.addSpace(token);
+            //     break;
             case Util.TokenType.Int:
 
                 // if (parent.nodeType == AST.Node.NodeType.VariableAssignment)

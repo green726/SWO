@@ -4,7 +4,14 @@ public class Dereference : Expression
 {
     public Expression actualExpr { get; set; }
 
-    public Dereference(Util.Token token, AST.Node? parent = null) : base(token)
+    public Dereference(Util.Token token) : base(token)
+    {
+        this.nodeType = NodeType.Dereference;
+
+        this.generator = new Generator.Dereference(this);
+    }
+
+    public Dereference(Util.Token token, AST.Node parent) : base(token)
     {
         this.nodeType = NodeType.Dereference;
 

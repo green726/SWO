@@ -65,7 +65,7 @@ public class IfStatementDeclaration : AST.Node
         {
             throw new ParserException($"illegal child ({child.value}) added to if statement declaration", child);
         }
-        base.addChild(child);
+        // base.addChild(child);
     }
 }
 
@@ -78,7 +78,7 @@ public class IfStatement : AST.Node
     // private bool isStat = true;
 
 
-    public IfStatement(Util.Token token, IfStatementDeclaration declaration, AST.Node? parent = null) : base(token)
+    public IfStatement(Util.Token token, IfStatementDeclaration declaration, AST.Node parent) : base(token)
     {
         this.nodeType = NodeType.IfStatement;
         this.generator = new Generator.IfStatement(this);
@@ -97,7 +97,6 @@ public class IfStatement : AST.Node
 
         // Util.Token thenCallTok = new Util.Token(Util.TokenType.Keyword, "then" + Parser.ifFuncNum, token.line, token.column);
         // this.thenCall = new FunctionCall(thenCallTok, null, topLevel: false);
-
 
         this.elseStat = new ElseStatement(this, token);
 

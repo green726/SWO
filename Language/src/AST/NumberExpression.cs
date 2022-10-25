@@ -4,7 +4,7 @@ using System;
 
 public class NumberExpression : Expression
 {
-    public NumberExpression(Util.Token token, AST.Node? parent) : base(token)
+    public NumberExpression(Util.Token token, AST.Node parent) : base(token)
 
     {
         this.nodeType = NodeType.NumberExpression;

@@ -6,7 +6,7 @@ public class IndexReference : Node
 {
     public bool isPointer = false;
     public NumberExpression numExpr;
-    public IndexReference(Util.Token token, AST.Node? parent = null) : base(token)
+    public IndexReference(Util.Token token, AST.Node parent) : base(token)
     {
         this.nodeType = NodeType.IndexReference;
         this.generator = new Generator.IndexReference(this);

@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 public static class EXE
 {
-    public static string? targetTriple;
+    public static string targetTriple;
     public static LLVMTargetRef target;
     public static LLVMTargetMachineRef targetMachine;
     public static LLVMBool targetBool;
@@ -42,7 +42,7 @@ public static class EXE
                 break;
         }
 
-        string? fileNameFinal;
+        string fileNameFinal = "";
 
         if (windows)
         {
@@ -116,7 +116,7 @@ public static class EXE
                 break;
         }
 
-        string? fileNameFinal;
+        string fileNameFinal = "";
 
         if (windows)
         {

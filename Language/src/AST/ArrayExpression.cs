@@ -5,7 +5,7 @@ public class ArrayExpression : Expression
     public Type containedType;
     public int length;
 
-    public ArrayExpression(Util.Token token, AST.Node? parent = null) : base(token)
+    public ArrayExpression(Util.Token token, AST.Node parent) : base(token)
     {
         this.value = new List<AST.Node>();
         this.nodeType = NodeType.ArrayExpression;

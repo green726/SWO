@@ -4,7 +4,7 @@ public class Reference : Expression
 {
     public Expression actualExpr { get; set; }
 
-    public Reference(Util.Token token, AST.Node? parent = null) : base(token)
+    public Reference(Util.Token token, AST.Node parent) : base(token)
     {
         this.nodeType = NodeType.Reference;
 

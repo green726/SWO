@@ -6,7 +6,7 @@ public class Type : AST.Node
     public Util.ClassType defaultType;
 
     //NOTE: this is the size of an array or similar type
-    public int? size = null;
+    public int size = 0;
     public bool isArray = false;
 
     public bool isPointer;

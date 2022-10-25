@@ -4,7 +4,7 @@ using Spectre.Console;
 
 public static class SWO
 {
-    private static string fileContents;
+    private static string fileContents = "";
     public static bool windows = false;
     public static ProjectInfo projectInfo;
 

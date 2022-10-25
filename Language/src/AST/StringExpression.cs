@@ -5,7 +5,7 @@ public class StringExpression : Expression
     // public new string value;
     public bool builtInString;
 
-    public StringExpression(Util.Token token, AST.Node? parent = null, bool dontAdd = false, bool builtInString = false) : base(token)
+    public StringExpression(Util.Token token, AST.Node parent, bool dontAdd = false, bool builtInString = false) : base(token)
     {
         this.nodeType = NodeType.StringExpression;
         this.generator = new Generator.StringExpression(this);

@@ -3,8 +3,7 @@ using Spectre.Console;
 [Serializable]
 public class GenException : Exception
 {
-
-    public override string? StackTrace { get; }/* => base.StackTrace; */
+    public override string StackTrace { get; }/* => base.StackTrace; */
     public GenException(string msg, AST.Node node) : base($"{msg} at {node.line}:{node.column}")
     {
     }

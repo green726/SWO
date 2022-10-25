@@ -9,10 +9,10 @@ public class VariableAssignment : AST.Node
     private int childLoop = 0;
 
     public bool binReassignment = false;
-    public BinaryExpression? bin = null;
-    public AST.Node? targetValue = null;
+    public BinaryExpression bin;
+    public AST.Node targetValue;
 
-    public VariableAssignment(Util.Token token, AST.Node? parent = null) : base(token)
+    public VariableAssignment(Util.Token token, AST.Node parent) : base(token)
     {
         this.nodeType = NodeType.VariableAssignment;
         this.generator = new Generator.VariableAssignment(this);

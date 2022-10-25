@@ -26,7 +26,7 @@ public class Type : Base
         }
         else
         {
-            if (type.size == null)
+            if (type.size == 0)
             {
                 genPointer();
                 return;

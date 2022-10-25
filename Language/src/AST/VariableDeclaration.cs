@@ -22,7 +22,7 @@ public class VariableDeclaration : Node
 
     public bool local = false;
 
-    public VariableDeclaration(Util.Token token, bool mutable, AST.Node? parent = null) : base(token)
+    public VariableDeclaration(Util.Token token, bool mutable, AST.Node parent) : base(token)
     {
         this.nodeType = NodeType.VariableDeclaration;
         this.generator = new Generator.VariableDeclaration(this);
@@ -47,8 +47,31 @@ public class VariableDeclaration : Node
             local = true;
             parent?.addChild(this);
         }
+    }
 
+    public VariableDeclaration(Util.Token token, bool mutable) : base(token)
+    {
+        this.nodeType = NodeType.VariableDeclaration;
+        this.generator = new Generator.VariableDeclaration(this);
 
+        this.newLineReset = true;
+
+        this.mutable = mutable;
+        parser.globalVarAss.Add(this);
+
+        this.defaultValue = new NullExpression(new Util.Token(Util.TokenType.Keyword, Config.settings.general.nulls.keyword, token.line, token.column));
+
+        if (parent == null)
+        {
+            DebugConsole.Write("adding var dec to parser nodes");
+            parser.nodes.Add(this);
+            local = false;
+        }
+        else
+        {
+            local = true;
+            parent?.addChild(this);
+        }
     }
 
     public VariableDeclaration(Util.Token typeTok, Node parent = null) : base(typeTok)
@@ -195,7 +218,7 @@ public class VariableDeclaration : Node
                     if (isArray)
                     {
                         ArrayExpression expr = (ArrayExpression)child;
-                        if (this.type.size != null && expr.length != this.type.size)
+                        if (this.type.size != 0 && expr.length != this.type.size)
                         {
                             throw ParserException.FactoryMethod("An array declaration received a default value that did not correspond with its declared size", "Make the initial expression size the same as in the assignment", child);
                         }
@@ -215,7 +238,7 @@ public class VariableDeclaration : Node
                     if (isArray)
                     {
                         ArrayExpression expr = (ArrayExpression)child;
-                        if (this.type.size != null && expr.length != this.type.size)
+                        if (this.type.size != 0 && expr.length != this.type.size)
                         {
                             throw ParserException.FactoryMethod("An array declaration received a default value that did not correspond with its declared size", "Make the initial expression size the same as in the assignment", child);
                         }

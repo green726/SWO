@@ -2,7 +2,7 @@ namespace AST;
 
 public class ExternStatement : Node
 {
-    private bool isBody = false;
+    // private bool isBody = false;
 
     public ExternStatement(Util.Token token, AST.Node parent = null) : base(token)
     {

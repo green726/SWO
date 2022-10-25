@@ -7,13 +7,13 @@ public class ParserException : Exception
 {
     public override IDictionary Data => base.Data;
 
-    public override string? HelpLink { get => base.HelpLink; set => base.HelpLink = value; }
+    public override string HelpLink { get => base.HelpLink; set => base.HelpLink = value; }
 
     public override string Message => base.Message;
 
-    public override string? Source { get => base.Source; set => base.Source = value; }
+    public override string Source { get => base.Source; set => base.Source = value; }
 
-    public override string? StackTrace { get; }/* => base.StackTrace; */
+    public override string StackTrace { get => base.StackTrace; }
 
     public ParserException(string msg, AST.Node node) : base($"{msg} at {node?.line}:{node?.column}")
     {
@@ -32,18 +32,29 @@ public class ParserException : Exception
 
     }
 
-    public static ParserException FactoryMethod(string whatHappened, string recommendedFix, Util.Token token, AST.Node? parent = null, bool typoSuspected = false)
+    public static ParserException FactoryMethod(string whatHappened, string recommendedFix, Util.Token token, bool typoSuspected = false)
     {
         string input = "";
         string codeBlock = "";
-        if (parent != null)
+        codeBlock = getCodeBlock(token);
+        if (typoSuspected && Config.settings.general.typo.enabled)
         {
-            codeBlock = $"{getCodeBlock(parent)} \n--------\n{getCodeBlock(token)}";
+            List<string> typoFixes = Typo.spellCheck(token.value);
+            input = $"{whatHappened}: \n```\n{codeBlock}\n```\nHow You Can Fix This: \n{recommendedFix} \nPossible typo solutions: {typoFixes.ToString()}\nError Was Thrown At {token.line}:{token.column}";
         }
         else
         {
-            codeBlock = getCodeBlock(token);
+            input = $"{whatHappened}: \n```\n{codeBlock}\n```\nHow You Can Fix This: \n{recommendedFix} \nError Was Thrown At {token.line}:{token.column}";
         }
+
+        return new ParserException(input);
+    }
+
+    public static ParserException FactoryMethod(string whatHappened, string recommendedFix, Util.Token token, AST.Node parent, bool typoSuspected = false)
+    {
+        string input = "";
+        string codeBlock = "";
+        codeBlock = $"{getCodeBlock(parent)} \n--------\n{getCodeBlock(token)}";
         if (typoSuspected && Config.settings.general.typo.enabled)
         {
             List<string> typoFixes = Typo.spellCheck(token.value);

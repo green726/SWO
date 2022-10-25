@@ -1,15 +1,14 @@
 namespace AST;
 
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 public class FunctionCall : Expression
 {
-    public string? functionName;
+    public string functionName = "";
     public List<AST.Expression> args;
 
-    public FunctionCall(Util.Token token, List<AST.Expression>? args, AST.Node? parent = null, bool topLevel = false) : base(token)
+    public FunctionCall(Util.Token token, List<AST.Expression> args, AST.Node parent, bool topLevel = false) : base(token)
     {
         this.newLineReset = true;
         this.nodeType = NodeType.FunctionCall;
@@ -19,19 +18,12 @@ public class FunctionCall : Expression
 
         this.functionName = token.value;
 
-        this.args = args ??= new List<AST.Expression>();
+        this.args = args = new List<AST.Expression>();
 
-        if (parent != null)
-        {
-            this.parent = parent;
-            this.parent.addChild(this);
-            return;
-        }
+        this.parent = parent;
+        this.parent.addChild(this);
+        return;
 
-        else if (topLevel)
-        {
-            // Parser.nodes.Add(this);
-        }
     }
 
     public string generateAltName()

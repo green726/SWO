@@ -12,7 +12,7 @@ public class Function : AST.Node
     public bool multiLine = false;
 
     //NOTE: Constructor 1:
-    public Function(Prototype prototype, List<AST.Node>? body = null, bool topLevel = true) : base(prototype)
+    public Function(Prototype prototype, bool topLevel = true) : base(prototype)
     {
         this.nodeType = NodeType.Function;
         this.generator = new Generator.Function(this);
@@ -28,7 +28,7 @@ public class Function : AST.Node
         //NOTE: prototype check export must be above setting parent
         this.prototype.checkExport();
         this.prototype.parent = this;
-        this.body = body;
+        this.body = new List<Node>();
 
         if (topLevel)
         {

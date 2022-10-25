@@ -11,7 +11,7 @@ public abstract class Node
     private Parser parentParser;
 
     public List<Node> children = new List<Node>();
-    public Node? parent = null;
+    public Node parent;
 
     public int line = 0;
     public int column = 0;
@@ -27,6 +27,18 @@ public abstract class Node
 
     public bool exportChecked = false;
 
+    protected Node()
+    {
+        this.parent = this;
+        this.charNum = 0;
+        this.codeExcerpt = "";
+        this.line = 0;
+        this.column = 0;
+        this.parser = Parser.getInstance();
+        this.parentParser = parser.parentParser;
+        this.generator = new Generator.Empty(this);
+    }
+
     protected Node(Util.Token token)
     {
         this.charNum = token.charNum;
@@ -35,6 +47,34 @@ public abstract class Node
         this.column = token.column;
         this.parser = Parser.getInstance();
         this.parentParser = parser.parentParser;
+        this.generator = new Generator.Empty(this);
+        this.parent = new Empty();
+    }
+
+    protected Node(Util.Token token, Node parent)
+    {
+        this.charNum = token.charNum;
+        this.codeExcerpt = token.value;
+        this.line = token.line;
+        this.column = token.column;
+        this.parser = Parser.getInstance();
+        this.parentParser = parser.parentParser;
+        this.generator = new Generator.Empty(this);
+        this.parent = parent;
+        this.parent.addChild(this);
+    }
+
+    protected Node(Node node, Node parent)
+    {
+        this.line = node.line;
+        this.column = node.column;
+        this.charNum = node.charNum;
+        this.codeExcerpt = node.codeExcerpt;
+        this.parser = Parser.getInstance();
+        this.parentParser = parser.parentParser;
+        this.generator = new Generator.Empty(this);
+        this.parent = parent;
+        this.parent.addChild(this);
     }
 
     protected Node(Node node)
@@ -45,10 +85,13 @@ public abstract class Node
         this.codeExcerpt = node.codeExcerpt;
         this.parser = Parser.getInstance();
         this.parentParser = parser.parentParser;
+        this.generator = new Generator.Empty(this);
+        this.parent = new Empty();
     }
 
     public enum NodeType
     {
+        Empty,
         Unknown,
         Struct,
         IndexReference,

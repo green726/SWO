@@ -8,7 +8,7 @@ public class Struct : Node
 
     public string name = null;
 
-    public Struct(Util.Token token, AST.Node? parent = null) : base(token)
+    public Struct(Util.Token token, AST.Node parent) : base(token)
     {
         this.nodeType = NodeType.Struct;
         this.generator = new Generator.Struct(this);
@@ -18,6 +18,16 @@ public class Struct : Node
 
         parser.nodes.Add(this);
     }
+
+    public Struct(Util.Token token) : base(token)
+    {
+        this.nodeType = NodeType.Struct;
+        this.generator = new Generator.Struct(this);
+        this.newLineReset = false;
+
+        parser.nodes.Add(this);
+    }
+
 
     public int getPropIndex(string propName)
     {

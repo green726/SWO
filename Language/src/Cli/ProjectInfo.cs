@@ -42,26 +42,26 @@ public class ProjectInfo
 
     public ProjectInfo()
     {
-        if (Config.settings.general.project.STDLib.include)
-        {
-            if (!STDLibIncluded)
-            {
-                libraries.Add(new Library("stdlib", false));
-            }
-        }
-        else
-        {
-            if (STDLibIncluded)
-            {
-                foreach (Library lib in libraries)
-                {
-                    if (lib.name == "stdlib")
-                    {
-                        libraries.Remove(lib);
-                    }
-                }
-            }
-        }
+        // if (Config.settings.general.project.STDLib.include)
+        // {
+        //     if (!STDLibIncluded)
+        //     {
+        //         libraries.Add(new Library("stdlib", false));
+        //     }
+        // }
+        // else
+        // {
+        //     if (STDLibIncluded)
+        //     {
+        //         foreach (Library lib in libraries)
+        //         {
+        //             if (lib.name == "stdlib")
+        //             {
+        //                 libraries.Remove(lib);
+        //             }
+        //         }
+        //     }
+        // }
     }
 
     public void setConfig()

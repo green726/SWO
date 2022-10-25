@@ -2,9 +2,9 @@ namespace AST;
 
 public class Return : Node
 {
-    public Expression? expr;
+    public Expression expr;
 
-    public Return(Util.Token token, AST.Node? parent = null) : base(token)
+    public Return(Util.Token token, AST.Node parent) : base(token)
     {
         this.nodeType = NodeType.Return;
         this.newLineReset = true;
@@ -31,7 +31,6 @@ public class Return : Node
     public override void addChild(Util.Token child)
     {
         throw ParserException.FactoryMethod("A non-expression was passed to a return function", "Delete it or replace it with an expression (number, variable, string, etc)", child, parent);
-        base.addChild(child);
     }
 
     public override void addParent(Node parent)
