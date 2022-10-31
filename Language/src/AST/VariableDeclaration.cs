@@ -36,7 +36,7 @@ public class VariableDeclaration : Node
 
         this.defaultValue = new NullExpression(new Util.Token(Util.TokenType.Keyword, Config.settings.general.nulls.keyword, token.line, token.column));
 
-        if (parent == null)
+        if (parent.nodeType == AST.Node.NodeType.Empty)
         {
             DebugConsole.Write("adding var dec to parser nodes");
             parser.nodes.Add(this);
@@ -61,7 +61,7 @@ public class VariableDeclaration : Node
 
         this.defaultValue = new NullExpression(new Util.Token(Util.TokenType.Keyword, Config.settings.general.nulls.keyword, token.line, token.column));
 
-        if (parent == null)
+        if (parent.nodeType == AST.Node.NodeType.Empty)
         {
             DebugConsole.Write("adding var dec to parser nodes");
             parser.nodes.Add(this);
@@ -94,7 +94,7 @@ public class VariableDeclaration : Node
 
         this.defaultValue = new NullExpression(new Util.Token(Util.TokenType.Keyword, Config.settings.general.nulls.keyword, typeTok.line, typeTok.column));
 
-        if (parent == null)
+        if (parent.nodeType == AST.Node.NodeType.Empty)
         {
             DebugConsole.Write("adding var dec to parser nodes");
             parser.nodes.Add(this);

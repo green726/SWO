@@ -65,12 +65,16 @@ public class Prototype : AST.Node
         {
             // Parser.nodes.Add(this);
         }
-        if (parent?.nodeType != AST.Node.NodeType.ExternStatement && parent != null)
+        if (parent?.nodeType != AST.Node.NodeType.ExternStatement && parent != null && parent?.nodeType != NodeType.Empty)
         {
             throw ParserException.FactoryMethod("A prototype may not have a non-extern parent", "Make the prototype top level", this);
         }
-        parent?.addChild(this);
-        this.parent = parent;
+        if (parent?.nodeType != AST.Node.NodeType.Empty)
+        {
+            parent?.addChild(this);
+            this.parent = parent;
+        }
+
     }
 
     //NOTE: addArgs are just extended from the add child - just to seperate handling of other tokens added (like names)

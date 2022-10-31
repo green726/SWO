@@ -68,7 +68,7 @@ public class Parser
     public bool isFinishedParsing = false;
     public Stack<AST.Node> delimParentStack = new Stack<AST.Node>();
 
-    public AST.Node lastMajorParentNode = null;
+    public AST.Node lastMajorParentNode = new AST.Empty();
 
     public AST.Node parent;
 
@@ -890,7 +890,7 @@ public class Parser
             if (parent?.nodeType != AST.Node.NodeType.Function && parent?.nodeType != AST.Node.NodeType.IfStatement && parent?.nodeType != AST.Node.NodeType.ElseStatement && parent?.nodeType != AST.Node.NodeType.ForLoop /* && tokenList[tokenIndex - 1].value != "{" */ && delimLevel == 0)
             {
 
-                parent = null;
+                parent = new AST.Empty();
                 return;
             }
             else

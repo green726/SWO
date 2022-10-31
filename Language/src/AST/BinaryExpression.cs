@@ -99,7 +99,7 @@ public class BinaryExpression : Expression
         {
             this.leftHand.addParent(this);
         }
-        else if (parent == null && this.leftHand.nodeType == NodeType.BinaryExpression)
+        else if (parent.nodeType == AST.Node.NodeType.Empty && this.leftHand.nodeType == NodeType.BinaryExpression)
         {
             this.parent = this.leftHand;
         }
@@ -107,7 +107,7 @@ public class BinaryExpression : Expression
 
         // this.rightHand = new NumberExpression(checkToken(nextToken, Util.tokenType.number), this);
 
-        if (this.parent == null)
+        if (this.parent.nodeType == AST.Node.NodeType.Empty)
         {
             //NOTE: - commented out below code is to throw in an anonymous function 
             // PrototypeAST proto = new PrototypeAST();

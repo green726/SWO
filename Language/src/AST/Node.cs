@@ -8,7 +8,7 @@ public abstract class Node
 
     public Parser parser;
 
-    private Parser parentParser;
+    private Parser? parentParser;
 
     public List<Node> children = new List<Node>();
     public Node parent;
@@ -35,7 +35,7 @@ public abstract class Node
         this.line = 0;
         this.column = 0;
         this.parser = Parser.getInstance();
-        this.parentParser = parser.parentParser;
+        this.parentParser = parser?.parentParser;
         this.generator = new Generator.Empty(this);
     }
 
@@ -174,7 +174,7 @@ public abstract class Node
     public virtual void checkExport()
     {
         //TODO: add public and private here
-        if (parent == null && Parser.exportTypes.Contains(this.nodeType) && parser.parentParser != null)
+        if (parent.nodeType == AST.Node.NodeType.Empty && Parser.exportTypes.Contains(this.nodeType) && parser.parentParser != null)
         {
             DebugConsole.WriteAnsi("[yellow]adding export node to parent parser named " + parentParser.fileName + " [/]");
             this.parentParser.nodes.Add(this);

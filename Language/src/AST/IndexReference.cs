@@ -15,7 +15,7 @@ public class IndexReference : Node
         this.parent = parent;
         this.parent?.addChild(this);
 
-        if (parent == null)
+        if (parent.nodeType == AST.Node.NodeType.Empty)
         {
             throw new Exception();
         }
