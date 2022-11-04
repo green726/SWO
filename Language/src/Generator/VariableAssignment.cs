@@ -14,6 +14,7 @@ public class VariableAssignment : Base
 
     public override void generate()
     {
+        base.generate();
         // AST.VariableDeclaration originalVarDec = namedValuesAST[varAss.varExpr.value];
         //
         // if (originalVarDec.type.value == "string")

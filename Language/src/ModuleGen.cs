@@ -61,9 +61,9 @@ public static class ModuleGen
     {
         List<IRGen> generators = new List<IRGen>();
 
+        // LLVMContextRef context = LLVM.ContextCreate();
         foreach (Parser parser in parsers)
         {
-            // LLVMContextRef context = LLVM.ContextCreate();
 
             // Make the module, which holds all the code.
             LLVMModuleRef module = LLVM.ModuleCreateWithName(parser.fileName);

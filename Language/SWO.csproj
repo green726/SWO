@@ -11,6 +11,7 @@
   <ItemGroup>
     <PackageReference Include="libLLVM" Version="14.0.0" />
     <PackageReference Include="llvmSharp" Version="5.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Spectre.Console" Version="0.44.0" />
     <PackageReference Include="SymSpell" Version="6.7.2" />
     <PackageReference Include="Tomlyn" Version="0.15.0" />

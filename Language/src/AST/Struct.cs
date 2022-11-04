@@ -4,9 +4,8 @@ namespace AST;
 public class Struct : Node
 {
     public List<AST.Node> properties = new List<AST.Node>();
-    public List<string> propertiesNames = new List<string>();
 
-    public string name = null;
+    public string name = "";
 
     public Struct(Util.Token token, AST.Node parent) : base(token)
     {
@@ -27,11 +26,49 @@ public class Struct : Node
 
         parser.nodes.Add(this);
     }
-
-
-    public int getPropIndex(string propName)
+    public VariableDeclaration getProperty(string propName, AST.Node caller)
     {
-        return propertiesNames.IndexOf(propName);
+        foreach (AST.Node node in properties)
+        {
+            AST.VariableDeclaration varDec = (AST.VariableDeclaration)node;
+            if (varDec.name == propName)
+            {
+                return varDec;
+            }
+        }
+
+        throw ParserException.FactoryMethod("An unknown property of a struct was referenced", "Remove the property reference, or change it to one that is a part of the struct", caller, this);
+    }
+
+    public VariableDeclaration getProperty(string propName)
+    {
+        List<VariableDeclaration> decList = (List<VariableDeclaration>)properties.Where((prop) =>
+        {
+            VariableDeclaration varDec = (VariableDeclaration)prop;
+            return varDec.name == propName;
+        });
+
+        if (decList.Count == 0)
+        {
+            throw ParserException.FactoryMethod("An unknown property of a struct was referenced", "Remove the property reference, or change it to one that is a part of the struct", this);
+        }
+
+        return decList[0];
+    }
+
+    public int getPropertyIndex(string propName)
+    {
+        int idx = 0;
+        foreach (AST.Node node in properties)
+        {
+            AST.VariableDeclaration varDec = (AST.VariableDeclaration)node;
+            if (varDec.name == propName)
+            {
+                return idx;
+            }
+            idx++;
+        }
+        throw ParserException.FactoryMethod("An unknown property of a struct was referenced", "Remove the property reference, or change it to one that is a part of the struct", this);
     }
 
     public override void addChild(Node child)
@@ -41,6 +78,7 @@ public class Struct : Node
             VariableExpression varExpr = (VariableExpression)child;
             this.name = varExpr.value;
             parser.typeList.Add(this.name);
+            parser.declaredStructs.Add(this.name, this);
             base.addChild(child);
             return;
         }
@@ -48,6 +86,7 @@ public class Struct : Node
         {
             throw new ArgumentException("non var dec added to str");
         }
+        DebugConsole.WriteAnsi("[green]adding var dec to struct[/]");
         AST.VariableDeclaration varDec = (AST.VariableDeclaration)child;
         properties.Add(child);
         base.addChild(child);
@@ -55,10 +94,11 @@ public class Struct : Node
 
     public override void addChild(Util.Token child)
     {
-        if (this.name == null)
+        if (this.name == "")
         {
             this.name = child.value;
             parser.typeList.Add(this.name);
+            parser.declaredStructs.Add(this.name, this);
         }
         else if (child.value == "{" || child.value == "}")
         {

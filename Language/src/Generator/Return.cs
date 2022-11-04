@@ -14,6 +14,7 @@ public class Return : Base
 
     public override void generate()
     {
+        base.generate();
         ret.expr.generator.generate();
         LLVMValueRef retValue = gen.valueStack.Pop();
         checkType(retValue.TypeOf());

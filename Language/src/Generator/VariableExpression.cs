@@ -112,6 +112,7 @@ public class VariableExpression : Base
             num = gen.getStructFieldIndex(varExpr);
             DebugConsole.Write("got struct gep num: " + num);
 
+
             LLVMValueRef numGEPRef = LLVM.BuildStructGEP(gen.builder, gepPtr, (uint)num, "structGEPTmp");
             gen.valueStack.Push(numGEPRef);
             DebugConsole.Write(numGEPRef);

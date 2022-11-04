@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
-using Tomlyn;
 using Spectre.Console;
+using Newtonsoft.Json;
 
 public static class SWO
 {
@@ -27,8 +27,10 @@ public static class SWO
             throw new ArgumentException("No SWO project files found in current directory");
         }
 
-        string tomlText = System.IO.File.ReadAllText(files[0]);
-        projectInfo = Toml.ToModel<ProjectInfo>(tomlText);
+        // string tomlText = System.IO.File.ReadAllText(files[0]);
+        // projectInfo = Toml.ToModel<ProjectInfo>(tomlText);
+        string jsonText = System.IO.File.ReadAllText(files[0]);
+        projectInfo = JsonConvert.DeserializeObject<ProjectInfo>(jsonText)!;
         projectInfo.setConfig();
 
         if (!settings.debugLogging)
@@ -85,6 +87,11 @@ public static class SWO
                         fileNames.Add(EXE.compileEXE(settings, generator, exeCompileTask));
                     }
                     EXE.link(settings, fileNames);
+
+
+                    foreach (Parser parser in parsers)
+                    {
+                    }
                 });
         }
         else
@@ -120,6 +127,10 @@ public static class SWO
                 fileNames.Add(EXE.compileEXE(settings, generator));
             }
             EXE.link(settings, fileNames);
+
+            if (settings.distributeAST)
+            {
+            }
         }
 
         AnsiConsole.MarkupLine("[green]SWO project successfully compiled[/]");
@@ -156,5 +167,15 @@ public static class SWO
 
         process.Start();
 
+    }
+
+    public static void serializeParsers(List<Parser> parsers)
+    {
+        foreach (Parser parser in parsers)
+        {
+            ASTFile file = new ASTFile(parser) { path = "hi" };
+
+            file.write();
+        }
     }
 }

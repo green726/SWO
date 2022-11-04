@@ -58,6 +58,7 @@ public class Parser
     //HACK: might want to do this differently
     //NOTE: modified name
     public Dictionary<string, AST.Prototype> declaredFuncs = new Dictionary<string, AST.Prototype>();
+    public Dictionary<string, AST.Struct> declaredStructs = new Dictionary<string, AST.Struct>();
 
     //NOTE: below can be used to add user defined types (structs/classes)
     public List<string> typeList = new List<string>() { "double", "float", "string" };
@@ -263,7 +264,6 @@ public class Parser
             throw new ParserException($"expected token of type {expectedType} but got {token.type}", token);
         }
     }
-
 
     public string printBinary(AST.BinaryExpression bin)
     {

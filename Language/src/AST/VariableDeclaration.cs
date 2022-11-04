@@ -122,7 +122,7 @@ public class VariableDeclaration : Node
             switch (childLoop)
             {
                 case 0:
-                    this.type = new Type(child); parser.addNamedValueInScope(this.name, this.type);
+                    this.type = new Type(child);
                     DebugConsole.WriteAnsi("[green]adding vardec to stack[/]");
                     break;
                 case 1:
@@ -136,6 +136,7 @@ public class VariableDeclaration : Node
                         return;
                     }
                     this.name = child.value;
+                    parser.addNamedValueInScope(this.name, this.type);
                     if (Config.settings.general.typo.enabled)
                     {
                         Typo.addToLittle(this);

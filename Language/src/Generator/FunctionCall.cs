@@ -63,7 +63,19 @@ public class FunctionCall : Base
             argsRef[i] = gen.valueStack.Pop();
         }
 
-        gen.valueStack.Push(LLVM.BuildCall(gen.builder, funcRef, argsRef, "calltmp"));
+        DebugConsole.WriteAnsi("[purple]funcCall stuff below[/]");
+        DebugConsole.Write(LLVM.GetReturnType(funcRef.TypeOf()).GetReturnType().TypeKind);
+
+        if (LLVM.GetReturnType(funcRef.TypeOf()).GetReturnType().TypeKind == LLVMTypeKind.LLVMVoidTypeKind)
+        {
+            DebugConsole.WriteAnsi("[purple]funcCallNoName[/]");
+            gen.valueStack.Push(LLVM.BuildCall(gen.builder, funcRef, argsRef, ""));
+        }
+        else
+        {
+            gen.valueStack.Push(LLVM.BuildCall(gen.builder, funcRef, argsRef, "calltmp"));
+        }
+
 
     }
 

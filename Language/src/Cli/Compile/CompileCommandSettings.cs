@@ -28,6 +28,10 @@ public class CompileCommandSettings : CommandSettings
     [CommandOption("-d|--debug")]
     public bool debugLogging { get; init; } = false;
 
+    [Description("Package the necessary public components of the file's AST for distribution (used by SAP)")]
+    [CommandOption("--distribute-ast")]
+    public bool distributeAST { get; init; } = false;
+
     public FileType resultFileType
     {
         get

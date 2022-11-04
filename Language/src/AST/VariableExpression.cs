@@ -8,15 +8,52 @@ public class VariableExpression : Expression
         this.generator = new Generator.VariableExpression(this);
 
         this.value = token.value;
+        this.parent = parent;
 
-        //TODO: implement the same variable scoping in the parser as the generator has
+        //TODO: allow this to handle structs
         DebugConsole.Write(this.value);
-        AST.Type originalType = parser.getNamedValueInScope(this.value);
-        this.type = originalType;
+        if (this.parent.nodeType == NodeType.VariableExpression)
+        {
+            VariableExpression varExprPar = (VariableExpression)parent;
+            VariableDeclaration varDec = parser.declaredStructs[varExprPar.type.value].getProperty(this.value, this);
+            AST.Type originalType = varDec.type;
+            this.type = originalType;
+            DebugConsole.Write(this.type);
+            DebugConsole.Write("set varExpr type based on struct");
+        }
+
+        if (this.parent.nodeType == NodeType.Reference)
+        {
+            Reference refPar = (Reference)parent;
+            if (refPar.actualExpr.nodeType == NodeType.VariableExpression)
+            {
+                VariableExpression varExprPar = (VariableExpression)refPar.actualExpr;
+                VariableDeclaration varDec = parser.declaredStructs[varExprPar.type.value].getProperty(this.value, this);
+                AST.Type originalType = varDec.type;
+                this.type = originalType;
+                DebugConsole.Write("set varExpr type based on ref");
+            }
+        }
+        else if (this.parent.nodeType == NodeType.Dereference)
+        {
+            Dereference derefPar = (Dereference)parent;
+            if (derefPar.actualExpr.nodeType == NodeType.VariableExpression)
+            {
+                VariableExpression varExprPar = (VariableExpression)derefPar.actualExpr;
+                VariableDeclaration varDec = parser.declaredStructs[varExprPar.type.value].getProperty(this.value, this);
+                AST.Type originalType = varDec.type;
+                this.type = originalType;
+                DebugConsole.Write("set varExpr type based on deref");
+            }
+        }
+        else
+        {
+            AST.Type originalType = parser.getNamedValueInScope(this.value);
+            this.type = originalType;
+        }
         DebugConsole.WriteAnsi($"[yellow]original type + {this.type.value}[/]");
         // this.type = new Type("int", this);
 
-        this.parent = parent;
         this.newLineReset = true;
 
         // if (token.value.Contains("[") && token.value.Contains("]"))

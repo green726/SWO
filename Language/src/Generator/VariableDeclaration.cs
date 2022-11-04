@@ -16,6 +16,7 @@ public class VariableDeclaration : Base
 
     public override void generate()
     {
+        base.generate();
         if (varDec.generated) { return; }
         // if (varDec.type.value == "string")
         // {

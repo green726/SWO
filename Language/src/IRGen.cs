@@ -1,7 +1,5 @@
 using LLVMSharp;
 
-using Spectre.Console;
-
 public class IRGen
 {
     public static Stack<IRGen> generatorStack = new Stack<IRGen>();
@@ -11,9 +9,9 @@ public class IRGen
         return generatorStack.Peek();
     }
 
-    public static IRGen addInstance(LLVMBuilderRef _builder, LLVMModuleRef _module, LLVMPassManagerRef _passManager, Parser _parser, string fileName)
+    public static IRGen addInstance(LLVMBuilderRef _builder, LLVMModuleRef _module, LLVMPassManagerRef _passManager, /* LLVMContextRef context, */ Parser _parser, string fileName)
     {
-        IRGen newGen = new IRGen(_builder, _module, _passManager, _parser, fileName);
+        IRGen newGen = new IRGen(_builder, _module, _passManager, /* context, */ _parser, fileName);
         generatorStack.Push(newGen);
         return newGen;
     }
@@ -23,7 +21,7 @@ public class IRGen
         return generatorStack.Pop();
     }
 
-    public IRGen(LLVMBuilderRef _builder, LLVMModuleRef _module, LLVMPassManagerRef _passManager, Parser parser, string fileName)
+    public IRGen(LLVMBuilderRef _builder, LLVMModuleRef _module, LLVMPassManagerRef _passManager, /* LLVMContextRef context, */ Parser parser, string fileName)
     {
         DebugConsole.WriteAnsi($"[blue]fileName: {fileName}[/]");
         this.fileName = fileName;
@@ -31,6 +29,7 @@ public class IRGen
         module = _module;
         passManager = _passManager;
         this.parser = parser;
+        // this.context = context;
     }
 
     public Parser parser;
@@ -47,8 +46,8 @@ public class IRGen
 
     public LLVMPassManagerRef passManager;
 
-    public readonly Stack<LLVMValueRef> valueStack = new Stack<LLVMValueRef>();
-    public readonly Stack<LLVMTypeRef> typeStack = new Stack<LLVMTypeRef>();
+    public Stack<LLVMValueRef> valueStack = new Stack<LLVMValueRef>();
+    public Stack<LLVMTypeRef> typeStack = new Stack<LLVMTypeRef>();
 
     public Dictionary<string, LLVMValueRef> namedValuesLLVM = new Dictionary<string, LLVMValueRef>();
     public Dictionary<string, AST.Struct> namedTypesAST = new Dictionary<string, AST.Struct>();
@@ -127,14 +126,14 @@ public class IRGen
 
     public int getStructFieldIndex(AST.VariableExpression varExpr)
     {
-        int index = currentStruct.Pop().getPropIndex(varExpr.value);
+        int index = currentStruct.Pop().getPropertyIndex(varExpr.value);
 
         return index;
     }
 
     public int getStructFieldIndex(string fieldName)
     {
-        int index = currentStruct.Pop().getPropIndex(fieldName);
+        int index = currentStruct.Pop().getPropertyIndex(fieldName);
 
         return index;
     }

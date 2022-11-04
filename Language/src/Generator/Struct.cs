@@ -13,13 +13,14 @@ public class Struct : Base
 
     public override void generate()
     {
+        base.generate();
         DebugConsole.Write("adding str with name of " + str.name + " to dict");
         gen.namedTypesAST.Add(str.name, this.str);
 
         foreach (AST.Node node in str.properties)
         {
             AST.VariableDeclaration varDec = (AST.VariableDeclaration)node;
-            str.propertiesNames.Add(varDec.name);
+            // str.propertiesNames.Add(varDec.name);
         }
 
         List<LLVMTypeRef> elementTypes = new List<LLVMTypeRef>();
@@ -31,7 +32,11 @@ public class Struct : Base
             elementTypes.Add(gen.typeStack.Pop());
         }
 
-        LLVMTypeRef structType = LLVM.StructCreateNamed(gen.context, this.str.name);
+
+        DebugConsole.Write("ekjad");
+        DebugConsole.Write(gen.context);
+        //BUG: this line errors
+        LLVMTypeRef structType = LLVM.StructCreateNamed(LLVM.GetGlobalContext(), this.str.name);
         LLVM.StructSetBody(structType, elementTypes.ToArray(), false);
 
         DebugConsole.Write("struct type dump");

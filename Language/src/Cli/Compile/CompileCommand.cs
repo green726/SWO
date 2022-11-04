@@ -1,7 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
-using Spectre.Console;
 using Spectre.Console.Cli;
-using Tomlyn;
 
 public class CompileCommand : Command<CompileCommandSettings>
 {

@@ -1,4 +1,5 @@
 using System.Runtime.Serialization;
+using Newtonsoft.Json;
 using Tomlyn;
 
 public class ProjectInfo
@@ -22,6 +23,8 @@ public class ProjectInfo
 
     public List<SWOFile> files { get; set; } = new List<SWOFile>();
 
+    public List<ASTFile> ASTFiles { get; set; } = new List<ASTFile>();
+
     public List<Library> libraries { get; set; } = new List<Library>();
     public string projectName { get; set; } = "unknown";
 
@@ -35,9 +38,10 @@ public class ProjectInfo
 
     public void write()
     {
-        var tomlString = Toml.FromModel(this);
+        // var tomlString = Toml.FromModel(this);
+        var jsonString = JsonConvert.SerializeObject(this);
         // DebugConsole.Write("Toml string: \n" + tomlString);
-        File.WriteAllText(@$"{path}/{projectName}.sproj", tomlString);
+        File.WriteAllText(@$"{path}/{projectName}.sproj", jsonString);
     }
 
     public ProjectInfo()
@@ -137,16 +141,53 @@ public class Library
 
 public class ASTFile
 {
+    public string nameWithoutExtension { get; set; } = "";
+    public string name { get; set; } = "";
+    public string path { get; set; } = "";
+
+    public Dictionary<string, AST.Prototype> prototypes { get; set; } = new Dictionary<string, AST.Prototype>();
+
+    public Dictionary<string, AST.Struct> structs { get; set; } = new Dictionary<string, AST.Struct>();
+
+    public static List<ASTFile> deserializeAll(string path)
+    {
+        string[] files = Directory.GetFiles(path, "*.ast.json", SearchOption.AllDirectories);
+        List<ASTFile> returnList = new List<ASTFile>();
+
+        foreach (string file in files)
+        {
+            string fileText = File.ReadAllText(file);
+
+            returnList.Add(JsonConvert.DeserializeObject<ASTFile>(fileText)!);
+        }
+        return returnList;
+    }
+
     public ASTFile()
     {
+    }
+
+    public ASTFile(Parser parser)
+    {
+        this.prototypes = parser.declaredFuncs;
+        this.structs = parser.declaredStructs;
+
+        this.nameWithoutExtension = parser.fileName;
+        this.name = $"{nameWithoutExtension}.ast.json";
+    }
+
+    public void write()
+    {
+        var jsonString = JsonConvert.SerializeObject(this);
+        File.WriteAllText(@$"{path}/{nameWithoutExtension}.ast.json", jsonString);
     }
 }
 
 public class SWOFile
 {
-    public string nameWithoutExtension { get; set; }
-    public string name { get; set; }
-    public string path { get; set; }
+    public string nameWithoutExtension { get; set; } = "";
+    public string name { get; set; } = "";
+    public string path { get; set; } = "";
 
     [IgnoreDataMember]
     public string value
@@ -166,6 +207,5 @@ public class SWOFile
 
     public SWOFile()
     {
-
     }
 }

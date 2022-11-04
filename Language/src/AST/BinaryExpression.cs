@@ -122,6 +122,7 @@ public class BinaryExpression : Expression
         this.type = this.leftHand.type;
 
     }
+
     public override void addChild(AST.Node child)
     {
         base.addChild(child);
