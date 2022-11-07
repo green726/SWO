@@ -1002,7 +1002,6 @@ public class Parser
 
                         return;
                     case "&":
-
                         parent = new AST.Reference(token, parent);
                         return;
                 }

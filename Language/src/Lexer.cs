@@ -41,7 +41,6 @@ public static class Lexer
 
             if (ch == ' ' || isFinalChar || ch == '\n' || ch == ')' || ch == '}' || specialChars.Contains(ch.ToString()) || ch == ';')
             {
-
                 //NOTE: below will avoid doing anything if you are in a string
                 if (lastChar != ' ' && !stringBuilder.ToString().StartsWith("\""))
                 {
@@ -87,16 +86,16 @@ public static class Lexer
                     lastChar = ch;
                     stringBuilder = new StringBuilder();
                     continue;
-                case '[':
-                    lexDelimiter(Util.TokenType.DelimiterOpen, stringBuilder, ch, line, column, charNum);
-                    lastChar = ch;
-                    stringBuilder = new StringBuilder();
-                    continue;
-                case ']':
-                    lexDelimiter(Util.TokenType.DelimiterClose, stringBuilder, ch, line, column, charNum);
-                    lastChar = ch;
-                    stringBuilder = new StringBuilder();
-                    continue;
+                    // case '[':
+                    //     lexDelimiter(Util.TokenType.DelimiterOpen, stringBuilder, ch, line, column, charNum);
+                    //     lastChar = ch;
+                    //     stringBuilder = new StringBuilder();
+                    //     continue;
+                    // case ']':
+                    //     lexDelimiter(Util.TokenType.DelimiterClose, stringBuilder, ch, line, column, charNum);
+                    //     lastChar = ch;
+                    //     stringBuilder = new StringBuilder();
+                    //     continue;
             }
 
             if (ch == '"')
