@@ -161,7 +161,8 @@ public class VariableDeclaration : Node
                 case 0:
                     this.name = child.value;
                     parser.addNamedValueInScope(this.name, this.type);
-                    DebugConsole.WriteAnsi($"[green]adding vardec to stack with name: {this.name}[/]");
+                    DebugConsole.WriteAnsi($"[green]adding vardec to stack with name:[/]");
+                    DebugConsole.Write(this.name);
                     break;
                 case 1:
                     if (Config.settings.variable.declaration.keyword.mutableIsSymbol)
