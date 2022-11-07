@@ -32,6 +32,9 @@ public class Dereference : Expression
         this.actualExpr = (AST.Expression)child;
         this.actualExpr.isDereference = true;
 
+        //BUG: need to actually figure out the type of this
+        this.type = actualExpr.type;
+
         base.addChild(child);
     }
 }

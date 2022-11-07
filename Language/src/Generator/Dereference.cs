@@ -13,11 +13,11 @@ public class Dereference : Expression
 
     public override void generate()
     {
+        base.generate();
         DebugConsole.WriteAnsi("[blue]dereference genning[/]");
         this.deref.actualExpr.generator.generate();
         checkPtrAndGen(gen.valueStack.Pop());
 
-        base.generate();
     }
 
     public void checkPtrAndGen(LLVMValueRef valInput)

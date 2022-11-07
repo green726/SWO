@@ -1,6 +1,5 @@
 namespace Generator;
 
-
 using LLVMSharp;
 using static IRGen;
 

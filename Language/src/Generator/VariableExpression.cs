@@ -119,11 +119,12 @@ public class VariableExpression : Base
 
             checkIsPtr();
 
-            // if (!varExpr.isReference/*  && varExpr.children.Count() == 0 */)
-            // {
-            //     LLVMValueRef numGEPRefLoad = LLVM.BuildLoad(builder, numGEPRef, "structGEPLoad");
-            //     valueStack.Push(numGEPRefLoad);
-            // }
+            if (!varExpr.isReference/*  && varExpr.children.Count() == 0 */)
+            {
+                LLVMValueRef numGEPRefLoad = LLVM.BuildLoad(gen.builder, numGEPRef, "structGEPLoad");
+                gen.valueStack.Push(numGEPRefLoad);
+                DebugConsole.Write(numGEPRefLoad);
+            }
 
             //NOTE: incase this iteself is another struct set the current struct to this for the rest of its children
             updateCurrentStruct(gepPtr, num);
@@ -134,7 +135,7 @@ public class VariableExpression : Base
         }
         else
         {
-            if (this.varExpr.isReference || this.varExpr.children.Count() > 0)
+            if (this.varExpr.isReference || this.varExpr.parent.nodeType == AST.Node.NodeType.Reference || this.varExpr.children.Count() > 0 || this.varExpr.type.isPointer)
             {
                 DebugConsole.Write("ptr var expr detected");
                 gen.valueStack.Push(generateVarRef());

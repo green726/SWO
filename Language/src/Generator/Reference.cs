@@ -13,6 +13,7 @@ public class Reference : Expression
 
     public override void generate()
     {
+        base.generate();
         reference.actualExpr.generator.generate();
 
         LLVMValueRef valRef = gen.valueStack.Pop();
@@ -38,7 +39,5 @@ public class Reference : Expression
         DebugConsole.Write(ptrValue);
 
         gen.valueStack.Push(ptrValue);
-
-        base.generate();
     }
 }

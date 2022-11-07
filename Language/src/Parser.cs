@@ -81,9 +81,21 @@ public class Parser
 
     public AST.Type getNamedValueInScope(string name)
     {
-        AST.Type val;
-        variablesTypeStack.Peek().TryGetValue(name, out val);
-        return val;
+        if (variablesTypeStack.Peek().ContainsKey(name))
+        {
+            return variablesTypeStack.Peek()[name];
+        }
+        throw new ParserException("An unknown variable was referenced");
+
+    }
+
+    public AST.Type getNamedValueInScope(string name, AST.Node caller)
+    {
+        if (variablesTypeStack.Peek().ContainsKey(name))
+        {
+            return variablesTypeStack.Peek()[name];
+        }
+        throw ParserException.FactoryMethod("An unknown variable was referenced", "Remove the reference", caller, true);
     }
 
     public void clearNamedASTStack()

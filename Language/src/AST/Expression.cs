@@ -2,7 +2,7 @@ namespace AST;
 
 public abstract class Expression : Node
 {
-    public dynamic value { get; set; }
+    public dynamic value { get; set; } = 0;
 
     public bool isReference = false;
     public bool isDereference = false;

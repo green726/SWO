@@ -18,16 +18,15 @@ public class VariableExpression : Expression
             VariableDeclaration varDec = parser.declaredStructs[varExprPar.type.value].getProperty(this.value, this);
             AST.Type originalType = varDec.type;
             this.type = originalType;
-            DebugConsole.Write(this.type);
+            DebugConsole.Write(this.type.value);
             DebugConsole.Write("set varExpr type based on struct");
         }
-
-        if (this.parent.nodeType == NodeType.Reference)
+        else if (this.parent.nodeType == NodeType.Reference)
         {
             Reference refPar = (Reference)parent;
-            if (refPar.actualExpr.nodeType == NodeType.VariableExpression)
+            if (refPar.parent.nodeType == NodeType.VariableExpression)
             {
-                VariableExpression varExprPar = (VariableExpression)refPar.actualExpr;
+                VariableExpression varExprPar = (VariableExpression)refPar.parent;
                 VariableDeclaration varDec = parser.declaredStructs[varExprPar.type.value].getProperty(this.value, this);
                 AST.Type originalType = varDec.type;
                 this.type = originalType;
@@ -37,19 +36,20 @@ public class VariableExpression : Expression
         else if (this.parent.nodeType == NodeType.Dereference)
         {
             Dereference derefPar = (Dereference)parent;
-            if (derefPar.actualExpr.nodeType == NodeType.VariableExpression)
+            if (derefPar.parent.nodeType == NodeType.VariableExpression)
             {
-                VariableExpression varExprPar = (VariableExpression)derefPar.actualExpr;
+                VariableExpression varExprPar = (VariableExpression)derefPar.parent;
                 VariableDeclaration varDec = parser.declaredStructs[varExprPar.type.value].getProperty(this.value, this);
                 AST.Type originalType = varDec.type;
                 this.type = originalType;
                 DebugConsole.Write("set varExpr type based on deref");
             }
         }
-        else
+        if (this.type == null)
         {
-            AST.Type originalType = parser.getNamedValueInScope(this.value);
+            AST.Type originalType = parser.getNamedValueInScope(this.value, this);
             this.type = originalType;
+            DebugConsole.Write("set varExpr type in else (based on original dec)");
         }
         DebugConsole.WriteAnsi($"[yellow]original type + {this.type.value}[/]");
         // this.type = new Type("int", this);
