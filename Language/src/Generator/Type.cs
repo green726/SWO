@@ -39,8 +39,39 @@ public class Type : Base
         }
     }
 
+    public LLVMTypeRef getBasicArrayType()
+    {
+        string containedType = type.getContainedTypeString(type);
+        DebugConsole.Write(containedType);
+        if (gen.namedTypesLLVM.ContainsKey(containedType))
+        {
+            return LLVM.ArrayType(gen.namedTypesLLVM[containedType], (uint)type.size);
+        }
+        (bool isInt, int bits) = type.parser.checkInt(containedType);
+        if (isInt)
+        {
+            return LLVM.ArrayType(LLVM.IntType((uint)bits), (uint)type.size);
+        }
+        switch (containedType)
+        {
+            case "double":
+                return LLVM.ArrayType(LLVM.DoubleType(), (uint)type.size);
+            case "string":
+                //TODO: implement strings as stdlib so they can have a sane type
+                return LLVM.ArrayType(LLVM.Int8Type(), (uint)type.size);
+            case "null":
+                return LLVM.ArrayType(LLVM.VoidType(), (uint)type.size);
+            default:
+                throw GenException.FactoryMethod("An unknown type was referenced", "Make it a known type, or remove it", this.type, true, this.type.value);
+        }
+    }
+
     public LLVMTypeRef getBasicType()
     {
+        if (type.isArray)
+        {
+            return getBasicArrayType();
+        }
         if (gen.namedTypesLLVM.ContainsKey(type.value))
         {
             return gen.namedTypesLLVM[type.value];

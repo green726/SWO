@@ -22,7 +22,7 @@ public class VariableExpression : Base
                 break;
             case AST.Node.NodeType.IndexReference:
                 AST.IndexReference idxPar = (AST.IndexReference)varExpr.parent;
-                varExpr.isReference = idxPar.isPointer;
+                // varExpr.isReference = idxPar.isPointer;
                 break;
                 // case AST.Node.NodeType.Reference:
                 //     varExpr.isReference = true;

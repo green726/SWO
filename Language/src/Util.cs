@@ -60,13 +60,6 @@ public static class Util
         return ret;
     }
 
-    public enum ClassType
-    {
-        Double,
-        Int,
-        String
-    }
-
 
     public class Token
     {

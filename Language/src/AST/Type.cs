@@ -3,7 +3,6 @@ namespace AST;
 public class Type : AST.Node
 {
     public string value;
-    public Util.ClassType defaultType;
 
     //NOTE: this is the size of an array or similar type
     public int size = 0;
@@ -23,6 +22,32 @@ public class Type : AST.Node
             token.value = token.value.Substring(0, token.value.Length - 1);
         }
 
+        if (token.value.Contains("[") && token.value.IndexOf("]") > token.value.IndexOf("["))
+        {
+            this.isArray = true;
+            //handles array types
+            int idxFirstBrack = token.value.IndexOf("[");
+            int idxSecondBrack = token.value.IndexOf("]");
+
+            if (idxFirstBrack + 1 == idxSecondBrack)
+            {
+                // TODO: implement auto-array sizing (gonna need to do it based on future values somehow)
+            }
+            else
+            {
+                string arrSizeStr = "";
+                foreach (char ch in token.value.Substring(idxFirstBrack + 1, idxSecondBrack - (idxFirstBrack + 1)))
+                {
+                    if (!Char.IsDigit(ch))
+                    {
+                        throw ParserException.FactoryMethod($"Illegal non-integer in array size declaration({ch})", "Replace it with an integer", token, this.parent);
+                    }
+                    arrSizeStr += ch;
+                }
+                this.size = int.Parse(arrSizeStr);
+            }
+        }
+
         this.value = token.value;
     }
 
@@ -40,28 +65,28 @@ public class Type : AST.Node
         this.value = value;
     }
 
+    public Type getContainedType(AST.Node caller)
+    {
+        if (!this.isArray)
+        {
+            throw ParserException.FactoryMethod("Attempted to get the contained type of a non-array", "Internal compiler error - make an issue on GitHub", caller, this);
+        }
+        Util.Token typeTok = new Util.Token(Util.TokenType.Keyword, this.value.Remove(this.value.IndexOf("[")), this.line, this.column, false);
+        return new Type(typeTok);
+    }
+
+    public string getContainedTypeString(AST.Node caller)
+    {
+        if (!this.isArray)
+        {
+            throw ParserException.FactoryMethod("Attempted to get the contained type of a non-array", "Internal compiler error - make an issue on GitHub", caller, this);
+        }
+        return this.value.Remove(this.value.IndexOf("["));
+    }
+
+
     public override void addChild(Util.Token child)
     {
-        if (child.value == "[")
-        {
-            this.isArray = true;
-            this.parsingArray = true;
-        }
-        else if (parsingArray)
-        {
-            if (child.value == "]")
-            {
-                this.parsingArray = false;
-            }
-            else if (child.type == Util.TokenType.Double || child.type == Util.TokenType.Int)
-            {
-                this.size = int.Parse(child.value);
-            }
-            else
-            {
-                throw new ParserException("Illegal array size declaration in type", child);
-            }
-        }
         base.addChild(child);
     }
 

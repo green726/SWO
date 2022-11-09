@@ -133,7 +133,13 @@ public class Parser
 
     public void addNamedValueInScope(string name, AST.Type value)
     {
+        DebugConsole.Write("add named to scope called with name " + name);
         variablesTypeStack.Peek().Add(name, value);
+    }
+
+    public static bool isAnArrayRef(Util.Token token)
+    {
+        return (token.value.Contains("[") && token.value.IndexOf("]") > token.value.IndexOf("["));
     }
 
     public bool isType(Util.Token token)
@@ -687,7 +693,7 @@ public class Parser
         //below can handle the nested variable expressions
         //TODO: replace this in favor of special char handling
         AST.VariableExpression varExpr = new AST.VariableExpression(token, parent);
-        if (parent?.nodeType != AST.Node.NodeType.VariableExpression)
+        if (parent.nodeType != AST.Node.NodeType.VariableExpression)
         {
             DebugConsole.Write("returning var expr");
             return (varExpr, delimLevel);
@@ -699,13 +705,13 @@ public class Parser
     {
         if (token.type == Util.TokenType.DelimiterOpen)
         {
-            if (token.value == "[" && parent?.nodeType != AST.Node.NodeType.VariableDeclaration)
-            {
-                parent = new AST.IndexReference(token, parent);
-                delimParentStack.Push(parent);
-                delimLevel++;
-                return (parent, delimLevel);
-            }
+            // if (token.value == "[" && parent?.nodeType != AST.Node.NodeType.VariableDeclaration)
+            // {
+            //     parent = new AST.IndexReference(token, parent);
+            //     delimParentStack.Push(parent);
+            //     delimLevel++;
+            //     return (parent, delimLevel);
+            // }
             bool addLayer = true;
             switch (parent?.nodeType)
             {
@@ -728,6 +734,9 @@ public class Parser
                         addLayer = false;
                     }
                     break;
+                case AST.Node.NodeType.ArrayExpression:
+                    addLayer = false;
+                    break;
                 default:
                     parent?.addChild(token);
                     break;
@@ -747,6 +756,9 @@ public class Parser
             bool removeLayer = true;
             switch (parent?.nodeType)
             {
+                case AST.Node.NodeType.ArrayExpression:
+                    removeLayer = false;
+                    break;
                 case AST.Node.NodeType.ForLoop:
                     if (token.value != ")")
                     {

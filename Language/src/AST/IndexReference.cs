@@ -4,13 +4,13 @@ using Spectre.Console;
 
 public class IndexReference : Node
 {
-    public bool isPointer = false;
     public NumberExpression numExpr;
-    public IndexReference(Util.Token token, AST.Node parent) : base(token)
+    public bool isPointer = false;
+
+    public IndexReference(Util.Token token, AST.Node parent) : base(token, parent)
     {
         this.nodeType = NodeType.IndexReference;
         this.generator = new Generator.IndexReference(this);
-
 
         this.parent = parent;
         this.parent?.addChild(this);
@@ -24,15 +24,5 @@ public class IndexReference : Node
         {
             throw new Exception();
         }
-
-        if (token.value != "[")
-        {
-            throw new Exception();
-        }
-    }
-
-    public override void addChild(Node child)
-    {
-        this.numExpr = (NumberExpression)child;
     }
 }
