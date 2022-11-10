@@ -129,13 +129,26 @@ public class Parser
     {
         return variablesTypeStack.Peek().ContainsKey(name);
     }
-
-
-    public void addNamedValueInScope(string name, TypeInformation value)
+    public void addNamedValueInScope(string name, TypeInformation type, AST.Node caller)
     {
         //TODO: handle variable declared that already exists
         DebugConsole.Write("add named to scope called with name " + name);
-        variablesTypeStack.Peek().Add(name, value);
+        if (variablesTypeStack.Peek().ContainsKey(name))
+        {
+            throw ParserException.FactoryMethod($"Illegal re-definition of variable named {name} with type {type.value}", "Remove the re-definition", caller, true, name);
+        }
+        variablesTypeStack.Peek().Add(name, type);
+    }
+
+    public void addNamedValueInScope(string name, TypeInformation type)
+    {
+        //TODO: handle variable declared that already exists
+        DebugConsole.Write("add named to scope called with name " + name);
+        if (variablesTypeStack.Peek().ContainsKey(name))
+        {
+            throw ParserException.FactoryMethod($"Illegal re-definition of variable named {name} with type {type.value}", "Remove the re-definition", name);
+        }
+        variablesTypeStack.Peek().Add(name, type);
     }
 
     public static bool isAnArrayRef(Util.Token token)

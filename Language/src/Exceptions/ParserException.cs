@@ -104,6 +104,21 @@ public class ParserException : Exception
         return new ParserException(input);
     }
 
+    public static ParserException FactoryMethod(string whatHappened, string recommendedFix, string codeBlock, int errorCode)
+    {
+        string input = "";
+        input = $"{whatHappened}\n```\n{codeBlock}\n```\nHow You Can Fix This: \n{recommendedFix} \nError Code: {errorCode}";
+
+        return new ParserException(input);
+    }
+
+    public static ParserException FactoryMethod(string whatHappened, string recommendedFix, string codeBlock)
+    {
+        string input = "";
+        input = $"{whatHappened}\n```\n{codeBlock}\n```\nHow You Can Fix This: \n{recommendedFix}";
+
+        return new ParserException(input);
+    }
 
     public static string getCodeBlock(AST.Node node)
     {

@@ -13,6 +13,7 @@ public class CLI
             config.AddCommand<NewProjectCommand>("new");
             config.AddCommand<CompileCommand>("compile");
             config.AddCommand<RunCommand>("run");
+            config.AddCommand<LookupErrorCommand>("error");
         });
         app.Run(args);
     }

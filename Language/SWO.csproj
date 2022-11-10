@@ -19,5 +19,6 @@
 
 <ItemGroup>
     <None Include="./src/Dictionaries/*.*" LinkBase="Dictionaries/" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="./src/CompilerResources/*.*" LinkBase="CompilerResources/" CopyToOutputDirectory="PreserveNewest" />
 </ItemGroup>
 </Project>
