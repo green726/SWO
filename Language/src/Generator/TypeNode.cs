@@ -105,3 +105,4 @@ public class Type : Base
         gen.typeStack.Push(getBasicType());
     }
 }
+

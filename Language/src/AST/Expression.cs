@@ -7,7 +7,7 @@ public abstract class Expression : Node
     public bool isReference = false;
     public bool isDereference = false;
 
-    public AST.Type type { get; set; }
+    public ParserTypeInformation type { get; set; }
 
     public Expression(Util.Token token) : base(token)
     {

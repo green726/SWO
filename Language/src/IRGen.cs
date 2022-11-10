@@ -138,16 +138,16 @@ public class IRGen
         return index;
     }
 
-    public AST.Type LLVMTypeToASTType(LLVMTypeRef type, AST.Node parent)
+    public TypeInformation LLVMTypeToASTType(LLVMTypeRef type, AST.Node parent)
     {
         switch (type.TypeKind)
         {
             case LLVMTypeKind.LLVMDoubleTypeKind:
-                return new AST.Type(new Util.Token(Util.TokenType.Keyword, "double", parent.line, parent.column));
+                return new ParserTypeInformation("int");
             case LLVMTypeKind.LLVMIntegerTypeKind:
-                return new AST.Type(new Util.Token(Util.TokenType.Keyword, "int", parent.line, parent.column));
+                return new ParserTypeInformation("int");
             case LLVMTypeKind.LLVMPointerTypeKind:
-                return new AST.Type(new Util.Token(Util.TokenType.Keyword, "int", parent.line, parent.column));
+                return new ParserTypeInformation("int");
         }
 
         throw GenException.FactoryMethod($"An unknown or unsupported type ({type.TypeKind.ToString()}) was used", "You used an undefined or illegal type | Likely a typo", parent, true, type.TypeKind.ToString());

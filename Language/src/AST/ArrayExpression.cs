@@ -2,7 +2,6 @@ namespace AST;
 
 public class ArrayExpression : Expression
 {
-    public Type containedType;
     public int length;
 
     public ArrayExpression(Util.Token token, AST.Node parent) : base(token)
@@ -22,8 +21,6 @@ public class ArrayExpression : Expression
             if (this.parent.nodeType == NodeType.VariableDeclaration)
             {
                 VariableDeclaration varDec = (VariableDeclaration)parent;
-                this.containedType = varDec.type;
-                this.containedType.isArray = true;
             }
             else
             {

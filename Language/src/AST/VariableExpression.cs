@@ -63,7 +63,7 @@ public class VariableExpression : Expression
                     VariableExpression varExprPar = (VariableExpression)parent;
                     VariableDeclaration varDec = parser.declaredStructs[varExprPar.type.value].getProperty(value, this);
                     Type originalType = varDec.type;
-                    this.type = originalType;
+                    this.type = (ParserTypeInformation)originalType;
                     DebugConsole.Write(type.value);
                     DebugConsole.Write("set varExpr type based on struct");
                     break;
@@ -77,7 +77,7 @@ public class VariableExpression : Expression
                         VariableExpression varExprPar = (VariableExpression)refPar.parent;
                         VariableDeclaration varDec = parser.declaredStructs[varExprPar.type.value].getProperty(value, this);
                         Type originalType = varDec.type;
-                        this.type = originalType;
+                        this.type = (ParserTypeInformation)originalType;
                         DebugConsole.Write("set varExpr type based on ref");
                     }
 
@@ -92,7 +92,7 @@ public class VariableExpression : Expression
                         VariableExpression varExprPar = (VariableExpression)derefPar.parent;
                         VariableDeclaration varDec = parser.declaredStructs[varExprPar.type.value].getProperty(value, this);
                         Type originalType = varDec.type;
-                        this.type = originalType;
+                        this.type = (ParserTypeInformation)originalType;
                         DebugConsole.Write("set varExpr type based on deref");
                     }
 
@@ -102,7 +102,7 @@ public class VariableExpression : Expression
         if (this.type == null)
         {
             DebugConsole.Write(this.value);
-            AST.Type originalType = parser.getNamedValueInScope(this.value, this);
+            ParserTypeInformation originalType = parser.getNamedValueInScope(this.value, this);
             this.type = originalType;
             DebugConsole.Write("set varExpr type in else (based on original dec)");
         }
@@ -111,7 +111,7 @@ public class VariableExpression : Expression
     private void handleArrayRefConstruction(Util.Token token, bool parentRequired = true)
     {
         discernType();
-        this.type = this.type.getContainedType(this);
+        this.type = this.type.getContainedType();
 
         if (parent != null)
         {

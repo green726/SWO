@@ -77,9 +77,9 @@ public class Parser
 
     public string[] binaryMathOps = { "+", "-", "*", "/" };
 
-    public Stack<Dictionary<string, AST.Type>> variablesTypeStack = new Stack<Dictionary<string, AST.Type>>();
+    public Stack<Dictionary<string, TypeInformation>> variablesTypeStack = new Stack<Dictionary<string, TypeInformation>>();
 
-    public AST.Type getNamedValueInScope(string name)
+    public TypeInformation getNamedValueInScopeType(string name)
     {
         if (variablesTypeStack.Peek().ContainsKey(name))
         {
@@ -89,7 +89,7 @@ public class Parser
 
     }
 
-    public AST.Type getNamedValueInScope(string name, AST.Node caller)
+    public TypeInformation getNamedValueInScope(string name, AST.Node caller)
     {
         if (variablesTypeStack.Peek().ContainsKey(name))
         {
@@ -108,11 +108,11 @@ public class Parser
         DebugConsole.WriteAnsi("[yellow]adding layer to stack[/]");
         if (variablesTypeStack.Count > 0)
         {
-            variablesTypeStack.Push(new Dictionary<string, AST.Type>(variablesTypeStack.Peek()));
+            variablesTypeStack.Push(new Dictionary<string, TypeInformation>(variablesTypeStack.Peek()));
         }
         else
         {
-            variablesTypeStack.Push(new Dictionary<string, AST.Type>());
+            variablesTypeStack.Push(new Dictionary<string, TypeInformation>());
         }
     }
 
@@ -131,8 +131,9 @@ public class Parser
     }
 
 
-    public void addNamedValueInScope(string name, AST.Type value)
+    public void addNamedValueInScope(string name, TypeInformation value)
     {
+        //TODO: handle variable declared that already exists
         DebugConsole.Write("add named to scope called with name " + name);
         variablesTypeStack.Peek().Add(name, value);
     }
@@ -297,8 +298,7 @@ public class Parser
         StringBuilder stringBuilder = new StringBuilder();
         if (func.prototype.arguments.Count() > 0)
         {
-
-            stringBuilder.Append($"first arg type: {printType(func.prototype.arguments.ElementAt(0).Value)}");
+            stringBuilder.Append($"first arg type: {printType((ParserTypeInformation)func.prototype.arguments.ElementAt(0).Value)}");
         }
         stringBuilder.Append($"{func.nodeType} name: {func.prototype.name} args: {Serialize(func.prototype.arguments.ToList())} body start: ");
         stringBuilder.Append(printASTRet(func.body));
@@ -339,7 +339,7 @@ public class Parser
         return $"";
     }
 
-    public string printType(AST.Type type)
+    public string printType(TypeInformation type)
     {
         return $"type with name of {type.value} and is array of {type.isArray}";
     }

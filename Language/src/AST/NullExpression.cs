@@ -7,7 +7,7 @@ public class NullExpression : Expression
         this.nodeType = AST.Node.NodeType.NullExpression;
         this.generator = new Generator.NullExpression(this);
 
-        this.type = new AST.Type("void", this);
+        this.type = new ParserTypeInformation("void");
     }
 
 
@@ -18,7 +18,7 @@ public class NullExpression : Expression
 
         this.parent = parent;
         this.parent?.addChild(this);
-        this.type = new AST.Type("void", this);
+        this.type = new ParserTypeInformation("void");
     }
 
 }

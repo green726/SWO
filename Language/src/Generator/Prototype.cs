@@ -45,7 +45,8 @@ public class Prototype : Base
                 arguments.Add(gen.typeStack.Pop());
             }
 
-            proto.returnType.generator.generate();
+            GeneratorTypeInformation genTypeInfo = (GeneratorTypeInformation)proto.returnType;
+            LLVMTypeRef retType = genTypeInfo.getLLVMType();
             LLVMTypeRef funcType = LLVM.FunctionType(gen.typeStack.Pop(), arguments.ToArray(), proto.variableArgument);
             function = LLVM.AddFunction(gen.module, proto.name, funcType);
             LLVM.SetLinkage(function, LLVMLinkage.LLVMExternalLinkage);

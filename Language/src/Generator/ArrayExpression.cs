@@ -2,11 +2,11 @@ namespace Generator;
 
 using LLVMSharp;
 
-public class ArrayExpression : Base
+public class ArrayExpression : Expression
 {
     public AST.ArrayExpression arrExpr;
 
-    public ArrayExpression(AST.Node node)
+    public ArrayExpression(AST.Expression node) : base(node)
     {
         this.arrExpr = (AST.ArrayExpression)node;
     }
@@ -15,10 +15,9 @@ public class ArrayExpression : Base
     {
         base.generate();
 
-        arrExpr.containedType.size = arrExpr.length;
-        arrExpr.containedType.generator.generate();
+        arrExpr.type.size = arrExpr.length;
 
-        LLVMTypeRef typeLLVM = gen.typeStack.Pop();
+        LLVMTypeRef typeLLVM = typeInfo.getLLVMType();
 
         DebugConsole.Write("array expr type: " + typeLLVM);
 

@@ -14,11 +14,11 @@ public class NumberExpression : Expression
         {
             case Util.TokenType.Double:
                 this.value = (double)Double.Parse(token.value);
-                this.type = new Type("double", this);
+                this.type = new ParserTypeInformation("double");
                 break;
             case Util.TokenType.Int:
                 this.value = (int)int.Parse(token.value);
-                this.type = new Type("int", this);
+                this.type = new ParserTypeInformation("int");
                 break;
         }
         this.parent = parent;

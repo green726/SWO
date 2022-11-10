@@ -65,16 +65,6 @@ public class Type : AST.Node
         this.value = value;
     }
 
-    public Type getContainedType(AST.Node caller)
-    {
-        if (!this.isArray)
-        {
-            throw ParserException.FactoryMethod("Attempted to get the contained type of a non-array", "Internal compiler error - make an issue on GitHub", caller, this);
-        }
-        Util.Token typeTok = new Util.Token(Util.TokenType.Keyword, this.value.Remove(this.value.IndexOf("[")), this.line, this.column, false);
-        return new Type(typeTok);
-    }
-
     public string getContainedTypeString(AST.Node caller)
     {
         if (!this.isArray)
@@ -84,22 +74,10 @@ public class Type : AST.Node
         return this.value.Remove(this.value.IndexOf("["));
     }
 
-
     public override void addChild(Util.Token child)
     {
         base.addChild(child);
     }
 
-    private void checkTypes(string value)
-    {
-        foreach (string type in parser.typeList)
-        {
-            if (type == value)
-            {
-                return;
-            }
-        }
-        throw new ParserException("Unknown type used", this);
-    }
 }
 

@@ -136,7 +136,7 @@ public class VariableDeclaration : Node
                         return;
                     }
                     this.name = child.value;
-                    parser.addNamedValueInScope(this.name, this.type);
+                    parser.addNamedValueInScope(this.name, (ParserTypeInformation)this.type);
                     if (Config.settings.general.typo.enabled)
                     {
                         Typo.addToLittle(this);
@@ -160,7 +160,7 @@ public class VariableDeclaration : Node
             {
                 case 0:
                     this.name = child.value;
-                    parser.addNamedValueInScope(this.name, this.type);
+                    parser.addNamedValueInScope(this.name, (ParserTypeInformation)this.type);
                     DebugConsole.WriteAnsi($"[green]adding vardec to stack with name:[/]");
                     DebugConsole.Write(this.name);
                     break;

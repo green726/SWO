@@ -9,9 +9,9 @@ public class Prototype : AST.Node
     public string name = "";
     public Dictionary<string, Type> arguments = new Dictionary<string, Type>();
     private bool typePredicted = true;
-    private Type prevType;
+    private AST.Type prevType;
 
-    public Type returnType;
+    public TypeInformation returnType;
 
     public bool external = false;
 
@@ -51,11 +51,11 @@ public class Prototype : AST.Node
             {
                 this.name = "";
             }
-            this.returnType = new Type("null", this);
+            this.returnType = new ParserTypeInformation("null");
         }
         else
         {
-            this.returnType = new Type(token);
+            this.returnType = new ParserTypeInformation(token.value);
         }
 
         this.arguments = new Dictionary<string, Type>();
@@ -103,7 +103,7 @@ public class Prototype : AST.Node
             // throw ParserException.FactoryMethod();
             arguments.Add(token.value, prevType);
             DebugConsole.Write(token.value);
-            parser.addNamedValueInScope(token.value, prevType);
+            parser.addNamedValueInScope(token.value, (ParserTypeInformation)prevType);
         }
     }
 

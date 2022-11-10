@@ -6,10 +6,12 @@ using static IRGen;
 public abstract class Expression : Base
 {
     public AST.Expression expr;
+    public GeneratorTypeInformation typeInfo;
 
     protected Expression(AST.Expression expr)
     {
         this.expr = expr;
+        this.typeInfo = (GeneratorTypeInformation)expr.type;
     }
 
     public override void generate()
