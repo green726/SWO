@@ -16,7 +16,8 @@ public class Prototype : Base
     {
         base.generate();
         proto.handleOverload();
-        DebugConsole.WriteAnsi("[yellow]proto named " + proto.name + " [/]");
+        DebugConsole.WriteAnsi("[yellow]proto named:[/]");
+        DebugConsole.Write(proto.name);
         //begin argument generation
         int argumentCount = proto.arguments.Count();
         List<LLVMTypeRef> arguments = new List<LLVMTypeRef>();
@@ -45,9 +46,9 @@ public class Prototype : Base
                 arguments.Add(gen.typeStack.Pop());
             }
 
-            GeneratorTypeInformation genTypeInfo = (GeneratorTypeInformation)proto.returnType;
+            GeneratorTypeInformation genTypeInfo = (GeneratorTypeInformation)(ParserTypeInformation)proto.returnType;
             LLVMTypeRef retType = genTypeInfo.getLLVMType();
-            LLVMTypeRef funcType = LLVM.FunctionType(gen.typeStack.Pop(), arguments.ToArray(), proto.variableArgument);
+            LLVMTypeRef funcType = LLVM.FunctionType(retType, arguments.ToArray(), proto.variableArgument);
             function = LLVM.AddFunction(gen.module, proto.name, funcType);
             LLVM.SetLinkage(function, LLVMLinkage.LLVMExternalLinkage);
         }

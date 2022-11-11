@@ -124,7 +124,13 @@ public class VariableExpression : Base
                 LLVMValueRef numGEPRefLoad = LLVM.BuildLoad(gen.builder, numGEPRef, "structGEPLoad");
                 gen.valueStack.Push(numGEPRefLoad);
                 DebugConsole.Write(numGEPRefLoad);
+                generateArrayGEP(numGEPRefLoad);
             }
+            else
+            {
+                generateArrayGEP(numGEPRef);
+            }
+
 
             //NOTE: incase this iteself is another struct set the current struct to this for the rest of its children
             updateCurrentStruct(gepPtr, num);
@@ -138,19 +144,43 @@ public class VariableExpression : Base
             if (this.varExpr.isReference || this.varExpr.parent.nodeType == AST.Node.NodeType.Reference || this.varExpr.children.Count() > 0 || this.varExpr.type.isPointer)
             {
                 DebugConsole.Write("ptr var expr detected");
-                gen.valueStack.Push(generateVarRef());
+                LLVMValueRef varRef = generateVarRef();
+                gen.valueStack.Push(varRef);
+                generateArrayGEP(varRef);
             }
             else
             {
-                DebugConsole.Write("generating load ref");
-                LLVMValueRef loadRef = generateVarLoad();
-                DebugConsole.Write("genned load ref");
-                gen.valueStack.Push(loadRef);
+                if (!varExpr.isArrayRef)
+                {
+                    DebugConsole.Write("generating load ref");
+                    LLVMValueRef loadRef = generateVarLoad();
+                    DebugConsole.Write("genned load ref");
+                    gen.valueStack.Push(loadRef);
+
+                }
+                else
+                {
+                    generateArrayGEP(generateVarRef());
+                }
             }
 
             updateCurrentStruct();
 
             genChildren();
+        }
+    }
+
+    public void generateArrayGEP(LLVMValueRef ptr)
+    {
+        if (varExpr.isArrayRef)
+        {
+            DebugConsole.Write("gepping");
+            DebugConsole.Write(ptr);
+            //TODO: gep it
+            LLVMValueRef arrayGepRef = LLVM.BuildStructGEP(gen.builder, ptr, (uint)varExpr.arrayIndex, "ArrayGEP");
+            LLVMValueRef loadRef = LLVM.BuildLoad(gen.builder, arrayGepRef, "ArrayGEPLoad");
+            gen.valueStack.Push(loadRef);
+            DebugConsole.Write("done gepping");
         }
     }
 

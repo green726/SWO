@@ -4,6 +4,8 @@ public class VariableExpression : Expression
 {
     public bool isArrayRef = false;
     public string unmodifiedVal = "";
+    public int arrayIndex = 0;
+
     public VariableExpression(Util.Token token, AST.Node parent, bool parentRequired = true) : base(token)
     {
         this.nodeType = NodeType.VariableExpression;
@@ -13,11 +15,13 @@ public class VariableExpression : Expression
 
         if (Parser.isAnArrayRef(token))
         {
-            DebugConsole.Write(token.value);
+            DebugConsole.Write($"ASDKHAJSDHJASHDKJHASDKHADKJLHAKHSBGDHGB {token.value}");
             this.value = token.value.Remove(token.value.IndexOf("["));
             this.isArrayRef = true;
+            DebugConsole.Write(token.value.Substring(token.value.IndexOf("[") + 1, token.value.IndexOf("]") - token.value.IndexOf("[") - 1));
+            this.arrayIndex = int.Parse(token.value.Substring(token.value.IndexOf("[") + 1, token.value.IndexOf("]") - token.value.IndexOf("[") - 1));
+            DebugConsole.Write(this.arrayIndex);
             this.unmodifiedVal = token.value;
-            DebugConsole.Write(this.value);
             handleArrayRefConstruction(token, parentRequired);
             return;
         }
@@ -31,7 +35,8 @@ public class VariableExpression : Expression
         discernType();
 
 
-        DebugConsole.WriteAnsi($"[yellow]original type + {this.type.value}[/]");
+        DebugConsole.WriteAnsi($"[yellow]original type:[/]");
+        DebugConsole.Write(this.type.value);
         // this.type = new Type("int", this);
 
 
@@ -68,7 +73,6 @@ public class VariableExpression : Expression
                     DebugConsole.Write("set varExpr type based on struct");
                     break;
                 }
-
             case NodeType.Reference:
                 {
                     Reference refPar = (Reference)parent;
@@ -112,6 +116,7 @@ public class VariableExpression : Expression
     {
         discernType();
         this.type = this.type.getContainedType();
+        DebugConsole.Write(this.type.value);
 
         if (parent != null)
         {

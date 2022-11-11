@@ -53,6 +53,8 @@ public class VariableDeclaration : Base
             if (varDec.local)
             {
                 LLVMValueRef allocaRef = LLVM.BuildAlloca(gen.builder, typeLLVM, varDec.name);
+                DebugConsole.Write("ZZZZZZZZZZZZZZ");
+                DebugConsole.Write(allocaRef);
                 gen.valueStack.Push(allocaRef);
                 if (init)
                 {

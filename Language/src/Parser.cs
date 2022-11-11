@@ -855,7 +855,7 @@ public class Parser
         //NOTE: handles imports and adding stuff
         if (previousNode != null && !previousNode.exportChecked)
         {
-            DebugConsole.Write("checking export for node of type " + previousNode.nodeType);
+            // DebugConsole.Write("checking export for node of type " + previousNode.nodeType);
             previousNode?.checkExport();
         }
 

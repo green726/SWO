@@ -34,7 +34,9 @@ public class Type : Base
             else
             {
                 uint count = (uint)type.size;
-                gen.typeStack.Push(LLVM.ArrayType(getBasicType(), count));
+                DebugConsole.WriteAnsi("[purple]askdjads[/]");
+                DebugConsole.Write(getBasicType());
+                gen.typeStack.Push(getBasicType());
             }
         }
     }

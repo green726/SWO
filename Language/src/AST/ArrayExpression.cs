@@ -30,7 +30,6 @@ public class ArrayExpression : Expression
         this.parent?.addChild(this);
 
         //TODO: implement this
-        // this.type = new Type();
 
     }
 
@@ -42,6 +41,15 @@ public class ArrayExpression : Expression
         }
         else
         {
+            Expression childExpr = (Expression)child;
+            if (value.Count == 0)
+            {
+                this.type = childExpr.type;
+            }
+            if (childExpr.type.value != this.type.value)
+            {
+                throw ParserException.FactoryMethod("Element of arrary expression does not match array expression type", $"Remove the element located at index ({this.value.Count})", childExpr, this);
+            }
             value.Add(child);
         }
         this.length++;
@@ -50,7 +58,6 @@ public class ArrayExpression : Expression
 
     public override void addChild(Util.Token child)
     {
-
         base.addChild(child);
     }
 }

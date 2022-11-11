@@ -81,6 +81,10 @@ public class VariableDeclaration : Node
         this.newLineReset = true;
 
         this.type = new Type(typeTok);
+        DebugConsole.Write(this.type.value);
+        DebugConsole.Write(this.type.isPointer);
+        DebugConsole.Write(this.type.isArray);
+        DebugConsole.Write(this.type.size);
 
         if (Config.settings.variable.declaration.keyword.forced)
         {

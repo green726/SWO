@@ -11,11 +11,13 @@ public abstract class Expression : Base
     protected Expression(AST.Expression expr)
     {
         this.expr = expr;
-        this.typeInfo = (GeneratorTypeInformation)expr.type;
+        // this.typeInfo = (GeneratorTypeInformation)expr.type;
     }
 
     public override void generate()
     {
+        DebugConsole.Write(expr.type);
+        this.typeInfo = (GeneratorTypeInformation)expr.type;
         // if (expr.isReference || expr.isDereference)
         // {
         //     LLVMValueRef valRef = valueStack.Pop();
