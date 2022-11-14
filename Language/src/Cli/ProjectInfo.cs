@@ -46,6 +46,7 @@ public class ProjectInfo
 
     public ProjectInfo()
     {
+        entryFile = new SWOFile();
         // if (Config.settings.general.project.STDLib.include)
         // {
         //     if (!STDLibIncluded)
