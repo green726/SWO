@@ -178,8 +178,12 @@ public class VariableExpression : Base
             DebugConsole.Write(ptr);
             //TODO: gep it
             LLVMValueRef arrayGepRef = LLVM.BuildStructGEP(gen.builder, ptr, (uint)varExpr.arrayIndex, "ArrayGEP");
-            LLVMValueRef loadRef = LLVM.BuildLoad(gen.builder, arrayGepRef, "ArrayGEPLoad");
-            gen.valueStack.Push(loadRef);
+            if (varExpr.parent.nodeType != AST.Node.NodeType.VariableAssignment)
+            {
+                LLVMValueRef loadRef = LLVM.BuildLoad(gen.builder, arrayGepRef, "ArrayGEPLoad");
+                gen.valueStack.Push(loadRef);
+            }
+            // gen.valueStack.Push(arrayGepRef);
             DebugConsole.Write("done gepping");
         }
     }

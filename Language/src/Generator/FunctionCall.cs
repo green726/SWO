@@ -26,7 +26,8 @@ public class FunctionCall : Base
 
             this.funcCall.type = (ParserTypeInformation)gen.parser.declaredFuncs[altName].returnType;
 
-            DebugConsole.WriteAnsi($"[red]alt name in function call gen: {altName}[/]");
+            DebugConsole.WriteAnsi($"[red]alt name in function call gen:[/]");
+            DebugConsole.Write(altName);
             nameToSearch = altName;
         }
 

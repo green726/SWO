@@ -33,10 +33,17 @@ public class Type : Base
             }
             else
             {
-                uint count = (uint)type.size;
-                DebugConsole.WriteAnsi("[purple]askdjads[/]");
-                DebugConsole.Write(getBasicType());
-                gen.typeStack.Push(getBasicType());
+                if (type.isPointer)
+                {
+                    DebugConsole.Write("Detected pointer to array");
+                    genPointer();
+                }
+                else
+                {
+                    uint count = (uint)type.size;
+                    DebugConsole.Write(getBasicType());
+                    gen.typeStack.Push(getBasicType());
+                }
             }
         }
     }
