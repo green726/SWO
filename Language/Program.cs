@@ -15,6 +15,87 @@ public static class SWO
         CLI cli = new CLI(args);
     }
 
+    public static void emitAST(CompileCommandSettings settings)
+    {
+        DebugConsole.log = settings.debugLogging;
+
+        string[] files = System.IO.Directory.GetFiles(settings.path, "*.sproj");
+
+        if (files.Length == 0)
+        {
+            throw new ArgumentException("No SWO project files found in current directory");
+        }
+
+        // string tomlText = System.IO.File.ReadAllText(files[0]);
+        // projectInfo = Toml.ToModel<ProjectInfo>(tomlText);
+        string jsonText = System.IO.File.ReadAllText(files[0]);
+        projectInfo = JsonConvert.DeserializeObject<ProjectInfo>(jsonText)!;
+        projectInfo.setConfig();
+
+        if (!settings.debugLogging)
+        {
+            AnsiConsole.Progress()
+                .Columns(new ProgressColumn[] {
+            new TaskDescriptionColumn(),
+            new ProgressBarColumn(),
+            new PercentageColumn(),
+            new RemainingTimeColumn(),
+            new SpinnerColumn(),
+                }).Start(ctx =>
+                {
+                    var configTask = ctx.AddTask("Initializing config");
+                    Config.initialize(projectInfo.configFilePath);
+                    configTask.StopTask();
+                    //TODO: check if its default or leave it alone
+                    settings.resultFileName = projectInfo.projectName;
+
+                    if (Config.settings.general.typo.enabled)
+                    {
+                        var typoTask = ctx.AddTask("Initializing typo checker");
+                        Typo.initialize(typoTask);
+                        typoTask.StopTask();
+                    }
+
+                    fileContents = System.IO.File.ReadAllText(projectInfo.entryFile.path);
+                    var lexTask = ctx.AddTask("Lexing (tokenizing) the SWO code");
+                    List<Util.Token> lexedContent = Lexer.lex(fileContents, lexTask);
+
+                    var parseTask = ctx.AddTask("Parsing the SWO code");
+
+                    List<Parser> parsers = Parser.startParsing(lexedContent, projectInfo.entryFile.nameWithoutExtension, projectInfo.entryFile.path, parseTask);
+
+                    var ASTTask = ctx.AddTask("Serializing the AST");
+                    foreach (Parser parser in parsers)
+                    {
+                        parser.writeAST();
+                    }
+                });
+        }
+        else
+        {
+            Config.initialize(projectInfo.configFilePath);
+            //TODO: check if its default or leave it alone
+            settings.resultFileName = projectInfo.projectName;
+
+            if (Config.settings.general.typo.enabled)
+            {
+                Typo.initialize();
+            }
+
+            fileContents = System.IO.File.ReadAllText(projectInfo.entryFile.path);
+            List<Util.Token> lexedContent = Lexer.lex(fileContents);
+
+            List<Parser> parsers = Parser.startParsing(lexedContent, projectInfo.entryFile.nameWithoutExtension, projectInfo.entryFile.path);
+
+            foreach (Parser parser in parsers)
+            {
+                parser.writeAST();
+            }
+        }
+
+        AnsiConsole.MarkupLine("[green]SWO project successfully compiled[/]");
+    }
+
     public static void compileProject(CompileCommandSettings settings)
     {
         DebugConsole.log = settings.debugLogging;
@@ -108,7 +189,7 @@ public static class SWO
             fileContents = System.IO.File.ReadAllText(projectInfo.entryFile.path);
             List<Util.Token> lexedContent = Lexer.lex(fileContents);
 
-            List<Parser> parsers = Parser.startParsing(lexedContent, projectInfo.entryFile.nameWithoutExtension);
+            List<Parser> parsers = Parser.startParsing(lexedContent, projectInfo.entryFile.nameWithoutExtension, projectInfo.entryFile.path);
 
             List<IRGen> generators = ModuleGen.CreateNewGenerators(parsers);
 
@@ -128,9 +209,6 @@ public static class SWO
             }
             EXE.link(settings, fileNames);
 
-            if (settings.distributeAST)
-            {
-            }
         }
 
         AnsiConsole.MarkupLine("[green]SWO project successfully compiled[/]");

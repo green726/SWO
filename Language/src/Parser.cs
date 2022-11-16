@@ -32,6 +32,7 @@ public class Parser
     }
 
     public string fileName = "";
+    public string filePath = "";
 
     public bool singleLineComment = false;
     public bool multiLineComment = false;
@@ -78,6 +79,12 @@ public class Parser
     public string[] binaryMathOps = { "+", "-", "*", "/" };
 
     public Stack<Dictionary<string, TypeInformation>> variablesTypeStack = new Stack<Dictionary<string, TypeInformation>>();
+
+    public void writeAST(SWOFile inputFile)
+    {
+        ASTFile ast = new ASTFile(this, this.filePath);
+        ast.write();
+    }
 
     public TypeInformation getNamedValueInScopeType(string name)
     {
@@ -1104,7 +1111,7 @@ public class Parser
         return;
     }
 
-    public Parser(List<Util.Token> tokenList, string fileName, Spectre.Console.ProgressTask progressTask = null)
+    public Parser(List<Util.Token> tokenList, string fileName, string filePath, Spectre.Console.ProgressTask progressTask = null)
     {
         this.tokenList = tokenList;
         this.progressTask = progressTask;
@@ -1131,7 +1138,7 @@ public class Parser
     }
 
 
-    public static List<Parser> startParsing(List<Util.Token> tokenList, string fileName, Spectre.Console.ProgressTask task = null)
+    public static List<Parser> startParsing(List<Util.Token> tokenList, string fileName, string filePath, Spectre.Console.ProgressTask task = null)
     {
         DebugConsole.WriteAnsi($"[red]fileName: {fileName}[/]");
         addInstance(tokenList, fileName, task);

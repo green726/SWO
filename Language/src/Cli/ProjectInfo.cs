@@ -175,6 +175,7 @@ public class ASTFile
 
         this.nameWithoutExtension = parser.fileName;
         this.name = $"{nameWithoutExtension}.ast.json";
+        this.path = path;
     }
 
     public void write()
