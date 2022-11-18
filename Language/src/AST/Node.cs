@@ -1,16 +1,21 @@
 namespace AST;
 
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 public abstract class Node
 {
+    [JsonIgnore]
     public Generator.Base generator;
 
+    [JsonIgnore]
     public Parser parser;
 
+    [JsonIgnore]
     private Parser? parentParser;
 
     public List<Node> children = new List<Node>();
+    [JsonIgnore]
     public Node parent;
 
     public int line = 0;

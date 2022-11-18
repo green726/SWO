@@ -64,6 +64,19 @@ public static class SWO
 
                     List<Parser> parsers = Parser.startParsing(lexedContent, projectInfo.entryFile.nameWithoutExtension, projectInfo.entryFile.path, parseTask);
 
+                    var moduleTask = ctx.AddTask("Initializing LLVM");
+                    List<IRGen> generators = ModuleGen.CreateNewGenerators(parsers, moduleTask);
+
+                    var llvmTask = ctx.AddTask("Compiling to LLVM IR");
+                    int i = 0;
+                    foreach (IRGen generator in generators)
+                    {
+                        IRGen.generatorStack.Push(generator);
+                        generator.generateIR(parsers[i].nodes);
+                        i++;
+                    }
+                    llvmTask.StopTask();
+
                     var ASTTask = ctx.AddTask("Serializing the AST");
                     foreach (Parser parser in parsers)
                     {
@@ -86,6 +99,16 @@ public static class SWO
             List<Util.Token> lexedContent = Lexer.lex(fileContents);
 
             List<Parser> parsers = Parser.startParsing(lexedContent, projectInfo.entryFile.nameWithoutExtension, projectInfo.entryFile.path);
+
+            List<IRGen> generators = ModuleGen.CreateNewGenerators(parsers);
+
+            int i = 0;
+            foreach (IRGen generator in generators)
+            {
+                IRGen.generatorStack.Push(generator);
+                generator.generateIR(parsers[i].nodes);
+                i++;
+            }
 
             foreach (Parser parser in parsers)
             {
@@ -144,7 +167,7 @@ public static class SWO
 
                     var parseTask = ctx.AddTask("Parsing the SWO code");
 
-                    List<Parser> parsers = Parser.startParsing(lexedContent, projectInfo.entryFile.nameWithoutExtension, parseTask);
+                    List<Parser> parsers = Parser.startParsing(lexedContent, projectInfo.entryFile.nameWithoutExtension, projectInfo.entryFile.path, parseTask);
 
                     var moduleTask = ctx.AddTask("Initializing LLVM");
                     List<IRGen> generators = ModuleGen.CreateNewGenerators(parsers, moduleTask);

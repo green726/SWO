@@ -1,5 +1,6 @@
 using static IRGen;
 using LLVMSharp;
+using Newtonsoft.Json;
 
 public abstract class TypeInformation
 {
@@ -9,6 +10,7 @@ public abstract class TypeInformation
     public bool isArray { get; set; } = false;
 
     public int size { get; set; } = 0;
+    [JsonIgnore]
     public Parser parser { get; set; } = Parser.getInstance();
 
     public string getTypePointedTo()

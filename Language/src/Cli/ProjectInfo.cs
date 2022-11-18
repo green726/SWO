@@ -136,7 +136,7 @@ public class Library
     public Library(string name, bool foreign = false)
     {
         //TODO: search globally in the swo libraries for this name - if not found search locally in project
-        this.libraryAST = new ASTFile();
+        // this.libraryAST = new ASTFile();
     }
 }
 
@@ -172,16 +172,20 @@ public class ASTFile
     {
         this.prototypes = parser.declaredFuncs;
         this.structs = parser.declaredStructs;
+        DebugConsole.Write(this.prototypes.First().Value);
 
         this.nameWithoutExtension = parser.fileName;
         this.name = $"{nameWithoutExtension}.ast.json";
-        this.path = path;
+        this.path = parser.filePath;
+        DebugConsole.Write(parser.filePath);
     }
 
     public void write()
     {
         var jsonString = JsonConvert.SerializeObject(this);
-        File.WriteAllText(@$"{path}/{nameWithoutExtension}.ast.json", jsonString);
+        DebugConsole.Write("path:" + path + " path end");
+        string fileToWrite = path.Remove(path.Length - 4);
+        File.WriteAllText(@$"{fileToWrite}.ast.json", jsonString);
     }
 }
 

@@ -8,9 +8,9 @@ public class Parser
     //NOTE: below is a stack containing instances of parser (used for multi file)
     public static Stack<Parser> parserStack = new Stack<Parser>();
 
-    public static Parser addInstance(List<Util.Token> tokenList, string fileName, Spectre.Console.ProgressTask task = null)
+    public static Parser addInstance(List<Util.Token> tokenList, string fileName, string path, Spectre.Console.ProgressTask task = null)
     {
-        Parser newParser = new Parser(tokenList, fileName, task);
+        Parser newParser = new Parser(tokenList, fileName, path, task);
         parserStack.Push(newParser);
         return newParser;
     }
@@ -80,9 +80,9 @@ public class Parser
 
     public Stack<Dictionary<string, TypeInformation>> variablesTypeStack = new Stack<Dictionary<string, TypeInformation>>();
 
-    public void writeAST(SWOFile inputFile)
+    public void writeAST()
     {
-        ASTFile ast = new ASTFile(this, this.filePath);
+        ASTFile ast = new ASTFile(this);
         ast.write();
     }
 
@@ -1117,6 +1117,7 @@ public class Parser
         this.progressTask = progressTask;
 
         this.fileName = fileName;
+        this.filePath = filePath;
 
         this.parentParser = Parser.getInstance();
 
@@ -1141,7 +1142,7 @@ public class Parser
     public static List<Parser> startParsing(List<Util.Token> tokenList, string fileName, string filePath, Spectre.Console.ProgressTask task = null)
     {
         DebugConsole.WriteAnsi($"[red]fileName: {fileName}[/]");
-        addInstance(tokenList, fileName, task);
+        addInstance(tokenList, fileName, filePath, task);
         // getInstance().parse(tokenList, task);
 
         List<Parser> completedParsersList = new List<Parser>();

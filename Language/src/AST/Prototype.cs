@@ -126,12 +126,19 @@ public class Prototype : AST.Node
             DebugConsole.WriteAnsi("[red]alt name below[/]");
             DebugConsole.Write(altName);
 
-            parser.declaredFuncs.Add(altName, this);
+            if (this.name != "main")
+            {
+
+                parser.declaredFuncs.Add(altName, this);
+            }
             this.name = altName;
         }
         else
         {
-            parser.declaredFuncs.Add(this.name, this);
+            if (this.name != "main")
+            {
+                parser.declaredFuncs.Add(this.name, this);
+            }
         }
     }
 
