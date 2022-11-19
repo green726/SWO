@@ -8,8 +8,8 @@ public class CompileCommandSettings : CommandSettings
     [CommandOption("-p|--path")]
     public string path { get; init; } = "";
 
-    [Description("Name of the entry SWO file you wish to compile - leave blank to search for \"Main.swo\" in the current directory")]
-    [CommandOption("-f|--file")]
+    [Description("Name of the SWO file you wish to compile - leave blank to search for \"Main.swo\" in the current directory")]
+    [CommandArgument(0, "[inputFile]")]
     public string file { get; init; } = "";
 
     [Description("The name of the target OS for the resulting compiled file - leave blank to use current OS")]
@@ -21,7 +21,7 @@ public class CompileCommandSettings : CommandSettings
     public string resultFileTypeStr { get; init; } = "NativeExecutable";
 
     [Description("The name of the resulting file")]
-    [CommandArgument(0, "[resultFileName]")]
+    [CommandArgument(1, "[resultFileName]")]
     public string resultFileName { get; set; } = "";
 
     [Description("SWO internal debug logging")]

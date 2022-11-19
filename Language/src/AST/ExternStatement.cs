@@ -10,7 +10,7 @@ public class ExternStatement : Node
         this.generator = new Generator.ExternStatement(this);
         this.newLineReset = false;
 
-        if (parent != null)
+        if (parent.nodeType != NodeType.Empty && parent != null)
         {
             throw ParserException.FactoryMethod("Illegal non-top level extern statement", "Remove it | Make it top level", this);
         }

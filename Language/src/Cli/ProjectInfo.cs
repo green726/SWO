@@ -164,6 +164,12 @@ public class ASTFile
         return returnList;
     }
 
+    public static ASTFile deserialize(string path)
+    {
+        var jset = new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Objects };
+        return JsonConvert.DeserializeObject<ASTFile>(File.ReadAllText(path), jset)!;
+    }
+
     public ASTFile()
     {
     }
@@ -182,7 +188,8 @@ public class ASTFile
 
     public void write()
     {
-        var jsonString = JsonConvert.SerializeObject(this);
+        var jset = new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Objects };
+        var jsonString = JsonConvert.SerializeObject(this, jset);
         DebugConsole.Write("path:" + path + " path end");
         string fileToWrite = path.Remove(path.Length - 4);
         File.WriteAllText(@$"{fileToWrite}.ast.json", jsonString);

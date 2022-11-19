@@ -32,6 +32,27 @@ public static class SWO
         projectInfo = JsonConvert.DeserializeObject<ProjectInfo>(jsonText)!;
         projectInfo.setConfig();
 
+
+        string filePath = "";
+        string fileName = "";
+        if (settings.file == "")
+        {
+            filePath = projectInfo.entryFile.path;
+            fileName = projectInfo.entryFile.name;
+        }
+        else
+        {
+            string nameToSearch = settings.file;
+            if (!settings.file.EndsWith(".swo"))
+            {
+                nameToSearch += ".swo";
+            }
+            filePath = Path.GetFullPath(nameToSearch);
+            fileName = Path.GetFileName(filePath);
+        }
+        DebugConsole.Write("name: " + fileName);
+        DebugConsole.Write("path: " + filePath);
+
         if (!settings.debugLogging)
         {
             AnsiConsole.Progress()
@@ -56,13 +77,14 @@ public static class SWO
                         typoTask.StopTask();
                     }
 
-                    fileContents = System.IO.File.ReadAllText(projectInfo.entryFile.path);
+                    fileContents = System.IO.File.ReadAllText(filePath);
                     var lexTask = ctx.AddTask("Lexing (tokenizing) the SWO code");
                     List<Util.Token> lexedContent = Lexer.lex(fileContents, lexTask);
 
                     var parseTask = ctx.AddTask("Parsing the SWO code");
 
-                    List<Parser> parsers = Parser.startParsing(lexedContent, projectInfo.entryFile.nameWithoutExtension, projectInfo.entryFile.path, parseTask);
+
+                    List<Parser> parsers = Parser.startParsing(lexedContent, fileName, filePath, parseTask);
 
                     var moduleTask = ctx.AddTask("Initializing LLVM");
                     List<IRGen> generators = ModuleGen.CreateNewGenerators(parsers, moduleTask);
@@ -95,10 +117,10 @@ public static class SWO
                 Typo.initialize();
             }
 
-            fileContents = System.IO.File.ReadAllText(projectInfo.entryFile.path);
+            fileContents = System.IO.File.ReadAllText(filePath);
             List<Util.Token> lexedContent = Lexer.lex(fileContents);
 
-            List<Parser> parsers = Parser.startParsing(lexedContent, projectInfo.entryFile.nameWithoutExtension, projectInfo.entryFile.path);
+            List<Parser> parsers = Parser.startParsing(lexedContent, fileName, filePath);
 
             List<IRGen> generators = ModuleGen.CreateNewGenerators(parsers);
 
@@ -137,6 +159,19 @@ public static class SWO
         projectInfo = JsonConvert.DeserializeObject<ProjectInfo>(jsonText)!;
         projectInfo.setConfig();
 
+        string filePath = "";
+        string fileName = "";
+        if (settings.file == "")
+        {
+            filePath = projectInfo.entryFile.path;
+            fileName = projectInfo.entryFile.name;
+        }
+        else
+        {
+            fileName = settings.file;
+            filePath = settings.path + settings.file + ".swo";
+        }
+
         if (!settings.debugLogging)
         {
             AnsiConsole.Progress()
@@ -161,13 +196,13 @@ public static class SWO
                         typoTask.StopTask();
                     }
 
-                    fileContents = System.IO.File.ReadAllText(projectInfo.entryFile.path);
+                    fileContents = System.IO.File.ReadAllText(filePath);
                     var lexTask = ctx.AddTask("Lexing (tokenizing) the SWO code");
                     List<Util.Token> lexedContent = Lexer.lex(fileContents, lexTask);
 
                     var parseTask = ctx.AddTask("Parsing the SWO code");
 
-                    List<Parser> parsers = Parser.startParsing(lexedContent, projectInfo.entryFile.nameWithoutExtension, projectInfo.entryFile.path, parseTask);
+                    List<Parser> parsers = Parser.startParsing(lexedContent, fileName, filePath, parseTask);
 
                     var moduleTask = ctx.AddTask("Initializing LLVM");
                     List<IRGen> generators = ModuleGen.CreateNewGenerators(parsers, moduleTask);
@@ -209,10 +244,10 @@ public static class SWO
                 Typo.initialize();
             }
 
-            fileContents = System.IO.File.ReadAllText(projectInfo.entryFile.path);
+            fileContents = System.IO.File.ReadAllText(filePath);
             List<Util.Token> lexedContent = Lexer.lex(fileContents);
 
-            List<Parser> parsers = Parser.startParsing(lexedContent, projectInfo.entryFile.nameWithoutExtension, projectInfo.entryFile.path);
+            List<Parser> parsers = Parser.startParsing(lexedContent, fileName, filePath);
 
             List<IRGen> generators = ModuleGen.CreateNewGenerators(parsers);
 

@@ -2,6 +2,7 @@ namespace AST;
 
 using System.Collections.Generic;
 using System.Text;
+using Newtonsoft.Json;
 
 
 public class Prototype : AST.Node
@@ -16,6 +17,11 @@ public class Prototype : AST.Node
     public bool external = false;
 
     public bool variableArgument = false;
+
+    [JsonConstructor]
+    public Prototype(TypeInformation returnType)
+    {
+    }
 
     public Prototype(AST.Prototype parent) : base(parent)
     {

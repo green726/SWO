@@ -13,6 +13,7 @@ public class GeneralModel
     public SemiColonModel semiColon { get; set; } = new SemiColonModel();
 
     public ProjectModel project { get; set; } = new ProjectModel();
+
 }
 
 public class ProjectModel
@@ -94,6 +95,8 @@ public class ImportModel
     public string keyword { get; set; } = "import";
 
     public ImportIgnoreModel ignore { get; set; } = new ImportIgnoreModel();
+
+    public bool favorAST { get; set; } = true;
 }
 
 public class ImportIgnoreModel
