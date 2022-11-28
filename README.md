@@ -1,8 +1,7 @@
 # SWO
 
 <aside>
-❗ This is a work in progress, and not all pages are complete. Please use the Notion (First item in the links section at the bottom) when possible
-
+❗ This is a work in progress, and not all pages are complete. Please use the [Notion](https://ivy-turquoise-4f8.notion.site/SWO-c193b980d415499c9103a9716067a5ba) when possible. The parser will also undergo a major rework when I deem the language capable of bootstrapping its compiler (the original parser was started with little planning and no knowledge into how parsers work - when the bootstrapping phase begins the parser will be significantly more efficient, clean, and concise)
 </aside>
 
 # About:
@@ -17,7 +16,7 @@
 - Be (easily) customizable without requiring users to write code
 - Maintain decent speed/performance in the compiler
 - Maintain speed in the language
-- Have a good FFI (Foreign Function Interface) / Interoperability with other LLVM languages (C, C++, Rust, etc)
+- Have a good FFI (Foreign Function Interface) / Interoperability with C (and maybe C++)
 
 ### Why?
 
@@ -44,19 +43,3 @@ int @fibRec(int n) {
     print(fibRec(4))
 }
 ```
-
-# Pages:
-
-[Documentation](Docs/Documentation%202fc9117d645f475fba9140278701c2a2.md)
-
-# Roadmap:
-
-# Links:
-
-Notion: [https://ivy-turquoise-4f8.notion.site/SWO-c193b980d415499c9103a9716067a5ba](https://ivy-turquoise-4f8.notion.site/SWO-c193b980d415499c9103a9716067a5ba)
-
-Internal Documentation: [https://www.notion.so/SWO-Internal-cb00b30071df4b7e80e22baf3b43df62](https://www.notion.so/SWO-Internal-cb00b30071df4b7e80e22baf3b43df62)
-
-[https://github.com/green726/SWO](https://github.com/green726/SWO)
-
----
