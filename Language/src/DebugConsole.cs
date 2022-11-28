@@ -16,7 +16,6 @@ public static class DebugConsole
         }
     }
 
-
     public static void VerifyModule(LLVMModuleRef module)
     {
         if (log)
@@ -54,7 +53,6 @@ public static class DebugConsole
         {
             AnsiConsole.MarkupLine(obj.ToString());
         }
-
     }
 
     public static void DumpType(LLVMTypeRef type)

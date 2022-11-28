@@ -7,6 +7,7 @@ public class IfStatementDeclaration : AST.Node
     public BinaryExpression expression = null;
     public bool finsihedParsing = false;
 
+
     public IfStatementDeclaration(Util.Token token, AST.Node parent = null) : base(token)
     {
         this.nodeType = NodeType.IfStatementDeclaration;

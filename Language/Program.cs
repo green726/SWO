@@ -32,7 +32,6 @@ public static class SWO
         projectInfo = JsonConvert.DeserializeObject<ProjectInfo>(jsonText)!;
         projectInfo.setConfig();
 
-
         string filePath = "";
         string fileName = "";
         if (settings.file == "")
@@ -83,11 +82,11 @@ public static class SWO
 
                     var parseTask = ctx.AddTask("Parsing the SWO code");
 
-
                     List<Parser> parsers = Parser.startParsing(lexedContent, fileName, filePath, parseTask);
 
                     var moduleTask = ctx.AddTask("Initializing LLVM");
                     List<IRGen> generators = ModuleGen.CreateNewGenerators(parsers, moduleTask);
+
 
                     var llvmTask = ctx.AddTask("Compiling to LLVM IR");
                     int i = 0;

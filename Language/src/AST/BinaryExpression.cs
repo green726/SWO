@@ -16,10 +16,10 @@ public class BinaryExpression : Expression
         Divide,
         Equals,
         LessThan,
+        GreaterThan,
     }
 
     public BinaryExpression(Util.Token token, AST.Node previousNode, AST.Node parent) : base(token)
-
     {
         this.nodeType = NodeType.BinaryExpression;
         this.generator = new Generator.BinaryExpression(this);
