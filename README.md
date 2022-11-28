@@ -1,8 +1,8 @@
 # SWO
 
-<aside>
-❗ This is a work in progress, and not all pages are complete. Please use the (Notion)[https://ivy-turquoise-4f8.notion.site/SWO-c193b980d415499c9103a9716067a5ba] when possible. The parser will also undergo a major rework when I deem the language capable of bootstrapping its compiler (the original parser was started with little planning and no knowledge into how parsers work - when the bootstrapping phase begins the parser will be significantly more efficient, clean, and concise)
-</aside>
+## Important Notice:
+
+This is a work in progress, and not all pages are complete. Please use the [Notion](https://ivy-turquoise-4f8.notion.site/SWO-c193b980d415499c9103a9716067a5ba) when possible. The parser will also undergo a major rework when I deem the language capable of bootstrapping its compiler (the original parser was started with little planning and no knowledge into how parsers work - when the bootstrapping phase begins the parser will be significantly more efficient, clean, and concise)
 
 # About:
 
