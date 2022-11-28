@@ -24,7 +24,7 @@ Why does SWO exist? I created SWO as a fun resume-building project and to learn 
 
 ### How?
 
-SWO is written in C# and uses a custom build parser. SWO uses the LLVMSharp C# LLVM bindings to turn the SWO code into LLVM IR. LLVM is used by various major languages including (but not limited to) C, C++, Rust, Haskell, Julia, Swift. 
+SWO is written in C# and uses a custom build parser. SWO uses the LLVMSharp C# LLVM bindings to translate the SWO code into LLVM Intermediary Representation (IR). This is then compiled (by LLVM) to native executables and/or binaries on a vareity of platforms. LLVM is used by various major languages including (but not limited to) C, C++, Rust, Haskell, Julia, Swift. 
 
 ### A quick peek:
 
