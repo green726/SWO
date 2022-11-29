@@ -6,18 +6,33 @@ public class BinaryExpression : Expression
 {
     public AST.Expression leftHand;
     public AST.Expression rightHand;
-    public OperatorType operatorType;
+    public BinaryOperator binOp;
 
-    public enum OperatorType
+    //constructor that takes in a left hand, right hand, an operator type, and a parent node
+    public BinaryExpression(AST.Expression leftHand, AST.Expression rightHand, Util.Token binOpTok, AST.Node parent) : base(leftHand, parent)
     {
-        Add,
-        Subtract,
-        Multiply,
-        Divide,
-        Equals,
-        LessThan,
-        GreaterThan,
+        this.leftHand = leftHand;
+        this.rightHand = rightHand;
+        this.binOp = new BinaryOperator(binOpTok);
+        this.parent = parent;
+
+        if (this.rightHand.nodeType == NodeType.BinaryExpression)
+        {
+            BinaryExpression rightBinExpr = (BinaryExpression)this.rightHand;
+            this.rightHand.parent = this;
+            if (this.binOp >= rightBinExpr.binOp)
+            {
+                return;
+            }
+            else
+            {
+                //TODO: reorder based on operator precedence
+            }
+
+        }
+
     }
+
 
     public BinaryExpression(Util.Token token, AST.Node previousNode, AST.Node parent) : base(token)
     {
@@ -120,23 +135,24 @@ public class BinaryExpression : Expression
         }
 
         this.type = this.leftHand.type;
-
     }
 
-    public override void addChild(AST.Node child)
-    {
-        base.addChild(child);
-        if (child.nodeType == AST.Node.NodeType.BinaryExpression)
-        {
-        }
-        else if (rightHand == null)
-        {
-            this.rightHand = (AST.Expression)child;
-        }
-        else if (rightHand != null)
-        {
-            this.parent.addChild(child);
-            child.addParent(this.parent);
-        }
-    }
+
+
+    // public override void addChild(AST.Node child)
+    // {
+    //     base.addChild(child);
+    //     if (child.nodeType == AST.Node.NodeType.BinaryExpression)
+    //     {
+    //     }
+    //     else if (rightHand == null)
+    //     {
+    //         this.rightHand = (AST.Expression)child;
+    //     }
+    //     else if (rightHand != null)
+    //     {
+    //         this.parent.addChild(child);
+    //         child.addParent(this.parent);
+    //     }
+    // }
 }

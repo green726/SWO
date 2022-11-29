@@ -31,25 +31,7 @@ public class Parser
             return null;
     }
 
-    //a static dictionary mapping every AST.BinaryExpression.OperatorType to an int
-    public static Dictionary<AST.BinaryExpression.OperatorType, int> binOpLevels = new Dictionary<AST.BinaryExpression.OperatorType, int>() {
-        {AST.BinaryExpression.OperatorType.Add, 20},
-        {AST.BinaryExpression.OperatorType.Subtract, 20},
-        {AST.BinaryExpression.OperatorType.Multiply, 40},
-        {AST.BinaryExpression.OperatorType.Divide, 40},
-        // {AST.BinaryExpression.OperatorType.Modulo, 40},
-        // {AST.BinaryExpression.OperatorType.Equal, 10},
-        // {AST.BinaryExpression.OperatorType.NotEqual, 10},
-        {AST.BinaryExpression.OperatorType.GreaterThan, 10},
-        // {AST.BinaryExpression.OperatorType.GreaterThanOrEqual, 10},
-        {AST.BinaryExpression.OperatorType.LessThan, 10},
-        // {AST.BinaryExpression.OperatorType.LessThanOrEqual, 10},
-        // {AST.BinaryExpression.OperatorType.And, 5},
-        // {AST.BinaryExpression.OperatorType.Or, 5},
-    };
-
     // public static Dictionary<AST.BinaryExpression.OperatorType, int> = 
-
     public string fileName = "";
     public string filePath = "";
 
