@@ -7,7 +7,13 @@ public abstract class Expression : Node
     public bool isReference = false;
     public bool isDereference = false;
 
-    public ParserTypeInformation type { get; set; } /* = new ParserTypeInformation("null"); */
+    public ParserTypeInformation type { get; set; } = new ParserTypeInformation("null");
+
+    public Expression() : base()
+    {
+        this.isExpression = true;
+        this.newLineReset = true;
+    }
 
     public Expression(Util.Token token) : base(token)
     {

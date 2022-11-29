@@ -31,7 +31,6 @@ public class Parser
             return null;
     }
 
-    // public static Dictionary<AST.BinaryExpression.OperatorType, int> = 
     public string fileName = "";
     public string filePath = "";
 
@@ -307,10 +306,10 @@ public class Parser
     public string printBinary(AST.BinaryExpression bin)
     {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.Append($"{bin.nodeType} op: {bin.operatorType} lhs type: {bin.leftHand.nodeType} rhs type: {bin?.rightHand?.nodeType} binop children below:");
-        stringBuilder.Append(printASTRet(bin?.children));
+        // stringBuilder.Append($"{bin.nodeType} op: {bin.operatorType} lhs type: {bin.leftHand.nodeType} rhs type: {bin?.rightHand?.nodeType} binop children below:");
+        // stringBuilder.Append(printASTRet(bin?.children));
 
-        return stringBuilder.ToString();
+        return "";
     }
 
     public string printFunc(AST.Function func)
@@ -840,7 +839,7 @@ public class Parser
             }
             if (delimLevel == 0)
             {
-                parent = null;
+                parent = new AST.Empty();
             }
             else
             {
@@ -991,17 +990,28 @@ public class Parser
             case Util.TokenType.Double:
                 new AST.NumberExpression(token, parent);
                 break;
-
             case Util.TokenType.Operator:
-                AST.BinaryExpression binExpr = new AST.BinaryExpression(token, previousNode, parent);
-
+                AST.Expression leftHand;
+                if (previousNode == null)
+                {
+                    throw new Exception("previous node is null");
+                }
+                //check if previous node is an expression and throw an error if it isnt
+                else if (!previousNode.isExpression)
+                {
+                    throw new Exception("expected expression before operator");
+                }
+                else
+                {
+                    leftHand = (AST.Expression)previousNode;
+                }
+                AST.BinaryExpression binExpr = new AST.BinaryExpression(leftHand, token, parent);
                 parent = binExpr;
                 return;
 
             case Util.TokenType.Keyword:
                 (AST.Node keyParent, int keyDelimLevel) = parseKeyword(token, currentTokenNum, parent, delimLevel);
                 //0 is the keyword AST.Node, 1 is the next token, and 2 is the next token index
-
                 parent = keyParent;
                 delimLevel = keyDelimLevel;
                 return;
@@ -1136,6 +1146,7 @@ public class Parser
         {
             progressTask.MaxValue = tokenList.Count();
         }
+        this.parent = new AST.Empty();
     }
 
 

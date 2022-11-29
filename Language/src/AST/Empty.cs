@@ -1,6 +1,6 @@
 namespace AST;
 
-public class Empty : Node
+public class Empty : Expression
 {
     public Empty() : base()
     {
