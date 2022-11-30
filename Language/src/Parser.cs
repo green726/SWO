@@ -700,6 +700,11 @@ public class Parser
         switch (parent?.nodeType)
         {
             case AST.Node.NodeType.VariableDeclaration:
+                if (nextToken.type == Util.TokenType.Operator)
+                {
+                    break;
+                }
+                DebugConsole.Write("adding to var dec");
                 parent?.addChild(token);
                 return (parent, delimLevel);
             case AST.Node.NodeType.Struct:
@@ -991,20 +996,20 @@ public class Parser
                 break;
             case Util.TokenType.Operator:
                 AST.Expression leftHand;
-                if (previousNode == null)
+                if (parent == null)
                 {
                     throw new Exception("previous node is null");
                 }
                 //check if previous node is an expression and throw an error if it isnt
-                else if (!previousNode.isExpression)
+                else if (!parent.isExpression)
                 {
                     throw new Exception("expected expression before operator");
                 }
                 else
                 {
-                    leftHand = (AST.Expression)previousNode;
+                    leftHand = (AST.Expression)parent;
                 }
-                AST.BinaryExpression binExpr = new AST.BinaryExpression(leftHand, token, parent);
+                AST.BinaryExpression binExpr = new AST.BinaryExpression(leftHand, token, parent.parent);
                 parent = binExpr;
                 return;
 

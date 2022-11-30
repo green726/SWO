@@ -15,6 +15,8 @@ public class BinaryExpression : Expression
         this.rightHand = new AST.Empty();
         this.binOp = new BinaryOperator(binOpTok);
         this.parent = parent;
+        this.generator = new Generator.BinaryExpression(this);
+        this.nodeType = NodeType.BinaryExpression;
     }
 
     public BinaryExpression(AST.Expression leftHand, AST.Expression rightHand, Util.Token binOpTok, AST.Node parent) : base(leftHand, parent)
@@ -26,6 +28,8 @@ public class BinaryExpression : Expression
 
         checkPrecedence();
         this.parent.addChild(this);
+        this.generator = new Generator.BinaryExpression(this);
+        this.nodeType = NodeType.BinaryExpression;
     }
 
     public BinaryExpression(AST.Expression leftHand, AST.Expression rightHand, string binOpStr, AST.Node parent) : base(leftHand, parent)
@@ -37,8 +41,9 @@ public class BinaryExpression : Expression
 
         checkPrecedence();
         this.parent.addChild(this);
+        this.generator = new Generator.BinaryExpression(this);
+        this.nodeType = NodeType.BinaryExpression;
     }
-
 
     public void checkPrecedence()
     {
@@ -70,6 +75,7 @@ public class BinaryExpression : Expression
 
     public override void addChild(Node child)
     {
+        DebugConsole.Write("adding child of type: " + child.nodeType + " to binExpr");
         //throw error if right hand node type is not Empty
         if (this.rightHand.nodeType != NodeType.Empty)
         {
@@ -79,6 +85,7 @@ public class BinaryExpression : Expression
         {
             throw new ParserException("BinaryExpression can only have Expression children");
         }
+        this.rightHand = (AST.Expression)child;
         checkPrecedence();
         this.parent.addChild(this);
         base.addChild(child);
