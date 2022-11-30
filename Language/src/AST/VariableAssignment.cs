@@ -61,7 +61,7 @@ public class VariableAssignment : AST.Node
             string tokenOp = token.value.Remove(1);
             //TODO: handle compound ops like +=
             this.binReassignment = true;
-            this.bin = new BinaryExpression(new Util.Token(Util.TokenType.Operator, tokenOp, token.line, token.column), varExpr, parent);
+            this.bin = new BinaryExpression(varExpr!, new Util.Token(Util.TokenType.Operator, tokenOp, token.line, token.column), parent);
         }
     }
 
@@ -83,7 +83,7 @@ public class VariableAssignment : AST.Node
         DebugConsole.Write("adding child of node type " + node.nodeType + " to varass with loop iteration of: " + childLoop);
         if (this.binReassignment == true)
         {
-            this?.bin?.addChild(node);
+            this.bin.addChild(node);
             DebugConsole.WriteAnsi("[yellow]adding child to varass bin[/]");
             childLoop++;
             base.addChild(node);
@@ -112,6 +112,4 @@ public class VariableAssignment : AST.Node
         childLoop++;
         base.addChild(node);
     }
-
-
 }

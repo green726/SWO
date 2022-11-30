@@ -15,7 +15,7 @@ public class VariableExpression : Expression
 
         if (Parser.isAnArrayRef(token))
         {
-            DebugConsole.Write($"ASDKHAJSDHJASHDKJHASDKHADKJLHAKHSBGDHGB {token.value}");
+            DebugConsole.Write($"isArrayRef (from var expr constructor) {token.value}");
             this.value = token.value.Remove(token.value.IndexOf("["));
             this.isArrayRef = true;
             DebugConsole.Write(token.value.Substring(token.value.IndexOf("[") + 1, token.value.IndexOf("]") - token.value.IndexOf("[") - 1));
@@ -71,7 +71,7 @@ public class VariableExpression : Expression
                     this.type = (ParserTypeInformation)originalType;
                     DebugConsole.Write(type.value);
                     DebugConsole.Write("set varExpr type based on struct");
-                    break;
+                    return;
                 }
             case NodeType.Reference:
                 {
@@ -83,8 +83,8 @@ public class VariableExpression : Expression
                         Type originalType = varDec.type;
                         this.type = (ParserTypeInformation)originalType;
                         DebugConsole.Write("set varExpr type based on ref");
+                        return;
                     }
-
                     break;
                 }
 
@@ -98,24 +98,21 @@ public class VariableExpression : Expression
                         Type originalType = varDec.type;
                         this.type = (ParserTypeInformation)originalType;
                         DebugConsole.Write("set varExpr type based on deref");
+                        return;
                     }
-
                     break;
                 }
         }
-        if (this.type == null)
-        {
-            DebugConsole.Write(this.value);
-            ParserTypeInformation originalType = parser.getNamedValueInScope(this.value, this);
-            this.type = originalType;
-            DebugConsole.Write("set varExpr type in else (based on original dec)");
-        }
+        DebugConsole.Write(this.value);
+        ParserTypeInformation originalTypeDefault = parser.getNamedValueInScope(this.value, this);
+        this.type = originalTypeDefault;
+        DebugConsole.Write("set varExpr type in else (based on original dec)");
     }
 
     private void handleArrayRefConstruction(Util.Token token, bool parentRequired = true)
     {
         discernType();
-        this.type = this.type.getContainedType();
+        this.type = this.type.getContainedType(this);
         DebugConsole.Write(this.type.value);
 
         if (parent != null)

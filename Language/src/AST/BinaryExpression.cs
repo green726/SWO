@@ -17,6 +17,29 @@ public class BinaryExpression : Expression
         this.parent = parent;
     }
 
+    public BinaryExpression(AST.Expression leftHand, AST.Expression rightHand, Util.Token binOpTok, AST.Node parent) : base(leftHand, parent)
+    {
+        this.leftHand = leftHand;
+        this.rightHand = new AST.Empty();
+        this.binOp = new BinaryOperator(binOpTok);
+        this.parent = parent;
+
+        checkPrecedence();
+        this.parent.addChild(this);
+    }
+
+    public BinaryExpression(AST.Expression leftHand, AST.Expression rightHand, string binOpStr, AST.Node parent) : base(leftHand, parent)
+    {
+        this.leftHand = leftHand;
+        this.rightHand = new AST.Empty();
+        this.binOp = new BinaryOperator(binOpStr);
+        this.parent = parent;
+
+        checkPrecedence();
+        this.parent.addChild(this);
+    }
+
+
     public void checkPrecedence()
     {
         if (this.rightHand.nodeType == NodeType.BinaryExpression)
@@ -47,6 +70,11 @@ public class BinaryExpression : Expression
 
     public override void addChild(Node child)
     {
+        //throw error if right hand node type is not Empty
+        if (this.rightHand.nodeType != NodeType.Empty)
+        {
+            throw new ParserException("Cannot add child to BinaryExpression with non-empty right hand");
+        }
         if (!child.isExpression)
         {
             throw new ParserException("BinaryExpression can only have Expression children");

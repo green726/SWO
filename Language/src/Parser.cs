@@ -668,7 +668,6 @@ public class Parser
                 break;
             case AST.Node.NodeType.ImportStatement:
                 parent.addChild(token);
-                DebugConsole.Write("ASDKJASKDj");
                 DebugConsole.WriteAnsi($"[green]returning parent of {parent.nodeType}[/]");
                 return (parent, delimLevel);
         }
