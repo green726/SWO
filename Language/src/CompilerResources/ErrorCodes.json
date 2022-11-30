@@ -1,3 +1,7 @@
 {
     "404": "[red]FUCK YOU IM NOT TELLING YOU[/]",
+    "79": "This is an internal compiler error. Generally, if you are receiving this error it is due to a compiler bug. Please make an issue on the SWO official GitHub (https://github.com/green726/SWO). This specfic error occured in the lexer",
+    "80": "This is an internal compiler error. Generally, if you are receiving this error it is due to a compiler bug. Please make an issue on the SWO official GitHub (https://github.com/green726/SWO). This specfic error occured in the parser",
+    "81": "This is an internal compiler error. Generally, if you are receiving this error it is due to a compiler bug. Please make an issue on the SWO official GitHub (https://github.com/green726/SWO). This specfic error occured in the generator",
+    "179": "This is an internal compiler error. Generally, if you are receiving this error it is due to a compiler bug. Please make an issue on the SWO official GitHub (https://github.com/green726/SWO). This specfic error occured within the compiler's type system. This error coincides with inadequate (or incorrect) information on a value's type stored within the TypeInformation class."
 }

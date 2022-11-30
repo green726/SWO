@@ -25,12 +25,22 @@ public abstract class TypeInformation
         }
     }
 
+    public string getContainedType(AST.Node caller)
+    {
+        if (!this.isArray)
+        {
+            throw ParserException.FactoryMethod("Attempted to get the contained type of a non-array", "Internal compiler error - make an issue on GitHub", caller, 179);
+        }
+        string ret = this.value.Remove(this.value.IndexOf("["));
+        return (ret);
+    }
+
     public string getContainedType()
     {
         if (!this.isArray)
         {
             // throw ParserException.FactoryMethod("Attempted to get the contained of a non-array", "Internal compiler error - make an issue on GitHub", caller, this);
-            throw new ParserException("Attempted to get the contained of a non-array");
+            throw new ParserException("Attempted to get the contained type of a non-array");
         }
         string ret = this.value.Remove(this.value.IndexOf("["));
         return (ret);

@@ -68,6 +68,44 @@ public class ParserException : Exception
         return new ParserException(input);
     }
 
+
+    public static ParserException FactoryMethod(string whatHappened, string recommendedFix, Util.Token token, AST.Node parent, int errorCode, bool typoSuspected = false)
+    {
+        string input = "";
+        string codeBlock = "";
+        codeBlock = $"{getCodeBlock(parent)} \n--------\n{getCodeBlock(token)}";
+        if (typoSuspected && Config.settings.general.typo.enabled)
+        {
+            List<string> typoFixes = Typo.spellCheck(token.value);
+            input = $"{whatHappened}: \n```\n{codeBlock}\n```\nHow You Can Fix This: \n{recommendedFix} \nPossible typo solutions: {typoFixes.ToString()}\nError Was Thrown At {token.line}:{token.column}\nError Code: {errorCode}";
+        }
+        else
+        {
+            input = $"{whatHappened}: \n```\n{codeBlock}\n```\nHow You Can Fix This: \n{recommendedFix} \nError Was Thrown At {token.line}:{token.column}\nError Code: {errorCode}";
+        }
+
+        return new ParserException(input);
+    }
+
+    public static ParserException FactoryMethod(string whatHappened, string recommendedFix, Util.Token token, int errorCode, bool typoSuspected = false)
+    {
+        string input = "";
+        string codeBlock = "";
+        codeBlock = getCodeBlock(token);
+        if (typoSuspected && Config.settings.general.typo.enabled)
+        {
+            List<string> typoFixes = Typo.spellCheck(token.value);
+            input = $"{whatHappened}: \n```\n{codeBlock}\n```\nHow You Can Fix This: \n{recommendedFix} \nPossible typo solutions: {typoFixes.ToString()}\nError Was Thrown At {token.line}:{token.column}\nError Code: {errorCode}";
+        }
+        else
+        {
+            input = $"{whatHappened}: \n```\n{codeBlock}\n```\nHow You Can Fix This: \n{recommendedFix} \nError Was Thrown At {token.line}:{token.column}\nError Code: {errorCode}";
+        }
+
+        return new ParserException(input);
+    }
+
+
     public static ParserException FactoryMethod(string whatHappened, string recommendedFix, AST.Node node, bool typoSuspected = false, string typoString = "")
     {
         string input = "";
@@ -103,6 +141,44 @@ public class ParserException : Exception
 
         return new ParserException(input);
     }
+
+
+    public static ParserException FactoryMethod(string whatHappened, string recommendedFix, AST.Node node, int errorCode, bool typoSuspected = false, string typoString = "")
+    {
+        string input = "";
+        if (typoSuspected && Config.settings.general.typo.enabled)
+        {
+            string codeBlock = getCodeBlock(node);
+            List<string> typoFixes = Typo.spellCheck(typoString);
+            input = $"{whatHappened}: \n```\n{codeBlock}\n```\nHow You Can Fix This: \n{recommendedFix} \nPossible typo solutions: {typoFixes.ToString()}\nError Was Thrown At {node.line}:{node.column}\nError Code: {errorCode}";
+        }
+        else
+        {
+            string codeBlock = getCodeBlock(node);
+            input = $"{whatHappened}\n```\n{codeBlock}\n```\nHow You Can Fix This: \n{recommendedFix} \nError Was Thrown At {node.line}:{node.column}\nError Code: {errorCode}";
+        }
+
+        return new ParserException(input);
+    }
+
+    public static ParserException FactoryMethod(string whatHappened, string recommendedFix, AST.Node node, AST.Node parent, int errorCode, bool typoSuspected = false, string typoString = "")
+    {
+        string input = "";
+        if (typoSuspected && Config.settings.general.typo.enabled)
+        {
+            string codeBlock = getCodeBlock(node);
+            List<string> typoFixes = Typo.spellCheck(typoString);
+            input = $"{whatHappened}: \n```\n{codeBlock}\n```\nHow You Can Fix This: \n{recommendedFix} \nPossible typo solutions: {typoFixes.ToString()}\nError Was Thrown At {node.line}:{node.column}\nError Code: {errorCode}";
+        }
+        else
+        {
+            string codeBlock = getCodeBlock(node);
+            input = $"{whatHappened}\n```\n{codeBlock}\n```\nHow You Can Fix This: \n{recommendedFix} \nError Was Thrown At {node.line}:{node.column}";
+        }
+
+        return new ParserException(input);
+    }
+
 
     public static ParserException FactoryMethod(string whatHappened, string recommendedFix, string codeBlock, int errorCode)
     {
