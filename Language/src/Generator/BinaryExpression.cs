@@ -19,6 +19,7 @@ public class BinaryExpression : Base
             throw ParserException.FactoryMethod("Binary Expression right hand is empty", "Remove the binary expression | add a right hand", binExpr);
         }
         base.generate();
+        // throw new Exception();
         DebugConsole.Write("rh type: " + binExpr.rightHand.nodeType);
         LLVMValueRef leftHand = new LLVMValueRef();
         LLVMValueRef rightHand = new LLVMValueRef();
@@ -38,7 +39,6 @@ public class BinaryExpression : Base
                 break;
         }
 
-        DebugConsole.Write("ee");
         switch (binExpr.rightHand.nodeType)
         {
             // case AST.Node.NodeType.VariableExpression:
@@ -52,7 +52,6 @@ public class BinaryExpression : Base
             default:
                 binExpr?.rightHand.generator.generate();
                 rightHand = gen.valueStack.Pop();
-                DebugConsole.Write("ee");
                 break;
         }
 

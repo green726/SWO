@@ -17,6 +17,8 @@ public class BinaryExpression : Expression
         this.parent = parent;
         this.generator = new Generator.BinaryExpression(this);
         this.nodeType = NodeType.BinaryExpression;
+        this.leftHand.parent.removeChild(this.leftHand);
+        this.leftHand.parent = this;
     }
 
     public BinaryExpression(AST.Expression leftHand, AST.Expression rightHand, Util.Token binOpTok, AST.Node parent) : base(leftHand, parent)
@@ -30,6 +32,8 @@ public class BinaryExpression : Expression
         this.parent.addChild(this);
         this.generator = new Generator.BinaryExpression(this);
         this.nodeType = NodeType.BinaryExpression;
+        this.leftHand.parent.removeChild(this.leftHand);
+        this.leftHand.parent = this;
     }
 
     public BinaryExpression(AST.Expression leftHand, AST.Expression rightHand, string binOpStr, AST.Node parent) : base(leftHand, parent)
@@ -43,6 +47,8 @@ public class BinaryExpression : Expression
         this.parent.addChild(this);
         this.generator = new Generator.BinaryExpression(this);
         this.nodeType = NodeType.BinaryExpression;
+        this.leftHand.parent.removeChild(this.leftHand);
+        this.leftHand.parent = this;
     }
 
     public void checkPrecedence()
