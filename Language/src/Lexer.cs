@@ -16,9 +16,10 @@ public static class Lexer
         inputStr = input;
         int line = 1;
         int column = 0;
-        int charNum = 0;
+        int charNum = -1;
         tokenList = new List<Util.Token>();
         char lastChar = new char();
+        // char nextChar = new char();
         StringBuilder stringBuilder = new StringBuilder();
 
         if (task != null)
@@ -26,8 +27,10 @@ public static class Lexer
             task.MaxValue = input.Length;
         }
 
+        int idx = -1;
         foreach (char ch in input)
         {
+            idx++;
             if (task != null)
             {
                 task.Increment(1);
@@ -120,6 +123,10 @@ public static class Lexer
             {
                 handleMultiCharSpecial("->", stringBuilder.ToString(), line, column, charNum);
                 stringBuilder = new StringBuilder();
+            }
+            else if (binOps.Contains(ch.ToString()) && lastChar == ' ' && input[idx + 1] == ' ')
+            {
+                tokenList.Add(new Util.Token(Util.TokenType.Operator, ch, line, column, charNum));
             }
             //NOTE: handling of modifier chars (ie reference/dereference) - they are only handeled if they are at the start of a word
             else if (modifierChars.Contains(ch.ToString()) && stringBuilder.ToString() == "")

@@ -79,6 +79,12 @@ public class BinaryExpression : Base
                     ir = cmpRef;
                     // ir = LLVM.BuildUIToFP(builder, cmpRef, LLVMTypeRef.Int1Type(), "booltmp");
                     break;
+                case BinaryOperator.OperatorType.Multiply:
+                    ir = LLVM.BuildMul(gen.builder, leftHand, rightHand, "multmp");
+                    break;
+                case BinaryOperator.OperatorType.Divide:
+                    ir = LLVM.BuildSDiv(gen.builder, leftHand, rightHand, "divtmp");
+                    break;
             }
         }
 
@@ -99,6 +105,12 @@ public class BinaryExpression : Base
                     DebugConsole.DumpValue(leftHand);
                     LLVMValueRef cmpRef = LLVM.BuildFCmp(gen.builder, LLVMRealPredicate.LLVMRealULT, leftHand, rightHand, "lessthantmp");
                     ir = LLVM.BuildUIToFP(gen.builder, cmpRef, LLVMTypeRef.DoubleType(), "booltmp");
+                    break;
+                case BinaryOperator.OperatorType.Multiply:
+                    ir = LLVM.BuildFMul(gen.builder, leftHand, rightHand, "multmp");
+                    break;
+                case BinaryOperator.OperatorType.Divide:
+                    ir = LLVM.BuildFDiv(gen.builder, leftHand, rightHand, "divtmp");
                     break;
             }
         }

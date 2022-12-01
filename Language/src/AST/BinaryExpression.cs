@@ -57,7 +57,7 @@ public class BinaryExpression : Expression
         {
             BinaryExpression rightBinExpr = (BinaryExpression)this.rightHand;
             this.rightHand.parent = this;
-            if (this.binOp >= rightBinExpr.binOp)
+            if (this.binOp <= rightBinExpr.binOp)
             {
                 return;
             }
@@ -70,11 +70,20 @@ public class BinaryExpression : Expression
                 this.leftHand = rightBinExpr.leftHand;
                 this.rightHand = leftHand;
 
+                Expression rightBinLeftHandPrevious = rightBinExpr.leftHand;
                 rightBinExpr.leftHand = rightBinExpr.rightHand;
-                rightBinExpr.rightHand = rightBinExpr.leftHand;
+                rightBinExpr.rightHand = rightBinLeftHandPrevious;
 
+                this.parent.removeChild(this);
+                this.parent.addChild(rightBinExpr);
                 rightBinExpr.parent = this.parent;
                 this.parent = rightBinExpr;
+
+                //1 + 2 * 3
+
+                DebugConsole.WriteAnsi("[purple]precedence swapped ops below:[/]");
+                DebugConsole.Write($"original left hand:\n  leftHand {this.leftHand} | rightHand {this.rightHand}");
+                DebugConsole.Write($"original right hand:\n  leftHand {rightBinExpr.leftHand} | rightHand {rightBinExpr.rightHand}");
             }
         }
     }
