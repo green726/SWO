@@ -11,7 +11,6 @@ public class Parser
     public static Parser addInstance(List<Util.Token> tokenList, string fileName, string path, Spectre.Console.ProgressTask task = null)
     {
         Parser newParser = new Parser(tokenList, fileName, path, task);
-        parserStack.Push(newParser);
         return newParser;
     }
 
@@ -28,7 +27,7 @@ public class Parser
         if (parserStack.Count > 0)
             return parserStack.Peek();
         else
-            return null;
+            throw new ParserException("No parser instances exist");
     }
 
     public string fileName = "";
@@ -40,6 +39,8 @@ public class Parser
     public int delimLevel = 0;
     public int prevLine = 0;
     public int prevColumn = 0;
+
+    public AST.Expression previousExpression;
 
     public Spectre.Console.ProgressTask progressTask;
 
@@ -70,7 +71,7 @@ public class Parser
     public bool isFinishedParsing = false;
     public Stack<AST.Node> delimParentStack = new Stack<AST.Node>();
 
-    public AST.Node lastMajorParentNode = new AST.Empty();
+    public AST.Node lastMajorParentNode;
 
     public AST.Node parent;
 
@@ -860,6 +861,11 @@ public class Parser
     {
         currentTokenNum++;
 
+        // if (parent.isExpression && previousExpression.nodeType == AST.Node.NodeType.Empty)
+        // {
+        //     previousExpression = (AST.Expression)parent;
+        // }
+
         previousNode = nodes.Count > 0 && currentTokenNum > 0 ? nodes.Last() : null;
 
         //NOTE: handles imports and adding stuff
@@ -996,23 +1002,26 @@ public class Parser
                 break;
             case Util.TokenType.Operator:
                 AST.Expression leftHand;
-                if (parent == null)
+                if (previousExpression.nodeType == AST.Node.NodeType.Empty)
                 {
-                    throw new Exception("previous node is null");
+                    throw new Exception("previous node is empty");
                 }
                 //check if previous node is an expression and throw an error if it isnt
-                else if (!parent.isExpression)
+                else if (!previousExpression.isExpression)
                 {
-                    throw new Exception("expected expression before operator");
+                    throw ParserException.FactoryMethod($"Expected expression before binary operator but got non-expression of type {previousExpression.nodeType}", "Remove the non-expression and replace it with an expression", previousExpression, parent);
                 }
                 else
                 {
-                    leftHand = (AST.Expression)parent;
+                    leftHand = (AST.Expression)previousExpression;
                 }
-                AST.BinaryExpression binExpr = new AST.BinaryExpression(leftHand, token, parent.parent);
+                if (parent.nodeType == AST.Node.NodeType.VariableExpression)
+                {
+                    parent = parent.parent;
+                }
+                AST.BinaryExpression binExpr = new AST.BinaryExpression(leftHand, token, parent);
                 parent = binExpr;
                 return;
-
             case Util.TokenType.Keyword:
                 (AST.Node keyParent, int keyDelimLevel) = parseKeyword(token, currentTokenNum, parent, delimLevel);
                 //0 is the keyword AST.Node, 1 is the next token, and 2 is the next token index
@@ -1125,15 +1134,20 @@ public class Parser
         return;
     }
 
+
     public Parser(List<Util.Token> tokenList, string fileName, string filePath, Spectre.Console.ProgressTask progressTask = null)
     {
+        if (Parser.parserStack.Count > 0)
+        {
+            this.parentParser = Parser.getInstance();
+        }
+        DebugConsole.Write("pushed to parent stack");
         this.tokenList = tokenList;
         this.progressTask = progressTask;
 
         this.fileName = fileName;
         this.filePath = filePath;
 
-        this.parentParser = Parser.getInstance();
 
         DebugConsole.WriteAnsi("[red]tokens[/]");
         foreach (Util.Token token in tokenList)
@@ -1150,7 +1164,10 @@ public class Parser
         {
             progressTask.MaxValue = tokenList.Count();
         }
+        Parser.parserStack.Push(this);
         this.parent = new AST.Empty();
+        this.previousExpression = new AST.Empty();
+        this.lastMajorParentNode = new AST.Empty();
     }
 
 
@@ -1181,6 +1198,10 @@ public class Parser
             }
             topParser.parse();
         }
+
+        DebugConsole.WriteAnsi("[green]AST below[/]");
+        completedParsersList[0].printAST(completedParsersList[0].nodes);
+        DebugConsole.WriteAnsi("[green]end of AST[/]");
 
         return completedParsersList;
     }

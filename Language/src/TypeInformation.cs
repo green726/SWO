@@ -11,7 +11,12 @@ public abstract class TypeInformation
 
     public int size { get; set; } = 0;
     [JsonIgnore]
-    public Parser parser { get; set; } = Parser.getInstance();
+    public Parser parser { get; set; }
+
+    public TypeInformation(Parser parser)
+    {
+        this.parser = parser;
+    }
 
     public string getTypePointedTo()
     {
@@ -51,14 +56,14 @@ public class GeneratorTypeInformation : TypeInformation
 {
     private IRGen gen { get; set; }
 
-    public GeneratorTypeInformation()
+    public GeneratorTypeInformation(Parser parser) : base(parser)
     {
         gen = IRGen.getInstance();
     }
 
     public static explicit operator GeneratorTypeInformation(ParserTypeInformation infoIn)
     {
-        return new GeneratorTypeInformation() { value = infoIn.value, isPointer = infoIn.isPointer, isArray = infoIn.isArray, size = infoIn.size, parser = infoIn.parser };
+        return new GeneratorTypeInformation(infoIn.parser) { value = infoIn.value, isPointer = infoIn.isPointer, isArray = infoIn.isArray, size = infoIn.size };
         // return new GeneratorTypeInformation() { infoIn };
     }
 
@@ -156,9 +161,8 @@ public class GeneratorTypeInformation : TypeInformation
 
 public class ParserTypeInformation : TypeInformation
 {
-    public ParserTypeInformation(string value)
+    public ParserTypeInformation(string value) : base(Parser.getInstance())
     {
-        parser = Parser.getInstance();
         if (value.EndsWith("*"))
         {
             this.isPointer = true;

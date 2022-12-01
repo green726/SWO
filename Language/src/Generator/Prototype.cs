@@ -15,9 +15,9 @@ public class Prototype : Base
     public override void generate()
     {
         base.generate();
-        proto.handleOverload();
         DebugConsole.WriteAnsi("[yellow]proto named:[/]");
         DebugConsole.Write(proto.name);
+        proto.handleOverload();
         //begin argument generation
         int argumentCount = proto.arguments.Count();
         List<LLVMTypeRef> arguments = new List<LLVMTypeRef>();

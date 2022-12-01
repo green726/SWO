@@ -13,6 +13,7 @@ public abstract class Expression : Node
     {
         this.isExpression = true;
         this.newLineReset = true;
+        this.parser.previousExpression = this;
     }
 
     public Expression(Util.Token token) : base(token)
@@ -33,6 +34,7 @@ public abstract class Expression : Node
         //     DebugConsole.WriteAnsi($"[blue]post deref val {this.value}[/]");
         // }
         this.newLineReset = true;
+        this.parser.previousExpression = this;
     }
 
     public Expression(Util.Token token, Node parent) : base(token)
@@ -53,6 +55,7 @@ public abstract class Expression : Node
         //     DebugConsole.WriteAnsi($"[blue]post deref val {this.value}[/]");
         // }
         this.newLineReset = true;
+        this.parser.previousExpression = this;
     }
 
     public Expression(Node node) : base(node)
@@ -60,6 +63,7 @@ public abstract class Expression : Node
         this.isExpression = true;
 
         this.newLineReset = true;
+        this.parser.previousExpression = this;
     }
 
 
@@ -68,6 +72,7 @@ public abstract class Expression : Node
         this.isExpression = true;
 
         this.newLineReset = true;
+        this.parser.previousExpression = this;
     }
 
 }
