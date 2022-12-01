@@ -83,7 +83,7 @@ public class BinaryExpression : Expression
     {
         DebugConsole.Write("adding child of type: " + child.nodeType + " to binExpr");
         //throw error if right hand node type is not Empty
-        if (this.rightHand.nodeType != NodeType.Empty)
+        if (this.rightHand.nodeType != NodeType.Empty && child.nodeType != NodeType.BinaryExpression)
         {
             throw new ParserException("Cannot add child to BinaryExpression with non-empty right hand");
         }
