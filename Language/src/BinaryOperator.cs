@@ -17,6 +17,28 @@ public class BinaryOperator
         // {OperatorType.Or, 5},
     };
 
+    private bool parenEncapsulated = false;
+
+    public int precedence
+    {
+        get
+        {
+            if (parenEncapsulated)
+            {
+                return 100;
+            }
+            else
+            {
+                return operatorPrecedences[operatorType];
+            }
+        }
+    }
+
+    public void parenEncapsulate()
+    {
+        this.parenEncapsulated = true;
+    }
+
     //override the equals method
     public override bool Equals(object? obj)
     {
@@ -31,36 +53,36 @@ public class BinaryOperator
     //overload the > operator
     public static bool operator >(BinaryOperator op1, BinaryOperator op2)
     {
-        return operatorPrecedences[op1.operatorType] > operatorPrecedences[op2.operatorType];
+        return op1.precedence > op2.precedence;
     }
 
     //overload the < operator
     public static bool operator <(BinaryOperator op1, BinaryOperator op2)
     {
-        return operatorPrecedences[op1.operatorType] < operatorPrecedences[op2.operatorType];
+        return op1.precedence < op2.precedence;
     }
 
     //overload the == operator
     public static bool operator ==(BinaryOperator op1, BinaryOperator op2)
     {
-        return operatorPrecedences[op1.operatorType] == operatorPrecedences[op2.operatorType];
+        return op1.precedence == op2.precedence;
     }
 
     //overload the != operator
     public static bool operator !=(BinaryOperator op1, BinaryOperator op2)
     {
-        return operatorPrecedences[op1.operatorType] != operatorPrecedences[op2.operatorType];
+        return op1.precedence != op2.precedence;
     }
 
     //overload the >= operator and the <= operator
     public static bool operator >=(BinaryOperator op1, BinaryOperator op2)
     {
-        return operatorPrecedences[op1.operatorType] >= operatorPrecedences[op2.operatorType];
+        return op1.precedence >= op2.precedence;
     }
 
     public static bool operator <=(BinaryOperator op1, BinaryOperator op2)
     {
-        return operatorPrecedences[op1.operatorType] <= operatorPrecedences[op2.operatorType];
+        return op1.precedence <= op2.precedence;
     }
 
     public enum OperatorType
@@ -79,7 +101,7 @@ public class BinaryOperator
     //compare to method based on the operator precendence
     public int CompareTo(BinaryOperator other)
     {
-        return operatorPrecedences[this.operatorType] - operatorPrecedences[other.operatorType];
+        return this.precedence - other.precedence;
     }
 
     //override the get hash code method

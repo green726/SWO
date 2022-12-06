@@ -85,6 +85,7 @@ public class Function : AST.Node
 
     public override void addChild(Util.Token child)
     {
+        base.addChild(child);
         if (children.Count() == 0)
         {
             if (child.value == "{")
@@ -97,7 +98,6 @@ public class Function : AST.Node
         {
             throw ParserException.FactoryMethod("Illegal token added to function", "Delete the token", child, this, true);
         }
-        base.addChild(child);
     }
 
 

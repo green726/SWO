@@ -737,6 +737,18 @@ public class Parser
             //     return (parent, delimLevel);
             // }
             bool addLayer = true;
+            if (token.value == "(")
+            {
+                if (parent.nodeType != AST.Node.NodeType.FunctionCall && parent.nodeType != AST.Node.NodeType.Prototype)
+                {
+                    //NOTE: code to handle parens being used to encapsulate other nodes. ie PEMDAS, anonymous funcs, etc
+                    delimLevel++;
+                    parent = new AST.ParenEncapsulation(token, parent);
+                    delimParentStack.Push(parent);
+                    addLayerToNamedASTStack();
+                    return (parent, delimLevel);
+                }
+            }
             switch (parent?.nodeType)
             {
                 case AST.Node.NodeType.VariableDeclaration:
@@ -836,6 +848,19 @@ public class Parser
                     delimParent?.addChild(token);
                     break;
             }
+            if (delimParent.nodeType == AST.Node.NodeType.ParenEncapsulation)
+            {
+                AST.ParenEncapsulation parenEncap = (AST.ParenEncapsulation)delimParent!;
+                if (parenEncap.containedExpression.nodeType == AST.Node.NodeType.BinaryExpression)
+                {
+                    delimLevel--;
+                    removeLayerFromASTStack();
+                    parent = parenEncap.containedExpression;
+                    return (parent, delimLevel);
+                }
+                throw new Exception();
+            }
+
             delimLevel--;
             if (removeLayer)
             {

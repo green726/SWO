@@ -124,6 +124,7 @@ public abstract class Node
         ExternStatement,
         Reference,
         Dereference,
+        ParenEncapsulation,
     }
 
     public virtual void addSpace(Util.Token space)
@@ -167,7 +168,7 @@ public abstract class Node
 
     public virtual void addChild(Util.Token child)
     {
-        // this.codeExcerpt += child.value;
+        this.codeExcerpt += child.value;
     }
 
     public virtual void removeChild(Node child)
