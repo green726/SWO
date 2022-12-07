@@ -113,6 +113,18 @@ public static class Lexer
                     continue;
                 }
             }
+            else if (ch == '\'')
+            {
+                if (stringBuilder.ToString().StartsWith("\'"))
+                {
+                    stringBuilder.Append(ch);
+                    DebugConsole.WriteAnsi($"[green]detected end of string and builder val is now: {stringBuilder.ToString()}[/]");
+                    tokenList.Add(new Util.Token(Util.TokenType.Char, stringBuilder.ToString(), line, column));
+                    stringBuilder = new StringBuilder();
+                    lastChar = ch;
+                    continue;
+                }
+            }
 
             //NOTE: below needs to stay if
             if (specialChars.Contains(ch.ToString()))

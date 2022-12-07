@@ -125,6 +125,7 @@ public abstract class Node
         Reference,
         Dereference,
         ParenEncapsulation,
+        CharExpression,
     }
 
     public virtual void addSpace(Util.Token space)

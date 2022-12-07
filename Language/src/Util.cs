@@ -37,7 +37,7 @@ public static class Util
         DelimiterOpen,
         AssignmentOp,
         String,
-        Text,
+        Char,
         Special,
         Modifier,
         Space,
