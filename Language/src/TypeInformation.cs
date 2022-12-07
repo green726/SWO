@@ -67,94 +67,69 @@ public class GeneratorTypeInformation : TypeInformation
         // return new GeneratorTypeInformation() { infoIn };
     }
 
-    private LLVMTypeRef getBasicArrayType()
+    public static LLVMTypeRef getLLVMTypeFromString(string type, IRGen gen, bool array = false, int size = 0)
     {
-        string containedType = getContainedType();
-        DebugConsole.Write(containedType);
-        if (gen.namedTypesLLVM.ContainsKey(containedType))
-        {
-            return LLVM.ArrayType(gen.namedTypesLLVM[containedType], (uint)size);
-        }
-        (bool isInt, int bits) = parser.checkInt(containedType);
+        LLVMTypeRef basicType;
+
+        (bool isInt, int bits) = Parser.checkInt(type);
         if (isInt)
         {
-            return LLVM.ArrayType(LLVM.IntType((uint)bits), (uint)size);
+            basicType = LLVM.IntType((uint)bits);
         }
-        switch (containedType)
+        else
         {
-            case "double":
-                return LLVM.ArrayType(LLVM.DoubleType(), (uint)size);
-            case "string":
-                //TODO: implement strings as stdlib so they can have a sane type
-                return LLVM.ArrayType(LLVM.Int8Type(), (uint)size);
-            case "null":
-                return LLVM.ArrayType(LLVM.VoidType(), (uint)size);
-            default:
-                throw new GenException("An unknown type was referenced");
-        }
-    }
-
-    private LLVMTypeRef getBasicType()
-    {
-        if (isArray)
-        {
-            return getBasicArrayType();
-        }
-        if (gen.namedTypesLLVM.ContainsKey(value))
-        {
-            return gen.namedTypesLLVM[value];
-        }
-        (bool isInt, int bits) = parser.checkInt(value);
-        if (isInt)
-        {
-            return LLVM.IntType((uint)bits);
-        }
-        switch (value)
-        {
-            case "double":
-                return LLVM.DoubleType();
-            case "string":
-                //TODO: implement strings as stdlib so they can have a sane type
-                return LLVM.ArrayType(LLVM.Int8Type(), 0);
-            case "null":
-                return LLVM.VoidType();
-            default:
-                throw new GenException("An unknown type was referenced");
+            switch (type)
+            {
+                case "double":
+                    basicType = LLVM.DoubleType();
+                    break;
+                case "string":
+                    //TODO: implement strings as stdlib so they can have a sane type
+                    basicType = LLVM.ArrayType(LLVM.Int8Type(), 0);
+                    break;
+                case "null":
+                    basicType = LLVM.VoidType();
+                    break;
+                case "bool":
+                    basicType = LLVM.Int1Type();
+                    break;
+                case "void":
+                    basicType = LLVM.VoidType();
+                    break;
+                case "char":
+                    basicType = LLVM.Int8Type();
+                    break;
+                default:
+                    throw new GenException($"An unknown type ({type}) was referenced");
+            }
         }
 
+        if (array)
+        {
+            return LLVM.ArrayType(basicType, (uint)size);
+        }
+        return basicType;
     }
 
     private LLVMTypeRef genPointer()
     {
-        return (LLVM.PointerType(getBasicType(), 0));
+        return (LLVM.PointerType(getLLVMTypeFromString(this.value, gen, this.isArray, this.size), 0));
     }
 
-    private LLVMTypeRef genNonArray()
+    private LLVMTypeRef genNonPtr()
     {
-        return (getBasicType());
+        return (getLLVMTypeFromString(this.value, gen, this.isArray, this.size));
     }
 
     public LLVMTypeRef getLLVMType()
     {
-        if (!isArray)
+        if (isPointer)
         {
-            if (isPointer)
-            {
-                return genPointer();
-            }
-            return genNonArray();
+            return genPointer();
         }
         else
         {
-            if (size == 0)
-            {
-                return genPointer();
-            }
-            else
-            {
-                uint count = (uint)size;
-                return LLVM.ArrayType(getBasicType(), count);
-            }
+            return genNonPtr();
         }
     }
 }

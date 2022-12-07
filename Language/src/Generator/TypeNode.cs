@@ -11,107 +11,27 @@ public class Type : Base
         this.type = (AST.Type)node;
     }
 
+    private LLVMTypeRef genPointer()
+    {
+        return (LLVM.PointerType(GeneratorTypeInformation.getLLVMTypeFromString(type.value, gen, type.isArray, type.size), 0));
+    }
+
+    private LLVMTypeRef genNonPtr()
+    {
+        return (GeneratorTypeInformation.getLLVMTypeFromString(type.value, gen, type.isArray, type.size));
+    }
+
     public override void generate()
     {
         base.generate();
-        // LLVMTypeRef llvmType = getBasicType();
-        if (!type.isArray)
+        if (type.isPointer)
         {
-            if (type.isPointer)
-            {
-                genPointer();
-                return;
-            }
-            genNonArray();
+            gen.typeStack.Push(genPointer());
         }
         else
         {
-            if (type.size == 0)
-            {
-                genPointer();
-                return;
-            }
-            else
-            {
-                if (type.isPointer)
-                {
-                    DebugConsole.Write("Detected pointer to array");
-                    genPointer();
-                }
-                else
-                {
-                    uint count = (uint)type.size;
-                    DebugConsole.Write(getBasicType());
-                    gen.typeStack.Push(getBasicType());
-                }
-            }
+            gen.typeStack.Push(genNonPtr());
         }
-    }
-
-    public LLVMTypeRef getBasicArrayType()
-    {
-        string containedType = type.getContainedTypeString(type);
-        DebugConsole.Write(containedType);
-        if (gen.namedTypesLLVM.ContainsKey(containedType))
-        {
-            return LLVM.ArrayType(gen.namedTypesLLVM[containedType], (uint)type.size);
-        }
-        (bool isInt, int bits) = type.parser.checkInt(containedType);
-        if (isInt)
-        {
-            return LLVM.ArrayType(LLVM.IntType((uint)bits), (uint)type.size);
-        }
-        switch (containedType)
-        {
-            case "double":
-                return LLVM.ArrayType(LLVM.DoubleType(), (uint)type.size);
-            case "string":
-                //TODO: implement strings as stdlib so they can have a sane type
-                return LLVM.ArrayType(LLVM.Int8Type(), (uint)type.size);
-            case "null":
-                return LLVM.ArrayType(LLVM.VoidType(), (uint)type.size);
-            default:
-                throw GenException.FactoryMethod("An unknown type was referenced", "Make it a known type, or remove it", this.type, true, this.type.value);
-        }
-    }
-
-    public LLVMTypeRef getBasicType()
-    {
-        if (type.isArray)
-        {
-            return getBasicArrayType();
-        }
-        if (gen.namedTypesLLVM.ContainsKey(type.value))
-        {
-            return gen.namedTypesLLVM[type.value];
-        }
-        (bool isInt, int bits) = type.parser.checkInt(type.value);
-        if (isInt)
-        {
-            return LLVM.IntType((uint)bits);
-        }
-        switch (type.value)
-        {
-            case "double":
-                return LLVM.DoubleType();
-            case "string":
-                //TODO: implement strings as stdlib so they can have a sane type
-                return LLVM.ArrayType(LLVM.Int8Type(), 0);
-            case "null":
-                return LLVM.VoidType();
-            default:
-                throw GenException.FactoryMethod("An unknown type was referenced", "Make it a known type, or remove it", this.type, true, this.type.value);
-        }
-    }
-
-    public void genPointer()
-    {
-        gen.typeStack.Push(LLVM.PointerType(getBasicType(), 0));
-    }
-
-    public void genNonArray()
-    {
-        gen.typeStack.Push(getBasicType());
     }
 }
 

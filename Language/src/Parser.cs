@@ -183,7 +183,7 @@ public class Parser
         return isInt;
     }
 
-    public (bool, int) checkInt(string value)
+    public static (bool, int) checkInt(string value)
     {
         if (value.EndsWith("*"))
         {
