@@ -6,8 +6,8 @@ public class ElseStatement : AST.Node
     // public Function elseFunc;
     // public FunctionCall elseCall;
 
-    public List<AST.Node> elseBody;
-
+    public AST.Node precedingStatement;
+    public List<AST.Node> body;
 
     public ElseStatement(AST.Node parent, Util.Token token) : base(token)
     {
@@ -16,22 +16,13 @@ public class ElseStatement : AST.Node
 
         this.parent = parent.parent;
 
-        this.elseBody = new List<AST.Node>();
-
-        // Util.Token elseProtoTok = new Util.Token(Util.TokenType.Keyword, "@else" + Parser.ifFuncNum, token.line, token.column);
-        // Prototype elseProto = new Prototype(elseProtoTok);
-        // this.elseFunc = new Function(elseProto, new List<AST.Node>(), topLevel: false);
-        // this.elseFunc.utilFunc = true;
-
-
-        // Util.Token thenCallTok = new Util.Token(Util.TokenType.Keyword, "else" + Parser.ifFuncNum, token.line, token.column);
-        // this.elseCall = new FunctionCall(thenCallTok, null, topLevel: false);
-
+        this.body = new List<AST.Node>();
+        this.precedingStatement = new AST.Empty();
     }
 
     public override void addChild(AST.Node child)
     {
-        elseBody.Add(child);
+        body.Add(child);
         base.addChild(child);
     }
 
@@ -39,8 +30,7 @@ public class ElseStatement : AST.Node
     {
         if (child.value != "{" && child.value != "}")
         {
-
-            throw ParserException.FactoryMethod($"Illegal child was added to an else statement", "No recommended fix", child);
+            throw ParserException.FactoryMethod($"Illegal child was added to an else statement", "Remove it", child, this);
         }
         base.addChild(child);
     }
