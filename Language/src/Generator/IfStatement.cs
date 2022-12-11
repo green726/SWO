@@ -16,6 +16,7 @@ public class IfStatement : Base
 
     public override void generate()
     {
+        base.generate();
         ifStat.condition.generator.generate();
         LLVMValueRef condValue = gen.valueStack.Pop();
 
@@ -27,9 +28,11 @@ public class IfStatement : Base
 
         LLVMBasicBlockRef thenBlock = LLVM.AppendBasicBlock(parentBlock, "then");
 
+        LLVMBasicBlockRef elseBlock = LLVM.AppendBasicBlock(parentBlock, "else");
+
         LLVMBasicBlockRef nextBlock = LLVM.AppendBasicBlock(parentBlock, "next");
 
-        LLVM.BuildCondBr(gen.builder, condValue, thenBlock, nextBlock);
+        LLVM.BuildCondBr(gen.builder, condValue, thenBlock, elseBlock);
 
         LLVM.PositionBuilderAtEnd(gen.builder, thenBlock);
 
@@ -44,10 +47,7 @@ public class IfStatement : Base
             thenBodyValues.Add(gen.valueStack.Pop());
         }
 
-        // if (!this.thenTopLevelRet)
-        // {
-        //     LLVM.BuildBr(gen.builder, mergeBlock);
-        // }
+        LLVM.BuildBr(gen.builder, nextBlock);
 
         //reset the then block in case builder was moved while populating it
         thenBlock = LLVM.GetInsertBlock(gen.builder);

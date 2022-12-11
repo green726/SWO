@@ -1,4 +1,6 @@
 namespace Generator;
+using LLVMSharp;
+using static IRGen;
 
 public class ElseStatement : Base
 {
@@ -11,6 +13,10 @@ public class ElseStatement : Base
 
     public override void generate()
     {
+        base.generate();
+        LLVMBasicBlockRef nextBlock = LLVM.GetInsertBlock(gen.builder);
+
+
 
     }
 }
