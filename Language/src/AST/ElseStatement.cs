@@ -6,10 +6,9 @@ public class ElseStatement : AST.Node
     // public Function elseFunc;
     // public FunctionCall elseCall;
 
-    public AST.Node precedingStatement;
     public List<AST.Node> body;
 
-    public ElseStatement(AST.Node parent, Util.Token token) : base(token)
+    public ElseStatement(Util.Token token, AST.Node parent) : base(token)
     {
         this.nodeType = NodeType.ElseStatement;
         this.generator = new Generator.ElseStatement(this);
@@ -17,7 +16,6 @@ public class ElseStatement : AST.Node
         this.parent = parent.parent;
 
         this.body = new List<AST.Node>();
-        this.precedingStatement = new AST.Empty();
     }
 
     public override void addChild(AST.Node child)

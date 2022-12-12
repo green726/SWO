@@ -112,7 +112,7 @@ public abstract class Node
         StringExpression,
         Type,
         IfStatement,
-        IfStatementDeclaration,
+        IfStatementConditional,
         ElseStatement,
         ForLoop,
         WhileLoop,

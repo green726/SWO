@@ -345,12 +345,14 @@ public class Parser
 
     public string printIfStat(AST.IfStatement ifStat)
     {
-        return $"if statement with expression of {printBinary(ifStat.declaration.expression)} and body of ( {printASTRet(ifStat.thenBody)} ) body end | else statement: {printElseStat(ifStat.elseStat)}";
+        return "";
+        // return $"if statement with expression of {printBinary(ifStat.declaration.expression)} and body of ( {printASTRet(ifStat.thenBody)} ) body end | else statement: {printElseStat(ifStat.elseStat)}";
     }
 
     public string printElseStat(AST.ElseStatement elseStat)
     {
-        return $"else statement with body of ( {printASTRet(elseStat.elseBody)} )";
+        return ""; ; ;
+        // return $"else statement with body of ( {printASTRet(elseStat.elseBody)} )";
     }
 
     public string printForLoop(AST.ForLoop forLoop)
@@ -588,14 +590,14 @@ public class Parser
         }
         else if (token.value == "if")
         {
-            AST.IfStatementDeclaration ifStat = new AST.IfStatementDeclaration(token, parent);
-            return (ifStat, delimLevel);
+            AST.IfStatement ifStat = new AST.IfStatement(token, parent);
+            return (ifStat.conditional, delimLevel);
         }
-        else if (token.value == "else")
-        {
-            AST.IfStatement ifParent = (AST.IfStatement)parent.children.Last();
-            return (ifParent.elseStat, delimLevel);
-        }
+        // else if (token.value == "else")
+        // {
+        //     AST.ElseStatement elseStat = new AST.ElseStatement(token, parent);
+        //     return (elseStat, delimLevel);
+        // }
         else if (token.value == "for")
         {
             AST.ForLoop forLoop = new AST.ForLoop(token, parent);
@@ -739,7 +741,7 @@ public class Parser
             bool addLayer = true;
             if (token.value == "(")
             {
-                if (parent.nodeType != AST.Node.NodeType.FunctionCall && parent.nodeType != AST.Node.NodeType.Prototype)
+                if (parent.nodeType != AST.Node.NodeType.FunctionCall && parent.nodeType != AST.Node.NodeType.Prototype && parent.nodeType != AST.Node.NodeType.IfStatement && parent.nodeType != AST.Node.NodeType.IfStatementConditional)
                 {
                     //NOTE: code to handle parens being used to encapsulate other nodes. ie PEMDAS, anonymous funcs, etc
                     delimLevel++;
@@ -809,8 +811,6 @@ public class Parser
                     }
                     delimLevel--;
                     return (parent, delimLevel);
-                case AST.Node.NodeType.IfStatement:
-                    break;
                 case AST.Node.NodeType.Function:
                     break;
                 case AST.Node.NodeType.Prototype:
@@ -860,20 +860,20 @@ public class Parser
                 }
                 throw new Exception();
             }
-
             delimLevel--;
             if (removeLayer)
             {
                 removeLayerFromASTStack();
                 // DebugConsole.WriteAnsi("[purple]removing layer from ast stack[/]");
             }
+            DebugConsole.Write("Delim level: " + delimLevel);
             if (delimLevel == 0)
             {
                 parent = new AST.Empty();
             }
             else
             {
-                // DebugConsole.Write("setting parent to delim parent of node type " + delimParent?.nodeType + " with parent of node type " + delimParent?.parent?.nodeType);
+                DebugConsole.Write("setting parent to delim parent of node type " + delimParent?.nodeType + " with parent of node type " + delimParent?.parent?.nodeType);
                 parent = delimParent.parent;
             }
         }
@@ -950,16 +950,14 @@ public class Parser
             if (singleLineComment)
             {
                 singleLineComment = false;
-
                 return;
             }
 
             if (delimLevel > 0)
             {
-                while (parent?.newLineReset == true)
+                while (parent?.newLineReset == true && parent.nodeType != AST.Node.NodeType.Empty)
                 {
                     parent = parent.parent;
-
                 }
 
                 return;
