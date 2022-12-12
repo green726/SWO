@@ -32,19 +32,14 @@ public class IfStatement : Base
 
         LLVMBasicBlockRef thenBlock = LLVM.AppendBasicBlock(parentBlock, "then");
 
+        LLVMBasicBlockRef elseBlock = LLVM.AppendBasicBlock(parentBlock, "else");
+        this.elseBlock = elseBlock;
+
         LLVMBasicBlockRef nextBlock = LLVM.AppendBasicBlock(parentBlock, "next");
         this.nextBlock = nextBlock;
 
-        if (ifStat.followingBlock.nodeType != AST.Node.NodeType.Empty)
-        {
-            LLVMBasicBlockRef elseBlock = LLVM.AppendBasicBlock(parentBlock, "else");
-            this.elseBlock = elseBlock;
-            LLVM.BuildCondBr(gen.builder, condValue, thenBlock, elseBlock);
-        }
-        else
-        {
-            LLVM.BuildCondBr(gen.builder, condValue, thenBlock, nextBlock);
-        }
+        LLVM.BuildCondBr(gen.builder, condValue, thenBlock, elseBlock);
+        // LLVM.BuildCondBr(gen.builder, condValue, thenBlock, nextBlock);
 
 
         LLVM.PositionBuilderAtEnd(gen.builder, thenBlock);
@@ -59,9 +54,6 @@ public class IfStatement : Base
         }
 
         LLVM.BuildBr(gen.builder, nextBlock);
-
-        //reset the then block in case builder was moved while populating it
-        thenBlock = LLVM.GetInsertBlock(gen.builder);
 
         LLVM.PositionBuilderAtEnd(gen.builder, nextBlock);
     }

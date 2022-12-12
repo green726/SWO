@@ -8,13 +8,12 @@ public class ElseStatement : AST.Node
 
     public List<AST.Node> body;
 
-    public ElseStatement(Util.Token token, AST.Node parent) : base(token)
+    public ElseStatement(Util.Token token, AST.Node parent) : base(token, parent)
     {
         this.nodeType = NodeType.ElseStatement;
         this.generator = new Generator.ElseStatement(this);
 
-        this.parent = parent.parent;
-
+        this.parent = parent;
         this.body = new List<AST.Node>();
     }
 

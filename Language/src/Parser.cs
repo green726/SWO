@@ -541,6 +541,8 @@ public class Parser
         List<dynamic> ret = new List<dynamic>();
         (Util.Token nextToken, int nextTokenIndex) = nextNonSpace(tokenIndex);
 
+        DebugConsole.Write("keyword val: " + token.value);
+
         if (token.value == Config.settings.variable.declaration.keyword.mutable)
         {
             AST.VariableDeclaration varDec = new AST.VariableDeclaration(token, true, parent);
@@ -593,11 +595,11 @@ public class Parser
             AST.IfStatement ifStat = new AST.IfStatement(token, parent);
             return (ifStat.conditional, delimLevel);
         }
-        // else if (token.value == "else")
-        // {
-        //     AST.ElseStatement elseStat = new AST.ElseStatement(token, parent);
-        //     return (elseStat, delimLevel);
-        // }
+        else if (token.value == "else")
+        {
+            AST.ElseStatement elseStat = new AST.ElseStatement(token, parent);
+            return (elseStat, delimLevel);
+        }
         else if (token.value == "for")
         {
             AST.ForLoop forLoop = new AST.ForLoop(token, parent);
