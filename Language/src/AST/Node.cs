@@ -113,6 +113,8 @@ public abstract class Node
         Type,
         IfStatement,
         IfStatementConditional,
+        ElseIfStatement,
+        ElseIfStatementConditional,
         ElseStatement,
         ForLoop,
         WhileLoop,

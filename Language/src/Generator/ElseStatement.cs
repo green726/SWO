@@ -21,14 +21,16 @@ public class ElseStatement : Base
 
         DebugConsole.DumpValue(elseBlock);
 
-        LLVM.PositionBuilderAtEnd(gen.builder, elseBlock);
+        LLVMBasicBlockRef brBlockFromIf = LLVM.GetLastInstruction(elseBlock);
+
+        LLVM.PositionBuilderBefore(gen.builder, brBlockFromIf);
 
         foreach (AST.Node node in elseStat.body)
         {
             node.generator.generate();
         }
 
-        LLVM.BuildBr(gen.builder, nextBlock);
+        // LLVM.BuildBr(gen.builder, nextBlock);
 
         LLVM.PositionBuilderAtEnd(gen.builder, nextBlock);
     }
