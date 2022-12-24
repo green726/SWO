@@ -133,6 +133,8 @@ public abstract class Node
         Dereference,
         ParenEncapsulation,
         CharExpression,
+        Trait,
+        Implement,
     }
 
     public virtual void addSpace(Util.Token space)

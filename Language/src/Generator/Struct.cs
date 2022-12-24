@@ -32,8 +32,6 @@ public class Struct : Base
             elementTypes.Add(gen.typeStack.Pop());
         }
 
-
-        DebugConsole.Write("ekjad");
         DebugConsole.Write(gen.context);
         //BUG: this line errors
         LLVMTypeRef structType = LLVM.StructCreateNamed(LLVM.GetGlobalContext(), this.str.name);
