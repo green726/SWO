@@ -1,10 +1,11 @@
 namespace AST;
 
-public class StructImplements : Node
+public class StructImplement : Node
 {
+    public StructTrait trait;
+    public Struct str;
 
-
-    public StructImplements(Util.Token token, AST.Node parent) : base(token)
+    public StructImplement(Util.Token token, AST.Node parent) : base(token)
     {
         this.parent = parent;
         this.parent.addChild(this);

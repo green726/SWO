@@ -1,4 +1,6 @@
 namespace Generator;
+using LLVMSharp;
+using static IRGen;
 
 public class ElseStatement : Base
 {
@@ -11,6 +13,26 @@ public class ElseStatement : Base
 
     public override void generate()
     {
+        base.generate();
+
+        // LLVMBasicBlockRef nextBlock = LLVM.GetInsertBlock(gen.builder);
+        //
+        // LLVMBasicBlockRef elseBlock = LLVM.GetPreviousBasicBlock(nextBlock);
+
+        LLVMBasicBlockRef nextBlock = gen.valueStack.Pop();
+        LLVMBasicBlockRef elseBlock = gen.valueStack.Pop();
+
+        LLVMValueRef brFromIf = LLVM.GetLastInstruction(elseBlock);
+
+        LLVM.PositionBuilderBefore(gen.builder, brFromIf);
+
+        foreach (AST.Node node in elseStat.body)
+        {
+            node.generator.generate();
+        }
+        // LLVM.BuildBr(gen.builder, nextBlock);
+
+        LLVM.PositionBuilderAtEnd(gen.builder, nextBlock);
 
     }
 }

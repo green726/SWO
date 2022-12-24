@@ -3,26 +3,15 @@ namespace Generator;
 using LLVMSharp;
 using static IRGen;
 
-public class IfStatementDeclaration : Base
-{
-    AST.IfStatementDeclaration dec;
-
-    public IfStatementDeclaration(AST.Node node)
-    {
-        this.dec = (AST.IfStatementDeclaration)node;
-    }
-
-    public override void generate()
-    {
-        dec.expression.generator.generate();
-    }
-}
-
 public class IfStatement : Base
 {
     AST.IfStatement ifStat;
     public bool thenTopLevelRet = false;
     public bool elseTopLevelRet = false;
+
+    public LLVMBasicBlockRef elseBlock;
+
+    public LLVMBasicBlockRef nextBlock;
 
     public IfStatement(AST.Node node)
     {
@@ -31,8 +20,8 @@ public class IfStatement : Base
 
     public override void generate()
     {
-        //evaluates the condition as a bool
-        ifStat.declaration.generator.generate();
+        base.generate();
+        ifStat.conditional.condition.generator.generate();
         LLVMValueRef condValue = gen.valueStack.Pop();
 
         // DebugConsole.Write("llvm module dump post condValue below");
@@ -44,79 +33,35 @@ public class IfStatement : Base
         LLVMBasicBlockRef thenBlock = LLVM.AppendBasicBlock(parentBlock, "then");
 
         LLVMBasicBlockRef elseBlock = LLVM.AppendBasicBlock(parentBlock, "else");
+        this.elseBlock = elseBlock;
 
-        LLVMBasicBlockRef mergeBlock = LLVM.AppendBasicBlock(parentBlock, "ifMerge");
+        LLVMBasicBlockRef nextBlock = LLVM.AppendBasicBlock(parentBlock, "next");
+        this.nextBlock = nextBlock;
 
         LLVM.BuildCondBr(gen.builder, condValue, thenBlock, elseBlock);
+        // LLVM.BuildCondBr(gen.builder, condValue, thenBlock, nextBlock);
 
-        // ifStat.thenFunc.generator.generate();
-        // ifStat.elseStat.elseFunc.generator.generate();
 
-        //puts builder at the end of the then block to write code for it
         LLVM.PositionBuilderAtEnd(gen.builder, thenBlock);
 
-        List<LLVMValueRef> thenBodyValues = new List<LLVMValueRef>();
-        foreach (AST.Node node in ifStat.thenBody)
+        foreach (AST.Node node in ifStat.body)
         {
             if (node.nodeType == AST.Node.NodeType.Return)
             {
                 this.thenTopLevelRet = true;
             }
             node.generator.generate();
-            thenBodyValues.Add(gen.valueStack.Pop());
         }
 
-        // ifStat.thenCall.generator.generate();
-        // LLVMValueRef thenValRef = valueStack.Pop();
+        LLVM.BuildBr(gen.builder, nextBlock);
 
-        if (!this.thenTopLevelRet)
-        {
-            LLVM.BuildBr(gen.builder, mergeBlock);
-        }
-
-        //reset the then block in case builder was moved while populating it
-        thenBlock = LLVM.GetInsertBlock(gen.builder);
-
-        //position the builder for the else
         LLVM.PositionBuilderAtEnd(gen.builder, elseBlock);
+        LLVM.BuildBr(gen.builder, nextBlock);
 
-        List<LLVMValueRef> elseBodyValues = new List<LLVMValueRef>();
-        foreach (AST.Node node in ifStat.elseStat.elseBody)
-        {
-            if (node.nodeType == AST.Node.NodeType.Return)
-            {
-                this.elseTopLevelRet = true;
-            }
-            node.generator.generate();
-            thenBodyValues.Add(gen.valueStack.Pop());
-        }
+        LLVM.PositionBuilderAtEnd(gen.builder, nextBlock);
 
-        // ifStat.elseStat.elseCall.generator.generate();
-        // LLVMValueRef elseValRef = valueStack.Pop();
-
-        if (!this.elseTopLevelRet)
-        {
-            LLVM.BuildBr(gen.builder, mergeBlock);
-        }
-
-
-        //resets else block
-        elseBlock = LLVM.GetInsertBlock(gen.builder);
-
-        // LLVM.PositionBuilderAtEnd(builder, mergeBlock);
-
-        LLVM.PositionBuilderAtEnd(gen.builder, mergeBlock);
-
-        // LLVM.PositionBuilderAtEnd(builder, mergeBlock);
-
-        // LLVMValueRef phiRef = LLVM.BuildPhi(builder, LLVM.DoubleType(), "iftmp");
-        // LLVM.AddIncoming(phiRef, new LLVMValueRef[] { thenValRef, elseValRef }, new LLVMBasicBlockRef[] { thenBlock, elseBlock }, 2);
-
-        // valueStack.Push(phiRef);
-
-        // LLVM.BuildRet(builder, phiRef);
-
+        gen.valueStack.Push(elseBlock);
+        gen.valueStack.Push(nextBlock);
     }
+
 }
-
-

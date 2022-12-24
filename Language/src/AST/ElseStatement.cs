@@ -6,32 +6,27 @@ public class ElseStatement : AST.Node
     // public Function elseFunc;
     // public FunctionCall elseCall;
 
-    public List<AST.Node> elseBody;
+    public List<AST.Node> body;
+    // public AST.Node prevNode;
 
-
-    public ElseStatement(AST.Node parent, Util.Token token) : base(token)
+    public ElseStatement(Util.Token token, AST.Node parent) : base(token, parent)
     {
         this.nodeType = NodeType.ElseStatement;
         this.generator = new Generator.ElseStatement(this);
 
-        this.parent = parent.parent;
+        this.parent = parent;
+        this.body = new List<AST.Node>();
 
-        this.elseBody = new List<AST.Node>();
-
-        // Util.Token elseProtoTok = new Util.Token(Util.TokenType.Keyword, "@else" + Parser.ifFuncNum, token.line, token.column);
-        // Prototype elseProto = new Prototype(elseProtoTok);
-        // this.elseFunc = new Function(elseProto, new List<AST.Node>(), topLevel: false);
-        // this.elseFunc.utilFunc = true;
-
-
-        // Util.Token thenCallTok = new Util.Token(Util.TokenType.Keyword, "else" + Parser.ifFuncNum, token.line, token.column);
-        // this.elseCall = new FunctionCall(thenCallTok, null, topLevel: false);
-
+        // if (prevNode.nodeType != NodeType.IfStatement || prevNode.nodeType != NodeType.ElseIfStatement)
+        // {
+        //     throw ParserException.FactoryMethod($"Else statement must follow an if or else if statement (it follows a {prevNode.nodeType})", "Remove the nodes in between the if and else statements | Make sure the else is following an if", this, prevNode);
+        // }
+        // this.prevNode = prevNode;
     }
 
     public override void addChild(AST.Node child)
     {
-        elseBody.Add(child);
+        body.Add(child);
         base.addChild(child);
     }
 
@@ -39,8 +34,7 @@ public class ElseStatement : AST.Node
     {
         if (child.value != "{" && child.value != "}")
         {
-
-            throw ParserException.FactoryMethod($"Illegal child was added to an else statement", "No recommended fix", child);
+            throw ParserException.FactoryMethod($"Illegal child was added to an else statement", "Remove it", child, this);
         }
         base.addChild(child);
     }

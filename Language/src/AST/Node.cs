@@ -42,6 +42,7 @@ public abstract class Node
         this.parser = Parser.getInstance();
         this.parentParser = parser?.parentParser;
         this.generator = new Generator.Empty(this);
+        // this.parser.previousNode = this;
     }
 
     protected Node(Util.Token token)
@@ -54,6 +55,7 @@ public abstract class Node
         this.parentParser = parser.parentParser;
         this.generator = new Generator.Empty(this);
         this.parent = new Empty();
+        // this.parser.previousNode = this;
     }
 
     protected Node(Util.Token token, Node parent)
@@ -67,6 +69,7 @@ public abstract class Node
         this.generator = new Generator.Empty(this);
         this.parent = parent;
         this.parent.addChild(this);
+        // this.parser.previousNode = this;
     }
 
     protected Node(Node node, Node parent)
@@ -80,6 +83,7 @@ public abstract class Node
         this.generator = new Generator.Empty(this);
         this.parent = parent;
         this.parent.addChild(this);
+        // this.parser.previousNode = this;
     }
 
     protected Node(Node node)
@@ -92,6 +96,7 @@ public abstract class Node
         this.parentParser = parser.parentParser;
         this.generator = new Generator.Empty(this);
         this.parent = new Empty();
+        // this.parser.previousNode = this;
     }
 
     public enum NodeType
@@ -112,7 +117,9 @@ public abstract class Node
         StringExpression,
         Type,
         IfStatement,
-        IfStatementDeclaration,
+        IfStatementConditional,
+        ElseIfStatement,
+        ElseIfStatementConditional,
         ElseStatement,
         ForLoop,
         WhileLoop,
@@ -126,6 +133,8 @@ public abstract class Node
         Dereference,
         ParenEncapsulation,
         CharExpression,
+        Trait,
+        Implement,
     }
 
     public virtual void addSpace(Util.Token space)

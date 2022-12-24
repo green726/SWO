@@ -100,7 +100,9 @@ public class GeneratorTypeInformation : TypeInformation
                     basicType = LLVM.Int8Type();
                     break;
                 default:
-                    throw new GenException($"An unknown type ({type}) was referenced");
+                    basicType = LLVM.GetTypeByName(gen.module, type);
+                    break;
+                    // throw new GenException($"An unknown type ({type}) was referenced");
             }
         }
 

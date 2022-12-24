@@ -71,9 +71,9 @@ public class Prototype : AST.Node
         {
             // Parser.nodes.Add(this);
         }
-        if (parent?.nodeType != AST.Node.NodeType.ExternStatement && parent != null && parent?.nodeType != NodeType.Empty)
+        if (parent?.nodeType != AST.Node.NodeType.ExternStatement && parent != null && parent?.nodeType != NodeType.Empty && parent?.nodeType != NodeType.Trait)
         {
-            throw ParserException.FactoryMethod("A prototype may not have a non-extern parent", "Make the prototype top level", this);
+            throw ParserException.FactoryMethod("A prototype may not have a non-extern and non-struct parent", "Make the prototype top level (or part of a struct)", this);
         }
         if (parent?.nodeType != AST.Node.NodeType.Empty)
         {
