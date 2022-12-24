@@ -20,9 +20,12 @@ public class ElseIfStatement : Base
         elseIf.conditional.condition.generator.generate();
         LLVMValueRef condValue = gen.valueStack.Pop();
 
-        LLVMBasicBlockRef prevElseBlock = LLVM.GetInsertBlock(gen.builder).GetPreviousBasicBlock();
+        // LLVMBasicBlockRef prevElseBlock = LLVM.GetInsertBlock(gen.builder).GetPreviousBasicBlock();
 
-        LLVMBasicBlockRef nextBlock = LLVM.GetInsertBlock(gen.builder);
+        // LLVMBasicBlockRef nextBlock = LLVM.GetInsertBlock(gen.builder);
+
+        LLVMBasicBlockRef nextBlock = gen.valueStack.Pop();
+        LLVMBasicBlockRef prevElseBlock = gen.valueStack.Pop();
 
         LLVMBasicBlockRef parentBlock = LLVM.GetBasicBlockParent(prevElseBlock);
 
