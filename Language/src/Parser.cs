@@ -597,8 +597,17 @@ public class Parser
         }
         else if (token.value == "else")
         {
-            AST.ElseStatement elseStat = new AST.ElseStatement(token, parent);
-            return (elseStat, delimLevel);
+            if (nextToken.value == "if")
+            {
+                AST.ElseIfStatement elseIfStat = new AST.ElseIfStatement(token, parent);
+                currentTokenNum = nextTokenIndex;
+                return (elseIfStat.conditional, delimLevel);
+            }
+            else
+            {
+                AST.ElseStatement elseStat = new AST.ElseStatement(token, parent);
+                return (elseStat, delimLevel);
+            }
         }
         else if (token.value == "for")
         {
@@ -743,7 +752,7 @@ public class Parser
             bool addLayer = true;
             if (token.value == "(")
             {
-                if (parent.nodeType != AST.Node.NodeType.FunctionCall && parent.nodeType != AST.Node.NodeType.Prototype && parent.nodeType != AST.Node.NodeType.IfStatement && parent.nodeType != AST.Node.NodeType.IfStatementConditional)
+                if (parent.nodeType != AST.Node.NodeType.FunctionCall && parent.nodeType != AST.Node.NodeType.Prototype && parent.nodeType != AST.Node.NodeType.IfStatement && parent.nodeType != AST.Node.NodeType.IfStatementConditional && parent.nodeType != AST.Node.NodeType.ElseIfStatement && parent.nodeType != AST.Node.NodeType.ElseIfStatementConditional)
                 {
                     //NOTE: code to handle parens being used to encapsulate other nodes. ie PEMDAS, anonymous funcs, etc
                     delimLevel++;
@@ -896,7 +905,7 @@ public class Parser
         previousNode = nodes.Count > 0 && currentTokenNum > 0 ? nodes.Last() : null;
 
         //NOTE: handles imports and adding stuff
-        if (previousNode != null && !previousNode.exportChecked)
+        if (previousNode != null && !previousNode.exportChecked && previousNode.nodeType != AST.Node.NodeType.Empty)
         {
             // DebugConsole.Write("checking export for node of type " + previousNode.nodeType);
             previousNode?.checkExport();
@@ -929,11 +938,11 @@ public class Parser
         {
             DebugConsole.Write($"token of value: {token.value} and type of {token.type} and parent of {parent?.nodeType} and delim level of {delimLevel} in file named {fileName} and previous node of type {previousNode?.nodeType}");
         }
-        if (this.parent?.nodeType == AST.Node.NodeType.Empty)
+        if (this?.previousNode?.nodeType != AST.Node.NodeType.Empty)
         {
             previousNode?.addCode(token);
         }
-        else
+        else if (this.parent?.nodeType != AST.Node.NodeType.Empty)
         {
             this.parent?.addCode(token);
         }

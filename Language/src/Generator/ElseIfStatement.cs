@@ -22,15 +22,25 @@ public class ElseIfStatement : Base
 
         LLVMBasicBlockRef prevElseBlock = LLVM.GetInsertBlock(gen.builder).GetPreviousBasicBlock();
 
-        LLVMBasicBlockRef thenBlock = LLVM.AppendBasicBlock(prevElseBlock, "then");
+        LLVMBasicBlockRef nextBlock = LLVM.GetInsertBlock(gen.builder);
 
-        LLVMBasicBlockRef elseBlock = LLVM.AppendBasicBlock(prevElseBlock, "else");
+        LLVMBasicBlockRef parentBlock = LLVM.GetBasicBlockParent(prevElseBlock);
 
-        LLVMBasicBlockRef nextBlock = LLVM.AppendBasicBlock(prevElseBlock, "next");
+        LLVMBasicBlockRef thenBlock = LLVM.AppendBasicBlock(parentBlock, "then");
+
+        LLVMBasicBlockRef elseBlock = LLVM.AppendBasicBlock(parentBlock, "else");
+
+        LLVMValueRef brFromIf = LLVM.GetLastInstruction(prevElseBlock);
+
+        LLVM.PositionBuilderAtEnd(gen.builder, elseBlock);
+        LLVM.BuildBr(gen.builder, nextBlock);
+
+        LLVM.PositionBuilderBefore(gen.builder, brFromIf);
+
+
+        // brFromIf.InstructionEraseFromParent();
 
         LLVM.BuildCondBr(gen.builder, condValue, thenBlock, elseBlock);
-        // LLVM.BuildCondBr(gen.builder, condValue, thenBlock, nextBlock);
-
 
         LLVM.PositionBuilderAtEnd(gen.builder, thenBlock);
 
@@ -42,6 +52,11 @@ public class ElseIfStatement : Base
         LLVM.BuildBr(gen.builder, nextBlock);
 
         LLVM.PositionBuilderAtEnd(gen.builder, nextBlock);
+
+        gen.valueStack.Push(elseBlock);
+        gen.valueStack.Push(nextBlock);
+
+        LLVM.InstructionEraseFromParent(brFromIf);
     }
 
 }

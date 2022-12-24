@@ -59,6 +59,9 @@ public class IfStatement : Base
         LLVM.BuildBr(gen.builder, nextBlock);
 
         LLVM.PositionBuilderAtEnd(gen.builder, nextBlock);
+
+        gen.valueStack.Push(elseBlock);
+        gen.valueStack.Push(nextBlock);
     }
 
 }

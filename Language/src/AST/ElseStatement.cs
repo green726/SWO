@@ -7,6 +7,7 @@ public class ElseStatement : AST.Node
     // public FunctionCall elseCall;
 
     public List<AST.Node> body;
+    // public AST.Node prevNode;
 
     public ElseStatement(Util.Token token, AST.Node parent) : base(token, parent)
     {
@@ -15,6 +16,12 @@ public class ElseStatement : AST.Node
 
         this.parent = parent;
         this.body = new List<AST.Node>();
+
+        // if (prevNode.nodeType != NodeType.IfStatement || prevNode.nodeType != NodeType.ElseIfStatement)
+        // {
+        //     throw ParserException.FactoryMethod($"Else statement must follow an if or else if statement (it follows a {prevNode.nodeType})", "Remove the nodes in between the if and else statements | Make sure the else is following an if", this, prevNode);
+        // }
+        // this.prevNode = prevNode;
     }
 
     public override void addChild(AST.Node child)
