@@ -7,6 +7,10 @@ public class Struct : Node
 
     public string name = "";
 
+    public List<StructImplement> implements = new List<StructImplement>();
+
+    public TypeInformation type;
+
     public Struct(Util.Token token, AST.Node parent) : base(token)
     {
         this.nodeType = NodeType.Struct;
@@ -26,6 +30,22 @@ public class Struct : Node
 
         parser.nodes.Add(this);
     }
+
+    public Function getFunc(string name, Node caller)
+    {
+        foreach (StructImplement impl in implements)
+        {
+            foreach (Function func in impl.functions)
+            {
+                if (func.prototype.name == name)
+                {
+                    return func;
+                }
+            }
+        }
+        throw ParserException.FactoryMethod("An unknown function of a struct was referenced", "Remove the function reference, or change it to one that is a part of the struct", caller, this);
+    }
+
     public VariableDeclaration getProperty(string propName, AST.Node caller)
     {
         foreach (AST.Node node in properties)
@@ -79,12 +99,18 @@ public class Struct : Node
             this.name = varExpr.value;
             parser.typeList.Add(this.name);
             parser.declaredStructs.Add(this.name, this);
+            this.type = new ParserTypeInformation(this.name);
+            base.addChild(child);
+            return;
+        }
+        else if (child.nodeType == NodeType.Implement)
+        {
             base.addChild(child);
             return;
         }
         if (child.nodeType != NodeType.VariableDeclaration)
         {
-            throw new ArgumentException("non var dec added to str");
+            throw ParserException.FactoryMethod($"Illegal child of type ({child.nodeType}) added to struct | Only variable declarations and implements may be added to structs", "Remove it", child, this);
         }
         DebugConsole.WriteAnsi("[green]adding var dec to struct[/]");
         AST.VariableDeclaration varDec = (AST.VariableDeclaration)child;
@@ -97,6 +123,7 @@ public class Struct : Node
         if (this.name == "")
         {
             this.name = child.value;
+            this.type = new ParserTypeInformation(this.name);
             parser.typeList.Add(this.name);
             parser.declaredStructs.Add(this.name, this);
         }

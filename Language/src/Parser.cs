@@ -61,6 +61,7 @@ public class Parser
     //NOTE: modified name
     public Dictionary<string, AST.Prototype> declaredFuncs = new Dictionary<string, AST.Prototype>();
     public Dictionary<string, AST.Struct> declaredStructs = new Dictionary<string, AST.Struct>();
+    public Dictionary<string, AST.StructTrait> declaredStructTraits = new Dictionary<string, AST.StructTrait>();
 
     //NOTE: below can be used to add user defined types (structs/classes)
     public List<string> typeList = new List<string>() { "double", "float", "string" };
@@ -593,6 +594,16 @@ public class Parser
             //TODO: add code here to implement "private"
             //NOTE: I can do this by throwing errors if a private thing is called outside of its file? I will have to store the origin files of stuff
         }
+        else if (token.value == "trait")
+        {
+            AST.StructTrait trait = new AST.StructTrait(token, parent);
+            return (trait, delimLevel);
+        }
+        else if (token.value == "implement")
+        {
+            AST.StructImplement implement = new AST.StructImplement(token, parent);
+            return (implement, delimLevel);
+        }
         else if (token.value == "if")
         {
             AST.IfStatement ifStat = new AST.IfStatement(token, parent);
@@ -727,6 +738,13 @@ public class Parser
             case AST.Node.NodeType.Struct:
                 parent.addChild(token);
                 return (parent, delimLevel);
+            case AST.Node.NodeType.Trait:
+                parent.addChild(token);
+                return (parent, delimLevel);
+            case AST.Node.NodeType.Implement:
+                parent.addChild(token);
+                return (parent, delimLevel);
+
         }
 
 
@@ -830,6 +848,7 @@ public class Parser
                 case AST.Node.NodeType.Prototype:
                     if (token.value == ")")
                     {
+                        parent.addChild(token);
                         if (nextNonSpace().value == "{")
                         {
                             parent = new AST.Function((AST.Prototype)parent);
@@ -1141,7 +1160,6 @@ public class Parser
                 else if (token.value == "#")
                 {
                     parent?.addChild(token);
-
                     return;
                 }
                 else

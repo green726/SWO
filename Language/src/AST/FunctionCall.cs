@@ -22,14 +22,24 @@ public class FunctionCall : Expression
 
         this.parent = parent;
         this.parent.addChild(this);
-        return;
 
+        if (this.parent.nodeType == NodeType.VariableExpression)
+        {
+            AST.VariableExpression parentVar = (AST.VariableExpression)this.parent;
+            DebugConsole.Write("funcName: " + this.functionName);
+            this.functionName = parentVar.type.value + "_" + this.functionName;
+            VariableExpression thisArgument = new VariableExpression(new Util.Token(Util.TokenType.Keyword, parentVar.value, this.line, this.column), this);
+            DebugConsole.WriteAnsi("[blue]detected struct func call[/]");
+        }
+
+        return;
     }
 
     public string generateAltName()
     {
         StringBuilder altNameSb = new StringBuilder();
 
+        DebugConsole.Write("alt name logs below: ");
         foreach (AST.Expression argExpr in args)
         {
             DebugConsole.Write(argExpr.nodeType);

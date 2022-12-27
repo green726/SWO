@@ -17,15 +17,15 @@ public class Prototype : Base
         base.generate();
         DebugConsole.WriteAnsi("[yellow]proto named:[/]");
         DebugConsole.Write(proto.name);
-        proto.handleOverload();
         //begin argument generation
         int argumentCount = proto.arguments.Count();
         List<LLVMTypeRef> arguments = new List<LLVMTypeRef>();
         //check if function is already defined
-        var function = LLVM.GetNamedFunction(gen.module, proto.name);
+        var function = LLVM.GetNamedFunction(gen.module, proto.getTrueName());
 
         if (function.Pointer != IntPtr.Zero)
         {
+            DebugConsole.Write("Detected proto already declared");
             //TODO: handle function overloading
             // If func already has a body, reject this.
             if (LLVM.CountBasicBlocks(function) != 0)
@@ -40,9 +40,13 @@ public class Prototype : Base
         }
         else
         {
+            DebugConsole.Write("Detected proto NOT already declared (new proto)");
+            proto.handleOverload();
             foreach (KeyValuePair<string, AST.Type> arg in proto.arguments)
             {
+                DebugConsole.Write("arg type: " + arg.Value.value);
                 arg.Value.generator.generate();
+                DebugConsole.Write("arg: " + gen.typeStack.Peek());
                 arguments.Add(gen.typeStack.Pop());
             }
 
@@ -58,10 +62,12 @@ public class Prototype : Base
         {
             gen.addLayerToNamedValueStack();
         }
+        DebugConsole.Write("BREAK8");
         int argLoopIndex = 0;
         foreach (KeyValuePair<string, AST.Type> arg in proto.arguments)
         {
             string argumentName = arg.Key;
+            DebugConsole.Write(argumentName);
 
             LLVMValueRef param = LLVM.GetParam(function, (uint)argLoopIndex);
             LLVM.SetValueName(param, argumentName);
@@ -70,9 +76,10 @@ public class Prototype : Base
             {
                 gen.addNamedValueInScope(argumentName, param);
             }
-            DebugConsole.Write("created argument with name of " + argumentName);
+            DebugConsole.Write("created argument: " + param);
             argLoopIndex++;
         }
+        DebugConsole.Write("BREAK9");
 
         DebugConsole.DumpValue(function);
 

@@ -15,20 +15,14 @@ public class VariableAssignment : Base
     public override void generate()
     {
         base.generate();
-        // AST.VariableDeclaration originalVarDec = namedValuesAST[varAss.varExpr.value];
-        //
-        // if (originalVarDec.type.value == "string")
-        // {
-        //     throw new GenException("mutable strings not yet supported", varAss);
-        // }
 
-        // (LLVMValueRef valRef, LLVMTypeRef typeLLVM) = generateVariableValue();
-        varAss.varExpr.isReference = true;
+        if (!varAss.varExpr.type.isStruct)
+        {
+            varAss.varExpr.isReference = true;
+        }
         varAss.varExpr.generator.generate();
-        LLVMValueRef targetValRef = gen.valueStack.Pop();
-
-        // LLVMValueRef loadRef = LLVM.BuildLoad(builder, namedMutablesLLVM[binVarName], binVarName);
-        // valueStack.Push(loadRef);
+        // LLVMValueRef targetValRef = gen.valueStack.Pop();
+        LLVMValueRef targetValRef = gen.getNamedValueInScope(varAss.varExpr.value);
         if (varAss.binReassignment)
         {
             DebugConsole.WriteAnsi("[green]bin reass detected[/]");
@@ -41,6 +35,7 @@ public class VariableAssignment : Base
         {
             DebugConsole.WriteAnsi("[green]non bin reass detected[/]");
             varAss.targetValue.generator.generate();
+            DebugConsole.Write("stack peek: " + gen.valueStack.Peek());
             LLVMValueRef resultValRef = gen.valueStack.Pop();
             LLVMValueRef storeRef = LLVM.BuildStore(gen.builder, resultValRef, targetValRef);
             gen.valueStack.Push(storeRef);

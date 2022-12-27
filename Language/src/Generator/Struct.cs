@@ -23,6 +23,7 @@ public class Struct : Base
             // str.propertiesNames.Add(varDec.name);
         }
 
+
         List<LLVMTypeRef> elementTypes = new List<LLVMTypeRef>();
 
         foreach (AST.Node node in this.str.properties)
@@ -42,5 +43,11 @@ public class Struct : Base
 
         gen.typeStack.Push(structType);
         gen.namedTypesLLVM.Add(str.name, structType);
+
+        foreach (AST.StructImplement impl in str.implements)
+        {
+            impl.generator.generate();
+        }
+
     }
 }

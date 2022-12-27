@@ -8,6 +8,8 @@ public class Type : AST.Node
     public int size = 0;
     public bool isArray = false;
 
+    public bool isStruct = false;
+
     public bool isPointer;
     private bool parsingArray = false;
 
@@ -49,6 +51,7 @@ public class Type : AST.Node
         }
 
         this.value = token.value;
+        this.isStruct = TypeInformation.checkForStruct(this.value);
     }
 
     public Type(string value, AST.Node parent) : base(parent)

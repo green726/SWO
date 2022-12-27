@@ -64,16 +64,14 @@ public class Prototype : AST.Node
             this.returnType = new ParserTypeInformation(token.value);
         }
 
-        this.arguments = new Dictionary<string, Type>();
-
         //TODO: replace this node type with external section
         if (external/*  || parent.nodeType == NodeType.BinaryExpression */)
         {
             // Parser.nodes.Add(this);
         }
-        if (parent?.nodeType != AST.Node.NodeType.ExternStatement && parent != null && parent?.nodeType != NodeType.Empty && parent?.nodeType != NodeType.Trait)
+        if (parent?.nodeType != AST.Node.NodeType.ExternStatement && parent != null && parent?.nodeType != NodeType.Empty && parent?.nodeType != NodeType.Trait && parent?.nodeType != NodeType.Implement)
         {
-            throw ParserException.FactoryMethod("A prototype may not have a non-extern and non-struct parent", "Make the prototype top level (or part of a struct)", this);
+            throw ParserException.FactoryMethod($"A prototype may not have a non-extern and non-struct parent (parent is {parent.nodeType})", "Make the prototype top level (or part of a struct)", this);
         }
         if (parent?.nodeType != AST.Node.NodeType.Empty)
         {
@@ -109,7 +107,7 @@ public class Prototype : AST.Node
             // throw ParserException.FactoryMethod();
             arguments.Add(token.value, prevType);
             DebugConsole.Write(token.value);
-            parser.addNamedValueInScope(token.value, (ParserTypeInformation)prevType);
+            // parser.addNamedValueInScope(token.value, (ParserTypeInformation)prevType);
         }
     }
 
@@ -124,6 +122,20 @@ public class Prototype : AST.Node
         return stringBuilder.ToString();
     }
 
+    public string getTrueName()
+    {
+        if (this.parent?.nodeType != AST.Node.NodeType.ExternStatement)
+        {
+            string altName = this.name + getArgTypes();
+            DebugConsole.WriteAnsi("[red]true name below[/]");
+            DebugConsole.Write(altName);
+
+            return altName;
+        }
+        return this.name;
+
+    }
+
     public void handleOverload()
     {
         if (this.parent?.nodeType != AST.Node.NodeType.ExternStatement)
@@ -134,7 +146,6 @@ public class Prototype : AST.Node
 
             if (this.name != "main")
             {
-
                 parser.declaredFuncs.Add(altName, this);
             }
             this.name = altName;
@@ -206,6 +217,19 @@ public class Prototype : AST.Node
         else if (child.value != "(" && child.value != ")")
         {
             addArg(child);
+        }
+        else if (child.value == ")")
+        {
+            addArgsToParserValues();
+            DebugConsole.WriteAnsi("[blue]adding args to parser[/]");
+        }
+    }
+
+    public void addArgsToParserValues()
+    {
+        foreach (KeyValuePair<string, Type> arg in this.arguments)
+        {
+            parser.addNamedValueInScope(arg.Key, (ParserTypeInformation)arg.Value);
         }
     }
 

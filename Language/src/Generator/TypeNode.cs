@@ -21,9 +21,23 @@ public class Type : Base
         return (GeneratorTypeInformation.getLLVMTypeFromString(type.value, gen, type.isArray, type.size));
     }
 
+    private LLVMTypeRef getBaseStructType()
+    {
+        if (!type.isStruct)
+        {
+            throw new GenException("Type is not a struct");
+        }
+        return (GeneratorTypeInformation.getBaseStructType(type.value, gen));
+    }
+
     public override void generate()
     {
         base.generate();
+        if (type.isStruct)
+        {
+            gen.typeStack.Push(getBaseStructType());
+        }
+
         if (type.isPointer)
         {
             gen.typeStack.Push(genPointer());

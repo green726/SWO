@@ -137,7 +137,7 @@ public class VariableExpression : Expression
 
     public override void addChild(AST.Node child)
     {
-        if (child.nodeType != NodeType.VariableExpression && child.nodeType != NodeType.IndexReference && child.nodeType != NodeType.Reference && child.nodeType != NodeType.Dereference)
+        if (child.nodeType != NodeType.VariableExpression && child.nodeType != NodeType.IndexReference && child.nodeType != NodeType.Reference && child.nodeType != NodeType.Dereference && child.nodeType != NodeType.FunctionCall)
         {
             throw ParserException.FactoryMethod("An illegal child was added to a variable expression", "remove it", child);
         }

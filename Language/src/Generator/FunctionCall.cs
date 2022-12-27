@@ -16,6 +16,7 @@ public class FunctionCall : Base
     {
         base.generate();
         string nameToSearch = "";
+
         if (funcCall.parser.declaredFuncs.ContainsKey(funcCall.functionName))
         {
             nameToSearch = funcCall.functionName;
@@ -59,6 +60,7 @@ public class FunctionCall : Base
         var argsRef = new LLVMValueRef[argumentCount];
         for (int i = 0; i < argumentCount; ++i)
         {
+            DebugConsole.Write("generating func call arg with value of: " + funcCall.args[i].value);
             funcCall.args[i].generator.generate();
             argsRef[i] = gen.valueStack.Pop();
         }

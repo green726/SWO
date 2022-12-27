@@ -36,7 +36,20 @@ public class VariableDeclaration : Base
         DebugConsole.Write(this.varDec.type.value);
         this.varDec.type.generator.generate();
         typeLLVM = gen.typeStack.Pop();
-        DebugConsole.WriteAnsi($"[red] type stack[/]");
+
+        if (varDec.type.isStruct && this.varDec.defaultValue.nodeType != AST.Node.NodeType.NullExpression)
+        {
+            typeLLVM = gen.typeStack.Pop();
+            DebugConsole.Write("creating struct val ref: " + valRef);
+            valRef = LLVM.BuildLoad(gen.builder, valRef, "structAssignmentLoad");
+            DebugConsole.Write("struct val ref: " + valRef);
+        }
+        else if (varDec.type.isStruct)
+        {
+            typeLLVM = gen.typeStack.Pop();
+        }
+
+        DebugConsole.WriteAnsi($"[red]var dec type stack[/]");
         DebugConsole.Write(typeLLVM);
 
         if (!varDec.mutable && typeLLVM.TypeKind != LLVMTypeKind.LLVMStructTypeKind && !varDec.local)
@@ -53,7 +66,6 @@ public class VariableDeclaration : Base
             if (varDec.local)
             {
                 LLVMValueRef allocaRef = LLVM.BuildAlloca(gen.builder, typeLLVM, varDec.name);
-                DebugConsole.Write("ZZZZZZZZZZZZZZ");
                 DebugConsole.Write(allocaRef);
                 gen.valueStack.Push(allocaRef);
                 if (init)

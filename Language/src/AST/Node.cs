@@ -12,7 +12,7 @@ public abstract class Node
     public Parser parser;
 
     [JsonIgnore]
-    private Parser? parentParser;
+    private Parser parentParser;
 
     public List<Node> children = new List<Node>();
     [JsonIgnore]

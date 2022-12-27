@@ -12,11 +12,10 @@ public class Function : AST.Node
     public bool multiLine = false;
 
     //NOTE: Constructor 1:
-    public Function(Prototype prototype, bool topLevel = true) : base(prototype)
+    public Function(Prototype prototype) : base(prototype)
     {
         this.nodeType = NodeType.Function;
         this.generator = new Generator.Function(this);
-
 
         if (body == null) body = new List<AST.Node>();
 
@@ -24,15 +23,26 @@ public class Function : AST.Node
         {
             throw ParserException.FactoryMethod("Prototype marked external implemented with body", "Unmark it as external, or remove the body/implementation of the prototype", this, prototype);
         }
+
+        if (prototype.parent == null || prototype.parent.nodeType == NodeType.Empty)
+        {
+            parser.nodes.Add(this);
+        }
+        else
+        {
+            DebugConsole.WriteAnsi("[blue]func named " + prototype.name + " with parent: " + prototype.parent.nodeType + "[/]");
+            this.parent = prototype.parent;
+        }
+
         this.prototype = prototype;
         //NOTE: prototype check export must be above setting parent
         this.prototype.checkExport();
         this.prototype.parent = this;
         this.body = new List<Node>();
 
-        if (topLevel)
+        if (this.parent.nodeType != NodeType.Empty)
         {
-            parser.nodes.Add(this);
+            this.parent.addChild(this);
         }
 
         // if (Config.settings.function.declaration.reorder && !Parser.declaredFunctionDict.ContainsKey(prototype.name))
@@ -42,35 +52,6 @@ public class Function : AST.Node
     }
 
     //NOTE: Constructor 2:
-    public Function(Prototype prototype, AST.Node body, bool topLevel = true) : base(prototype)
-    {
-
-        if (prototype.external)
-        {
-            throw ParserException.FactoryMethod("Prototype marked external implemented with body", "Unmark it as external, or remove the body/implementation of the prototype", prototype);
-        }
-
-        this.newLineReset = true;
-        this.multiLine = false;
-        this.nodeType = NodeType.Function;
-        this.generator = new Generator.Function(this);
-
-        this.prototype = prototype;
-        this.prototype.checkExport();
-        this.body = new List<AST.Node>();
-        this.body.Add(body);
-
-        if (topLevel)
-        {
-            parser.nodes.Add(this);
-        }
-
-        // if (Config.settings.function.declaration.reorder)
-        // {
-        //     Parser.declaredFunctionDict.Add(prototype.name, this);
-        // }
-    }
-
     public override void removeChild(AST.Node child)
     {
         base.removeChild(child);

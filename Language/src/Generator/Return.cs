@@ -28,6 +28,9 @@ public class Return : Base
         LLVMTypeKind funcRetTypeKind = funcRef.TypeOf().GetReturnType().GetElementType().TypeKind;
         LLVMTypeKind retTypeKind = retType.TypeKind;
 
+        DebugConsole.Write("func type kind: " + funcRetTypeKind);
+        DebugConsole.Write("ret type kind: " + retTypeKind);
+
         if (funcRetTypeKind != retTypeKind)
         {
             throw GenException.FactoryMethod($"Return type({retType.ToString()}) does not match declared function type ({funcRef.TypeOf().GetReturnType().ToString()})", "Remove the return statement | Change the function return type", this.ret);

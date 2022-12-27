@@ -8,6 +8,7 @@ public abstract class TypeInformation
 
     public bool isPointer { get; set; } = false;
     public bool isArray { get; set; } = false;
+    public bool isStruct { get; set; } = false;
 
     public int size { get; set; } = 0;
     [JsonIgnore]
@@ -16,6 +17,7 @@ public abstract class TypeInformation
     public TypeInformation(Parser parser)
     {
         this.parser = parser;
+        this.isStruct = checkForStruct(this.value);
     }
 
     public string getTypePointedTo()
@@ -49,6 +51,34 @@ public abstract class TypeInformation
         }
         string ret = this.value.Remove(this.value.IndexOf("["));
         return (ret);
+    }
+
+    public static bool checkForStruct(string value)
+    {
+        (bool isInt, int bits) = Parser.checkInt(value);
+        if (isInt)
+        {
+            return false;
+        }
+        else
+        {
+            switch (value)
+            {
+                case "double":
+                case "string":
+                case "null":
+                case "bool":
+                case "void":
+                case "char":
+                    return false;
+                default:
+                    // if (LLVM.GetTypeByName(parser.module, value).Pointer == IntPtr.Zero)
+                    // {
+                    //     throw new GenException($"Type ({value}) not found | Remove it or replace it with a declared type");
+                    // }
+                    return true;
+            }
+        }
     }
 }
 
@@ -100,7 +130,12 @@ public class GeneratorTypeInformation : TypeInformation
                     basicType = LLVM.Int8Type();
                     break;
                 default:
-                    basicType = LLVM.GetTypeByName(gen.module, type);
+                    basicType = LLVM.PointerType(LLVM.GetTypeByName(gen.module, type), 0);
+                    // basicType = LLVM.GetTypeByName(gen.module, type);
+                    if (basicType.Pointer == IntPtr.Zero)
+                    {
+                        throw new GenException($"Type ({type}) not found | Remove it or replace it with a declared type");
+                    }
                     break;
                     // throw new GenException($"An unknown type ({type}) was referenced");
             }
@@ -111,6 +146,16 @@ public class GeneratorTypeInformation : TypeInformation
             return LLVM.ArrayType(basicType, (uint)size);
         }
         return basicType;
+    }
+
+    public static LLVMTypeRef getBaseStructType(string type, IRGen gen)
+    {
+        LLVMTypeRef declaredType = LLVM.GetTypeByName(gen.module, type);
+        if (declaredType.Pointer == IntPtr.Zero)
+        {
+            throw new GenException($"Type ({type}) not found | Remove it or replace it with a declared type");
+        }
+        return declaredType;
     }
 
     private LLVMTypeRef genPointer()
@@ -173,9 +218,9 @@ public class ParserTypeInformation : TypeInformation
         }
 
         this.value = value;
-
-        this.value = value;
     }
+
+
 
     public static implicit operator ParserTypeInformation(string strIn)
     {
