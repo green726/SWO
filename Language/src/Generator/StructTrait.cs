@@ -14,6 +14,7 @@ public class StructTrait : Base
     {
         base.generate();
 
+        DebugConsole.WriteAnsi("[blue]genning struct trait[/]");
         List<LLVMTypeRef> funcTypes = new List<LLVMTypeRef>();
         foreach (AST.Prototype proto in trait.protos)
         {
@@ -26,11 +27,16 @@ public class StructTrait : Base
                 funcArgTypes[idx] = gen.typeStack.Pop();
                 idx++;
             }
-            LLVMTypeRef funcType = LLVM.FunctionType(((GeneratorTypeInformation)proto.returnType).getLLVMType(), funcArgTypes, false);
+            ParserTypeInformation retParserType = (ParserTypeInformation)proto.returnType;
+            GeneratorTypeInformation retGenType = (GeneratorTypeInformation)retParserType;
+            LLVMTypeRef funcType = LLVM.FunctionType(retGenType.getLLVMType(), funcArgTypes, false);
             funcTypes.Add(funcType);
         }
 
+        DebugConsole.Write("trait name: " + trait.name);
         LLVMTypeRef structType = LLVM.StructCreateNamed(LLVM.GetGlobalContext(), trait.name);
+
+        DebugConsole.Write("struct type: " + structType);
 
         LLVM.StructSetBody(structType, funcTypes.ToArray(), false);
 

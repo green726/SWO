@@ -24,12 +24,22 @@ public class FunctionCall : Base
         else
         {
             string altName = funcCall.functionName + funcCall.generateAltName();
-
-            this.funcCall.type = (ParserTypeInformation)gen.parser.declaredFuncs[altName].returnType;
-
             DebugConsole.WriteAnsi($"[red]alt name in function call gen:[/]");
             DebugConsole.Write(altName);
-            nameToSearch = altName;
+            // nameToSearch = altName;
+
+            try
+            {
+                // this.funcCall.type = (ParserTypeInformation)gen.parser.declaredFuncs[altName].returnType;
+                (nameToSearch, this.funcCall.type) = gen.getDeclaredFunction(altName, funcCall);
+                DebugConsole.WriteAnsi("[red]result of irgen.getDeclaredFunction for funccall named: " + this.funcCall.functionName + " result: name: " + nameToSearch + " ret type: " + this.funcCall.type.value + "[/]");
+            }
+            catch (Exception e)
+            {
+                DebugConsole.WriteAnsi("[red]errored[/]");
+                // DebugConsole.DumpModule(gen.module);
+                throw e;
+            }
         }
 
         LLVMValueRef funcRef = LLVM.GetNamedFunction(gen.module, nameToSearch);
@@ -70,11 +80,12 @@ public class FunctionCall : Base
 
         if (LLVM.GetReturnType(funcRef.TypeOf()).GetReturnType().TypeKind == LLVMTypeKind.LLVMVoidTypeKind)
         {
-            DebugConsole.WriteAnsi("[purple]funcCallNoName[/]");
+            DebugConsole.WriteAnsi("[purple]funcCallVoidRet[/]");
             gen.valueStack.Push(LLVM.BuildCall(gen.builder, funcRef, argsRef, ""));
         }
         else
         {
+            DebugConsole.Write("Pushing func call named: " + funcCall.functionName);
             gen.valueStack.Push(LLVM.BuildCall(gen.builder, funcRef, argsRef, "calltmp"));
         }
 

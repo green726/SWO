@@ -8,6 +8,7 @@ public class Struct : Node
     public string name = "";
 
     public List<StructImplement> implements = new List<StructImplement>();
+    public List<StructTrait> implementedTraits = new List<StructTrait>();
 
     public TypeInformation type;
 

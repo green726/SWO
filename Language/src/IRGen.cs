@@ -183,13 +183,88 @@ public class IRGen
         return loadRef;
     }
 
+    public int compareTypeInheritance(TypeInformation type1, TypeInformation type2)
+    {
+        return 0;
+    }
+
     public LLVMValueRef getReference(LLVMValueRef startRef)
     {
         return new LLVMValueRef();
     }
 
+    public (string, ParserTypeInformation) getDeclaredFunction(string input, AST.FunctionCall caller)
+    {
+        string nameToSearch = input;
+
+        if (parser.declaredFuncs.ContainsKey(nameToSearch))
+        {
+            return (nameToSearch, (ParserTypeInformation)parser.declaredFuncs[nameToSearch].returnType);
+        }
+
+        nameToSearch = caller.functionName;
+        DebugConsole.Write("new name to search: " + nameToSearch);
+
+        List<AST.Prototype> protosMatchingNameAndArgCount = new List<AST.Prototype>();
+
+        foreach (KeyValuePair<string, AST.Prototype> pair in parser.declaredFuncs)
+        {
+            if (pair.Key.Contains(nameToSearch) && pair.Value.arguments.Count == caller.args.Count)
+            {
+                protosMatchingNameAndArgCount.Add(pair.Value);
+            }
+        }
+
+        if (protosMatchingNameAndArgCount.Count == 0)
+        {
+            throw GenException.FactoryMethod($"No function with the name {nameToSearch} was found", "You tried to call a function that doesn't exist - possible typo in the function call or mismatch arguments", caller, true, nameToSearch);
+        }
+
+        //TODO: sort protos matching type based upon the closes inheritance
+        foreach (AST.Prototype proto in protosMatchingNameAndArgCount)
+        {
+            int idx = 0;
+            foreach (AST.Type argType in proto.arguments.Values)
+            {
+                if (argType.value == caller.args[idx].type.value)
+                {
+                    idx++;
+                    continue;
+                }
+                else if (argType.isStruct && caller.args[idx].type.isStruct)
+                {
+                    if (parser.declaredStructs.ContainsKey(caller.args[idx].type.value) || parser.declaredStructTraits.ContainsKey(caller.args[idx].type.value))
+                    {
+                        DebugConsole.Write("detected arg that is a struct - caller args[idx].value is: " + caller.args[idx].type.value);
+                        AST.Struct str = parser.declaredStructs[caller.args[idx].type.value];
+                        if (str.implementedTraits.Contains(parser.declaredStructTraits[argType.value]))
+                        {
+                            idx++;
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                else
+                {
+                    break;
+                }
 
 
+                idx++;
+            }
+            if (idx == proto.arguments.Count)
+            {
+                return (proto.name, (ParserTypeInformation)proto.returnType);
+            }
+        }
+
+        throw GenException.FactoryMethod($"No function with the name {nameToSearch} was found", "You tried to call a function that doesn't exist", caller, true, nameToSearch);
+
+    }
 
     public void generateIR(List<AST.Node> nodes, Spectre.Console.ProgressTask task)
     {

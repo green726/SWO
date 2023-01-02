@@ -9,6 +9,7 @@ public abstract class TypeInformation
     public bool isPointer { get; set; } = false;
     public bool isArray { get; set; } = false;
     public bool isStruct { get; set; } = false;
+    public bool isTrait { get; set; } = false;
 
     public int size { get; set; } = 0;
     [JsonIgnore]
@@ -17,7 +18,7 @@ public abstract class TypeInformation
     public TypeInformation(Parser parser)
     {
         this.parser = parser;
-        this.isStruct = checkForStruct(this.value);
+        (this.isStruct, this.isTrait) = checkForCustomType(this.value, parser);
     }
 
     public string getTypePointedTo()
@@ -53,12 +54,12 @@ public abstract class TypeInformation
         return (ret);
     }
 
-    public static bool checkForStruct(string value)
+    public static (bool, bool) checkForCustomType(string value, Parser parser)
     {
         (bool isInt, int bits) = Parser.checkInt(value);
         if (isInt)
         {
-            return false;
+            return (false, false);
         }
         else
         {
@@ -70,13 +71,17 @@ public abstract class TypeInformation
                 case "bool":
                 case "void":
                 case "char":
-                    return false;
+                    return (false, false);
                 default:
                     // if (LLVM.GetTypeByName(parser.module, value).Pointer == IntPtr.Zero)
                     // {
                     //     throw new GenException($"Type ({value}) not found | Remove it or replace it with a declared type");
                     // }
-                    return true;
+                    if (parser.declaredStructTraits.ContainsKey(value))
+                    {
+                        return (false, true);
+                    }
+                    return (true, false);
             }
         }
     }
@@ -93,7 +98,7 @@ public class GeneratorTypeInformation : TypeInformation
 
     public static explicit operator GeneratorTypeInformation(ParserTypeInformation infoIn)
     {
-        return new GeneratorTypeInformation(infoIn.parser) { value = infoIn.value, isPointer = infoIn.isPointer, isArray = infoIn.isArray, size = infoIn.size };
+        return new GeneratorTypeInformation(infoIn.parser) { value = infoIn.value, isPointer = infoIn.isPointer, isArray = infoIn.isArray, size = infoIn.size, isStruct = infoIn.isStruct, isTrait = infoIn.isTrait };
         // return new GeneratorTypeInformation() { infoIn };
     }
 
@@ -222,13 +227,13 @@ public class ParserTypeInformation : TypeInformation
 
 
 
-    public static implicit operator ParserTypeInformation(string strIn)
+    public static explicit operator ParserTypeInformation(string strIn)
     {
         return new ParserTypeInformation(strIn);
     }
 
     public static explicit operator ParserTypeInformation(AST.Type typeIn)
     {
-        return new ParserTypeInformation(typeIn.value) { isArray = typeIn.isArray, isPointer = typeIn.isPointer, size = typeIn.size, parser = typeIn.parser };
+        return new ParserTypeInformation(typeIn.value) { isArray = typeIn.isArray, isPointer = typeIn.isPointer, size = typeIn.size, parser = typeIn.parser, isStruct = typeIn.isStruct, isTrait = typeIn.isTrait };
     }
 }

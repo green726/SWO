@@ -6,6 +6,8 @@ public class VariableExpression : Expression
     public string unmodifiedVal = "";
     public int arrayIndex = 0;
 
+    public TypeInformation desiredType;
+
     public VariableExpression(Util.Token token, AST.Node parent, bool parentRequired = true) : base(token)
     {
         this.nodeType = NodeType.VariableExpression;
@@ -112,7 +114,7 @@ public class VariableExpression : Expression
     private void handleArrayRefConstruction(Util.Token token, bool parentRequired = true)
     {
         discernType();
-        this.type = this.type.getContainedType(this);
+        this.type = (ParserTypeInformation)this.type.getContainedType(this);
         DebugConsole.Write(this.type.value);
 
         if (parent != null)

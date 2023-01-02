@@ -17,6 +17,7 @@ public class VariableDeclaration : Base
     public override void generate()
     {
         base.generate();
+        DebugConsole.Write("Generating varDec with name of: " + varDec.name);
         if (varDec.generated) { return; }
         // if (varDec.type.value == "string")
         // {
@@ -29,6 +30,7 @@ public class VariableDeclaration : Base
         if (this.varDec.defaultValue.nodeType != AST.Node.NodeType.NullExpression)
         {
             this.varDec.defaultValue.generator.generate();
+            DebugConsole.Write("generated vardec default val");
             valRef = gen.valueStack.Pop();
             init = true;
         }

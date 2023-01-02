@@ -38,6 +38,7 @@ public class StructImplement : Node
         if (this.trait == null && child.type == Util.TokenType.Keyword)
         {
             this.trait = parser.declaredStructTraits[child.value];
+            this.str.implementedTraits.Add(this.trait);
         }
         else if (child.type == Util.TokenType.Keyword)
         {

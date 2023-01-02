@@ -135,6 +135,7 @@ public abstract class Node
         CharExpression,
         Trait,
         Implement,
+        Cast,
     }
 
     public virtual void addSpace(Util.Token space)

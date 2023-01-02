@@ -16,6 +16,10 @@ public class StructTrait : Node
             this.parent = parent;
             this.parent.addChild(this);
         }
+        else
+        {
+            parser.nodes.Add(this);
+        }
 
     }
 
@@ -37,8 +41,11 @@ public class StructTrait : Node
         {
             throw ParserException.FactoryMethod("Illegal token added to struct trait definition", "Remove it", child, this);
         }
-        parser.declaredStructTraits.Add(this.name, this);
-        this.name = child.value;
+        else if (this.name == "")
+        {
+            this.name = child.value;
+            parser.declaredStructTraits.Add(this.name, this);
+        }
         base.addChild(child);
     }
 }

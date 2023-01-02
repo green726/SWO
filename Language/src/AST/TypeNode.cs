@@ -9,6 +9,7 @@ public class Type : AST.Node
     public bool isArray = false;
 
     public bool isStruct = false;
+    public bool isTrait = false;
 
     public bool isPointer;
     private bool parsingArray = false;
@@ -51,7 +52,7 @@ public class Type : AST.Node
         }
 
         this.value = token.value;
-        this.isStruct = TypeInformation.checkForStruct(this.value);
+        (this.isStruct, this.isTrait) = TypeInformation.checkForCustomType(this.value, parser);
     }
 
     public Type(string value, AST.Node parent) : base(parent)
