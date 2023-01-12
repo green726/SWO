@@ -40,6 +40,6 @@ int @fibRec(int n) {
 }
 
 @main() {
-    print(fibRec(4))
+    printf("%d", fibRec(4))
 }
 ```
