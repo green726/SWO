@@ -3,11 +3,11 @@ namespace Generator;
 using LLVMSharp;
 using static IRGen;
 
-public class VariableExpression : Base
+public class VariableExpression : Expression
 {
     AST.VariableExpression varExpr;
 
-    public VariableExpression(AST.Node node)
+    public VariableExpression(AST.Node node) : base((AST.Expression)node)
     {
         this.varExpr = (AST.VariableExpression)node;
     }

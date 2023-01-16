@@ -35,7 +35,7 @@ public class VariableExpression : Expression
         //NOTE:  below is the absolute BS for structs
         DebugConsole.Write(this.value);
         discernType();
-
+        checkForCasts();
 
         DebugConsole.WriteAnsi($"[yellow]original type:[/]");
         DebugConsole.Write(this.type.value);
@@ -58,6 +58,17 @@ public class VariableExpression : Expression
         else if (parentRequired)
         {
             throw new ParserException($"Illegal variable expression {this.value}", token);
+        }
+    }
+
+    public void checkForCasts()
+    {
+        //TODO: ensure that the cast is possible and implicit - if not throw an error
+        if (this.desiredType != null && this.type.value != this.desiredType.value)
+        {
+            DebugConsole.Write("creating implicit cast for variable expressionm");
+            Generator.ImplicitCast implCast = new Generator.ImplicitCast(this, (Generator.Expression)this.generator, this.desiredType);
+            this.generator = implCast;
         }
     }
 
@@ -116,6 +127,7 @@ public class VariableExpression : Expression
         discernType();
         this.type = (ParserTypeInformation)this.type.getContainedType(this);
         DebugConsole.Write(this.type.value);
+        checkForCasts();
 
         if (parent != null)
         {

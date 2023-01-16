@@ -193,13 +193,13 @@ public class IRGen
         return new LLVMValueRef();
     }
 
-    public (string, ParserTypeInformation) getDeclaredFunction(string input, AST.FunctionCall caller)
+    public (string, AST.Prototype, int) getDeclaredFunction(string input, AST.FunctionCall caller)
     {
         string nameToSearch = input;
 
         if (parser.declaredFuncs.ContainsKey(nameToSearch))
         {
-            return (nameToSearch, (ParserTypeInformation)parser.declaredFuncs[nameToSearch].returnType);
+            return (nameToSearch, parser.declaredFuncs[nameToSearch], 0);
         }
 
         nameToSearch = caller.functionName;
@@ -217,21 +217,57 @@ public class IRGen
 
         if (protosMatchingNameAndArgCount.Count == 0)
         {
-            throw GenException.FactoryMethod($"No function with the name {nameToSearch} was found", "You tried to call a function that doesn't exist - possible typo in the function call or mismatch arguments", caller, true, nameToSearch);
+            if (caller.parent.nodeType == AST.Node.NodeType.VariableExpression)
+            {
+                //cast caller.parent to an AST.VariablExpression
+                AST.VariableExpression varExpr = (AST.VariableExpression)caller.parent;
+                if (varExpr.type.isTrait)
+                {
+                    AST.StructTrait trait = parser.declaredStructTraits[varExpr.type.value];
+                    List<AST.Prototype> traitProtos = new List<AST.Prototype>();
+                    string newNameIHATEMYSELF = nameToSearch.Remove(0, nameToSearch.IndexOf("_") + 1);
+                    DebugConsole.Write("caller func name: " + newNameIHATEMYSELF);
+                    for (int i = 0; i < trait.protos.Count; i++)
+                    {
+                        DebugConsole.Write(trait.protos[i].name);
+                        if (trait.protos[i].name.Contains(newNameIHATEMYSELF))
+                        {
+                            traitProtos.Add(trait.protos[i]);
+                        }
+                    }
+                    if (traitProtos.Count == 0)
+                    {
+                        throw GenException.FactoryMethod($"No function with the name {nameToSearch} was found (WITHIN TRAIT PROTOS)", "You tried to call a function that doesn't exist - possible typo in the function call or mismatch arguments", caller, true, nameToSearch);
+                    }
+                    (string name, AST.Prototype actualProto) = checkProtoArgTypes(nameToSearch, caller, traitProtos);
+                    int idxInTraitVal = trait.protos.IndexOf(actualProto) + 1;
+                    return (name, actualProto, idxInTraitVal);
+                }
+            }
+            throw GenException.FactoryMethod($"No function with the name {nameToSearch} was found (AKSJDKAJSD)", "You tried to call a function that doesn't exist - possible typo in the function call or mismatch arguments", caller, true, nameToSearch);
         }
 
-        //TODO: sort protos matching type based upon the closes inheritance
-        foreach (AST.Prototype proto in protosMatchingNameAndArgCount)
+        (string retName, AST.Prototype retProto) = checkProtoArgTypes(nameToSearch, caller, protosMatchingNameAndArgCount);
+        return (retName, retProto, 0);
+
+    }
+
+    public (string, AST.Prototype) checkProtoArgTypes(string nameToSearch, AST.FunctionCall caller, List<AST.Prototype> listToCheck)
+    {
+        foreach (AST.Prototype proto in listToCheck)
         {
+            DebugConsole.Write(proto.name);
             int idx = 0;
             foreach (AST.Type argType in proto.arguments.Values)
             {
+                DebugConsole.Write("arg type: " + argType.value);
+                DebugConsole.Write("caller arg type: " + caller.args[idx].type.value);
                 if (argType.value == caller.args[idx].type.value)
                 {
                     idx++;
                     continue;
                 }
-                else if (argType.isStruct && caller.args[idx].type.isStruct)
+                else if (argType.isTrait && caller.args[idx].type.isStruct)
                 {
                     if (parser.declaredStructs.ContainsKey(caller.args[idx].type.value) || parser.declaredStructTraits.ContainsKey(caller.args[idx].type.value))
                     {
@@ -258,12 +294,10 @@ public class IRGen
             }
             if (idx == proto.arguments.Count)
             {
-                return (proto.name, (ParserTypeInformation)proto.returnType);
+                return (proto.name, proto);
             }
         }
-
-        throw GenException.FactoryMethod($"No function with the name {nameToSearch} was found", "You tried to call a function that doesn't exist", caller, true, nameToSearch);
-
+        throw GenException.FactoryMethod($"No function with the name {nameToSearch} was found (THIS IS IN THAT LOOPY FUNC)", "You tried to call a function that doesn't exist", caller, true, nameToSearch);
     }
 
     public void generateIR(List<AST.Node> nodes, Spectre.Console.ProgressTask task)
@@ -323,5 +357,9 @@ public class IRGen
         DebugConsole.WriteAnsi("[blue]post optimizations LLVM IR below [/]");
         DebugConsole.DumpModule(module);
         DebugConsole.Write("");
+    }
+
+    public void test()
+    {
     }
 }

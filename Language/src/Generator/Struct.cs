@@ -11,6 +11,17 @@ public class Struct : Base
         this.str = (AST.Struct)node;
     }
 
+    public void createImplValues(LLVMValueRef strPtr, string varName)
+    {
+        DebugConsole.Write("running create impl values in struct named: " + str.name);
+        foreach (AST.StructImplement implement in str.implements)
+        {
+            DebugConsole.Write("creating impl values for: " + implement.trait.name);
+            ((StructImplement)implement.generator).createImplValue(strPtr, varName);
+        }
+        DebugConsole.Write("finished running create impl values in struct named: " + str.name);
+    }
+
     public override void generate()
     {
         base.generate();

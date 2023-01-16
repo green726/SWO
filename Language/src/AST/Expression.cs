@@ -7,7 +7,9 @@ public abstract class Expression : Node
     public bool isReference = false;
     public bool isDereference = false;
 
-    public ParserTypeInformation type { get; set; } = new ParserTypeInformation("null");
+    public ParserTypeInformation type { get; set; }
+
+    public Generator.ImplicitCast implicitCast { get; set; }
 
     public Expression() : base()
     {
@@ -54,6 +56,14 @@ public abstract class Expression : Node
         //     this.value = token.value.Substring(1, token.value.Length - 1);
         //     DebugConsole.WriteAnsi($"[blue]post deref val {this.value}[/]");
         // }
+        this.newLineReset = true;
+        this.parser.previousExpression = this;
+    }
+
+    public Expression(Node node, bool useNodeParser) : base(node, useNodeParser)
+    {
+        this.isExpression = true;
+
         this.newLineReset = true;
         this.parser.previousExpression = this;
     }

@@ -78,6 +78,12 @@ public class VariableDeclaration : Base
 
                 gen.addNamedValueInScope(varDec.name, allocaRef);
                 // namedValuesLLVM.Add(varDec.name, allocaRef);
+
+                if (varDec.type.isStruct)
+                {
+                    Base strGen = gen.parser.declaredStructs[varDec.type.value].generator;
+                    ((Struct)strGen).createImplValues(allocaRef, varDec.name);
+                }
             }
             else
             {
@@ -104,8 +110,16 @@ public class VariableDeclaration : Base
 
                 gen.addNamedValueInScope(varDec.name, allocaRef);
                 // namedValuesLLVM.Add(varDec.name, allocaRef);
+
+                if (varDec.type.isStruct)
+                {
+                    Base strGen = gen.parser.declaredStructs[varDec.type.value].generator;
+                    ((Struct)strGen).createImplValues(allocaRef, varDec.name);
+                }
             }
         }
+
+
 
         DebugConsole.Write("adding var to named globals with name of" + varDec.name);
         // namedValuesAST.Add(varDec.name, varDec);

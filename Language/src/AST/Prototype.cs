@@ -78,6 +78,11 @@ public class Prototype : AST.Node
             parent?.addChild(this);
             this.parent = parent;
         }
+        if (parent?.nodeType == NodeType.Trait)
+        {
+            AST.StructTrait trait = (AST.StructTrait)parent;
+            this.arguments.Add("this", new Type(trait.name, this));
+        }
 
     }
 

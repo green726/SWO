@@ -86,6 +86,20 @@ public abstract class Node
         // this.parser.previousNode = this;
     }
 
+    protected Node(Node node, bool useNodeParser)
+    {
+        this.line = node.line;
+        this.column = node.column;
+        this.charNum = node.charNum;
+        this.codeExcerpt = node.codeExcerpt;
+        this.parser = node.parser;
+        this.parentParser = parser.parentParser;
+        this.generator = new Generator.Empty(this);
+        this.parent = new Empty();
+        // this.parser.previousNode = this;
+    }
+
+
     protected Node(Node node)
     {
         this.line = node.line;
@@ -136,6 +150,7 @@ public abstract class Node
         Trait,
         Implement,
         Cast,
+        ImplicitCast,
     }
 
     public virtual void addSpace(Util.Token space)

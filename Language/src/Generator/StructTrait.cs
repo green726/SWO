@@ -14,13 +14,21 @@ public class StructTrait : Base
     {
         base.generate();
 
+        DebugConsole.Write("trait name: " + trait.name);
+        LLVMTypeRef structType = LLVM.StructCreateNamed(LLVM.GetGlobalContext(), trait.name);
+
+        DebugConsole.Write("struct type: " + structType);
+
+
         DebugConsole.WriteAnsi("[blue]genning struct trait[/]");
         List<LLVMTypeRef> funcTypes = new List<LLVMTypeRef>();
         foreach (AST.Prototype proto in trait.protos)
         {
-            LLVMTypeRef[] funcArgTypes = new LLVMTypeRef[proto.arguments.Count];
+            // proto.arguments.Insert(0)
+            LLVMTypeRef[] funcArgTypes = new LLVMTypeRef[proto.arguments.Count + 1];
+            funcArgTypes[0] = LLVM.PointerType(structType, 0);
 
-            int idx = 0;
+            int idx = 1;
             foreach (KeyValuePair<string, AST.Type> arg in proto.arguments)
             {
                 arg.Value.generator.generate();
@@ -33,10 +41,6 @@ public class StructTrait : Base
             funcTypes.Add(funcType);
         }
 
-        DebugConsole.Write("trait name: " + trait.name);
-        LLVMTypeRef structType = LLVM.StructCreateNamed(LLVM.GetGlobalContext(), trait.name);
-
-        DebugConsole.Write("struct type: " + structType);
 
         LLVM.StructSetBody(structType, funcTypes.ToArray(), false);
 

@@ -16,13 +16,14 @@ public class VariableAssignment : Base
     {
         base.generate();
 
-        if (!varAss.varExpr.type.isStruct)
-        {
-            varAss.varExpr.isReference = true;
-        }
+        //BUG: might need to add back in the below if statement | I HATE LLVM
+        // if (!varAss.type.isStruct)
+        // {
+        varAss.varExpr.isReference = true;
+        // }
         varAss.varExpr.generator.generate();
-        // LLVMValueRef targetValRef = gen.valueStack.Pop();
-        LLVMValueRef targetValRef = gen.getNamedValueInScope(varAss.varExpr.value);
+        LLVMValueRef targetValRef = gen.valueStack.Pop();
+        // LLVMValueRef targetValRef = gen.getNamedValueInScope(varAss.varExpr.value);
         if (varAss.binReassignment)
         {
             DebugConsole.WriteAnsi("[green]bin reass detected[/]");

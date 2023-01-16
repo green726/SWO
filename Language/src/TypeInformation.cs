@@ -21,6 +21,13 @@ public abstract class TypeInformation
         (this.isStruct, this.isTrait) = checkForCustomType(this.value, parser);
     }
 
+    public TypeInformation(string value, Parser parser)
+    {
+        this.value = value;
+        this.parser = parser;
+        (this.isStruct, this.isTrait) = checkForCustomType(this.value, parser);
+    }
+
     public string getTypePointedTo()
     {
         if (this.isPointer)
@@ -90,6 +97,11 @@ public abstract class TypeInformation
 public class GeneratorTypeInformation : TypeInformation
 {
     private IRGen gen { get; set; }
+
+    public GeneratorTypeInformation(string value, Parser parser) : base(value, parser)
+    {
+        gen = IRGen.getInstance();
+    }
 
     public GeneratorTypeInformation(Parser parser) : base(parser)
     {
