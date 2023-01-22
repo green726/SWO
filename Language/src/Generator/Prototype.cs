@@ -15,6 +15,7 @@ public class Prototype : Base
     public override void generate()
     {
         base.generate();
+
         DebugConsole.WriteAnsi("[yellow]proto named:[/]");
         DebugConsole.Write(proto.name);
         //begin argument generation
@@ -62,7 +63,6 @@ public class Prototype : Base
         {
             gen.addLayerToNamedValueStack();
         }
-        DebugConsole.Write("BREAK8");
         int argLoopIndex = 0;
         foreach (KeyValuePair<string, AST.Type> arg in proto.arguments)
         {
@@ -79,11 +79,30 @@ public class Prototype : Base
             DebugConsole.Write("created argument: " + param);
             argLoopIndex++;
         }
-        DebugConsole.Write("BREAK9");
 
         DebugConsole.DumpValue(function);
 
         gen.valueStack.Push(function);
+    }
+
+    public LLVMTypeRef getType()
+    {
+        base.generate();
+        //begin argument generation
+        int argumentCount = proto.arguments.Count();
+        List<LLVMTypeRef> arguments = new List<LLVMTypeRef>();
+
+        foreach (KeyValuePair<string, AST.Type> arg in proto.arguments)
+        {
+            arg.Value.generator.generate();
+            arguments.Add(gen.typeStack.Pop());
+        }
+
+        GeneratorTypeInformation genTypeInfo = (GeneratorTypeInformation)(ParserTypeInformation)proto.returnType;
+        LLVMTypeRef retType = genTypeInfo.getLLVMType();
+        LLVMTypeRef funcType = LLVM.FunctionType(retType, arguments.ToArray(), proto.variableArgument);
+
+        return funcType;
     }
 
 }

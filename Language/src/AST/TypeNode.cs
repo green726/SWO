@@ -21,8 +21,10 @@ public class Type : AST.Node
 
         if (token.value.EndsWith("*"))
         {
+            DebugConsole.WriteAnsi("[red] detected pointer type(pre)[/]" + token.value);
             this.isPointer = true;
             token.value = token.value.Substring(0, token.value.Length - 1);
+            DebugConsole.WriteAnsi("[red] detected pointer type(post)[/]" + token.value);
         }
 
         if (token.value.Contains("[") && token.value.IndexOf("]") > token.value.IndexOf("["))
@@ -62,11 +64,40 @@ public class Type : AST.Node
 
         if (value.EndsWith("*"))
         {
+            DebugConsole.WriteAnsi("[red] detected pointer type(pre)[/]" + value);
             this.isPointer = true;
-            value.Remove(value.Length - 1);
+            value = value.Substring(0, value.Length - 1);
+            DebugConsole.WriteAnsi("[red] detected pointer type(post)[/]" + value);
+        }
+
+        if (value.Contains("[") && value.IndexOf("]") > value.IndexOf("["))
+        {
+            this.isArray = true;
+            //handles array types
+            int idxFirstBrack = value.IndexOf("[");
+            int idxSecondBrack = value.IndexOf("]");
+
+            if (idxFirstBrack + 1 == idxSecondBrack)
+            {
+                // TODO: implement auto-array sizing (gonna need to do it based on future values somehow)
+            }
+            else
+            {
+                string arrSizeStr = "";
+                foreach (char ch in value.Substring(idxFirstBrack + 1, idxSecondBrack - (idxFirstBrack + 1)))
+                {
+                    if (!Char.IsDigit(ch))
+                    {
+                        throw ParserException.FactoryMethod($"Illegal non-integer in array size declaration({ch})", "Replace it with an integer", this.parent);
+                    }
+                    arrSizeStr += ch;
+                }
+                this.size = int.Parse(arrSizeStr);
+            }
         }
 
         this.value = value;
+        (this.isStruct, this.isTrait) = TypeInformation.checkForCustomType(this.value, parser);
     }
 
     public string getContainedTypeString(AST.Node caller)
@@ -82,6 +113,5 @@ public class Type : AST.Node
     {
         base.addChild(child);
     }
-
 }
 

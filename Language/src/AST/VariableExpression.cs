@@ -64,9 +64,9 @@ public class VariableExpression : Expression
     public void checkForCasts()
     {
         //TODO: ensure that the cast is possible and implicit - if not throw an error
-        if (this.desiredType != null && this.type.value != this.desiredType.value)
+        if (this.desiredType != null && this.type.value != this.desiredType.value && this.desiredType.value != "void")
         {
-            DebugConsole.Write("creating implicit cast for variable expressionm");
+            DebugConsole.Write("creating implicit cast for variable expression to type " + this.desiredType.value);
             Generator.ImplicitCast implCast = new Generator.ImplicitCast(this, (Generator.Expression)this.generator, this.desiredType);
             this.generator = implCast;
         }

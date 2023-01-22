@@ -16,12 +16,14 @@ public abstract class Expression : Base
 
     public override void generate()
     {
-        DebugConsole.Write(expr.type);
+        DebugConsole.Write(expr.nodeType);
+        DebugConsole.Write(expr.value);
+        DebugConsole.Write(expr.type.value);
         this.typeInfo = (GeneratorTypeInformation)expr.type;
 
         if (expr.implicitCast != null)
         {
-            
+
         }
 
         base.generate();

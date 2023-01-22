@@ -45,6 +45,17 @@ public class Function : AST.Node
             this.parent.addChild(this);
         }
 
+        if (this.parent.nodeType == NodeType.Implement)
+        {
+            StructImplement implement = (StructImplement)this.parent;
+            AST.VariableDeclaration argReDec = new AST.VariableDeclaration(new Util.Token(Util.TokenType.Keyword, implement.str.name, this.line, this.column), this);
+            argReDec.addChild(new Util.Token(Util.TokenType.Keyword, "this", this.line, this.column));
+            argReDec.addChild(new Util.Token(Util.TokenType.Operator, "=", this.line, this.column));
+            AST.Cast cast = new AST.Cast(implement.str.type, new AST.VariableExpression(new Util.Token(Util.TokenType.Keyword, "thisArg", this.line, this.column), this), argReDec);
+            argReDec.addChild(cast);
+            // this.body.Add(argReDec);
+        }
+
         // if (Config.settings.function.declaration.reorder && !Parser.declaredFunctionDict.ContainsKey(prototype.name))
         // {
         //     Parser.declaredFunctionDict.Add(prototype.name, this);

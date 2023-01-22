@@ -18,6 +18,8 @@ public class Prototype : AST.Node
 
     public bool variableArgument = false;
 
+    private AST.Type voidType;
+
     [JsonConstructor]
     public Prototype(TypeInformation returnType)
     {
@@ -35,6 +37,7 @@ public class Prototype : AST.Node
 
         this.nodeType = NodeType.Prototype;
         this.generator = new Generator.Prototype(this);
+        this.voidType = new Type("void*", this);
     }
 
     public Prototype(Util.Token token, AST.Node parent = null, bool startWithRet = false, bool external = false) : base(token)
@@ -81,9 +84,9 @@ public class Prototype : AST.Node
         if (parent?.nodeType == NodeType.Trait)
         {
             AST.StructTrait trait = (AST.StructTrait)parent;
-            this.arguments.Add("this", new Type(trait.name, this));
+            this.arguments.Add("thisArg", new Type(trait.name, this));
         }
-
+        this.voidType = new Type("void*", this);
     }
 
     //NOTE: addArgs are just extended from the add child - just to seperate handling of other tokens added (like names)
@@ -235,6 +238,19 @@ public class Prototype : AST.Node
         foreach (KeyValuePair<string, Type> arg in this.arguments)
         {
             parser.addNamedValueInScope(arg.Key, (ParserTypeInformation)arg.Value);
+        }
+    }
+
+    public void modifyThisArg()
+    {
+        if (this.arguments.ContainsKey("thisArg"))
+        {
+            this.arguments["thisArg"] = voidType;
+            DebugConsole.WriteAnsi("[purple] voidType: [/]" + voidType.value);
+        }
+        else
+        {
+            throw ParserException.FactoryMethod("A prototype was modified to have a void* \"this\" argument, but the prototype did not have a \"this\" argument", "Internal compiler error - make an issue on GitHub", this);
         }
     }
 

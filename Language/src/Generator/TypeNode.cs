@@ -13,6 +13,8 @@ public class Type : Base
 
     private LLVMTypeRef genPointer()
     {
+        DebugConsole.Write("genning typenode pointer type");
+        DebugConsole.Write("ee: " + GeneratorTypeInformation.getLLVMTypeFromString(type.value, gen, type.isArray, type.size));
         return (LLVM.PointerType(GeneratorTypeInformation.getLLVMTypeFromString(type.value, gen, type.isArray, type.size), 0));
     }
 

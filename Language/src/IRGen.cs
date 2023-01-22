@@ -89,7 +89,16 @@ public class IRGen
 
     public void addNamedValueInScope(string name, LLVMValueRef value)
     {
-        namedValuesLLVMStack.Peek().Add(name, value);
+        try
+        {
+
+            namedValuesLLVMStack.Peek().Add(name, value);
+        }
+        catch (Exception e)
+        {
+            DebugConsole.DumpModule(module);
+            throw e;
+        }
     }
 
     // public AST.Struct getNamedTypeASTInScope(string name)
@@ -127,14 +136,12 @@ public class IRGen
     public int getStructFieldIndex(AST.VariableExpression varExpr)
     {
         int index = currentStruct.Pop().getPropertyIndex(varExpr.value);
-
         return index;
     }
 
     public int getStructFieldIndex(string fieldName)
     {
         int index = currentStruct.Pop().getPropertyIndex(fieldName);
-
         return index;
     }
 
@@ -240,7 +247,7 @@ public class IRGen
                         throw GenException.FactoryMethod($"No function with the name {nameToSearch} was found (WITHIN TRAIT PROTOS)", "You tried to call a function that doesn't exist - possible typo in the function call or mismatch arguments", caller, true, nameToSearch);
                     }
                     (string name, AST.Prototype actualProto) = checkProtoArgTypes(nameToSearch, caller, traitProtos);
-                    int idxInTraitVal = trait.protos.IndexOf(actualProto) + 1;
+                    int idxInTraitVal = trait.protos.IndexOf(actualProto);
                     return (name, actualProto, idxInTraitVal);
                 }
             }
@@ -262,7 +269,7 @@ public class IRGen
             {
                 DebugConsole.Write("arg type: " + argType.value);
                 DebugConsole.Write("caller arg type: " + caller.args[idx].type.value);
-                if (argType.value == caller.args[idx].type.value)
+                if (argType.value == caller.args[idx].type.value || argType.value == "void")
                 {
                     idx++;
                     continue;

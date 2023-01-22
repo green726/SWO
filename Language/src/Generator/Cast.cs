@@ -29,7 +29,9 @@ public class Cast : Expression
             return;
         }
 
-        LLVMValueRef casted = LLVM.BuildCast(gen.builder, LLVMOpcode.LLVMBitCast, cast.target.value, ((GeneratorTypeInformation)cast.desiredType).getLLVMType(), "cast");
+        GeneratorTypeInformation targetType = (GeneratorTypeInformation)cast.target.type;
+        cast.target.generator.generate();
+        LLVMValueRef casted = LLVM.BuildCast(gen.builder, LLVMOpcode.LLVMBitCast, gen.valueStack.Pop(), targetType.getLLVMType(), "cast");
         gen.valueStack.Push(casted);
 
     }

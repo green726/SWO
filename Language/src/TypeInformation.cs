@@ -114,9 +114,15 @@ public class GeneratorTypeInformation : TypeInformation
         // return new GeneratorTypeInformation() { infoIn };
     }
 
+    public static explicit operator GeneratorTypeInformation(AST.Type infoIn)
+    {
+        return new GeneratorTypeInformation(infoIn.parser) { value = infoIn.value, isPointer = infoIn.isPointer, isArray = infoIn.isArray, size = infoIn.size, isStruct = infoIn.isStruct, isTrait = infoIn.isTrait };
+    }
+
     public static LLVMTypeRef getLLVMTypeFromString(string type, IRGen gen, bool array = false, int size = 0)
     {
         LLVMTypeRef basicType;
+        DebugConsole.Write("type: " + type);
 
         (bool isInt, int bits) = Parser.checkInt(type);
         if (isInt)
@@ -141,6 +147,7 @@ public class GeneratorTypeInformation : TypeInformation
                     basicType = LLVM.Int1Type();
                     break;
                 case "void":
+                    DebugConsole.Write("void type found");
                     basicType = LLVM.VoidType();
                     break;
                 case "char":

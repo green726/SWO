@@ -1,6 +1,5 @@
 //TODO: double check the previous node stuff for binexpr
 using System.Text;
-using static System.Text.Json.JsonSerializer;
 
 public class Parser
 {

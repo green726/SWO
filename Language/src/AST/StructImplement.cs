@@ -26,7 +26,7 @@ public class StructImplement : Node
     public void addThisKeyword(Prototype proto)
     {
         AST.Type strType = new Type(new Util.Token(Util.TokenType.Keyword, str.name, proto.line, proto.column));
-        proto.arguments.Add("this", strType);
+        proto.arguments.Add("thisArg", strType);
         // parser.addNamedValueInScope("this", (ParserTypeInformation)strType, this);
         DebugConsole.WriteAnsi($"[red]added \"this\" to proto named {proto.name}[/]");
     }

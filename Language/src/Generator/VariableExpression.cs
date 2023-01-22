@@ -58,7 +58,6 @@ public class VariableExpression : Expression
                 gen.currentStruct.Push(strType);
                 DebugConsole.Write("updated currentStruct");
             }
-
             else
             {
                 DebugConsole.Write("didnt update current struct");
@@ -162,7 +161,7 @@ public class VariableExpression : Expression
         }
         else
         {
-            if (this.varExpr.isReference || this.varExpr.parent.nodeType == AST.Node.NodeType.Reference || this.varExpr.children.Count() > 0 || this.varExpr.type.isPointer || this.varExpr.type.isStruct)
+            if (this.varExpr.isReference || this.varExpr.parent.nodeType == AST.Node.NodeType.Reference || this.varExpr.children.Count() > 0 || this.varExpr.type.isPointer || this.varExpr.type.isStruct || this.varExpr.type.isTrait)
             {
                 DebugConsole.Write(this.varExpr.isReference);
                 DebugConsole.Write("ptr var expr detected");
@@ -177,7 +176,6 @@ public class VariableExpression : Expression
                     DebugConsole.Write("generating load ref");
                     LLVMValueRef loadRef = generateVarLoad();
                     gen.valueStack.Push(loadRef);
-
                 }
                 else
                 {

@@ -19,7 +19,12 @@ public class Function : Base
     {
         base.generate();
         if (func.generated) { return; }
-        //BUG: might not be working
+
+
+        if (func.parent.nodeType == AST.Node.NodeType.Implement)
+        {
+            func.prototype.modifyThisArg();
+        }
         func.prototype.generator.generate();
 
         LLVMValueRef function = gen.valueStack.Pop();

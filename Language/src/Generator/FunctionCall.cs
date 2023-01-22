@@ -41,7 +41,16 @@ public class FunctionCall : Base
             if (traitFuncIdx != 0)
             {
                 DebugConsole.Write("value stack peek in trait func gen: " + gen.valueStack.Peek());
-                funcRef = LLVM.BuildStructGEP(gen.builder, gen.valueStack.Peek(), (uint)traitFuncIdx, "traitFuncPtr");
+                DebugConsole.Write("idx: " + traitFuncIdx);
+                DebugConsole.Write(gen.valueStack.Peek().TypeOf());
+                LLVMValueRef vtableRef = LLVM.BuildStructGEP(gen.builder, gen.valueStack.Peek(), 1, "traitFuncPtr");
+                DebugConsole.Write("vtable ref: " + vtableRef);
+                DebugConsole.Write("vtable type:" + vtableRef.TypeOf());
+                LLVMValueRef loadRef = LLVM.BuildLoad(gen.builder, vtableRef, "traitVtableLoad");
+                DebugConsole.Write("load ref:" + loadRef);
+                funcRef = LLVM.BuildLoad(gen.builder, LLVM.BuildStructGEP(gen.builder, loadRef, (uint)traitFuncIdx, "traitFuncPtr"), "traitFuncLoad");
+                DebugConsole.Write("func ref: " + funcRef);
+                DebugConsole.Write("func ref type: " + funcRef.TypeOf());
             }
             else
             {
@@ -67,10 +76,11 @@ public class FunctionCall : Base
             // }
         }
 
-        if (LLVM.CountParams(funcRef) != funcCall.args.Count && LLVM.IsFunctionVarArg(funcRef.TypeOf().GetElementType()) == false)
-        {
-            throw new GenException($"Incorrect # arguments passed ({funcCall.args.Count} passed but {LLVM.CountParams(funcRef)} required)", funcCall);
-        }
+        // if (LLVM.CountParams(funcRef) != funcCall.args.Count && LLVM.IsFunctionVarArg(funcRef.TypeOf().GetElementType()) == false)
+        // {
+        //     DebugConsole.DumpModule(gen.module);
+        //     throw new GenException($"Incorrect # arguments passed ({funcCall.args.Count} passed but {LLVM.CountParams(funcRef)} required)", funcCall);
+        // }
 
         int argumentCount = funcCall.args.Count;
         var argsRef = new LLVMValueRef[argumentCount];
@@ -85,8 +95,31 @@ public class FunctionCall : Base
                 {
                     DebugConsole.Write("checking varExpr for casts");
                     AST.VariableExpression varExpr = (AST.VariableExpression)funcCall.args[i];
-                    varExpr.desiredType = new GeneratorTypeInformation(proto.arguments.ElementAt(i).Value.value, gen.parser);
+                    varExpr.desiredType = (GeneratorTypeInformation)proto.arguments.ElementAt(i).Value;
                     varExpr.checkForCasts();
+                }
+            }
+
+
+            if (i == 0)
+            {
+                if (funcCall.parent.nodeType == AST.Node.NodeType.VariableExpression)
+                {
+                    AST.VariableExpression varExpr = (AST.VariableExpression)funcCall.parent;
+                    DebugConsole.WriteAnsi($"[green]checking if a trait func it being called from trait var: {varExpr.value}[/]");
+                    if (varExpr.type.isTrait)
+                    {
+                        DebugConsole.Write("\"this\" arg is trait");
+                        funcCall.args[i].generator.generate();
+                        LLVMValueRef thisRef = gen.valueStack.Pop();
+                        DebugConsole.Write(thisRef);
+
+                        LLVMValueRef gep = LLVM.BuildStructGEP(gen.builder, thisRef, 0, "thisGEP");
+                        LLVMValueRef load = LLVM.BuildLoad(gen.builder, gep, "thisGEPLoad");
+                        DebugConsole.WriteAnsi("[blue]traitGeppedInFuncCall: " + gep + "[/]");
+                        argsRef[i] = load;
+                        continue;
+                    }
                 }
             }
 

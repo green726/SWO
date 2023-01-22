@@ -59,6 +59,5 @@ public class Struct : Base
         {
             impl.generator.generate();
         }
-
     }
 }

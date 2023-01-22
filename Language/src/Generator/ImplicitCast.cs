@@ -18,6 +18,7 @@ public class ImplicitCast : Expression
 
     public override void generate()
     {
+        // throw new Exception("Not implemented");
         this.exprGen.generate();
         base.generate();
 
@@ -33,7 +34,6 @@ public class ImplicitCast : Expression
             return;
         }
 
-        this.expr.generator.generate();
         LLVMValueRef cast = LLVM.BuildCast(gen.builder, LLVMOpcode.LLVMBitCast, gen.valueStack.Pop(), ((GeneratorTypeInformation)this.desiredType).getLLVMType(), "cast");
         gen.valueStack.Push(cast);
     }

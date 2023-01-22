@@ -15,6 +15,7 @@ public class Cast : Expression
 
         this.value = desired.value;
         this.desiredType = desired;
+        this.type = (ParserTypeInformation)desiredType;
         this.target = (Expression)target;
     }
 
@@ -27,6 +28,7 @@ public class Cast : Expression
 
         this.value = token.value;
         this.desiredType = new ParserTypeInformation(token.value);
+        this.type = (ParserTypeInformation)desiredType;
         this.target = (Expression)target;
     }
 
@@ -39,6 +41,7 @@ public class Cast : Expression
 
         this.value = token.value;
         this.desiredType = new ParserTypeInformation(token.value);
+        this.type = (ParserTypeInformation)desiredType;
     }
 
     public override void addChild(Node child)
