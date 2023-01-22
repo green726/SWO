@@ -206,7 +206,7 @@ public class IRGen
 
         if (parser.declaredFuncs.ContainsKey(nameToSearch))
         {
-            return (nameToSearch, parser.declaredFuncs[nameToSearch], 0);
+            return (nameToSearch, parser.declaredFuncs[nameToSearch], -1);
         }
 
         nameToSearch = caller.functionName;
@@ -230,6 +230,7 @@ public class IRGen
                 AST.VariableExpression varExpr = (AST.VariableExpression)caller.parent;
                 if (varExpr.type.isTrait)
                 {
+                    DebugConsole.Write("in the weird trait function bs");
                     AST.StructTrait trait = parser.declaredStructTraits[varExpr.type.value];
                     List<AST.Prototype> traitProtos = new List<AST.Prototype>();
                     string newNameIHATEMYSELF = nameToSearch.Remove(0, nameToSearch.IndexOf("_") + 1);
@@ -255,7 +256,7 @@ public class IRGen
         }
 
         (string retName, AST.Prototype retProto) = checkProtoArgTypes(nameToSearch, caller, protosMatchingNameAndArgCount);
-        return (retName, retProto, 0);
+        return (retName, retProto, -1);
 
     }
 

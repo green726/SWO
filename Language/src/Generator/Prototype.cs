@@ -16,8 +16,7 @@ public class Prototype : Base
     {
         base.generate();
 
-        DebugConsole.WriteAnsi("[yellow]proto named:[/]");
-        DebugConsole.Write(proto.name);
+        DebugConsole.WriteAnsi($"[yellow]proto named: {proto.name} with parent of type: {proto.parent.nodeType} [/]");
         //begin argument generation
         int argumentCount = proto.arguments.Count();
         List<LLVMTypeRef> arguments = new List<LLVMTypeRef>();

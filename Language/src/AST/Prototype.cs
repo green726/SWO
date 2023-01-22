@@ -256,7 +256,7 @@ public class Prototype : AST.Node
 
     public override void checkExport()
     {
-        if (parser.parentParser != null)
+        if (parser.parentParser != null && this.parent.nodeType != NodeType.Trait)
         {
             DebugConsole.WriteAnsi("[green]checking export for proto: " + this.name + " [/]");
             this.exportChecked = true;

@@ -28,13 +28,6 @@ public class Struct : Base
         DebugConsole.Write("adding str with name of " + str.name + " to dict");
         gen.namedTypesAST.Add(str.name, this.str);
 
-        foreach (AST.Node node in str.properties)
-        {
-            AST.VariableDeclaration varDec = (AST.VariableDeclaration)node;
-            // str.propertiesNames.Add(varDec.name);
-        }
-
-
         List<LLVMTypeRef> elementTypes = new List<LLVMTypeRef>();
 
         foreach (AST.Node node in this.str.properties)

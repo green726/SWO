@@ -38,7 +38,7 @@ public class FunctionCall : Base
             this.funcCall.type = (ParserTypeInformation)proto.returnType;
             DebugConsole.WriteAnsi("[red]result of irgen.getDeclaredFunction for funccall named: " + this.funcCall.functionName + " result: name: " + nameToSearch + " ret type: " + this.funcCall.type.value + "[/]");
 
-            if (traitFuncIdx != 0)
+            if (traitFuncIdx > -1)
             {
                 DebugConsole.Write("value stack peek in trait func gen: " + gen.valueStack.Peek());
                 DebugConsole.Write("idx: " + traitFuncIdx);

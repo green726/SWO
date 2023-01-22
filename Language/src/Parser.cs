@@ -855,7 +855,7 @@ public class Parser
                             delimLevel--;
                             return (parent, delimLevel);
                         }
-                        else
+                        else if (parent?.parent == null || parent?.parent.nodeType == AST.Node.NodeType.Empty || parent?.parent.nodeType == AST.Node.NodeType.ExternStatement)
                         {
                             nodes.Add(parent);
                             break;
