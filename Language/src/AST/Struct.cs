@@ -10,6 +10,8 @@ public class Struct : Node
     public List<StructImplement> implements = new List<StructImplement>();
     public List<StructTrait> implementedTraits = new List<StructTrait>();
 
+    public List<Function> functions = new List<Function>();
+
     public TypeInformation type;
 
     public Struct(Util.Token token, AST.Node parent) : base(token)
@@ -42,6 +44,14 @@ public class Struct : Node
                 {
                     return func;
                 }
+            }
+        }
+
+        foreach (Function func in functions)
+        {
+            if (func.prototype.name == name)
+            {
+                return func;
             }
         }
         throw ParserException.FactoryMethod("An unknown function of a struct was referenced", "Remove the function reference, or change it to one that is a part of the struct", caller, this);
@@ -109,7 +119,12 @@ public class Struct : Node
             base.addChild(child);
             return;
         }
-        if (child.nodeType != NodeType.VariableDeclaration)
+        else if (child.nodeType == NodeType.Function) {
+            this.functions.Add((Function)child);
+            base.addChild(child);
+            return;
+        }
+        else if (child.nodeType != NodeType.VariableDeclaration)
         {
             throw ParserException.FactoryMethod($"Illegal child of type ({child.nodeType}) added to struct | Only variable declarations and implements may be added to structs", "Remove it", child, this);
         }

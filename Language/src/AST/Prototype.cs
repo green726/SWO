@@ -124,7 +124,7 @@ public class Prototype : AST.Node
         StringBuilder stringBuilder = new StringBuilder();
         foreach (KeyValuePair<string, Type> arg in this.arguments)
         {
-            stringBuilder.Append("_" + arg.Value.value);
+            stringBuilder.Append("_" + arg.Value.rawValue);
         }
 
         return stringBuilder.ToString();
@@ -132,6 +132,9 @@ public class Prototype : AST.Node
 
     public string getTrueName()
     {
+        if (this.name == "main") {
+            return this.name;
+        }
         if (this.parent?.nodeType != AST.Node.NodeType.ExternStatement)
         {
             string altName = this.name + getArgTypes();
@@ -141,11 +144,14 @@ public class Prototype : AST.Node
             return altName;
         }
         return this.name;
-
     }
 
     public void handleOverload()
     {
+        if (this.name == "main")
+        {
+            return;
+        }
         if (this.parent?.nodeType != AST.Node.NodeType.ExternStatement)
         {
             string altName = this.name + getArgTypes();
@@ -246,7 +252,7 @@ public class Prototype : AST.Node
         if (this.arguments.ContainsKey("thisArg"))
         {
             this.arguments["thisArg"] = voidType;
-            DebugConsole.WriteAnsi("[purple] voidType: [/]" + voidType.value);
+            DebugConsole.WriteAnsi("[purple] voidType: [/]" + voidType.rawValue);
         }
         else
         {

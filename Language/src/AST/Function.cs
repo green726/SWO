@@ -55,6 +55,15 @@ public class Function : AST.Node
             argReDec.addChild(cast);
             // this.body.Add(argReDec);
         }
+        else if (this.parent.nodeType == NodeType.Struct)
+        {
+            Struct strPar = (Struct)parent;
+            AST.VariableDeclaration argReDec = new AST.VariableDeclaration(new Util.Token(Util.TokenType.Keyword, strPar.name, this.line, this.column), this);
+            argReDec.addChild(new Util.Token(Util.TokenType.Keyword, "this", this.line, this.column));
+            argReDec.addChild(new Util.Token(Util.TokenType.Operator, "=", this.line, this.column));
+            AST.Cast cast = new AST.Cast(strPar.type, new AST.VariableExpression(new Util.Token(Util.TokenType.Keyword, "thisArg", this.line, this.column), this), argReDec);
+            argReDec.addChild(cast);
+        }
 
         // if (Config.settings.function.declaration.reorder && !Parser.declaredFunctionDict.ContainsKey(prototype.name))
         // {

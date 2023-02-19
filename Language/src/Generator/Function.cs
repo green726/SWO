@@ -20,7 +20,6 @@ public class Function : Base
         base.generate();
         if (func.generated) { return; }
 
-
         if (func.parent.nodeType == AST.Node.NodeType.Implement)
         {
             func.prototype.modifyThisArg();
@@ -62,7 +61,6 @@ public class Function : Base
         {
             LLVM.BuildRetVoid(gen.builder);
         }
-
 
         gen.valueStack.Push(function);
         gen.clearNamedValueScope();

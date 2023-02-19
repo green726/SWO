@@ -38,7 +38,7 @@ public class Struct : Base
         }
 
         DebugConsole.Write(gen.context);
-        //BUG: this line errors
+
         LLVMTypeRef structType = LLVM.StructCreateNamed(LLVM.GetGlobalContext(), this.str.name);
         LLVM.StructSetBody(structType, elementTypes.ToArray(), false);
 
@@ -47,6 +47,10 @@ public class Struct : Base
 
         gen.typeStack.Push(structType);
         gen.namedTypesLLVM.Add(str.name, structType);
+
+        foreach (AST.Function func in str.functions) {
+            func.generator.generate();
+        }
 
         foreach (AST.StructImplement impl in str.implements)
         {
