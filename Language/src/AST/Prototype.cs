@@ -124,7 +124,7 @@ public class Prototype : AST.Node
         StringBuilder stringBuilder = new StringBuilder();
         foreach (KeyValuePair<string, Type> arg in this.arguments)
         {
-            stringBuilder.Append("_" + arg.Value.rawValue);
+            stringBuilder.Append("_" + arg.Value.value);
         }
 
         return stringBuilder.ToString();
@@ -252,7 +252,7 @@ public class Prototype : AST.Node
         if (this.arguments.ContainsKey("thisArg"))
         {
             this.arguments["thisArg"] = voidType;
-            DebugConsole.WriteAnsi("[purple] voidType: [/]" + voidType.rawValue);
+            DebugConsole.WriteAnsi("[purple] voidType: [/]" + voidType.value);
         }
         else
         {

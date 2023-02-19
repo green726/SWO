@@ -119,7 +119,7 @@ public class VariableExpression : Expression
         base.generate();
         DebugConsole.Write("genning varExpr with value of " + varExpr.value + " parent type of " + varExpr.parent?.nodeType + " and children count of " + varExpr.children.Count());
         GeneratorTypeInformation exprGenTypeInfo = (GeneratorTypeInformation)varExpr.type;
-        LLVMTypeRef varExprTypeLLVM = exprGenTypeInfo.getLLVMType();
+        LLVMTypeRef varExprTypeLLVM = exprGenTypeInfo.genType();
 
         if (varExpr?.parent?.nodeType == AST.Node.NodeType.VariableExpression || varExpr?.parent?.nodeType == AST.Node.NodeType.IndexReference || varExpr?.parent?.parent?.nodeType == AST.Node.NodeType.VariableExpression && varExpr.parent.nodeType != AST.Node.NodeType.FunctionCall)
         {

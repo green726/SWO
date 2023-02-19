@@ -11,43 +11,11 @@ public class Type : Base
         this.type = (AST.Type)node;
     }
 
-    private LLVMTypeRef genPointer()
-    {
-        DebugConsole.Write("genning typenode pointer type");
-        DebugConsole.Write("ee: " + GeneratorTypeInformation.getLLVMTypeFromString(type.value, gen, type.isArray, type.size));
-        return (LLVM.PointerType(GeneratorTypeInformation.getLLVMTypeFromString(type.value, gen, type.isArray, type.size), 0));
-    }
-
-    private LLVMTypeRef genNonPtr()
-    {
-        return (GeneratorTypeInformation.getLLVMTypeFromString(type.value, gen, type.isArray, type.size));
-    }
-
-    private LLVMTypeRef getBaseStructType()
-    {
-        if (!type.isStruct)
-        {
-            throw new GenException("Type is not a struct");
-        }
-        return (GeneratorTypeInformation.getBaseStructType(type.value, gen));
-    }
-
     public override void generate()
     {
         base.generate();
-        if (type.isStruct)
-        {
-            gen.typeStack.Push(getBaseStructType());
-        }
 
-        if (type.isPointer)
-        {
-            gen.typeStack.Push(genPointer());
-        }
-        else
-        {
-            gen.typeStack.Push(genNonPtr());
-        }
+        GeneratorTypeInformation.genType((GeneratorTypeInformation)type, gen);
     }
 }
 

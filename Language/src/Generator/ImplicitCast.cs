@@ -34,7 +34,7 @@ public class ImplicitCast : Expression
             return;
         }
 
-        LLVMValueRef cast = LLVM.BuildCast(gen.builder, LLVMOpcode.LLVMBitCast, gen.valueStack.Pop(), ((GeneratorTypeInformation)this.desiredType).getLLVMType(), "cast");
+        LLVMValueRef cast = LLVM.BuildCast(gen.builder, LLVMOpcode.LLVMBitCast, gen.valueStack.Pop(), ((GeneratorTypeInformation)this.desiredType).genType(), "cast");
         gen.valueStack.Push(cast);
     }
 }

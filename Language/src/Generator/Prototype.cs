@@ -51,7 +51,7 @@ public class Prototype : Base
             }
 
             GeneratorTypeInformation genTypeInfo = (GeneratorTypeInformation)(ParserTypeInformation)proto.returnType;
-            LLVMTypeRef retType = genTypeInfo.getLLVMType();
+            LLVMTypeRef retType = genTypeInfo.genType();
             LLVMTypeRef funcType = LLVM.FunctionType(retType, arguments.ToArray(), proto.variableArgument);
             function = LLVM.AddFunction(gen.module, proto.name, funcType);
             LLVM.SetLinkage(function, LLVMLinkage.LLVMExternalLinkage);
@@ -98,7 +98,7 @@ public class Prototype : Base
         }
 
         GeneratorTypeInformation genTypeInfo = (GeneratorTypeInformation)(ParserTypeInformation)proto.returnType;
-        LLVMTypeRef retType = genTypeInfo.getLLVMType();
+        LLVMTypeRef retType = genTypeInfo.genType();
         LLVMTypeRef funcType = LLVM.FunctionType(retType, arguments.ToArray(), proto.variableArgument);
 
         return funcType;

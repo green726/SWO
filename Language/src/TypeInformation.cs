@@ -12,6 +12,9 @@ public abstract class TypeInformation
     public bool isTrait { get; set; } = false;
 
     public int size { get; set; } = 0;
+
+    public TypeInformation containedType = null;
+
     [JsonIgnore]
     public Parser parser { get; set; }
 
@@ -119,57 +122,68 @@ public class GeneratorTypeInformation : TypeInformation
         return new GeneratorTypeInformation(infoIn.parser) { value = infoIn.value, isPointer = infoIn.isPointer, isArray = infoIn.isArray, size = infoIn.size, isStruct = infoIn.isStruct, isTrait = infoIn.isTrait };
     }
 
-    public static LLVMTypeRef getLLVMTypeFromString(string type, IRGen gen, bool array = false, int size = 0)
-    {
-        LLVMTypeRef basicType;
-        DebugConsole.Write("type: " + type);
+    public LLVMTypeRef genType() {
+        return genType(this, this.gen);
+    }
 
-        (bool isInt, int bits) = Parser.checkInt(type);
-        if (isInt)
+    public static LLVMTypeRef genType(TypeInformation type, IRGen gen)
+    {
+        if (type.containedType != null)
         {
-            basicType = LLVM.IntType((uint)bits);
+            LLVMTypeRef containedType = genType(type.containedType, gen);
+
+            if (type.isPointer)
+            {
+                return LLVM.PointerType(containedType, 0);
+            }
+            else if (type.isArray)
+            {
+                return LLVM.ArrayType(containedType, (uint)type.size);
+            }
         }
         else
         {
-            switch (type)
+            LLVMTypeRef basicType;
+            (bool isInt, int bits) = Parser.checkInt(type.value);
+            if (isInt)
             {
-                case "double":
-                    basicType = LLVM.DoubleType();
-                    break;
-                case "string":
-                    //TODO: implement strings as stdlib so they can have a sane type
-                    basicType = LLVM.ArrayType(LLVM.Int8Type(), 0);
-                    break;
-                case "null":
-                    basicType = LLVM.VoidType();
-                    break;
-                case "bool":
-                    basicType = LLVM.Int1Type();
-                    break;
-                case "void":
-                    DebugConsole.Write("void type found");
-                    basicType = LLVM.VoidType();
-                    break;
-                case "char":
-                    basicType = LLVM.Int8Type();
-                    break;
-                default:
-                    basicType = LLVM.PointerType(LLVM.GetTypeByName(gen.module, type), 0);
-                    // basicType = LLVM.GetTypeByName(gen.module, type);
-                    if (basicType.Pointer == IntPtr.Zero)
-                    {
-                        throw new GenException($"Type ({type}) not found | Remove it or replace it with a declared type");
-                    }
-                    break;
-                    // throw new GenException($"An unknown type ({type}) was referenced");
+                basicType = LLVM.IntType((uint)bits);
             }
+            else
+            {
+                switch (type.value)
+                {
+                    case "double":
+                        basicType = LLVM.DoubleType();
+                        break;
+                    case "string":
+                        //TODO: implement strings as stdlib so they can have a sane type
+                        basicType = LLVM.ArrayType(LLVM.Int8Type(), 0);
+                        break;
+                    case "null":
+                        basicType = LLVM.VoidType();
+                        break;
+                    case "bool":
+                        basicType = LLVM.Int1Type();
+                        break;
+                    case "void":
+                        basicType = LLVM.VoidType();
+                        break;
+                    case "char":
+                        basicType = LLVM.Int8Type();
+                        break;
+                    default:
+                        basicType = LLVM.PointerType(LLVM.GetTypeByName(gen.module, type.value), 0);
+                        if (basicType.Pointer == IntPtr.Zero)
+                        {
+                            throw new GenException($"Type ({type}) not found | Remove it or replace it with a declared type");
+                        }
+                        break;
+                }
+            }
+            return basicType;
         }
-
-        if (array)
-        {
-            return LLVM.ArrayType(basicType, (uint)size);
-        }
-        return basicType;
+        return new LLVMTypeRef();
     }
 
     public static LLVMTypeRef getBaseStructType(string type, IRGen gen)
@@ -181,44 +195,26 @@ public class GeneratorTypeInformation : TypeInformation
         }
         return declaredType;
     }
-
-    private LLVMTypeRef genPointer()
-    {
-        return (LLVM.PointerType(getLLVMTypeFromString(this.value, gen, this.isArray, this.size), 0));
-    }
-
-    private LLVMTypeRef genNonPtr()
-    {
-        return (getLLVMTypeFromString(this.value, gen, this.isArray, this.size));
-    }
-
-    public LLVMTypeRef getLLVMType()
-    {
-        if (isPointer)
-        {
-            return genPointer();
-        }
-        else
-        {
-            return genNonPtr();
-        }
-    }
 }
 
 public class ParserTypeInformation : TypeInformation
 {
-    public ParserTypeInformation(string value) : base(Parser.getInstance())
+
+    public ParserTypeInformation(string value, TypeInformation typeInfo) : this(value, typeInfo.parser) { }
+
+    public ParserTypeInformation(string value) : this(value, Parser.getInstance()) { }
+
+    public ParserTypeInformation(string value, Parser parser) : base(parser)
     {
         if (value.EndsWith("*"))
         {
             this.isPointer = true;
-            value = value.Substring(0, value.Length - 1);
+            this.containedType = new ParserTypeInformation(value.Substring(0, value.Length - 1), this);
         }
-
-        if (value.Contains("[") && value.IndexOf("]") > value.IndexOf("["))
+        else if (value.Contains("[") && value.IndexOf("]") > value.IndexOf("["))
         {
             this.isArray = true;
-            //handles array 
+            //handles array types
             int idxFirstBrack = value.IndexOf("[");
             int idxSecondBrack = value.IndexOf("]");
 
@@ -233,18 +229,27 @@ public class ParserTypeInformation : TypeInformation
                 {
                     if (!Char.IsDigit(ch))
                     {
-                        throw new ParserException($"Illegal non-integer in array size declaration({ch})");
+                        throw new ParserException($"Illegal non-integer in array size declaration({ch}) - Replace it with an integer");
                     }
                     arrSizeStr += ch;
                 }
                 this.size = int.Parse(arrSizeStr);
             }
+            this.containedType = new ParserTypeInformation(value.Substring(0, idxFirstBrack), this);
         }
 
-        this.value = value;
+        if (this.containedType != null)
+        {
+            this.isStruct = this.containedType.isStruct;
+            this.isTrait = this.containedType.isTrait;
+        }
+        else
+        {
+            (this.isStruct, this.isTrait) = TypeInformation.checkForCustomType(this.value, parser);
+        }
+
+
     }
-
-
 
     public static explicit operator ParserTypeInformation(string strIn)
     {
@@ -253,6 +258,11 @@ public class ParserTypeInformation : TypeInformation
 
     public static explicit operator ParserTypeInformation(AST.Type typeIn)
     {
-        return new ParserTypeInformation(typeIn.value) { isArray = typeIn.isArray, isPointer = typeIn.isPointer, size = typeIn.size, parser = typeIn.parser, isStruct = typeIn.isStruct, isTrait = typeIn.isTrait };
+        ParserTypeInformation contained = null;
+        if (typeIn.containedType != null)
+        {
+            contained = (ParserTypeInformation)typeIn.containedType;
+        }
+        return new ParserTypeInformation(typeIn.value) { isArray = typeIn.isArray, isPointer = typeIn.isPointer, size = typeIn.size, parser = typeIn.parser, isStruct = typeIn.isStruct, isTrait = typeIn.isTrait, containedType = contained };
     }
 }

@@ -40,7 +40,7 @@ public class StructTrait : Base
 
             ParserTypeInformation retParserType = (ParserTypeInformation)proto.returnType;
             GeneratorTypeInformation retGenType = (GeneratorTypeInformation)retParserType;
-            LLVMTypeRef funcType = LLVM.FunctionType(retGenType.getLLVMType(), funcArgTypes, false);
+            LLVMTypeRef funcType = LLVM.FunctionType(retGenType.genType(), funcArgTypes, false);
             DebugConsole.Write(funcType);
             funcTypes.Add(LLVM.PointerType(funcType, 0));
         }

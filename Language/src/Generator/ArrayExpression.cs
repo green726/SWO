@@ -17,7 +17,7 @@ public class ArrayExpression : Expression
 
         arrExpr.type.size = arrExpr.length;
 
-        LLVMTypeRef typeLLVM = typeInfo.getLLVMType();
+        LLVMTypeRef typeLLVM = typeInfo.genType();
 
         DebugConsole.Write("array expr type: " + typeLLVM);
 

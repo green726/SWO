@@ -12,22 +12,21 @@ public class Type : AST.Node
     public bool isTrait = false;
 
     public bool isPointer;
-    private bool parsingArray = false;
+
+    public Type containedType = null;
 
     public Type(Util.Token token) : base(token)
     {
         this.nodeType = NodeType.Type;
         this.generator = new Generator.Type(this);
+        this.value = token.value;
 
         if (token.value.EndsWith("*"))
         {
-            DebugConsole.WriteAnsi("[red] detected pointer type(pre)[/]" + token.value);
             this.isPointer = true;
-            token.value = token.value.Substring(0, token.value.Length - 1);
-            DebugConsole.WriteAnsi("[red] detected pointer type(post)[/]" + token.value);
+            this.containedType = new Type(token.value.Substring(0, token.value.Length - 1), this);
         }
-
-        if (token.value.Contains("[") && token.value.IndexOf("]") > token.value.IndexOf("["))
+        else if (token.value.Contains("[") && token.value.IndexOf("]") > token.value.IndexOf("["))
         {
             this.isArray = true;
             //handles array types
@@ -51,10 +50,18 @@ public class Type : AST.Node
                 }
                 this.size = int.Parse(arrSizeStr);
             }
+            this.containedType = new Type(token.value.Substring(0, idxFirstBrack), this);
         }
 
-        this.value = token.value;
-        (this.isStruct, this.isTrait) = TypeInformation.checkForCustomType(this.value, parser);
+        if (this.containedType != null)
+        {
+            this.isStruct = this.containedType.isStruct;
+            this.isTrait = this.containedType.isTrait;
+        }
+        else
+        {
+            (this.isStruct, this.isTrait) = TypeInformation.checkForCustomType(this.value, parser);
+        }
     }
 
     public Type(string value, AST.Node parent) : base(parent)
@@ -64,13 +71,10 @@ public class Type : AST.Node
 
         if (value.EndsWith("*"))
         {
-            DebugConsole.WriteAnsi("[red] detected pointer type(pre)[/]" + value);
             this.isPointer = true;
-            value = value.Substring(0, value.Length - 1);
-            DebugConsole.WriteAnsi("[red] detected pointer type(post)[/]" + value);
+            this.containedType = new Type(value.Substring(0, value.Length - 1), this);
         }
-
-        if (value.Contains("[") && value.IndexOf("]") > value.IndexOf("["))
+        else if (value.Contains("[") && value.IndexOf("]") > value.IndexOf("["))
         {
             this.isArray = true;
             //handles array types
@@ -94,19 +98,27 @@ public class Type : AST.Node
                 }
                 this.size = int.Parse(arrSizeStr);
             }
+            this.containedType = new Type(value.Substring(0, idxFirstBrack), this);
         }
 
-        this.value = value;
-        (this.isStruct, this.isTrait) = TypeInformation.checkForCustomType(this.value, parser);
+        if (this.containedType != null)
+        {
+            this.isStruct = this.containedType.isStruct;
+            this.isTrait = this.containedType.isTrait;
+        }
+        else
+        {
+            (this.isStruct, this.isTrait) = TypeInformation.checkForCustomType(this.value, parser);
+        }
     }
 
     public string getContainedTypeString(AST.Node caller)
     {
-        if (!this.isArray)
+        if (this.containedType == null)
         {
-            throw ParserException.FactoryMethod("Attempted to get the contained type of a non-array", "Internal compiler error - make an issue on GitHub", caller, this);
+            throw ParserException.FactoryMethod("Attempted to get the contained type of a non-array / non-pointer type", "Internal compiler error - make an issue on GitHub", caller, this);
         }
-        return this.value.Remove(this.value.IndexOf("["));
+        return this.containedType.value;
     }
 
     public override void addChild(Util.Token child)
