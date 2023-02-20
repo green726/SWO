@@ -192,7 +192,8 @@ public class GeneratorTypeInformation : TypeInformation
                         basicType = LLVM.Int8Type();
                         break;
                     default:
-                        basicType = LLVM.PointerType(LLVM.GetTypeByName(gen.module, type.value), 0);
+                        // basicType = LLVM.PointerType(LLVM.GetTypeByName(gen.module, type.value), 0);
+                        basicType = LLVM.GetTypeByName(gen.module, type.value);
                         if (basicType.Pointer == IntPtr.Zero)
                         {
                             throw new GenException($"Type ({type}) not found | Remove it or replace it with a declared type");

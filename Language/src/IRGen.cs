@@ -259,7 +259,7 @@ public class IRGen
                     return (name, actualProto, idxInTraitVal);
                 }
             }
-            throw GenException.FactoryMethod($"No function with the name {nameToSearch} was found (AKSJDKAJSD)", "You tried to call a function that doesn't exist - possible typo in the function call or mismatch arguments", caller, true, nameToSearch);
+            throw GenException.FactoryMethod($"No function with the name {nameToSearch} was found", "You tried to call a function that doesn't exist - possible typo in the function call or mismatched arguments", caller, true, nameToSearch);
         }
 
         (string retName, AST.Prototype retProto) = checkProtoArgTypes(nameToSearch, caller, protosMatchingNameAndArgCount);

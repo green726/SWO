@@ -41,7 +41,7 @@ public class VariableDeclaration : Base
 
         if (varDec.type.isStruct && this.varDec.defaultValue.nodeType != AST.Node.NodeType.NullExpression)
         {
-            typeLLVM = gen.typeStack.Pop();
+            // typeLLVM = gen.typeStack.Pop();
             DebugConsole.Write("creating struct val ref: " + valRef);
             valRef = LLVM.BuildLoad(gen.builder, valRef, "structAssignmentLoad");
             DebugConsole.Write("struct val ref: " + valRef);
@@ -68,7 +68,7 @@ public class VariableDeclaration : Base
             if (varDec.local)
             {
                 LLVMValueRef allocaRef = LLVM.BuildAlloca(gen.builder, typeLLVM, varDec.name);
-                DebugConsole.Write(allocaRef);
+                DebugConsole.Write("allocaRef: " + allocaRef);
                 gen.valueStack.Push(allocaRef);
                 if (init)
                 {
