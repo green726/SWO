@@ -282,13 +282,13 @@ public class VariableExpression : Expression
     public LLVMValueRef generateVarLoad()
     {
         LLVMValueRef varRef = generateVarRef();
-        if (varRef.TypeOf().TypeKind == LLVMTypeKind.LLVMPointerTypeKind)
-        {
-            return LLVM.BuildLoad(gen.builder, varRef, varExpr.value);
-        }
-        else
-        {
+        // if (varRef.TypeOf().TypeKind == LLVMTypeKind.LLVMPointerTypeKind)
+        // {
+        //     return LLVM.BuildLoad(gen.builder, varRef, varExpr.value);
+        // }
+        // else
+        // {
             return varRef;
-        }
+        // }
     }
 }

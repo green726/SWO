@@ -124,7 +124,12 @@ public class FunctionCall : Base
             }
 
             funcCall.args[i].generator.generate();
-            argsRef[i] = gen.valueStack.Pop();
+            LLVMValueRef argVal = gen.valueStack.Pop();
+
+            if (funcRef.GetParams().Length > 0 && !argVal.TypeOf().Equals(funcRef.GetParams()[i].TypeOf())) {
+                argVal = LLVM.BuildBitCast(gen.builder, argVal, funcRef.GetParam((uint)i).TypeOf(), "argImplicitCast");
+            }
+            argsRef[i] = argVal;
         }
 
         DebugConsole.WriteAnsi("[purple]funcCall stuff below[/]");
