@@ -193,10 +193,18 @@ public class VariableExpression : Expression
     {
         if (varExpr.isArrayRef)
         {
-            DebugConsole.Write("gepping");
+            // if (ptr.TypeOf().TypeKind != LLVMTypeKind.LLVMPointerTypeKind)
+            // {
+            //     LLVMValueRef alloca = LLVM.BuildAlloca(gen.builder, ptr.TypeOf(), "ArrayPtrAlloca");
+            //     LLVM.BuildStore(gen.builder, ptr, alloca);
+            //     ptr = alloca;
+            // }
+            DebugConsole.Write("gepping with idx " + varExpr.arrayIndex);
             DebugConsole.Write(ptr);
-            //TODO: gep it
-            LLVMValueRef arrayGepRef = LLVM.BuildStructGEP(gen.builder, ptr, (uint)varExpr.arrayIndex, "ArrayGEP");
+
+            // LLVMValueRef arrayGepRef = LLVM.BuildStructGEP(gen.builder, ptr, (uint)varExpr.arrayIndex, "ArrayGEP");
+            LLVMValueRef arrayGepRef = LLVM.BuildGEP(gen.builder, ptr, new LLVMValueRef[] {/* LLVM.ConstInt(LLVM.Int64Type(), 0, false),  */LLVM.ConstInt(LLVM.Int64Type(), (uint)varExpr.arrayIndex, false)}, "ArrayGEP");
+            DebugConsole.Write(arrayGepRef);
             if (varExpr.parent.nodeType != AST.Node.NodeType.VariableAssignment)
             {
                 LLVMValueRef loadRef = LLVM.BuildLoad(gen.builder, arrayGepRef, "ArrayGEPLoad");

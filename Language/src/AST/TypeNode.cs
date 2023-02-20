@@ -17,6 +17,8 @@ public class Type : AST.Node
 
     public Type(Util.Token token) : base(token)
     {
+        DebugConsole.WriteAnsi("[purple]constructing typenode with value: [/]");
+        DebugConsole.Write(token.value);
         this.nodeType = NodeType.Type;
         this.generator = new Generator.Type(this);
         this.value = token.value;
@@ -24,6 +26,7 @@ public class Type : AST.Node
         if (token.value.EndsWith("*"))
         {
             this.isPointer = true;
+            DebugConsole.WriteAnsi("[blue]detected a pointer type and setting its contained type[/]");
             this.containedType = new Type(token.value.Substring(0, token.value.Length - 1), this);
         }
         else if (token.value.Contains("[") && token.value.IndexOf("]") > token.value.IndexOf("["))
@@ -69,6 +72,11 @@ public class Type : AST.Node
         this.nodeType = NodeType.Type;
         this.generator = new Generator.Type(this);
 
+        DebugConsole.WriteAnsi("[purple]value: [/]");
+        DebugConsole.Write(value);
+
+        this.value = value;
+
         if (value.EndsWith("*"))
         {
             this.isPointer = true;
@@ -108,6 +116,8 @@ public class Type : AST.Node
         }
         else
         {
+            DebugConsole.Write("value again: ");
+            DebugConsole.Write(value);
             (this.isStruct, this.isTrait) = TypeInformation.checkForCustomType(this.value, parser);
         }
     }

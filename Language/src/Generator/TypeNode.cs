@@ -15,7 +15,7 @@ public class Type : Base
     {
         base.generate();
 
-        GeneratorTypeInformation.genType((GeneratorTypeInformation)type, gen);
+        gen.typeStack.Push(GeneratorTypeInformation.genType((GeneratorTypeInformation)type, gen));
     }
 }
 

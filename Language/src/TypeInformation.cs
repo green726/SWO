@@ -21,7 +21,7 @@ public abstract class TypeInformation
     public TypeInformation(Parser parser)
     {
         this.parser = parser;
-        (this.isStruct, this.isTrait) = checkForCustomType(this.value, parser);
+        (this.isStruct, this.isTrait) = (false, false);
     }
 
     public TypeInformation(string value, Parser parser)
@@ -45,27 +45,27 @@ public abstract class TypeInformation
 
     public string getContainedType(AST.Node caller)
     {
-        if (!this.isArray)
+        if (!this.isArray && !this.isPointer)
         {
             throw ParserException.FactoryMethod("Attempted to get the contained type of a non-array", "Internal compiler error - make an issue on GitHub", caller, 179);
         }
-        string ret = this.value.Remove(this.value.IndexOf("["));
-        return (ret);
+        return this.containedType.value;
     }
 
     public string getContainedType()
     {
-        if (!this.isArray)
+        if (!this.isArray && !this.isPointer)
         {
             // throw ParserException.FactoryMethod("Attempted to get the contained of a non-array", "Internal compiler error - make an issue on GitHub", caller, this);
             throw new ParserException("Attempted to get the contained type of a non-array");
         }
-        string ret = this.value.Remove(this.value.IndexOf("["));
-        return (ret);
+        return this.containedType.value;
     }
 
     public static (bool, bool) checkForCustomType(string value, Parser parser)
     {
+        DebugConsole.Write("3RD GODDAMN VALUE:");
+        DebugConsole.Write(value);
         (bool isInt, int bits) = Parser.checkInt(value);
         if (isInt)
         {
@@ -87,6 +87,7 @@ public abstract class TypeInformation
                     // {
                     //     throw new GenException($"Type ({value}) not found | Remove it or replace it with a declared type");
                     // }
+
                     if (parser.declaredStructTraits.ContainsKey(value))
                     {
                         return (false, true);
@@ -113,23 +114,31 @@ public class GeneratorTypeInformation : TypeInformation
 
     public static explicit operator GeneratorTypeInformation(ParserTypeInformation infoIn)
     {
-        return new GeneratorTypeInformation(infoIn.parser) { value = infoIn.value, isPointer = infoIn.isPointer, isArray = infoIn.isArray, size = infoIn.size, isStruct = infoIn.isStruct, isTrait = infoIn.isTrait };
+        return new GeneratorTypeInformation(infoIn.parser) { value = infoIn.value, isPointer = infoIn.isPointer, isArray = infoIn.isArray, size = infoIn.size, isStruct = infoIn.isStruct, isTrait = infoIn.isTrait, containedType = infoIn.containedType };
         // return new GeneratorTypeInformation() { infoIn };
     }
 
     public static explicit operator GeneratorTypeInformation(AST.Type infoIn)
     {
-        return new GeneratorTypeInformation(infoIn.parser) { value = infoIn.value, isPointer = infoIn.isPointer, isArray = infoIn.isArray, size = infoIn.size, isStruct = infoIn.isStruct, isTrait = infoIn.isTrait };
+        GeneratorTypeInformation contained = null;
+        if (infoIn.containedType != null)
+        {
+            contained = (GeneratorTypeInformation)infoIn.containedType;
+        }
+        return new GeneratorTypeInformation(infoIn.parser) { value = infoIn.value, isPointer = infoIn.isPointer, isArray = infoIn.isArray, size = infoIn.size, isStruct = infoIn.isStruct, isTrait = infoIn.isTrait, containedType = contained };
     }
 
-    public LLVMTypeRef genType() {
+    public LLVMTypeRef genType()
+    {
         return genType(this, this.gen);
     }
 
     public static LLVMTypeRef genType(TypeInformation type, IRGen gen)
     {
+        DebugConsole.Write("gen type called with value: " + type.value);
         if (type.containedType != null)
         {
+            DebugConsole.Write("detected contained types");
             LLVMTypeRef containedType = genType(type.containedType, gen);
 
             if (type.isPointer)
@@ -138,11 +147,16 @@ public class GeneratorTypeInformation : TypeInformation
             }
             else if (type.isArray)
             {
+                if (type.size == 0)
+                {
+                    return LLVM.PointerType(containedType, 0);
+                }
                 return LLVM.ArrayType(containedType, (uint)type.size);
             }
         }
         else
         {
+            DebugConsole.Write("no contained types");
             LLVMTypeRef basicType;
             (bool isInt, int bits) = Parser.checkInt(type.value);
             if (isInt)
@@ -158,7 +172,12 @@ public class GeneratorTypeInformation : TypeInformation
                         break;
                     case "string":
                         //TODO: implement strings as stdlib so they can have a sane type
-                        basicType = LLVM.ArrayType(LLVM.Int8Type(), 0);
+                        if (type.size != 0) {
+                            basicType = LLVM.ArrayType(LLVM.Int8Type(), (uint)type.size);
+                        }
+                        else {
+                            basicType = LLVM.PointerType(LLVM.Int8Type(), 0);
+                        }
                         break;
                     case "null":
                         basicType = LLVM.VoidType();
@@ -199,13 +218,13 @@ public class GeneratorTypeInformation : TypeInformation
 
 public class ParserTypeInformation : TypeInformation
 {
-
     public ParserTypeInformation(string value, TypeInformation typeInfo) : this(value, typeInfo.parser) { }
 
     public ParserTypeInformation(string value) : this(value, Parser.getInstance()) { }
 
     public ParserTypeInformation(string value, Parser parser) : base(parser)
     {
+        this.value = value;
         if (value.EndsWith("*"))
         {
             this.isPointer = true;

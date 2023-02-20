@@ -47,7 +47,8 @@ public class Prototype : Base
                 DebugConsole.Write("arg type: " + arg.Value.value);
                 arg.Value.generator.generate();
                 DebugConsole.Write("arg: " + gen.typeStack.Peek());
-                arguments.Add(gen.typeStack.Pop());
+                LLVMTypeRef argType = gen.typeStack.Pop();
+                arguments.Add(argType);
             }
 
             GeneratorTypeInformation genTypeInfo = (GeneratorTypeInformation)(ParserTypeInformation)proto.returnType;
