@@ -145,6 +145,13 @@ public class IRGen
         return index;
     }
 
+    public bool isTypeMoreThanOnePointer(LLVMTypeRef type)
+    {
+        string typeString = type.PrintTypeToString();
+        int count = typeString.Count(f => f == '*');
+        return count > 1;
+    }
+
     public TypeInformation LLVMTypeToASTType(LLVMTypeRef type, AST.Node parent)
     {
         switch (type.TypeKind)

@@ -201,9 +201,17 @@ public class VariableExpression : Expression
             // }
             DebugConsole.Write("gepping with idx " + varExpr.arrayIndex);
             DebugConsole.Write(ptr);
+            DebugConsole.Write("typeof ptr: " + ptr.TypeOf() + " typekind: " + ptr.TypeOf().TypeKind);
 
-            // LLVMValueRef arrayGepRef = LLVM.BuildStructGEP(gen.builder, ptr, (uint)varExpr.arrayIndex, "ArrayGEP");
-            LLVMValueRef arrayGepRef = LLVM.BuildGEP(gen.builder, ptr, new LLVMValueRef[] {/* LLVM.ConstInt(LLVM.Int64Type(), 0, false),  */LLVM.ConstInt(LLVM.Int64Type(), (uint)varExpr.arrayIndex, false)}, "ArrayGEP");
+            LLVMValueRef arrayGepRef;
+            if (!gen.isTypeMoreThanOnePointer(ptr.TypeOf()))
+            {
+                arrayGepRef = LLVM.BuildStructGEP(gen.builder, ptr, (uint)varExpr.arrayIndex, "ArrayGEP");
+            }
+            else
+            {
+                arrayGepRef = LLVM.BuildGEP(gen.builder, ptr, new LLVMValueRef[] {/* LLVM.ConstInt(LLVM.Int64Type(), 0, false),  */LLVM.ConstInt(LLVM.Int64Type(), (uint)varExpr.arrayIndex, false) }, "ArrayGEP");
+            }
             DebugConsole.Write(arrayGepRef);
             if (varExpr.parent.nodeType != AST.Node.NodeType.VariableAssignment)
             {
