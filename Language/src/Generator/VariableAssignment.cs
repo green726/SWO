@@ -35,6 +35,7 @@ public class VariableAssignment : Base
         else
         {
             DebugConsole.WriteAnsi("[green]non bin reass detected[/]");
+            DebugConsole.Write(varAss.targetValue);
             varAss.targetValue.generator.generate();
             DebugConsole.Write("stack peek: " + gen.valueStack.Peek());
             LLVMValueRef resultValRef = gen.valueStack.Pop();

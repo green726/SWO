@@ -14,6 +14,7 @@ public class ForLoop : Base
 
     public override void generate()
     {
+        base.generate();
         //TODO: replace all the phi var stuff in here with normal SWO variables (mem2reg should optimize it all into phi vars)
         gen.addLayerToNamedValueStack();
 

@@ -67,6 +67,14 @@ public class ForLoop : AST.Node
             return;
         }
 
+        DebugConsole.WriteAnsi($"[green]adding child of type {child.nodeType} to for loop with parse iteration of {parseIteration}[/]");
+
+        if (child.nodeType == NodeType.VariableExpression)
+        {
+            parseIteration++;
+            return;
+        }
+
         switch (parseIteration)
         {
             case 0:
@@ -79,33 +87,31 @@ public class ForLoop : AST.Node
                 this.varDec = (AST.VariableDeclaration)child;
                 break;
             case 1:
-                if (child.nodeType != NodeType.VariableExpression)
-                {
-                    throw ParserException.FactoryMethod($"For Loop expected variable but found a {child.nodeType}", $"Remove the {child.nodeType} and replace it with a variable", child);
-                }
-                break;
-            case 2:
-                if (child.nodeType != NodeType.BinaryExpression)
+                if (child.nodeType != NodeType.BinaryExpression && child.nodeType != NodeType.VariableExpression)
                 {
                     throw ParserException.FactoryMethod($"For Loop expected binary expression but found a {child.nodeType}", $"Remove the {child.nodeType} and replace it with a binary expression", child);
                 }
-                this.loopCondition = (AST.BinaryExpression)child;
+                else if (child.nodeType == NodeType.BinaryExpression)
+                {
+                    this.loopCondition = (AST.BinaryExpression)child;
+                }
                 break;
-            case 4:
+            case 2:
                 if (child.nodeType != NodeType.VariableAssignment)
                 {
-                    throw ParserException.FactoryMethod($"For Loop expected variable but found a {child.nodeType}", $"Remove the {child.nodeType} and replace it with a variable", child);
+                    throw ParserException.FactoryMethod($"For Loop expected variable assignment but found a {child.nodeType}", $"Remove the {child.nodeType} and replace it with a variable assignment", child);
                 }
                 this.loopIteration = (AST.VariableAssignment)child;
                 break;
         }
         parseIteration++;
-
     }
 
     public override void removeChild(AST.Node child)
     {
+        DebugConsole.WriteAnsi($"[yellow]removing child of type {child.nodeType} from for loop with parse iteration (before decrement) of {parseIteration}[/]");
         base.removeChild(child);
         body.Remove(child);
+        parseIteration -= 1;
     }
 }

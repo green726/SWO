@@ -9,15 +9,42 @@ public class FunctionCall : Base
 
     AST.Prototype proto;
 
+    static string[] builtinNames = { "sizeof" };
+
     public FunctionCall(AST.Node node)
     {
         this.funcCall = (AST.FunctionCall)node;
+    }
+
+    public void generateBuiltin()
+    {
+        switch (funcCall.functionName)
+        {
+            case "sizeof":
+                if (funcCall.args.Count > 1)
+                {
+                    throw GenException.FactoryMethod("sizeof builtin takes only a single argument", "Remove the excess arguments", funcCall);
+                }
+                funcCall.args[0].generator.generate();
+                LLVMValueRef arg = gen.valueStack.Pop();
+                LLVMValueRef sizeOf = LLVM.SizeOf(arg.TypeOf());
+                gen.valueStack.Push(sizeOf);
+                break;
+            default:
+                throw new Exception("Unimplemented");
+        }
     }
 
     public override void generate()
     {
         base.generate();
         string nameToSearch = "";
+
+        if (builtinNames.Contains(funcCall.functionName))
+        {
+            generateBuiltin();
+            return;
+        }
 
         LLVMValueRef funcRef;
         if (funcCall.parser.declaredFuncs.ContainsKey(funcCall.functionName))
@@ -126,7 +153,8 @@ public class FunctionCall : Base
             funcCall.args[i].generator.generate();
             LLVMValueRef argVal = gen.valueStack.Pop();
 
-            if (funcRef.GetParams().Length > 0 && !argVal.TypeOf().Equals(funcRef.GetParams()[i].TypeOf())) {
+            if (funcRef.GetParams().Length > 0 && !argVal.TypeOf().Equals(funcRef.GetParams()[i].TypeOf()))
+            {
                 argVal = LLVM.BuildBitCast(gen.builder, argVal, funcRef.GetParam((uint)i).TypeOf(), "argImplicitCast");
             }
             argsRef[i] = argVal;

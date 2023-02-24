@@ -12,23 +12,23 @@ public class VariableExpression : Expression
         this.varExpr = (AST.VariableExpression)node;
     }
 
-    public void checkIsPtr()
-    {
-        switch (varExpr.parent?.nodeType)
-        {
-            case AST.Node.NodeType.VariableExpression:
-                AST.VariableExpression varExprPar = (AST.VariableExpression)varExpr.parent;
-                varExpr.isReference = varExprPar.isReference;
-                break;
-            case AST.Node.NodeType.IndexReference:
-                AST.IndexReference idxPar = (AST.IndexReference)varExpr.parent;
-                // varExpr.isReference = idxPar.isPointer;
-                break;
-                // case AST.Node.NodeType.Reference:
-                //     varExpr.isReference = true;
-                //     break;
-        }
-    }
+    // public void checkIsPtr()
+    // {
+    //     switch (varExpr.parent?.nodeType)
+    //     {
+    //         case AST.Node.NodeType.VariableExpression:
+    //             AST.VariableExpression varExprPar = (AST.VariableExpression)varExpr.parent;
+    //             varExpr.isReference = varExprPar.isReference;
+    //             break;
+    //         case AST.Node.NodeType.IndexReference:
+    //             AST.IndexReference idxPar = (AST.IndexReference)varExpr.parent;
+    //             // varExpr.isReference = idxPar.isPointer;
+    //             break;
+    //             // case AST.Node.NodeType.Reference:
+    //             //     varExpr.isReference = true;
+    //             //     break;
+    //     }
+    // }
 
     public void updateCurrentStruct(LLVMValueRef parRef, int index)
     {
@@ -90,7 +90,8 @@ public class VariableExpression : Expression
             string strName = handleLLVMTypeBeingStupid(strValRef.TypeOf().PrintTypeToString());
             // string strName = strValRef.TypeOf().GetStructName();
 
-            DebugConsole.WriteAnsi("[purple]strName: " + strName + "[/]");
+            DebugConsole.WriteAnsi("[purple]strName: [/]");
+            DebugConsole.Write(strName);
 
             if (strName.EndsWith("*"))
             {
@@ -121,7 +122,7 @@ public class VariableExpression : Expression
         GeneratorTypeInformation exprGenTypeInfo = (GeneratorTypeInformation)varExpr.type;
         LLVMTypeRef varExprTypeLLVM = exprGenTypeInfo.genType();
 
-        if (varExpr?.parent?.nodeType == AST.Node.NodeType.VariableExpression || varExpr?.parent?.nodeType == AST.Node.NodeType.IndexReference || varExpr?.parent?.parent?.nodeType == AST.Node.NodeType.VariableExpression && varExpr.parent.nodeType != AST.Node.NodeType.FunctionCall)
+        if (varExpr?.parent?.nodeType == AST.Node.NodeType.VariableExpression/*  || varExpr?.parent?.nodeType == AST.Node.NodeType.IndexReference || varExpr?.parent?.parent?.nodeType == AST.Node.NodeType.VariableExpression && varExpr.parent.nodeType != AST.Node.NodeType.FunctionCall */)
         {
             int num = 0;
             LLVMValueRef gepPtr = gen.valueStack.Pop();
@@ -137,20 +138,15 @@ public class VariableExpression : Expression
             gen.valueStack.Push(numGEPRef);
             DebugConsole.Write("successfully built gep");
 
-            checkIsPtr();
+            // checkIsPtr();
 
             if (!varExpr.isReference/*  && varExpr.children.Count() == 0 */)
             {
                 LLVMValueRef numGEPRefLoad = LLVM.BuildLoad(gen.builder, numGEPRef, "structGEPLoad");
                 gen.valueStack.Push(numGEPRefLoad);
                 DebugConsole.Write(numGEPRefLoad);
-                generateArrayGEP(numGEPRefLoad);
+                // generateArrayGEP(numGEPRefLoad);
             }
-            else
-            {
-                generateArrayGEP(numGEPRef);
-            }
-
 
             //NOTE: incase this iteself is another struct set the current struct to this for the rest of its children
             updateCurrentStruct(gepPtr, num);
@@ -167,59 +163,21 @@ public class VariableExpression : Expression
                 DebugConsole.Write("ptr var expr detected");
                 LLVMValueRef varRef = generateVarRef();
                 gen.valueStack.Push(varRef);
-                generateArrayGEP(varRef);
             }
             else
             {
-                if (!varExpr.isArrayRef)
-                {
-                    DebugConsole.Write("generating load ref");
-                    LLVMValueRef loadRef = generateVarLoad();
-                    gen.valueStack.Push(loadRef);
-                }
-                else
-                {
-                    generateArrayGEP(generateVarRef());
-                }
+                DebugConsole.Write("generating load ref");
+                LLVMValueRef loadRef = generateVarLoad();
+                gen.valueStack.Push(loadRef);
             }
 
             updateCurrentStruct();
 
+            DebugConsole.Write("updated current struct");
+
             genChildren();
-        }
-    }
-
-    public void generateArrayGEP(LLVMValueRef ptr)
-    {
-        if (varExpr.isArrayRef)
-        {
-            // if (ptr.TypeOf().TypeKind != LLVMTypeKind.LLVMPointerTypeKind)
-            // {
-            //     LLVMValueRef alloca = LLVM.BuildAlloca(gen.builder, ptr.TypeOf(), "ArrayPtrAlloca");
-            //     LLVM.BuildStore(gen.builder, ptr, alloca);
-            //     ptr = alloca;
-            // }
-            DebugConsole.Write("gepping with idx " + varExpr.arrayIndex);
-            DebugConsole.Write(ptr);
-            DebugConsole.Write("typeof ptr: " + ptr.TypeOf() + " typekind: " + ptr.TypeOf().TypeKind);
-
-            LLVMValueRef arrayGepRef;
-            if (!gen.isTypeMoreThanOnePointer(ptr.TypeOf()))
-            {
-                arrayGepRef = LLVM.BuildStructGEP(gen.builder, ptr, (uint)varExpr.arrayIndex, "ArrayGEP");
-            }
-            else
-            {
-                arrayGepRef = LLVM.BuildGEP(gen.builder, ptr, new LLVMValueRef[] {/* LLVM.ConstInt(LLVM.Int64Type(), 0, false),  */LLVM.ConstInt(LLVM.Int64Type(), (uint)varExpr.arrayIndex, false) }, "ArrayGEP");
-            }
-            DebugConsole.Write(arrayGepRef);
-            if (varExpr.parent.nodeType != AST.Node.NodeType.VariableAssignment)
-            {
-                LLVMValueRef loadRef = LLVM.BuildLoad(gen.builder, arrayGepRef, "ArrayGEPLoad");
-                gen.valueStack.Push(loadRef);
-            }
-            // gen.valueStack.Push(arrayGepRef);
-            DebugConsole.Write("done gepping");
+            DebugConsole.Write("generated children");
+            return;
         }
     }
 
@@ -253,6 +211,7 @@ public class VariableExpression : Expression
             DebugConsole.WriteAnsi("[green]detected variable in scope[/]");
             // varRef = namedValuesLLVM[varExpr.value];
             varRef = gen.getNamedValueInScope(varExpr.value);
+            DebugConsole.Write("got value in scope");
             if (varRef.Pointer != IntPtr.Zero)
             {
                 return varRef;
@@ -282,13 +241,14 @@ public class VariableExpression : Expression
     public LLVMValueRef generateVarLoad()
     {
         LLVMValueRef varRef = generateVarRef();
-        // if (varRef.TypeOf().TypeKind == LLVMTypeKind.LLVMPointerTypeKind)
-        // {
-        //     return LLVM.BuildLoad(gen.builder, varRef, varExpr.value);
-        // }
-        // else
-        // {
+        DebugConsole.Write("received varRef from generate var load");
+        if (varRef.TypeOf().TypeKind == LLVMTypeKind.LLVMPointerTypeKind)
+        {
+            return LLVM.BuildLoad(gen.builder, varRef, varExpr.value);
+        }
+        else
+        {
             return varRef;
-        // }
+        }
     }
 }

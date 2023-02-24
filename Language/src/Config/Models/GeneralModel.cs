@@ -14,6 +14,30 @@ public class GeneralModel
 
     public ProjectModel project { get; set; } = new ProjectModel();
 
+    public BindingGeneratorModel bindings { get; set; } = new BindingGeneratorModel();
+
+}
+
+public class BindingGeneratorModel
+{
+    public string clangPath { get; set; } = "";
+
+    public BindingGeneratorModel()
+    {
+        if (clangPath == "")
+        {
+            switch (Util.checkOs())
+            {
+                // case "win10-x64":
+                //     clangPath = @"C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin\gcc.exe";
+                //     break;
+                case "linux-x64":
+                    clangPath = @"/usr/bin/clang";
+                    break;
+            }
+
+        }
+    }
 }
 
 public class ProjectModel

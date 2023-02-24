@@ -108,7 +108,6 @@ public class Struct : Node
         {
             VariableExpression varExpr = (VariableExpression)child;
             this.name = varExpr.value;
-            parser.typeList.Add(this.name);
             parser.declaredStructs.Add(this.name, this);
             this.type = new ParserTypeInformation(this.name);
             base.addChild(child);
@@ -140,7 +139,6 @@ public class Struct : Node
         {
             this.name = child.value;
             this.type = new ParserTypeInformation(this.name);
-            parser.typeList.Add(this.name);
             parser.declaredStructs.Add(this.name, this);
         }
         else if (child.value == "{" || child.value == "}")

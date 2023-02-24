@@ -30,15 +30,14 @@ public class VariableAssignment : AST.Node
                 this.children.Add(prevVarExpr);
 
                 this.parent = parser.lastMajorParentNode;
+                DebugConsole.Write("variable assignment last major parent node: " + this.parent.nodeType);
                 this.parent?.addChild(this);
             }
-
             else
             {
                 this.parent = parent;
                 this.parent?.addChild(this);
             }
-
 
             this.childLoop = 0;
         }
@@ -59,9 +58,9 @@ public class VariableAssignment : AST.Node
         {
             DebugConsole.WriteAnsi("[yellow]compound var ass detected[/]");
             string tokenOp = token.value.Remove(1);
-            //TODO: handle compound ops like +=
+
             this.binReassignment = true;
-            this.bin = new BinaryExpression(varExpr!, new Util.Token(Util.TokenType.Operator, tokenOp, token.line, token.column), parent);
+            this.bin = new BinaryExpression(varExpr, new Util.Token(Util.TokenType.Operator, tokenOp, token.line, token.column), this);
         }
     }
 
@@ -83,10 +82,12 @@ public class VariableAssignment : AST.Node
         DebugConsole.Write("adding child of node type " + node.nodeType + " to varass with loop iteration of: " + childLoop);
         if (this.binReassignment == true)
         {
+            if (node == this.bin) {
+                return;
+            }
             this.bin.addChild(node);
             DebugConsole.WriteAnsi("[yellow]adding child to varass bin[/]");
             childLoop++;
-            base.addChild(node);
             return;
         }
         switch (childLoop)

@@ -51,7 +51,6 @@ public class FunctionCall : Expression
 
     public override void addChild(AST.Node child)
     {
-
         base.addChild(child);
         args.Add((AST.Expression)child);
     }

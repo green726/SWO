@@ -119,6 +119,7 @@ public class BinaryExpression : Expression
         this.rightHand = (AST.Expression)child;
         if (prevRightHand.nodeType == NodeType.Empty)
         {
+            DebugConsole.Write("binary expression adding child to its parent (type " + this.parent.nodeType + ")");
             this.parent.addChild(this);
         }
         checkPrecedence();

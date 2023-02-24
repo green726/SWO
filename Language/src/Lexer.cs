@@ -89,16 +89,16 @@ public static class Lexer
                     lastChar = ch;
                     stringBuilder = new StringBuilder();
                     continue;
-                    // case '[':
-                    //     lexDelimiter(Util.TokenType.DelimiterOpen, stringBuilder, ch, line, column, charNum);
-                    //     lastChar = ch;
-                    //     stringBuilder = new StringBuilder();
-                    //     continue;
-                    // case ']':
-                    //     lexDelimiter(Util.TokenType.DelimiterClose, stringBuilder, ch, line, column, charNum);
-                    //     lastChar = ch;
-                    //     stringBuilder = new StringBuilder();
-                    //     continue;
+                case '[':
+                    lexDelimiter(Util.TokenType.DelimiterOpen, stringBuilder, ch, line, column, charNum);
+                    lastChar = ch;
+                    stringBuilder = new StringBuilder();
+                    continue;
+                case ']':
+                    lexDelimiter(Util.TokenType.DelimiterClose, stringBuilder, ch, line, column, charNum);
+                    lastChar = ch;
+                    stringBuilder = new StringBuilder();
+                    continue;
             }
 
             if (ch == '"')

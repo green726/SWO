@@ -68,7 +68,7 @@ public abstract class Node
         this.parentParser = parser.parentParser;
         this.generator = new Generator.Empty(this);
         this.parent = parent;
-        this.parent.addChild(this);
+        // this.parent.addChild(this);
         // this.parser.previousNode = this;
     }
 

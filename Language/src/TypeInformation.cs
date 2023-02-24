@@ -62,10 +62,62 @@ public abstract class TypeInformation
         return this.containedType.value;
     }
 
+    public static bool isValidType(ParserTypeInformation type)
+    {
+        if (type.isPointer || type.isArray)
+        {
+            return isValidType((ParserTypeInformation)type.containedType);
+        }
+
+        else
+        {
+            (bool isInt, int bits) = Parser.checkInt(type.value); if (isInt)
+            {
+                return true;
+            }
+
+            switch (type.value)
+            {
+                case "double":
+                case "string":
+                case "null":
+                case "bool":
+                case "void":
+                case "char":
+                    return true;
+                default:
+                    if (type.parser.declaredStructs.ContainsKey(type.value))
+                    {
+                        return true;
+                    }
+                    else if (type.parser.declaredStructTraits.ContainsKey(type.value))
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+            }
+        }
+    }
+
+    public static bool isValidType(string value, Parser parser)
+    {
+        try
+        {
+            ParserTypeInformation typeInfo = new ParserTypeInformation(value, parser);
+            return isValidType(typeInfo);
+        }
+        catch
+        {
+            return false;
+        }
+
+    }
+
     public static (bool, bool) checkForCustomType(string value, Parser parser)
     {
-        DebugConsole.Write("3RD GODDAMN VALUE:");
-        DebugConsole.Write(value);
         (bool isInt, int bits) = Parser.checkInt(value);
         if (isInt)
         {
@@ -172,10 +224,12 @@ public class GeneratorTypeInformation : TypeInformation
                         break;
                     case "string":
                         //TODO: implement strings as stdlib so they can have a sane type
-                        if (type.size != 0) {
+                        if (type.size != 0)
+                        {
                             basicType = LLVM.ArrayType(LLVM.Int8Type(), (uint)type.size);
                         }
-                        else {
+                        else
+                        {
                             basicType = LLVM.PointerType(LLVM.Int8Type(), 0);
                         }
                         break;
@@ -267,8 +321,6 @@ public class ParserTypeInformation : TypeInformation
         {
             (this.isStruct, this.isTrait) = TypeInformation.checkForCustomType(this.value, parser);
         }
-
-
     }
 
     public static explicit operator ParserTypeInformation(string strIn)

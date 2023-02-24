@@ -17,16 +17,32 @@ public class Type : AST.Node
 
     public Type(Util.Token token) : base(token)
     {
-        DebugConsole.WriteAnsi("[purple]constructing typenode with value: [/]");
-        DebugConsole.Write(token.value);
+        //TODO: check if the parsers next non space is a bracket and if so advance the parser token and incoroprate the array into this things token
         this.nodeType = NodeType.Type;
         this.generator = new Generator.Type(this);
+
+        if (parser.nextNonSpace().value == "[")
+        {
+            for (int i = 1; i < 4; i++)
+            {
+                token.value += parser.tokenList[parser.currentTokenNum + i].value;
+            }
+            //NOTE: adds 3 to skip the rest of the array (minus one b/c the parser will also increment)
+            /*
+                0 = int
+                1 = [
+                2 = 12301230
+                3 = ]
+                4 = akdsjaksdjjashsdkjahsjd
+            */
+            parser.currentTokenNum += 3;
+        }
+
         this.value = token.value;
 
         if (token.value.EndsWith("*"))
         {
             this.isPointer = true;
-            DebugConsole.WriteAnsi("[blue]detected a pointer type and setting its contained type[/]");
             this.containedType = new Type(token.value.Substring(0, token.value.Length - 1), this);
         }
         else if (token.value.Contains("[") && token.value.IndexOf("]") > token.value.IndexOf("["))
@@ -72,8 +88,23 @@ public class Type : AST.Node
         this.nodeType = NodeType.Type;
         this.generator = new Generator.Type(this);
 
-        DebugConsole.WriteAnsi("[purple]value: [/]");
-        DebugConsole.Write(value);
+
+        if (parser.nextNonSpace().value == "[")
+        {
+            for (int i = 1; i < 4; i++)
+            {
+                value += parser.tokenList[parser.currentTokenNum + i].value;
+            }
+            //NOTE: adds 3 to skip the rest of the array (minus one b/c the parser will also increment)
+            /*
+                0 = int
+                1 = [
+                2 = 12301230
+                3 = ]
+                4 = akdsjaksdjjashsdkjahsjd
+            */
+            parser.currentTokenNum += 3;
+        }
 
         this.value = value;
 
@@ -116,8 +147,6 @@ public class Type : AST.Node
         }
         else
         {
-            DebugConsole.Write("value again: ");
-            DebugConsole.Write(value);
             (this.isStruct, this.isTrait) = TypeInformation.checkForCustomType(this.value, parser);
         }
     }

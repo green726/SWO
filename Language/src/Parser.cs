@@ -62,9 +62,6 @@ public class Parser
     public Dictionary<string, AST.Struct> declaredStructs = new Dictionary<string, AST.Struct>();
     public Dictionary<string, AST.StructTrait> declaredStructTraits = new Dictionary<string, AST.StructTrait>();
 
-    //NOTE: below can be used to add user defined types (structs/classes)
-    public List<string> typeList = new List<string>() { "double", "float", "string" };
-
     //NOTE: below are all for the while loop func
     public int finalTokenNum = 0;
     public int currentTokenNum = -1;
@@ -165,22 +162,12 @@ public class Parser
 
     public bool isType(Util.Token token)
     {
-        if (typeList.Contains(token.value))
-        {
-            return true;
-        }
-        (bool isInt, int bits) = checkInt(token.value);
-        return isInt;
+        return TypeInformation.isValidType(token.value, this);
     }
 
     public bool isType(string value)
     {
-        if (typeList.Contains(value))
-        {
-            return true;
-        }
-        (bool isInt, int bits) = checkInt(value);
-        return isInt;
+        return TypeInformation.isValidType(value, this);
     }
 
     public static (bool, int) checkInt(string value)
@@ -705,7 +692,7 @@ public class Parser
         if (!Config.settings.variable.declaration.keyword.forced)
         {
             (Util.Token twoToks, int twoToksIdx) = nextNonSpace(nextTokenIndex);
-            if (twoToks.value == "=" || twoToks.value == Config.settings.variable.declaration.keyword.mutable)
+            if (parent.nodeType != AST.Node.NodeType.IndexReference && twoToks.value == "=" || twoToks.value == Config.settings.variable.declaration.keyword.mutable)
             {
                 DebugConsole.WriteAnsi("[red]detected no keyword variable dec with equals[/]");
                 AST.VariableDeclaration varDec = new AST.VariableDeclaration(token, parent);
@@ -746,12 +733,16 @@ public class Parser
 
         }
 
-
         //below can handle the nested variable expressions
         //TODO: replace this in favor of special char handling
         AST.VariableExpression varExpr = new AST.VariableExpression(token, parent);
         if (parent.nodeType != AST.Node.NodeType.VariableExpression)
         {
+            if (nextNonSpace().value != "." && nextNonSpace().value != "[" && nextNonSpace().type != Util.TokenType.Operator && nextNonSpace().type != Util.TokenType.AssignmentOp)
+            {
+                DebugConsole.Write("not returning var expr as parent");
+                return (parent, delimLevel);
+            }
             DebugConsole.Write("returning var expr");
             return (varExpr, delimLevel);
         }
@@ -760,19 +751,25 @@ public class Parser
 
     public (AST.Node parent, int delimLevel) parseDelim(Util.Token token, int tokenIndex, AST.Node parent, int delimLevel = 0)
     {
+        if (token.value == "[" && parent.isExpression)
+        {
+            delimParentStack.Push(parent);
+            parent = new AST.IndexReference(token, parent);
+            delimLevel++;
+            return (parent, delimLevel);
+        }
+        else if (token.value == "]" && parent.isExpression)
+        {
+            parent = delimParentStack.Pop();
+            delimLevel--;
+            return (parent, delimLevel);
+        }
         if (token.type == Util.TokenType.DelimiterOpen)
         {
-            // if (token.value == "[" && parent?.nodeType != AST.Node.NodeType.VariableDeclaration)
-            // {
-            //     parent = new AST.IndexReference(token, parent);
-            //     delimParentStack.Push(parent);
-            //     delimLevel++;
-            //     return (parent, delimLevel);
-            // }
             bool addLayer = true;
             if (token.value == "(")
             {
-                if (parent.nodeType != AST.Node.NodeType.FunctionCall && parent.nodeType != AST.Node.NodeType.Prototype && parent.nodeType != AST.Node.NodeType.IfStatement && parent.nodeType != AST.Node.NodeType.IfStatementConditional && parent.nodeType != AST.Node.NodeType.ElseIfStatement && parent.nodeType != AST.Node.NodeType.ElseIfStatementConditional)
+                if (parent.nodeType != AST.Node.NodeType.FunctionCall && parent.nodeType != AST.Node.NodeType.Prototype && parent.nodeType != AST.Node.NodeType.IfStatement && parent.nodeType != AST.Node.NodeType.IfStatementConditional && parent.nodeType != AST.Node.NodeType.ElseIfStatement && parent.nodeType != AST.Node.NodeType.ElseIfStatementConditional && parent.nodeType != AST.Node.NodeType.ForLoop)
                 {
                     //NOTE: code to handle parens being used to encapsulate other nodes. ie PEMDAS, anonymous funcs, etc
                     delimLevel++;
@@ -1029,7 +1026,6 @@ public class Parser
 
         if (singleLineComment || multiLineComment)
         {
-
             return;
         }
 
@@ -1160,6 +1156,24 @@ public class Parser
                 {
                     parent?.addChild(token);
                     return;
+                }
+                else if (token.value == ",")
+                {
+                    if (parent?.nodeType == AST.Node.NodeType.VariableExpression)
+                    {
+                        parent = parent?.parent;
+                        while (parent?.nodeType == AST.Node.NodeType.VariableExpression)
+                        {
+                            parent = parent?.parent;
+                        }
+                        parent?.addChild(token);
+                        return;
+                    }
+                    else
+                    {
+                        parent?.addChild(token);
+                        return;
+                    }
                 }
                 else
                 {

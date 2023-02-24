@@ -29,9 +29,10 @@ public class IndexReference : Base
 
     public override void generate()
     {
+        base.generate();
         DebugConsole.WriteAnsi("[green]genning arr gep[/]");
         LLVMValueRef varRef = gen.valueStack.Pop();
-        DebugConsole.Write(varRef);
+        DebugConsole.Write("var ref: " + varRef);
         LLVMValueRef gepRef = generateGEP(varRef);
         DebugConsole.Write(gepRef);
         gen.valueStack.Push(gepRef);
@@ -43,21 +44,18 @@ public class IndexReference : Base
             gen.valueStack.Push(gepLoadRef);
             DebugConsole.Write(gepLoadRef);
         }
-
         else
         {
+            DebugConsole.WriteAnsi("[red]genning index ref children[/]");
             foreach (AST.Node child in idx.children)
             {
                 child.generator.generate();
             }
         }
-
-        return;
     }
 
     public LLVMValueRef generateGEP(LLVMValueRef varPtr)
     {
-        List<LLVMValueRef> childValueList = new List<LLVMValueRef>();
 
         LLVMTypeRef varType = varPtr.TypeOf();
 
@@ -65,22 +63,27 @@ public class IndexReference : Base
 
         DebugConsole.Write(LLVM.GetTypeKind(varType));
 
-        if (LLVM.GetTypeKind(varType) != LLVMTypeKind.LLVMPointerTypeKind)
-        {
-            int arraySize = (int)LLVM.GetArrayLength(varType);
-            if (Config.settings.variable.arrays.outOfBoundsErrorEnabled && idx.numExpr.value > arraySize)
-            {
-                throw GenException.FactoryMethod("Index out of range", "Make the index in range", idx);
-            }
-        }
+        // if (LLVM.GetTypeKind(varType) != LLVMTypeKind.LLVMPointerTypeKind)
+        // {
+        //     int arraySize = (int)LLVM.GetArrayLength(varType);
+        //     if (Config.settings.variable.arrays.outOfBoundsErrorEnabled && idx.numExpr.value > arraySize)
+        //     {
+        //         throw GenException.FactoryMethod("Index out of range", "Make the index in range", idx);
+        //     }
+        // }
 
         //BUG: this might need to go before the out of range checking in case there is an offset - idk
-        idx.numExpr.value += Config.settings.variable.arrays.startIndex;
-        idx.numExpr.generator.generate();
-        DebugConsole.Write(gen.valueStack.Peek());
-        childValueList.Add(gen.valueStack.Pop());
+        // idx.expr.value += Config.settings.variable.arrays.startIndex;
+        
+        DebugConsole.Write("generating indexRef expr");
+        idx.expr.generator.generate();
+        DebugConsole.Write("generated indexRef expr");
 
-        return LLVM.BuildStructGEP(gen.builder, varPtr, (uint)idx.numExpr.value, "idxGEP");
+        LLVMValueRef indexExpr = gen.valueStack.Pop();
+        DebugConsole.Write("index expr: " + indexExpr);
+        DebugConsole.Write("var ptr: " + varPtr);
 
+        return LLVM.BuildGEP(gen.builder, varPtr, new LLVMValueRef[] { LLVM.ConstInt(LLVM.Int32Type(), 0, false), indexExpr }, "idxGEP");
+        // return LLVM.BuildStructGEP(gen.builder, varPtr, (uint)idx.numExpr.value, "idxGEP");
     }
 }
