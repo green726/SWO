@@ -4,7 +4,6 @@ using Spectre.Console;
 public class IndexReference : Expression
 {
     public Expression expr;
-    public bool isPointer = false;
 
     public IndexReference(Util.Token token, AST.Node parent) : base(token, parent)
     {

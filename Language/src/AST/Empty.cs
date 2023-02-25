@@ -2,7 +2,7 @@ namespace AST;
 
 public class Empty : Expression
 {
-    public Empty() : base()
+    public Empty() : base(true)
     {
         this.nodeType = NodeType.Empty;
     }

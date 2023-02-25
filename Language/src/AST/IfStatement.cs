@@ -18,6 +18,8 @@ public class IfStatement : AST.Node
         this.generator = new Generator.IfStatement(this);
 
         this.conditional = new IfStatementConditional(token, this);
+        this.parent = parent;
+        this.parent.addChild(this);
     }
 
     public override void addChild(Util.Token child)
@@ -63,6 +65,7 @@ public class IfStatementConditional : Node
         this.nodeType = NodeType.IfStatementConditional;
         // this.generator = new Generator.IfStatementConditional(this);
         this.parent = parent;
+        this.parent.addChild(this);
     }
 
     public override void addChild(Util.Token child)
@@ -88,18 +91,21 @@ public class IfStatementConditional : Node
 
     public override void removeChild(Node child)
     {
+        DebugConsole.Write("if stat cond remove child called with type of: " + child.nodeType);
         this.condition = new AST.Empty();
         base.removeChild(child);
     }
 
     public override void addChild(Node child)
     {
-        if (this.condition.nodeType == NodeType.Empty)
+        DebugConsole.Write("adding child to if stat conditional with type of: " + child.nodeType);
+        if (this.condition.nodeType == NodeType.Empty || this.condition == null)
         {
             if (!child.isExpression)
             {
                 throw ParserException.FactoryMethod("A non expression was used as a conditional in an if statement", "Remove it and replace it with an expression (ie foo == bar) or (funcThatReturnsBool())", child, this);
             }
+            DebugConsole.Write("setting condition of if stat cond");
             this.condition = (AST.Expression)child;
         }
         // else if (this.condition.nodeType == NodeType.Empty)

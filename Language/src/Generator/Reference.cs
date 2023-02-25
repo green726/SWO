@@ -21,10 +21,12 @@ public class Reference : Expression
         DebugConsole.WriteAnsi($"[blue]valueRef: [/]");
         DebugConsole.Write(valRef);
 
-        LLVMTypeRef typeRef = LLVM.TypeOf(valRef);
+        gen.valueStack.Push(valRef);
 
-        DebugConsole.WriteAnsi($"[blue]typeRef: [/]");
-        DebugConsole.Write(typeRef);
+        // LLVMTypeRef typeRef = LLVM.TypeOf(valRef);
+
+        // DebugConsole.WriteAnsi($"[blue]typeRef: [/]");
+        // DebugConsole.Write(typeRef);
 
         // if (typeRef.TypeKind == LLVMTypeKind.LLVMPointerTypeKind)
         // {
@@ -33,13 +35,13 @@ public class Reference : Expression
         //     return;
         // }
 
-        LLVMTypeRef ptrType = LLVM.PointerType(typeRef, 0);
+        // LLVMTypeRef ptrType = LLVM.PointerType(typeRef, 0);
 
-        LLVMValueRef ptrValue = LLVM.BuildPointerCast(gen.builder, valRef, ptrType, "ptrCast");
+        // LLVMValueRef ptrValue = LLVM.BuildPointerCast(gen.builder, valRef, ptrType, "ptrCast");
 
-        DebugConsole.WriteAnsi("[red]ref pointer val: [/]");
-        DebugConsole.Write(ptrValue);
+        // DebugConsole.WriteAnsi("[red]ref pointer val: [/]");
+        // DebugConsole.Write(ptrValue);
 
-        gen.valueStack.Push(ptrValue);
+        // gen.valueStack.Push(ptrValue);
     }
 }

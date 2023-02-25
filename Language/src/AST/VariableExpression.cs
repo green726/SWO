@@ -13,22 +13,7 @@ public class VariableExpression : Expression
         this.parent = parent;
         this.newLineReset = true;
 
-        // if (Parser.isAnArrayRef(token))
-        // {
-        //     DebugConsole.Write($"isArrayRef (from var expr constructor) {token.value}");
-        //     this.value = token.value.Remove(token.value.IndexOf("["));
-        //     this.isArrayRef = true;
-        //     DebugConsole.Write(token.value.Substring(token.value.IndexOf("[") + 1, token.value.IndexOf("]") - token.value.IndexOf("[") - 1));
-        //     // this.arrayIndex = int.Parse(token.value.Substring(token.value.IndexOf("[") + 1, token.value.IndexOf("]") - token.value.IndexOf("[") - 1));
-        //     DebugConsole.Write(this.arrayIndex);
-        //     this.unmodifiedVal = token.value;
-        //     handleArrayRefConstruction(token, parentRequired);
-        //     return;
-        // }
-        // else
-        // {
         this.value = token.value;
-        // }
 
         //NOTE:  below is the absolute BS for structs
         DebugConsole.Write(this.value);
@@ -38,15 +23,6 @@ public class VariableExpression : Expression
         DebugConsole.WriteAnsi($"[yellow]original type:[/]");
         DebugConsole.Write(this.type.value);
         // this.type = new Type("int", this);
-
-
-        // if (token.value.Contains("[") && token.value.Contains("]"))
-        // {
-        //     String[] splitStr = token.value.Split("[");
-        //
-        //     this.value = splitStr[0];
-        //     this.addChild(new NumberExpression(new Util.Token(Util.TokenType.Int, splitStr[1], token.line, token.column + 1), this));
-        // }
 
 
         if (parent != null)

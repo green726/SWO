@@ -738,7 +738,7 @@ public class Parser
         AST.VariableExpression varExpr = new AST.VariableExpression(token, parent);
         if (parent.nodeType != AST.Node.NodeType.VariableExpression)
         {
-            if (nextNonSpace().value != "." && nextNonSpace().value != "[" && nextNonSpace().type != Util.TokenType.Operator && nextNonSpace().type != Util.TokenType.AssignmentOp)
+            if (nextNonSpace().value != "." && nextNonSpace().value != "[" && nextNonSpace().type != Util.TokenType.Operator && nextNonSpace().type != Util.TokenType.AssignmentOp && parent.nodeType != AST.Node.NodeType.Reference && parent.nodeType != AST.Node.NodeType.Dereference)
             {
                 DebugConsole.Write("not returning var expr as parent");
                 return (parent, delimLevel);
@@ -753,16 +753,27 @@ public class Parser
     {
         if (token.value == "[" && parent.isExpression)
         {
-            delimParentStack.Push(parent);
+            delimParentStack.Push(parent.parent);
             parent = new AST.IndexReference(token, parent);
             delimLevel++;
             return (parent, delimLevel);
         }
-        else if (token.value == "]" && parent.isExpression)
+        else if (token.value == "]")
         {
-            parent = delimParentStack.Pop();
-            delimLevel--;
-            return (parent, delimLevel);
+            if (nextNonSpace().value == "." || nextNonSpace().value == "["/*  || nextNonSpace().type == Util.TokenType.AssignmentOp */)
+            {
+                // previousExpression = (AST.Expression)parent;
+                delimLevel--;
+                return (parent, delimLevel);
+            }
+            else
+            {
+                previousExpression = (AST.Expression)parent.parent;
+                DebugConsole.Write("set previous expression of index ref to: " + previousExpression);
+                parent = delimParentStack.Pop();
+                delimLevel--;
+                return (parent, delimLevel);
+            }
         }
         if (token.type == Util.TokenType.DelimiterOpen)
         {
@@ -910,12 +921,21 @@ public class Parser
         return (parent, delimLevel);
     }
 
+    public AST.Node unVariableExprParent(AST.Node parIn)
+    {
+        AST.Node par = parIn;
+        while (par.nodeType == AST.Node.NodeType.VariableExpression)
+        {
+            par = par.parent;
+        }
+        return par;
+    }
 
     public void parse()
     {
         currentTokenNum++;
 
-        // if (parent.isExpression && previousExpression.nodeType == AST.Node.NodeType.Empty)
+        // if (parent.isExpression && previousExpression.nodeType == AST.Node.NodeType.Empty && parent.parent.nodeType != AST.Node.NodeType.VariableExpression && parent.parent.nodeType != AST.Node.NodeType.IndexReference)
         // {
         //     previousExpression = (AST.Expression)parent;
         // }
@@ -954,7 +974,7 @@ public class Parser
 
         if (token.type != Util.TokenType.Space)
         {
-            DebugConsole.Write($"token of value: {token.value} and type of {token.type} and parent of {parent?.nodeType} and delim level of {delimLevel} in file named {fileName} and previous node of type {previousNode?.nodeType}");
+            DebugConsole.Write($"token of value: {token.value} and type of {token.type} and parent of {parent?.nodeType} and delim level of {delimLevel} in file named {fileName} and previous node of type {previousNode?.nodeType} and previous expression of type {previousExpression?.nodeType}");
         }
         if (this?.previousNode?.nodeType != AST.Node.NodeType.Empty)
         {
@@ -1068,7 +1088,7 @@ public class Parser
                 }
                 if (parent.nodeType == AST.Node.NodeType.VariableExpression)
                 {
-                    parent = parent.parent;
+                    parent = unVariableExprParent(parent);
                 }
                 AST.BinaryExpression binExpr = new AST.BinaryExpression(leftHand, token, parent);
                 parent = binExpr;
@@ -1087,7 +1107,7 @@ public class Parser
                 }
                 else
                 {
-                    DebugConsole.WriteAnsi("[purple]Creating var ass[/]");
+                    DebugConsole.WriteAnsi($"[purple]Creating var ass with prev expr: {previousExpression}[/]");
                     AST.VariableAssignment varAss = new AST.VariableAssignment(token, parent);
 
                     parent = varAss;
@@ -1105,7 +1125,6 @@ public class Parser
                 {
                     case "*":
                         parent = new AST.Dereference(token, parent);
-
                         return;
                     case "&":
                         parent = new AST.Reference(token, parent);
@@ -1162,7 +1181,7 @@ public class Parser
                     if (parent?.nodeType == AST.Node.NodeType.VariableExpression)
                     {
                         parent = parent?.parent;
-                        while (parent?.nodeType == AST.Node.NodeType.VariableExpression)
+                        while (parent?.nodeType == AST.Node.NodeType.VariableExpression || parent?.nodeType == AST.Node.NodeType.Reference || parent?.nodeType == AST.Node.NodeType.Dereference)
                         {
                             parent = parent?.parent;
                         }

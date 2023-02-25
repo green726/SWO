@@ -34,13 +34,45 @@ public class BinaryOperator
         }
     }
 
+    //write a method to check if the operator's type is a comparison operator
+    public bool isComparisonOperator()
+    {
+        return operatorType == OperatorType.Equals || /* operatorType == OperatorType.NotEqual || */ operatorType == OperatorType.GreaterThan || /* operatorType == OperatorType.GreaterThanOrEqual || */ operatorType == OperatorType.LessThan /* || operatorType == OperatorType.LessThanOrEqual */;
+    }
+
+    //write a method to reverse comparison operators
+    public void reverseComparisonOperator()
+    {
+        switch (operatorType)
+        {
+            case OperatorType.Equals:
+                operatorType = OperatorType.Equals;
+                break;
+            // case OperatorType.NotEqual:
+            //     operatorType = OperatorType.NotEqual;
+            //     break;
+            case OperatorType.GreaterThan:
+                operatorType = OperatorType.LessThan;
+                break;
+            // case OperatorType.GreaterThanOrEqual:
+            //     operatorType = OperatorType.LessThanOrEqual;
+            //     break;
+            case OperatorType.LessThan:
+                operatorType = OperatorType.GreaterThan;
+                break;
+            // case OperatorType.LessThanOrEqual:
+            //     operatorType = OperatorType.GreaterThanOrEqual;
+            //     break;
+        }
+    }
+
     public void parenEncapsulate()
     {
         this.parenEncapsulated = true;
     }
 
     //override the equals method
-    public override bool Equals(object? obj)
+    public override bool Equals(object obj)
     {
         if (obj == null || GetType() != obj.GetType())
         {
@@ -96,7 +128,7 @@ public class BinaryOperator
         GreaterThan,
     }
 
-    public readonly OperatorType operatorType;
+    public OperatorType operatorType;
 
     //compare to method based on the operator precendence
     public int CompareTo(BinaryOperator other)

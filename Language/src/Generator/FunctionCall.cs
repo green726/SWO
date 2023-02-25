@@ -18,6 +18,7 @@ public class FunctionCall : Base
 
     public void generateBuiltin()
     {
+        DebugConsole.Write("generating builtin with name of " + funcCall.functionName);
         switch (funcCall.functionName)
         {
             case "sizeof":

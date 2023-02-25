@@ -14,6 +14,7 @@ public class VariableAssignment : AST.Node
 
     public VariableAssignment(Util.Token token, AST.Node parent) : base(token)
     {
+        DebugConsole.Write("variable assignment top prev expr: " + parser.previousExpression);
         this.nodeType = NodeType.VariableAssignment;
         this.generator = new Generator.VariableAssignment(this);
 
@@ -35,6 +36,12 @@ public class VariableAssignment : AST.Node
             }
             else
             {
+                DebugConsole.Write("prev expression of parser: " + parser.previousExpression);
+                VariableExpression prevVarExpr = (VariableExpression)parser.previousExpression;
+                prevVarExpr.addParent(this);
+                this.varExpr = prevVarExpr;
+
+                this.children.Add(prevVarExpr);
                 this.parent = parent;
                 this.parent?.addChild(this);
             }
@@ -79,10 +86,13 @@ public class VariableAssignment : AST.Node
     public override void addChild(AST.Node node)
     {
         base.addChild(node);
-        DebugConsole.Write("adding child of node type " + node.nodeType + " to varass with loop iteration of: " + childLoop);
+        DebugConsole.Write("adding child of node type " + node.nodeType + " to varass with varExpr of " + varExpr.value + " with loop iteration of: " + childLoop + " and binReassignment of " + this.binReassignment);
         if (this.binReassignment == true)
         {
-            if (node == this.bin) {
+            // if(node == this.bin)
+            if (node.nodeType == NodeType.BinaryExpression)
+            {
+                DebugConsole.Write("not adding child");
                 return;
             }
             this.bin.addChild(node);

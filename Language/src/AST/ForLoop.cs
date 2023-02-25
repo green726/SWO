@@ -61,13 +61,14 @@ public class ForLoop : AST.Node
     {
         base.addChild(child);
 
+        DebugConsole.WriteAnsi($"[green]adding child of type {child.nodeType} to for loop with parse iteration of {parseIteration} and is body of {isBody}[/]");
+
         if (isBody)
         {
             body.Add(child);
             return;
         }
 
-        DebugConsole.WriteAnsi($"[green]adding child of type {child.nodeType} to for loop with parse iteration of {parseIteration}[/]");
 
         if (child.nodeType == NodeType.VariableExpression)
         {

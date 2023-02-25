@@ -18,6 +18,8 @@ public class ForLoop : Base
         //TODO: replace all the phi var stuff in here with normal SWO variables (mem2reg should optimize it all into phi vars)
         gen.addLayerToNamedValueStack();
 
+        DebugConsole.WriteAnsi($"[purple]generating for loop [/]");
+
         //create the basic blocks for the loop
         LLVMBasicBlockRef parentBlock = LLVM.GetInsertBlock(gen.builder).GetBasicBlockParent();
         LLVMBasicBlockRef loopBlock = LLVM.AppendBasicBlock(parentBlock, "forLoopBody");
@@ -33,11 +35,13 @@ public class ForLoop : Base
 
         LLVM.PositionBuilderAtEnd(gen.builder, loopBlock);
 
+        DebugConsole.Write("for loop body length: " + forLoop.body.Count);
+
         //emit the body of the loop
         foreach (AST.Node node in forLoop.body)
         {
+            DebugConsole.WriteAnsi($"[purple]in for loop body generating node of type: {node.nodeType}[/]");
             node.generator.generate();
-            DebugConsole.Write("generated node of type in for loop body: " + node.nodeType);
         }
 
         LLVM.BuildBr(gen.builder, loopIncrementBlock);

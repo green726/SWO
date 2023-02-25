@@ -240,7 +240,7 @@ public class GeneratorTypeInformation : TypeInformation
                         basicType = LLVM.Int1Type();
                         break;
                     case "void":
-                        basicType = LLVM.VoidType();
+                        basicType = LLVM.Int8Type();
                         break;
                     case "char":
                         basicType = LLVM.Int8Type();

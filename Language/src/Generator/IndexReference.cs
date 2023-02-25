@@ -12,17 +12,17 @@ public class IndexReference : Base
         this.idx = (AST.IndexReference)node;
     }
 
-    public void checkIsPtr()
+    public void checkIsReference()
     {
         switch (idx.parent?.nodeType)
         {
             case AST.Node.NodeType.VariableExpression:
                 AST.VariableExpression varExprPar = (AST.VariableExpression)idx.parent;
-                idx.isPointer = varExprPar.isReference;
+                idx.isReference = varExprPar.isReference;
                 break;
             case AST.Node.NodeType.IndexReference:
                 AST.IndexReference idxPar = (AST.IndexReference)idx.parent;
-                idx.isPointer = idxPar.isPointer;
+                idx.isReference = idxPar.isReference;
                 break;
         }
     }
@@ -30,6 +30,7 @@ public class IndexReference : Base
     public override void generate()
     {
         base.generate();
+        checkIsReference();
         DebugConsole.WriteAnsi("[green]genning arr gep[/]");
         LLVMValueRef varRef = gen.valueStack.Pop();
         DebugConsole.Write("var ref: " + varRef);
@@ -38,7 +39,7 @@ public class IndexReference : Base
         gen.valueStack.Push(gepRef);
 
 
-        if (idx.children.Count() == 0)
+        if (idx.children.Count() == 0 && !idx.isReference)
         {
             LLVMValueRef gepLoadRef = LLVM.BuildLoad(gen.builder, gepRef, "arrRefLoad");
             gen.valueStack.Push(gepLoadRef);

@@ -14,6 +14,7 @@ public class BinaryExpression : Expression
     public BinaryExpression(AST.Expression leftHand, Util.Token binOpTok, AST.Node parent) : base(leftHand, parent)
     {
         this.leftHand = leftHand;
+        DebugConsole.Write("binary expression with left hand of type: " + leftHand.nodeType + " and value of: " + leftHand.value + " that has parent of type: " + leftHand.parent.nodeType);
         this.rightHand = new AST.Empty();
         this.binOp = new BinaryOperator(binOpTok);
         this.parent = parent;
@@ -26,6 +27,8 @@ public class BinaryExpression : Expression
     public BinaryExpression(AST.Expression leftHand, AST.Expression rightHand, Util.Token binOpTok, AST.Node parent) : base(leftHand, parent)
     {
         this.leftHand = leftHand;
+        DebugConsole.Write("binary expression with left hand of type: " + leftHand.nodeType + " and value of: " + leftHand.value + " that has parent of type: " + leftHand.parent.nodeType);
+        this.rightHand = new AST.Empty();
         this.rightHand = new AST.Empty();
         this.binOp = new BinaryOperator(binOpTok);
         this.parent = parent;
@@ -40,6 +43,8 @@ public class BinaryExpression : Expression
     public BinaryExpression(AST.Expression leftHand, AST.Expression rightHand, string binOpStr, AST.Node parent) : base(leftHand, parent)
     {
         this.leftHand = leftHand;
+        DebugConsole.Write("binary expression with left hand of type: " + leftHand.nodeType + " and value of: " + leftHand.value + " that has parent of type: " + leftHand.parent.nodeType);
+        this.rightHand = new AST.Empty();
         this.rightHand = new AST.Empty();
         this.binOp = new BinaryOperator(binOpStr);
         this.parent = parent;
@@ -77,9 +82,17 @@ public class BinaryExpression : Expression
                 DebugConsole.Write($"original left hand parent:\n {this.parent}");
                 DebugConsole.Write($"original right hand parent:\n {rightBinExpr.parent}");
 
+                //4 * 4 < 10
+                //4 * 4 < 10
+                //10 > 4 * 4
+
                 //3 * 2 + 4 = 10 (but in reality 18)
                 //4 + 2 * 3 = 10 (but really 10)
                 //
+
+                if (rightBinExpr.binOp.isComparisonOperator()) {
+                    rightBinExpr.binOp.reverseComparisonOperator();
+                }
 
                 //this will swap the left and right hands
                 this.rightHand = this.leftHand;
@@ -119,7 +132,7 @@ public class BinaryExpression : Expression
         this.rightHand = (AST.Expression)child;
         if (prevRightHand.nodeType == NodeType.Empty)
         {
-            DebugConsole.Write("binary expression adding child to its parent (type " + this.parent.nodeType + ")");
+            DebugConsole.Write("binary expression adding itself as a child to its parent (type " + this.parent.nodeType + ")");
             this.parent.addChild(this);
         }
         checkPrecedence();

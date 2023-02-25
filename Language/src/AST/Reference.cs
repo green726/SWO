@@ -17,25 +17,22 @@ public class Reference : Expression
 
     public override void addChild(Node child)
     {
-        //TODO: maybe implement this to allow types to have a "*" at the beginning to mark a ptr type
-        // if (child.nodeType == AST.Node.NodeType.Type)
-        // {
-        //     Type type = (Type)child;
-        //     type.isPointer = true;
-        // }
+        base.addChild(child);
         if (!child.isExpression)
         {
             throw ParserException.FactoryMethod("A non expression was referenced", "Remove the reference (\"&\")", child, this);
         }
+        else if (this.actualExpr != null)
+        {
+            throw ParserException.FactoryMethod("A reference was already set", "Remove the reference (\"&\")", child, this);
+        }
+
 
         this.actualExpr = (AST.Expression)child;
         this.actualExpr.isReference = true;
 
-        //BUG: need to actually figure out the type
-        this.type = actualExpr.type;
 
-        parser.parent = this.parent;
-
-        base.addChild(child);
+        this.type = new ParserTypeInformation("*" + actualExpr.type.value, this.parser);
+        DebugConsole.Write(this.type.value);
     }
 }

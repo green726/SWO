@@ -53,6 +53,7 @@ public class Function : Base
                 }
                 this.topLevelRet = true;
             }
+            DebugConsole.Write("generating function body node of type: " + node.nodeType.ToString());
             node.generator.generate();
         }
 

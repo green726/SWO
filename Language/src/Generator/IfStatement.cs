@@ -21,6 +21,8 @@ public class IfStatement : Base
     public override void generate()
     {
         base.generate();
+
+        DebugConsole.Write("if statement with conditon of type: " + ifStat.conditional.condition.nodeType);
         ifStat.conditional.condition.generator.generate();
         LLVMValueRef condValue = gen.valueStack.Pop();
 
