@@ -1,7 +1,6 @@
 extern {
     @printf(#)
     @memset(void* ptr, int val, int num);
-    int @sizeof(void*);
 }
 
 @sieve() {
@@ -25,8 +24,9 @@ extern {
     }
 }
 
-@main() {
+int @main() {
     int n = 1000000;
     printf("Following are the prime numbers smaller than or equal to %d \n", *n);
     sieve();
+    return 0;
 }

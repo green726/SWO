@@ -26,6 +26,8 @@ public class ElseStatement : Base
 
         LLVM.PositionBuilderBefore(gen.builder, brFromIf);
 
+        DebugConsole.Write("else statement body count: " + elseStat.body.Count);
+
         foreach (AST.Node node in elseStat.body)
         {
             node.generator.generate();

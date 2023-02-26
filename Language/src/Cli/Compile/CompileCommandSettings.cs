@@ -28,6 +28,10 @@ public class CompileCommandSettings : CommandSettings
     [CommandOption("-d|--debug")]
     public bool debugLogging { get; init; } = false;
 
+    [Description("Opimization level you wish to use for compilation. Values can be from 0 (least) to 2 (most). The optimization levels coincide (roughly) with Clang's optimization levels.")]
+    [CommandOption("-o|--optimize")]
+    public int optimizationLevel { get; init; } = 1;
+
     // [Description("Package the necessary public components of the file's AST for distribution (used by SAP)")]
     // [CommandOption("--distribute-ast")]
     // public bool distributeAST { get; init; } = false;

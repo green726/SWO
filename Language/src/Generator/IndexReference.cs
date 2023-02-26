@@ -75,7 +75,7 @@ public class IndexReference : Base
 
         //BUG: this might need to go before the out of range checking in case there is an offset - idk
         // idx.expr.value += Config.settings.variable.arrays.startIndex;
-        
+
         DebugConsole.Write("generating indexRef expr");
         idx.expr.generator.generate();
         DebugConsole.Write("generated indexRef expr");
@@ -84,6 +84,10 @@ public class IndexReference : Base
         DebugConsole.Write("index expr: " + indexExpr);
         DebugConsole.Write("var ptr: " + varPtr);
 
+        if (LLVM.GetTypeKind(varType) == LLVMTypeKind.LLVMPointerTypeKind)
+        {
+            return LLVM.BuildGEP(gen.builder, varPtr, new LLVMValueRef[] { indexExpr }, "idxGEP");
+        }
         return LLVM.BuildGEP(gen.builder, varPtr, new LLVMValueRef[] { LLVM.ConstInt(LLVM.Int32Type(), 0, false), indexExpr }, "idxGEP");
         // return LLVM.BuildStructGEP(gen.builder, varPtr, (uint)idx.numExpr.value, "idxGEP");
     }

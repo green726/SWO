@@ -85,7 +85,7 @@ public static class SWO
                     List<Parser> parsers = Parser.startParsing(lexedContent, fileName, filePath, parseTask);
 
                     var moduleTask = ctx.AddTask("Initializing LLVM");
-                    List<IRGen> generators = ModuleGen.CreateNewGenerators(parsers, moduleTask);
+                    List<IRGen> generators = ModuleGen.CreateNewGenerators(parsers, moduleTask, settings);
 
 
                     var llvmTask = ctx.AddTask("Compiling to LLVM IR");
@@ -121,7 +121,7 @@ public static class SWO
 
             List<Parser> parsers = Parser.startParsing(lexedContent, fileName, filePath);
 
-            List<IRGen> generators = ModuleGen.CreateNewGenerators(parsers);
+            List<IRGen> generators = ModuleGen.CreateNewGenerators(parsers, settings);
 
             int i = 0;
             foreach (IRGen generator in generators)
@@ -204,7 +204,7 @@ public static class SWO
                     List<Parser> parsers = Parser.startParsing(lexedContent, fileName, filePath, parseTask);
 
                     var moduleTask = ctx.AddTask("Initializing LLVM");
-                    List<IRGen> generators = ModuleGen.CreateNewGenerators(parsers, moduleTask);
+                    List<IRGen> generators = ModuleGen.CreateNewGenerators(parsers, moduleTask, settings);
 
                     var llvmTask = ctx.AddTask("Compiling to LLVM IR");
                     int i = 0;
@@ -224,12 +224,16 @@ public static class SWO
                     {
                         fileNames.Add(EXE.compileEXE(settings, generator, exeCompileTask));
                     }
-                    EXE.link(settings, fileNames);
 
-
-                    foreach (Parser parser in parsers)
+                    if (settings.resultFileType == FileType.NativeExecutable)
                     {
+                        EXE.link(settings, fileNames);
                     }
+
+
+                    // foreach (Parser parser in parsers)
+                    // {
+                    // }
                 });
         }
         else
@@ -248,7 +252,7 @@ public static class SWO
 
             List<Parser> parsers = Parser.startParsing(lexedContent, fileName, filePath);
 
-            List<IRGen> generators = ModuleGen.CreateNewGenerators(parsers);
+            List<IRGen> generators = ModuleGen.CreateNewGenerators(parsers, settings);
 
             int i = 0;
             foreach (IRGen generator in generators)
@@ -264,7 +268,10 @@ public static class SWO
             {
                 fileNames.Add(EXE.compileEXE(settings, generator));
             }
-            EXE.link(settings, fileNames);
+            if (settings.resultFileType == FileType.NativeExecutable)
+            {
+                EXE.link(settings, fileNames);
+            }
 
         }
 

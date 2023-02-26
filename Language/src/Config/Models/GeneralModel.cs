@@ -73,7 +73,7 @@ public class CommentModel
 
 public class LinkerModel
 {
-    public string type { get; set; } = "gcc";
+    public string type { get; set; } = "clang";
     public bool auto { get; set; } = true;
 
     public string path { get; set; } = "";
@@ -96,9 +96,23 @@ public class LinkerModel
                             path = @"/usr/bin/gcc";
                             break;
                     }
-                    args = "-O -no-pie -o";
+                    args = "-O3 -no-pie -o";
                     break;
-
+                case "clang":
+                    switch (Util.checkOs())
+                    {
+                        case "win10-x64":
+                            // path = @"C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin\gcc.exe";
+                            // break;
+                            throw new Exception("Invalid OS (Windows) for clang linker. Please manually specify the path or use GCC installed through MinGW Chocolatey package.");
+                        case "linux-x64":
+                            path = @"/usr/bin/clang";
+                            break;
+                    }
+                    args = "-O3 -o";
+                    break;
+                default:
+                    throw new Exception("Invalid linker type");
             }
         }
     }

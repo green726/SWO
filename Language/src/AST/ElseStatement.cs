@@ -15,6 +15,7 @@ public class ElseStatement : AST.Node
         this.generator = new Generator.ElseStatement(this);
 
         this.parent = parent;
+        this.parent.addChild(this);
         this.body = new List<AST.Node>();
 
         // if (prevNode.nodeType != NodeType.IfStatement || prevNode.nodeType != NodeType.ElseIfStatement)
