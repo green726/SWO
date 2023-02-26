@@ -22,6 +22,7 @@ public class CompileCommandSettings : CommandSettings
 
     [Description("The name of the resulting file")]
     [CommandArgument(1, "[resultFileName]")]
+    [CommandOption("-o|--out")]
     public string resultFileName { get; set; } = "";
 
     [Description("SWO internal debug logging")]
@@ -29,7 +30,7 @@ public class CompileCommandSettings : CommandSettings
     public bool debugLogging { get; init; } = false;
 
     [Description("Opimization level you wish to use for compilation. Values can be from 0 (least) to 2 (most). The optimization levels coincide (roughly) with Clang's optimization levels.")]
-    [CommandOption("-o|--optimize")]
+    [CommandOption("-O|--optimize")]
     public int optimizationLevel { get; init; } = 1;
 
     // [Description("Package the necessary public components of the file's AST for distribution (used by SAP)")]

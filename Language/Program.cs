@@ -49,6 +49,13 @@ public static class SWO
             filePath = Path.GetFullPath(nameToSearch);
             fileName = Path.GetFileName(filePath);
         }
+
+        if (settings.resultFileName == "")
+        {
+            settings.resultFileName = projectInfo.projectName;
+        }
+
+
         DebugConsole.Write("name: " + fileName);
         DebugConsole.Write("path: " + filePath);
 
@@ -66,8 +73,6 @@ public static class SWO
                     var configTask = ctx.AddTask("Initializing config");
                     Config.initialize(projectInfo.configFilePath);
                     configTask.StopTask();
-                    //TODO: check if its default or leave it alone
-                    settings.resultFileName = projectInfo.projectName;
 
                     if (Config.settings.general.typo.enabled)
                     {
@@ -108,8 +113,6 @@ public static class SWO
         else
         {
             Config.initialize(projectInfo.configFilePath);
-            //TODO: check if its default or leave it alone
-            settings.resultFileName = projectInfo.projectName;
 
             if (Config.settings.general.typo.enabled)
             {
@@ -171,6 +174,11 @@ public static class SWO
             filePath = settings.path + settings.file + ".swo";
         }
 
+        if (settings.resultFileName == "")
+        {
+            settings.resultFileName = projectInfo.projectName;
+        }
+
         if (!settings.debugLogging)
         {
             AnsiConsole.Progress()
@@ -185,8 +193,6 @@ public static class SWO
                     var configTask = ctx.AddTask("Initializing config");
                     Config.initialize(projectInfo.configFilePath);
                     configTask.StopTask();
-                    //TODO: check if its default or leave it alone
-                    settings.resultFileName = projectInfo.projectName;
 
                     if (Config.settings.general.typo.enabled)
                     {
@@ -239,8 +245,8 @@ public static class SWO
         else
         {
             Config.initialize(projectInfo.configFilePath);
-            //TODO: check if its default or leave it alone
-            settings.resultFileName = projectInfo.projectName;
+
+
 
             if (Config.settings.general.typo.enabled)
             {

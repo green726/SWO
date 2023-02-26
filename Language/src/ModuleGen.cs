@@ -18,6 +18,8 @@ public static class ModuleGen
 
         // Simplify the control flow graph (deleting unreachable blocks, etc).
         LLVM.AddCFGSimplificationPass(passManager);
+
+        LLVM.AddGVNPass(passManager);
     }
 
     public static void optimizeOne(LLVMPassManagerRef passManager)
@@ -88,11 +90,7 @@ public static class ModuleGen
 
         LLVM.AddMergedLoadStoreMotionPass(passManager);
 
-        LLVM.AddGVNPass(passManager);
-
         LLVM.AddSLPVectorizePass(passManager);
-
-        Console.WriteLine("optimize 2 called");
     }
 
     public static void addOptimizations(LLVMPassManagerRef passManager, CompileCommandSettings settings)

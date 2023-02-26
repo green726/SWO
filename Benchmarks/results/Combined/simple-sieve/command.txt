@@ -1,0 +1,5 @@
+
+hyperfine './simple-sieve-o0' './simple-sieve-o1' './simple-sieve-o2' '~/coding/SWO/Benchmarks/src/C/
+simple-sieve/mainO0' '~/coding/SWO/Benchmarks/src/C/simple-sieve/mainO1' '~/coding/SWO/Benchmarks/src/C
+/simple-sieve/mainO2' --export-json ~/coding/SWO/Benchmarks/results/Combined/simple-sieve/results.json 
+--export-markdown ~/coding/SWO/Benchmarks/results/Combined/simple-sieve/results.md

@@ -1,5 +1,5 @@
 extern {
-    @printf(#)
+    @printf(#);
     @memset(void* ptr, int val, int num);
 }
 
