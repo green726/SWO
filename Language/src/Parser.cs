@@ -684,6 +684,10 @@ public class Parser
                 parent.addChild(token);
                 DebugConsole.WriteAnsi($"[green]returning parent of {parent.nodeType}[/]");
                 return (parent, delimLevel);
+            case AST.Node.NodeType.Implement:
+                parent.addChild(token);
+                return (parent, delimLevel);
+
         }
 
 
@@ -725,9 +729,6 @@ public class Parser
                 parent.addChild(token);
                 return (parent, delimLevel);
             case AST.Node.NodeType.Trait:
-                parent.addChild(token);
-                return (parent, delimLevel);
-            case AST.Node.NodeType.Implement:
                 parent.addChild(token);
                 return (parent, delimLevel);
 
