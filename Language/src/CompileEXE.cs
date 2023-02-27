@@ -174,14 +174,19 @@ public static class EXE
             DebugConsole.Write(name);
         }
 
+
+
         Process process = new Process();
 
         process.StartInfo.FileName = Config.settings.general.linker.path;
         process.StartInfo.Arguments = $"{Config.settings.general.linker.args} {settings.resultFileName} {fullObjectPath}";
 
+        DebugConsole.Write(process.StartInfo.FileName);
+
         process.Start();
 
         process.WaitForExit();
+
 
         string executableEnding = settings.targetOSName == "win10-x64" ? ".exe" : ".out";
         string exeFile = Path.GetFullPath(settings.path + "/a" + executableEnding);

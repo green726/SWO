@@ -80,7 +80,7 @@ public class LinkerModel
 
     public string args { get; set; } = "";
 
-    public LinkerModel()
+    public void checkPath()
     {
         if (path == "")
         {

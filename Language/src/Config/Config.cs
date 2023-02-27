@@ -9,6 +9,7 @@ public static class Config
         string configInput = File.ReadAllText(configFile);
 
         settings = Toml.ToModel<ConfigModel.ConfigModel>(configInput);
+        settings.general.linker.checkPath();
     }
 
 }
