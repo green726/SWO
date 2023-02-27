@@ -85,7 +85,9 @@ public class IndexReference : Base
         DebugConsole.Write("TYPEOF: " + varPtr.TypeOf());
 
         AST.Expression expr = (AST.Expression)idx.parent;
-        if (expr.type.isPointer)
+
+        //BUG: the second condition of this if statement is a hacky fix for the fact that the type of a string is a pointer to a char
+        if (expr.type.isPointer || expr.type.isArray && expr.type.getContainedType() == "string")
         {
             return LLVM.BuildGEP(gen.builder, varPtr, new LLVMValueRef[] { indexExpr }, "ptrIdxGEP");
         }
