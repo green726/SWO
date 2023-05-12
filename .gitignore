@@ -2,4 +2,4 @@
 /Language/obj/
 /Installer/bin/
 /Installer/obj/
-*.zip
+/Zips/*.zip
