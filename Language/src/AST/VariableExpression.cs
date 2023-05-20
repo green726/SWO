@@ -10,6 +10,7 @@ public class VariableExpression : Expression
     {
         this.nodeType = NodeType.VariableExpression;
         this.generator = new Generator.VariableExpression(this);
+        this.transpilerGenerator = new TranspilerGenerator.VariableExpression(this);
         this.parent = parent;
         this.newLineReset = true;
 

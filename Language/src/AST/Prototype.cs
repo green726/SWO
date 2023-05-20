@@ -37,6 +37,7 @@ public class Prototype : AST.Node
 
         this.nodeType = NodeType.Prototype;
         this.generator = new Generator.Prototype(this);
+        this.transpilerGenerator = new TranspilerGenerator.Prototype(this);
         this.voidType = new Type("void*", this);
     }
 
@@ -44,6 +45,7 @@ public class Prototype : AST.Node
     {
         this.nodeType = NodeType.Prototype;
         this.generator = new Generator.Prototype(this);
+        this.transpilerGenerator = new TranspilerGenerator.Prototype(this);
         // Parser.addLayerToNamedASTStack();
 
         this.external = external;

@@ -143,6 +143,109 @@ public static class SWO
         AnsiConsole.MarkupLine("[green]SWO project successfully compiled[/]");
     }
 
+    public static void transpileProject(TranspileCommandSettings settings)
+    {
+        DebugConsole.log = settings.debugLogging;
+
+        // DebugConsole.Write(settings.resultFileType);
+        string[] files = System.IO.Directory.GetFiles(settings.path, "*.sproj");
+
+        if (files.Length == 0)
+        {
+            throw new ArgumentException("No SWO project files found in current directory");
+        }
+
+        // string tomlText = System.IO.File.ReadAllText(files[0]);
+        // projectInfo = Toml.ToModel<ProjectInfo>(tomlText);
+        string jsonText = System.IO.File.ReadAllText(files[0]);
+        projectInfo = JsonConvert.DeserializeObject<ProjectInfo>(jsonText)!;
+        projectInfo.setConfig();
+
+        string filePath = "";
+        string fileName = "";
+        if (settings.file == "")
+        {
+            filePath = projectInfo.entryFile.path;
+            fileName = projectInfo.entryFile.name;
+        }
+        else
+        {
+            fileName = settings.file;
+            filePath = settings.path + settings.file + ".swo";
+        }
+
+        if (settings.resultFileName == "")
+        {
+            settings.resultFileName = projectInfo.projectName;
+        }
+
+        if (!settings.debugLogging)
+        {
+            AnsiConsole.Progress()
+                .Columns(new ProgressColumn[] {
+            new TaskDescriptionColumn(),
+            new ProgressBarColumn(),
+            new PercentageColumn(),
+            new RemainingTimeColumn(),
+            new SpinnerColumn(),
+                }).Start(ctx =>
+                {
+                    var configTask = ctx.AddTask("Initializing config");
+                    Config.initializeTranspiler(projectInfo.configFilePath, settings.targetConfigPath);
+                    configTask.StopTask();
+
+                    if (Config.settings.general.typo.enabled)
+                    {
+                        var typoTask = ctx.AddTask("Initializing typo checker");
+                        Typo.initialize(typoTask);
+                        typoTask.StopTask();
+                    }
+
+                    fileContents = System.IO.File.ReadAllText(filePath);
+                    var lexTask = ctx.AddTask("Lexing (tokenizing) the SWO code");
+                    List<Util.Token> lexedContent = Lexer.lex(fileContents, lexTask);
+
+                    var parseTask = ctx.AddTask("Parsing the SWO code");
+
+                    List<Parser> parsers = Parser.startParsing(lexedContent, fileName, filePath, parseTask);
+
+                    var genTask = ctx.AddTask("Generating the transpiled code");
+
+                    foreach (Parser parser in parsers)
+                    {
+                        TranspilerGenerator.TranspilerGen gen = TranspilerGenerator.TranspilerGen.addInstance(parser, parser.fileName, settings);
+                        gen.generate();
+                    }
+                    genTask.StopTask();
+                });
+        }
+        else
+        {
+            Config.initializeTranspiler(projectInfo.configFilePath, settings.targetConfigPath);
+
+
+            if (Config.settings.general.typo.enabled)
+            {
+                Typo.initialize();
+            }
+
+            fileContents = System.IO.File.ReadAllText(filePath);
+            List<Util.Token> lexedContent = Lexer.lex(fileContents);
+
+            List<Parser> parsers = Parser.startParsing(lexedContent, fileName, filePath);
+
+            foreach (Parser parser in parsers)
+            {
+                TranspilerGenerator.TranspilerGen gen = TranspilerGenerator.TranspilerGen.addInstance(parser, parser.fileName, settings);
+                gen.generate();
+            }
+
+        }
+
+        AnsiConsole.MarkupLine("[green]SWO project successfully compiled[/]");
+
+    }
+
     public static void compileProject(CompileCommandSettings settings)
     {
         DebugConsole.log = settings.debugLogging;

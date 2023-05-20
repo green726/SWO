@@ -20,6 +20,7 @@ public class Type : AST.Node
         //TODO: check if the parsers next non space is a bracket and if so advance the parser token and incoroprate the array into this things token
         this.nodeType = NodeType.Type;
         this.generator = new Generator.Type(this);
+        this.transpilerGenerator = new TranspilerGenerator.Type(this);
 
         if (parser.nextNonSpace().value == "[")
         {
@@ -87,6 +88,7 @@ public class Type : AST.Node
     {
         this.nodeType = NodeType.Type;
         this.generator = new Generator.Type(this);
+        this.transpilerGenerator = new TranspilerGenerator.Type(this);
 
 
         if (parser.nextNonSpace().value == "[")

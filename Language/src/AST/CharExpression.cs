@@ -6,6 +6,7 @@ public class CharExpression : Expression
     {
         this.nodeType = NodeType.CharExpression;
         this.generator = new Generator.CharExpression(this);
+        this.transpilerGenerator = new TranspilerGenerator.CharExpression(this);
         this.parent = parent;
         this.parent.addChild(this);
 

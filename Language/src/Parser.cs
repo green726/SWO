@@ -650,7 +650,7 @@ public class Parser
                 return (proto, delimLevel);
             }
         }
-        if (nextToken.value == Config.settings.function.calling.args.delimeters[0] || nextToken.value == "(")
+        if (nextToken.value == Config.settings.function.calling.args.delimiters[0] || nextToken.value == "(")
         {
             DebugConsole.WriteAnsi("[purple]making new func call[/]");
             AST.FunctionCall funcCall = new AST.FunctionCall(token, null, parent);

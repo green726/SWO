@@ -9,6 +9,9 @@ public abstract class Node
     public Generator.Base generator;
 
     [JsonIgnore]
+    public TranspilerGenerator.Base transpilerGenerator;
+
+    [JsonIgnore]
     public Parser parser;
 
     [JsonIgnore]

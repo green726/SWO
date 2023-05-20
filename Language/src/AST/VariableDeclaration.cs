@@ -26,6 +26,7 @@ public class VariableDeclaration : Node
     {
         this.nodeType = NodeType.VariableDeclaration;
         this.generator = new Generator.VariableDeclaration(this);
+        this.transpilerGenerator = new TranspilerGenerator.VariableDeclaration(this);
 
         this.newLineReset = true;
 
@@ -53,6 +54,7 @@ public class VariableDeclaration : Node
     {
         this.nodeType = NodeType.VariableDeclaration;
         this.generator = new Generator.VariableDeclaration(this);
+        this.transpilerGenerator = new TranspilerGenerator.VariableDeclaration(this);
 
         this.newLineReset = true;
 
@@ -78,6 +80,7 @@ public class VariableDeclaration : Node
     {
         this.nodeType = NodeType.VariableDeclaration;
         this.generator = new Generator.VariableDeclaration(this);
+        this.transpilerGenerator = new TranspilerGenerator.VariableDeclaration(this);
         this.newLineReset = true;
 
         this.type = new Type(typeTok);

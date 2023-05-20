@@ -14,6 +14,7 @@ public class CLI
             config.AddCommand<CompileCommand>("compile");
             config.AddCommand<RunCommand>("run");
             config.AddCommand<LookupErrorCommand>("error");
+            config.AddCommand<TranspileCommand>("transpile");
         });
         app.Run(args);
     }

@@ -16,6 +16,7 @@ public class Function : AST.Node
     {
         this.nodeType = NodeType.Function;
         this.generator = new Generator.Function(this);
+        this.transpilerGenerator = new TranspilerGenerator.Function(this);
 
         if (body == null) body = new List<AST.Node>();
 

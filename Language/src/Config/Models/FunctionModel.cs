@@ -65,14 +65,14 @@ public class FunctionDeclarationMarker
 
 public class FunctionDeclarationArgs
 {
-    public List<string> delimeters { get; set; } = new List<string> { "(", ")" };
+    public List<string> delimiters { get; set; } = new List<string> { "(", ")" };
 
     public string seperator { get; set; } = ",";
 }
 
 public class FunctionDeclarationBody
 {
-    public List<string> delimeters { get; set; } = new List<string>() { "{", "}" };
+    public List<string> delimiters { get; set; } = new List<string>() { "{", "}" };
 }
 
 public class FunctionCallingModel
@@ -83,8 +83,8 @@ public class FunctionCallingModel
 
 public class FunctionCallingArgs
 {
-    [DataMember(Name = "delimeters")]
-    public List<string> delimeters { get; set; } = new List<string>() { "(", ")" };
+    [DataMember(Name = "delimiters")]
+    public List<string> delimiters { get; set; } = new List<string>() { "(", ")" };
 
     public string seperator { get; set; } = ",";
 }
