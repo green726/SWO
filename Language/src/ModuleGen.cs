@@ -52,7 +52,7 @@ public static class ModuleGen
 
         LLVM.AddPruneEHPass(passManager);
 
-        LLVM.AddLoopUnswitchPass(passManager);
+        // LLVM.AddLoopUnswitchPass(passManager);
 
         LLVM.AddAlignmentFromAssumptionsPass(passManager);
 
