@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using Spectre.Console;
 using Newtonsoft.Json;
+using LLVMSharp;
 
 public static class SWO
 {

@@ -50,7 +50,7 @@ public static class ModuleGen
 
         LLVM.AddLICMPass(passManager);
 
-        LLVM.AddPruneEHPass(passManager);
+        // LLVM.AddPruneEHPass(passManager);
 
         // LLVM.AddLoopUnswitchPass(passManager);
 

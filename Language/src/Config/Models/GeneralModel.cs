@@ -106,6 +106,8 @@ public class LinkerModel
                             // break;
                             throw new Exception("Invalid OS (Windows) for clang linker. Please manually specify the path or use GCC installed through MinGW Chocolatey package.");
                         case "linux-x64":
+                            //TODO: make it work with new clang
+                            // path = @"/usr/lib/llvm14/bin/clang";
                             path = @"/usr/bin/clang";
                             break;
                     }
