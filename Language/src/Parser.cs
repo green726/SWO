@@ -626,6 +626,7 @@ public class Parser
         }
         else if (Config.settings.function.declaration.marker.word && token.value == Config.settings.function.declaration.marker.value)
         {
+            DebugConsole.Write("making new proto with the word declaration");
             AST.Prototype proto = new AST.Prototype(token, parent);
             return (proto, delimLevel);
         }
@@ -650,7 +651,7 @@ public class Parser
                 return (proto, delimLevel);
             }
         }
-        if (nextToken.value == Config.settings.function.calling.args.delimiters[0] || nextToken.value == "(")
+        if (nextToken.value == Config.settings.function.calling.args.delimiters[0] /* || nextToken.value == "("  */&& parent?.nodeType != AST.Node.NodeType.Prototype)
         {
             DebugConsole.WriteAnsi("[purple]making new func call[/]");
             AST.FunctionCall funcCall = new AST.FunctionCall(token, null, parent);

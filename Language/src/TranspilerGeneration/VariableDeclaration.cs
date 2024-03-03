@@ -17,11 +17,11 @@ public class VariableDeclaration : Base
         {
             if (varDec.mutable)
             {
-                gen.write(Config.settings.variable.declaration.keyword.mutable);
+                gen.write(Config.target.variable.declaration.keyword.mutable);
             }
             else
             {
-                gen.write(Config.settings.variable.declaration.keyword.constant);
+                gen.write(Config.target.variable.declaration.keyword.constant);
             }
         }
 
