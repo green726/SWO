@@ -7,7 +7,7 @@
 
 </aside>
 
-### Philosophies:
+### Philosophy:
 
 - Be (easily) customizable without requiring users to write code
 - Maintain decent speed/performance in the compiler
