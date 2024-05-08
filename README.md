@@ -16,7 +16,7 @@
 
 ### Why?
 
-Why does SWO exist? I created SWO as a fun resume-building project and to learn about compilers. 
+Why does SWO exist? I created SWO as a fun project to learn about compilers. 
 
 ### How?
 
