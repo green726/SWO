@@ -7,7 +7,7 @@
 
 </aside>
 
-### Philosophies:
+### Philosophy:
 
 - Be (easily) customizable without requiring users to write code
 - Maintain decent speed/performance in the compiler
@@ -16,7 +16,7 @@
 
 ### Why?
 
-Why does SWO exist? I created SWO as a fun resume-building project and to learn about compilers. 
+Why does SWO exist? I created SWO as a fun project to learn about compilers. 
 
 ### How?
 
