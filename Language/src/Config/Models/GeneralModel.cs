@@ -111,7 +111,7 @@ public class LinkerModel
                             path = @"/usr/bin/clang";
                             break;
                     }
-                    args = "-O3 -o";
+                    args = "-O3 --emit-static-lib -o";
                     break;
                 default:
                     throw new Exception("Invalid linker type");

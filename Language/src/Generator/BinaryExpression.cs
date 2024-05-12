@@ -55,6 +55,12 @@ public class BinaryExpression : Base
                 break;
         }
 
+        if (binExpr.leftHand.type.value != binExpr.rightHand.type.value)
+        {
+            throw GenException.FactoryMethod($"Binary expression has mis-matched  left ({binExpr.leftHand.type.value}) right ({binExpr.rightHand.type.value}) hand types.", "Ensure that the right and left hand expressions have matching types.", binExpr);
+        }
+
+
         if (LLVM.GetTypeKind(rightHand.TypeOf()) == LLVMTypeKind.LLVMIntegerTypeKind)
         {
             intMath = true;

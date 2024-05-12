@@ -88,7 +88,6 @@ public class BinaryExpression : Expression
 
                 //3 * 2 + 4 = 10 (but in reality 18)
                 //4 + 2 * 3 = 10 (but really 10)
-                //
 
                 if (rightBinExpr.binOp.isComparisonOperator()) {
                     rightBinExpr.binOp.reverseComparisonOperator();
@@ -114,6 +113,14 @@ public class BinaryExpression : Expression
                 DebugConsole.Write($"original right hand parent:\n {rightBinExpr.parent}");
             }
         }
+
+        if (this.leftHand.type.value != this.rightHand.type.value)
+        {
+            throw ParserException.FactoryMethod($"Binary expression has mis-matched  left ({this.leftHand.type.value}) right ({this.rightHand.type.value}) hand types.", "Ensure that the right and left hand expressions have matching types.", this);
+        }
+
+        DebugConsole.Write("Setting bin expr type to type of left hand");
+        this.type = this.leftHand.type;
     }
 
     public override void addChild(Node child)
